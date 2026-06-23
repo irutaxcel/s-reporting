@@ -55,5 +55,9 @@ $route['translate_uri_dashes'] = FALSE;
 
 $route['sign-in'] = 'Authentication';
 $route['auth-login'] = 'Authentication/authlogin';
+$route['auth-logout'] = 'Authentication/logout';
 
 $route['main-dashboard'] = 'DashboardController/mainDashboard';
+
+$route['personnel-chantier'] = 'TechController/personeChantier';
+$route['personnel-chantier/store'] = 'TechController/storePersonnelChantier';

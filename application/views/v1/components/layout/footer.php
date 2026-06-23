@@ -1,9 +1,35 @@
+<style>
+.main-footer {
+    border-top: 3px solid #74c476;
+    background: #ffffff;
+    color: #495057;
+    font-size: 14px;
+}
+
+.main-footer strong {
+    color: #173b35;
+}
+
+.main-footer .float-right {
+    color: #6c757d;
+}
+</style>
 <footer class="main-footer">
-    <strong>Copyright &copy; 2014-2021 <a href="https://adminlte.io">AdminLTE.io</a>.</strong>
-    All rights reserved.
+
     <div class="float-right d-none d-sm-inline-block">
-        <b>Version</b> 3.2.0
+        <b>Version</b> 1.0.0
     </div>
+
+    <strong>
+        © <?= date('Y') ?>
+        SATRACO Construction -
+        Construction Management System (CMS)
+    </strong>
+
+    <span class="ml-2 text-muted">
+        Tous droits réservés.
+    </span>
+
 </footer>
 
 <!-- Control Sidebar -->

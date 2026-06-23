@@ -11,4 +11,12 @@ class AuthModel extends CI_Model
             ->get('users')
             ->row();
     }
+
+    public function getRoleName($id_role)
+    {
+        return $this->db
+            ->where('id', $id_role)
+            ->get('roles')
+            ->row()->name;
+    }
 }
