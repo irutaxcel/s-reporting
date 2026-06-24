@@ -1,0 +1,1 @@
+<!-- ici le contenue de la page footer ave un bouton a imprimer -->

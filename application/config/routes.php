@@ -65,3 +65,5 @@ $route['personnel-chantier/store'] = 'TechController/storePersonnelChantier';
 $route['personnel-update'] = 'TechController/personnelUpdate';
 
 $route['personnel-delete/(:num)'] = 'TechController/personnelDelete/$1';
+
+$route['personnel-chantier-print'] = 'TechController/personnelChantierPrint';

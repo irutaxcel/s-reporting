@@ -26,26 +26,39 @@ class TechController extends CI_Controller
             return;
         }
 
-        $title = 'Personnel Chantier';
+        $data['title'] = 'Personnel Chantier';
 
-        $allChantier = $this->tech->getAllChantier();
+        // Semaine actuelle : dimanche -> vendredi
+        if (date('w') == 0) {
+            $data['debut_semaine'] = date('Y-m-d');
+        } else {
+            $data['debut_semaine'] = date('Y-m-d', strtotime('last sunday'));
+        }
 
-        $data['total_chantiers'] = count($allChantier);
+        $data['fin_semaine'] = date('Y-m-d', strtotime($data['debut_semaine'] . ' +5 days'));
 
-        $data['total_personnels'] = $this->tech->countAllPersonnel();
+        // Données principales
+        $data['allChantier'] = $this->tech->getAllChantier();
 
-        $data['montant_total'] = $this->tech->sumAllPersonnel();
+        // Totaux de la semaine actuelle
+        $data['total_chantiers'] = count($data['allChantier']);
+        $data['total_personnels'] = $this->tech->countAllPersonnel(
+            $data['debut_semaine'],
+            $data['fin_semaine']
+        );
 
-        $this->load->view('v1/components/layout/header', ['title' => $title]);
-        $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/technique/personeChantier', [
-            'allChantier'      => $allChantier,
-            'total_chantiers'  => $data['total_chantiers'],
-            'total_personnels' => $data['total_personnels'],
-            'montant_total'    => $data['montant_total'],
-        ]);
-        $this->load->view('v1/components/layout/footer');
+        $data['montant_total'] = $this->tech->sumAllPersonnel(
+            $data['debut_semaine'],
+            $data['fin_semaine']
+        );
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/personeChantier', $data);
+        $this->load->view('v1/components/layout/footer', $data);
     }
+
+
 
     public function storePersonnelChantier()
     {
@@ -143,5 +156,44 @@ class TechController extends CI_Controller
         );
 
         redirect('personnel-chantier');
+    }
+
+    public function personnelChantierPrint()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Personnel Chantier';
+
+        // Semaine actuelle : dimanche -> vendredi
+        if (date('w') == 0) {
+            $data['debut_semaine'] = date('Y-m-d');
+        } else {
+            $data['debut_semaine'] = date('Y-m-d', strtotime('last sunday'));
+        }
+
+        $data['fin_semaine'] = date('Y-m-d', strtotime($data['debut_semaine'] . ' +5 days'));
+
+        // Données principales
+        $data['allChantier'] = $this->tech->getAllChantier();
+
+        // Totaux de la semaine actuelle
+        $data['total_chantiers'] = count($data['allChantier']);
+        $data['total_personnels'] = $this->tech->countAllPersonnel(
+            $data['debut_semaine'],
+            $data['fin_semaine']
+        );
+
+        $data['montant_total'] = $this->tech->sumAllPersonnel(
+            $data['debut_semaine'],
+            $data['fin_semaine']
+        );
+
+
+        $this->load->view('v1/components/layout/header-print', $data);
+        $this->load->view('v1/components/modules/technique/personnelChantierPrint', $data);
+        $this->load->view('v1/components/layout/footer-print', $data);
     }
 }

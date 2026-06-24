@@ -121,11 +121,21 @@
                     </h3>
 
                     <div class="card-tools">
-                        <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalPersonnel">
+                        <div class="btn-group">
 
-                            <i class="fas fa-plus"></i>
-                            Ajouter personnel
-                        </button>
+                            <button class="btn btn-success btn-sm" data-toggle="modal" data-target="#modalPersonnel">
+
+                                <i class="fas fa-plus"></i>
+                                Ajouter personnel
+                            </button>
+
+                            <a href="<?= base_url('personnel-chantier-print') ?>" class="btn btn-primary btn-sm">
+
+                                <i class="fas fa-print"></i>
+                                Imprimer
+                            </a>
+
+                        </div>
                     </div>
                 </div>
 
@@ -386,6 +396,22 @@
 
                     <!-- CHANTIER 1 -->
                     <?php foreach ($allChantier as $chantier) : ?>
+
+                    <?php
+                        $index = 1;
+                        $total_chantier = 0;
+
+                        $personnels = $this->tech->getPersonlChantier(
+                            $chantier->id,
+                            $debut_semaine,
+                            $fin_semaine
+                        );
+
+                        if (empty($personnels)) {
+                            continue;
+                        }
+                        ?>
+
                     <div class="card card-success card-outline mb-4">
 
                         <div class="card-header bg-success">
@@ -395,7 +421,13 @@
 
                             <div class="card-tools">
                                 <span class="badge badge-light">
-                                    12 Personnels
+                                    <?= count($personnels) ?> Personnels
+                                </span>
+
+                                <span class="badge badge-warning ml-2">
+                                    <?= date('d-m-Y', strtotime($debut_semaine)) ?>
+                                    au
+                                    <?= date('d-m-Y', strtotime($fin_semaine)) ?>
                                 </span>
                             </div>
                         </div>
@@ -412,29 +444,23 @@
                                         <th>Montant</th>
                                         <th>Date début</th>
                                         <th>Date fin</th>
+                                        <th>Date saisie</th>
                                         <th class="text-center">Actions</th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
 
-                                    <?php
-                                        $index = 1;
-                                        $total_chantier = 0;
-                                        $personnels = $this->tech->getPersonlChantier($chantier->id);
-                                        ?>
-
                                     <?php foreach ($personnels as $persl) : ?>
 
-                                    <?php $total_chantier += $persl->unit_rate; ?>
+                                    <?php $total_chantier += (float) $persl->unit_rate; ?>
 
                                     <tr>
                                         <td><?= $index++ ?></td>
                                         <td><?= $persl->worker_name ?></td>
                                         <td><?= $persl->function_name ?></td>
-                                        <td>
-                                            <?= number_format($persl->unit_rate, 0, ',', ' ') ?> FBU
-                                        </td>
+                                        <td><?= number_format($persl->unit_rate, 0, ',', ' ') ?> FBU</td>
+
                                         <td>
                                             <?= !empty($persl->start_date) ? date('d-m-Y', strtotime($persl->start_date)) : '-' ?>
                                         </td>
@@ -443,31 +469,31 @@
                                             <?= !empty($persl->end_date) ? date('d-m-Y', strtotime($persl->end_date)) : '-' ?>
                                         </td>
 
+                                        <td>
+                                            <?= !empty($persl->created_at) ? date('d-m-Y H:i', strtotime($persl->created_at)) : '-' ?>
+                                        </td>
+
                                         <td class="text-center">
                                             <button type="button" class="btn btn-info btn-sm">
                                                 <i class="fas fa-eye"></i>
                                             </button>
 
                                             <button type="button" class="btn btn-warning btn-sm" onclick="editPersonnel(
-                                                    '<?= $persl->id ?>',
-                                                    '<?= addslashes($persl->worker_name) ?>',
-                                                    '<?= addslashes($persl->worker_type) ?>',
-                                                    '<?= addslashes($persl->function_name) ?>',
-                                                    '<?= $persl->start_date ?>',
-                                                    '<?= $persl->end_date ?>',
-                                                    '<?= $persl->pay_mode ?>',
-                                                    '<?= $persl->unit_rate ?>'
-                                                )">
-
+                                        '<?= $persl->id ?>',
+                                        '<?= addslashes($persl->worker_name) ?>',
+                                        '<?= addslashes($persl->worker_type) ?>',
+                                        '<?= addslashes($persl->function_name) ?>',
+                                        '<?= $persl->start_date ?>',
+                                        '<?= $persl->end_date ?>',
+                                        '<?= $persl->pay_mode ?>',
+                                        '<?= $persl->unit_rate ?>'
+                                    )">
                                                 <i class="fas fa-edit"></i>
-
                                             </button>
 
                                             <button type="button" class="btn btn-danger btn-sm"
                                                 onclick="deletePersonnel(<?= $persl->id ?>)">
-
                                                 <i class="fas fa-trash"></i>
-
                                             </button>
                                         </td>
                                     </tr>
@@ -478,15 +504,12 @@
                                         <td></td>
                                         <th>Total</th>
                                         <td></td>
-                                        <th>
-                                            <?= number_format($total_chantier, 0, ',', ' ') ?> FBU
-                                        </th>
+                                        <th><?= number_format($total_chantier, 0, ',', ' ') ?> FBU</th>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
-
-
 
                                 </tbody>
 
@@ -495,7 +518,8 @@
                         </div>
 
                     </div>
-                    <?php endforeach ?>
+
+                    <?php endforeach; ?>
 
                     <div class="modal fade" id="editPersonnelModal">
 
