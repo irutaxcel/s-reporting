@@ -61,3 +61,7 @@ $route['main-dashboard'] = 'DashboardController/mainDashboard';
 
 $route['personnel-chantier'] = 'TechController/personeChantier';
 $route['personnel-chantier/store'] = 'TechController/storePersonnelChantier';
+
+$route['personnel-update'] = 'TechController/personnelUpdate';
+
+$route['personnel-delete/(:num)'] = 'TechController/personnelDelete/$1';

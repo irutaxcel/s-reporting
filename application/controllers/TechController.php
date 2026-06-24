@@ -30,9 +30,20 @@ class TechController extends CI_Controller
 
         $allChantier = $this->tech->getAllChantier();
 
+        $data['total_chantiers'] = count($allChantier);
+
+        $data['total_personnels'] = $this->tech->countAllPersonnel();
+
+        $data['montant_total'] = $this->tech->sumAllPersonnel();
+
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/technique/personeChantier', ['allChantier' => $allChantier]);
+        $this->load->view('v1/components/modules/technique/personeChantier', [
+            'allChantier'      => $allChantier,
+            'total_chantiers'  => $data['total_chantiers'],
+            'total_personnels' => $data['total_personnels'],
+            'montant_total'    => $data['montant_total'],
+        ]);
         $this->load->view('v1/components/layout/footer');
     }
 
@@ -94,6 +105,43 @@ class TechController extends CI_Controller
         $this->tech->insertPersonnelChantierBatch($insertData);
 
         $this->session->set_flashdata('success', 'Personnel chantier enregistré avec succès.');
+        redirect('personnel-chantier');
+    }
+
+    public function personnelUpdate()
+    {
+        $id = $this->input->post('id');
+
+        if (empty($id)) {
+            $this->session->set_flashdata('error', 'Personnel introuvable.');
+            redirect('personnel-chantier');
+        }
+
+        $data = [
+            'worker_name'   => $this->input->post('worker_name', TRUE),
+            'worker_type'   => $this->input->post('worker_type', TRUE),
+            'function_name' => $this->input->post('function_name', TRUE),
+            'start_date'    => $this->input->post('start_date') ?: null,
+            'end_date'      => $this->input->post('end_date') ?: null,
+            'pay_mode'      => $this->input->post('pay_mode', TRUE),
+            'unit_rate'     => $this->input->post('unit_rate') ?: 0,
+        ];
+
+        $this->tech->updatePersonnelChantier($id, $data);
+
+        $this->session->set_flashdata('success', 'Personnel modifié avec succès.');
+        redirect('personnel-chantier');
+    }
+
+    public function personnelDelete($id)
+    {
+        $this->tech->deletePersonnelChantier($id);
+
+        $this->session->set_flashdata(
+            'success',
+            'Personnel supprimé avec succès.'
+        );
+
         redirect('personnel-chantier');
     }
 }
