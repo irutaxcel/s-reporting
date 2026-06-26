@@ -91,7 +91,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -130,10 +130,18 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Achats & Approvisionnement') { ?>
+                            <a href="<?= base_url('achat') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Achats</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('achat') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Achats</p>
+                            </a>
+                            <?php } ?>
+
                         </li>
 
                         <li class="nav-item">

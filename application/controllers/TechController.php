@@ -19,6 +19,18 @@ class TechController extends CI_Controller
         $this->load->view('welcome_message');
     }
 
+    public function achatMateriels()
+    {
+        $title = 'Achats & Approvisionnement';
+
+        $allChantiers = $this->tech->getAllChantier();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/technique/achatMateriels', ['allChantiers' => $allChantiers]);
+        $this->load->view('v1/components/layout/footer');
+    }
+
     public function personeChantier()
     {
         if (!$this->session->userdata('user_id')) {

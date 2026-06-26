@@ -180,10 +180,9 @@
             </div>
 
             <div class="company-info">
-                <strong>NIF :</strong> 1002003004005<br>
-                <strong>REGISTRE DE COMMERCE :</strong><br>
-                RCCM/BUJ/2020/B/12345<br>
-                <strong>TÉL :</strong> +257 68 13 13 13<br>
+                <strong>NIF :</strong> 4000070948<br>
+                <strong>R C : </strong>46865<br>
+                <strong>TÉL :</strong> +257 68 13 13 13 / +257 22 24 50 97<br>
                 <strong>EMAIL :</strong> info@satracoconstruction.com<br>
 
                 <button onclick="window.print()" class="print-btn">
@@ -226,7 +225,7 @@
                         <th>Montant</th>
                         <th>Date début</th>
                         <th>Date fin</th>
-                        <th>Date saisie</th>
+                        <!-- <th>Date saisie</th> -->
                     </tr>
                 </thead>
 
@@ -241,7 +240,7 @@
                         <td><?= number_format($persl->unit_rate, 0, ',', ' ') ?> FBU</td>
                         <td><?= !empty($persl->start_date) ? date('d-m-Y', strtotime($persl->start_date)) : '-' ?></td>
                         <td><?= !empty($persl->end_date) ? date('d-m-Y', strtotime($persl->end_date)) : '-' ?></td>
-                        <td><?= !empty($persl->created_at) ? date('d-m-Y H:i', strtotime($persl->created_at)) : '-' ?>
+                        <!-- <td><?= !empty($persl->created_at) ? date('d-m-Y H:i', strtotime($persl->created_at)) : '-' ?> -->
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -272,15 +271,15 @@
             </div>
 
             <div>
-                Tél : +257 68 13 13 13<br>
+                Tél : +257 68 13 13 13 / +257 22 24 50 97<br>
                 Email : info@satracoconstruction.com<br>
                 Site web : https://satracoconstruction.com
             </div>
 
-            <div>
+            <!-- <div>
                 Imprimé le : <?= date('d-m-Y à H:i') ?><br>
                 Page 1 / 1
-            </div>
+            </div> -->
         </div>
 
     </div>

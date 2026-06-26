@@ -479,15 +479,15 @@
                                             </button>
 
                                             <button type="button" class="btn btn-warning btn-sm" onclick="editPersonnel(
-                                        '<?= $persl->id ?>',
-                                        '<?= addslashes($persl->worker_name) ?>',
-                                        '<?= addslashes($persl->worker_type) ?>',
-                                        '<?= addslashes($persl->function_name) ?>',
-                                        '<?= $persl->start_date ?>',
-                                        '<?= $persl->end_date ?>',
-                                        '<?= $persl->pay_mode ?>',
-                                        '<?= $persl->unit_rate ?>'
-                                    )">
+                                                '<?= $persl->id ?>',
+                                                '<?= addslashes($persl->worker_name) ?>',
+                                                '<?= addslashes($persl->worker_type) ?>',
+                                                '<?= addslashes($persl->function_name) ?>',
+                                                '<?= $persl->start_date ?>',
+                                                '<?= $persl->end_date ?>',
+                                                '<?= $persl->pay_mode ?>',
+                                                '<?= $persl->unit_rate ?>'
+                                            )">
                                                 <i class="fas fa-edit"></i>
                                             </button>
 
