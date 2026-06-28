@@ -91,7 +91,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -109,10 +109,18 @@
                     <ul class="nav nav-treeview">
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Projets') { ?>
+                            <a href="<?= base_url('projects') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Projets</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('projects') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Projets</p>
+                            </a>
+                            <?php } ?>
+
                         </li>
 
                         <li class="nav-item">

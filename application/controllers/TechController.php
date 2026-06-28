@@ -19,16 +19,313 @@ class TechController extends CI_Controller
         $this->load->view('welcome_message');
     }
 
+    public function projects()
+    {
+
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Projets';
+
+        $project_ref = $this->tech->generateProjectReference();
+
+        $allProject = $this->tech->getAllProject();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view(
+            'v1/components/modules/technique/projects',
+            ['project_ref' => $project_ref, 'allProject' => $allProject]
+        );
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function project_store()
+    {
+        $data = [
+            'company_id' => 2,
+            'name'       => $this->input->post('name', true),
+            'reference'  => $this->input->post('reference', true),
+            'status'     => $this->input->post('status', true),
+            'created_at' => date('Y-m-d H:i:s')
+        ];
+
+        $insertion = $this->tech->insertProject($data);
+
+        if ($insertion) {
+
+            $this->session->set_flashdata('success', 'Projet enregistré avec succès.');
+        } else {
+            $this->session->set_flashdata('error', 'Erreur de Insertion');
+        }
+        redirect('projects');
+    }
+
+    public function projectEditAjax()
+    {
+        $id = $this->input->post('id');
+
+        $project = $this->tech->getProjectById($id);
+
+        echo json_encode($project);
+    }
+
+    public function projectUpdate()
+    {
+        $id = $this->input->post('id', TRUE);
+
+        $data = [
+            'name'   => $this->input->post('name', TRUE),
+            'status' => $this->input->post('status', TRUE),
+        ];
+
+        if ($this->tech->updateProject($id, $data)) {
+            $this->session->set_flashdata('success', 'Projet modifié avec succès.');
+        } else {
+            $this->session->set_flashdata('error', 'Erreur lors de la modification du projet.');
+        }
+
+        redirect('projects');
+    }
+
+    public function projectDeleteAjax()
+    {
+        $id = $this->input->post('id');
+
+        if ($this->tech->deleteProject($id)) {
+            echo json_encode([
+                'status' => true,
+                'message' => 'Projet supprimé avec succès.'
+            ]);
+        } else {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Impossible de supprimer ce projet.'
+            ]);
+        }
+    }
+
     public function achatMateriels()
     {
+
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $title = 'Achats & Approvisionnement';
 
         $allChantiers = $this->tech->getAllChantier();
 
+        $allAchats = $this->tech->getAllAchats();
+
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/technique/achatMateriels', ['allChantiers' => $allChantiers]);
+        $this->load->view(
+            'v1/components/modules/technique/achatMateriels',
+            [
+                'allChantiers' => $allChantiers,
+                'allAchats'    => $allAchats
+            ]
+        );
         $this->load->view('v1/components/layout/footer');
+    }
+
+    public function store_achat_materiel()
+    {
+        // $this->load->model('TechModel');
+
+        $chantier_id = $this->input->post('chantier_id');
+        $chantier = $this->tech->getChantierById($chantier_id);
+        $demande_par    = $this->input->post('demande_par');
+        $charge_achat   = $this->input->post('charge_achat');
+        $verifie_par    = $this->input->post('verifie_par');
+        $total_general  = $this->input->post('total_general');
+
+        $articles       = $this->input->post('article');
+        $quantites      = $this->input->post('quantite');
+        $prix_unitaires = $this->input->post('prix_unitaire');
+        $totaux_lignes  = $this->input->post('total_ligne');
+
+        $data_form = [
+
+            'company_id'            => 2,
+
+            'chantier_id'           => $chantier->id,
+
+            'destination_chantier'  => $chantier->name,
+
+            'requested_by'          => $demande_par,
+
+            'buyer_name'            => $charge_achat,
+
+            'category_type'         => 'chantier',
+
+            'requires_validation'   => 1,
+
+            'total_amount'          => $total_general,
+
+            'verified_by'           => $verifie_par,
+
+            'technical_approver'    => 'Directeur Technique',
+
+            'financial_approver'    => 'Directrice Administrative et Financière',
+
+            'dg_approver'           => 'Directeur Général',
+
+            'treasurer_name'        => 'Trésorier',
+
+            'verifier_status'       => 'en_attente',
+
+            'technical_status'      => 'en_attente',
+
+            'financial_status'      => 'en_attente',
+
+            'dg_status'             => 'en_attente',
+
+            'treasury_status'       => 'en_attente',
+
+            'request_date'          => date('Y-m-d'),
+
+            'workflow_status'       => 'en_attente',
+
+            'created_by'           => $this->session->userdata('user_id'),
+
+            'created_at'            => date('Y-m-d H:i:s')
+
+        ];
+
+        $insert = $this->tech->insert_achat_materiel_form(
+            $data_form,
+            $articles,
+            $quantites,
+            $prix_unitaires,
+            $totaux_lignes
+        );
+
+        if ($insert) {
+            $this->session->set_flashdata('success', 'Demande d’achat enregistrée avec succès.');
+        } else {
+            $this->session->set_flashdata('error', 'Erreur lors de l’enregistrement.');
+        }
+
+        redirect($_SERVER['HTTP_REFERER']);
+    }
+
+    public function valider_achat()
+    {
+        // $this->load->model('TechModel');
+
+        $id    = $this->input->post('id');
+        $champ = $this->input->post('champ');
+
+        $champs_autorises = [
+            'technical_status',
+            'financial_status',
+            'treasury_status'
+        ];
+
+        if (!in_array($champ, $champs_autorises)) {
+            echo json_encode(['status' => 'error']);
+            return;
+        }
+
+        $update = $this->tech->validerAchat($id, $champ);
+
+        echo json_encode([
+            'status' => $update ? 'success' : 'error'
+        ]);
+    }
+
+    public function get_achat_materiel($id)
+    {
+        $this->load->model('TechModel');
+
+        $achat = $this->TechModel->getAchatById($id);
+        $items = $this->TechModel->getAchatItems($id);
+
+        echo json_encode([
+            'achat' => $achat,
+            'items' => $items
+        ]);
+    }
+
+    public function update_achat_materiel()
+    {
+        $this->load->model('TechModel');
+
+        $id            = $this->input->post('id');
+        $chantier_id   = $this->input->post('chantier_id');
+        $demande_par   = $this->input->post('demande_par');
+        $charge_achat  = $this->input->post('charge_achat');
+        $verifie_par   = $this->input->post('verifie_par');
+        $total_general = $this->input->post('total_general');
+
+        $chantier = $this->TechModel->getChantierById($chantier_id);
+
+        $data_form = [
+            'chantier_id'           => $chantier_id,
+            'destination_chantier'  => $chantier ? $chantier->name : '',
+            'requested_by'          => $demande_par,
+            'buyer_name'            => $charge_achat,
+            'total_amount'          => $total_general,
+            'verified_by'           => $verifie_par
+        ];
+
+        $articles       = $this->input->post('article');
+        $quantites      = $this->input->post('quantite');
+        $prix_unitaires = $this->input->post('prix_unitaire');
+        $totaux_lignes  = $this->input->post('total_ligne');
+
+        $update = $this->TechModel->updateAchatMateriel(
+            $id,
+            $data_form,
+            $articles,
+            $quantites,
+            $prix_unitaires,
+            $totaux_lignes
+        );
+
+        $this->session->set_flashdata(
+            $update ? 'success' : 'error',
+            $update ? 'Demande modifiée avec succès.' : 'Erreur lors de la modification.'
+        );
+
+        redirect($_SERVER['HTTP_REFERER']);
+    }
+
+    public function delete_achat_materiel()
+    {
+        $this->load->model('TechModel');
+
+        $id = $this->input->post('id');
+
+        $delete = $this->TechModel->deleteAchatMateriel($id);
+
+        echo json_encode([
+            'status' => $delete ? 'success' : 'error'
+        ]);
+    }
+
+    public function print_achat($id)
+    {
+        $achat = $this->tech->getAchatById($id);
+
+        $articles = $this->tech->getAchatItems($id);
+
+        $this->load->view('v1/components/layout/header-print');
+
+        $this->load->view(
+            'v1/components/modules/technique/achatPrint',
+            [
+                'achat' => $achat,
+                'articles' => $articles
+            ]
+        );
+
+        $this->load->view('v1/components/layout/footer-print');
     }
 
     public function personeChantier()

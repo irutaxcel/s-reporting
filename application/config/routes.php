@@ -69,3 +69,20 @@ $route['personnel-delete/(:num)'] = 'TechController/personnelDelete/$1';
 $route['personnel-chantier-print'] = 'TechController/personnelChantierPrint';
 
 $route['achat'] = 'TechController/achatMateriels';
+
+$route['tech/store_achat_materiel'] = 'TechController/store_achat_materiel';
+
+$route['tech/valider-achat'] = 'TechController/valider_achat';
+
+$route['tech/get-achat-materiel/(:num)'] = 'TechController/get_achat_materiel/$1';
+$route['tech/update-achat-materiel'] = 'TechController/update_achat_materiel';
+
+$route['tech/delete-achat-materiel'] = 'TechController/delete_achat_materiel';
+
+$route['tech/print-achat/(:num)'] = 'TechController/print_achat/$1';
+
+$route['projects'] = 'TechController/projects';
+$route['tech/project-store'] = 'TechController/project_store';
+$route['tech/project-edit-ajax'] = 'TechController/projectEditAjax';
+$route['tech/project-update'] = 'TechController/projectUpdate';
+$route['tech/project-delete-ajax'] = 'TechController/projectDeleteAjax';
