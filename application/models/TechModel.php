@@ -301,4 +301,66 @@ class TechModel extends CI_Model
             ->where('id', $id)
             ->delete('projects');
     }
+
+    public function generateChantierReference()
+    {
+        $this->db->select('ref_chantier');
+        $this->db->from('chantiers');
+        $this->db->order_by('id', 'DESC');
+        $this->db->limit(1);
+
+        $query = $this->db->get();
+
+        if ($query->num_rows() > 0) {
+
+            $last = $query->row()->ref_chantier;
+
+            $number = intval(substr($last, -3));
+
+            $number++;
+        } else {
+
+            $number = 1;
+        }
+
+        return 'CH-' . date('Y') . '-' . str_pad($number, 3, '0', STR_PAD_LEFT);
+    }
+
+    public function insertChantier($data)
+    {
+        return $this->db->insert('chantiers', $data);
+    }
+
+    public function getAllChantiers()
+    {
+        $this->db->select('
+            chantiers.*,
+            projects.name AS project_name
+        ');
+
+        $this->db->from('chantiers');
+
+        $this->db->join(
+            'projects',
+            'projects.id = chantiers.project_id',
+            'left'
+        );
+
+        $this->db->order_by('chantiers.id', 'DESC');
+
+        return $this->db->get()->result();
+    }
+
+    public function updateChantier($id, $data)
+    {
+        $this->db->where('id', $id);
+        return $this->db->update('chantiers', $data);
+    }
+
+    public function deleteChantier($id)
+    {
+        $this->db->where('id', $id);
+
+        return $this->db->delete('chantiers');
+    }
 }

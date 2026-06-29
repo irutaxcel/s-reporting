@@ -107,6 +107,141 @@ class TechController extends CI_Controller
         }
     }
 
+    public function chantiers()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Chantiers & exécution';
+
+        $allProject = $this->tech->getAllProject();
+
+        $reference = $this->tech->generateChantierReference();
+
+        $allChantier = $this->tech->getAllChantiers();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view(
+            'v1/components/modules/technique/chantiers',
+            ['allProject' => $allProject, 'reference' => $reference, 'allChantier' => $allChantier]
+        );
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function storeChantier()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $data = [
+            'company_id'       => 2, // ou $this->session->userdata('company_id')
+            'project_id'       => $this->input->post('projet_id'),
+            'ref_chantier'     => $this->input->post('reference'),
+            'name'             => $this->input->post('nom_chantier'),
+            'chef_chantier'    => $this->input->post('chef_chantier'),
+            'location'         => $this->input->post('localisation'),
+            'budget'           => $this->input->post('budget') ?: 0,
+            'date_debut'       => $this->input->post('date_debut') ?: null,
+            'date_fin_prevue'  => $this->input->post('date_fin_prevue') ?: null,
+            'status'           => $this->input->post('etat'),
+            'created_at'       => date('Y-m-d H:i:s')
+        ];
+
+        $insert = $this->tech->insertChantier($data);
+
+        if ($insert) {
+            $this->session->set_flashdata('success', 'Chantier enregistré avec succès.');
+        } else {
+            $this->session->set_flashdata('error', 'Erreur lors de l’enregistrement du chantier.');
+        }
+
+        redirect('chantiers');
+    }
+
+    public function getChantier()
+    {
+        $id = $this->input->post('id');
+
+        $this->load->model('TechModel', 'tech');
+
+        echo json_encode(
+            $this->tech->getChantierById($id)
+        );
+    }
+
+    public function updateChantier()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $id = $this->input->post('id');
+
+        $data = [
+            'project_id'      => $this->input->post('projet_id'),
+            'ref_chantier'    => $this->input->post('reference'),
+            'name'            => $this->input->post('nom_chantier'),
+            'chef_chantier'   => $this->input->post('chef_chantier'),
+            'location'        => $this->input->post('localisation'),
+            'budget'          => $this->input->post('budget') ?: 0,
+            'date_debut'      => $this->input->post('date_debut') ?: null,
+            'date_fin_prevue' => $this->input->post('date_fin_prevue') ?: null,
+            'status'          => $this->input->post('etat')
+        ];
+
+        $update = $this->tech->updateChantier($id, $data);
+
+        if ($update) {
+            $this->session->set_flashdata('success', 'Chantier modifié avec succès.');
+        } else {
+            $this->session->set_flashdata('error', 'Aucune modification effectuée ou erreur.');
+        }
+
+        redirect('chantiers');
+    }
+
+
+    public function deleteChantierAjax()
+    {
+        $id = $this->input->post('id');
+
+        $this->load->model('TechModel', 'tech');
+
+        if ($this->tech->deleteChantier($id)) {
+
+            echo json_encode([
+                'status' => true,
+                'message' => 'Chantier supprimé avec succès.'
+            ]);
+        } else {
+
+            echo json_encode([
+                'status' => false,
+                'message' => 'Erreur lors de la suppression.'
+            ]);
+        }
+    }
+
+    public function subTraitant()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Sous-traitants';
+
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view(
+            'v1/components/modules/technique/subTraitant',
+
+        );
+        $this->load->view('v1/components/layout/footer');
+    }
+
     public function achatMateriels()
     {
 

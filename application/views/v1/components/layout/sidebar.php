@@ -91,7 +91,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -124,10 +124,18 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Chantiers & exécution') { ?>
+                            <a href="<?= base_url('chantiers') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Chantiers</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('chantiers') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Chantiers</p>
+                            </a>
+                            <?php } ?>
+
                         </li>
 
                         <li class="nav-item">
@@ -160,10 +168,19 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Sous-traitants') { ?>
+                            <a href="<?= base_url('sous-traitant') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Sous Traitant</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('sous-traitant') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Sous Traitant</p>
+                            </a>
+                            <?php }
+                                ?>
+
                         </li>
 
                         <li class="nav-item">

@@ -289,9 +289,9 @@
                                     <tr>
                                         <th>Réf.</th>
                                         <th>Projet</th>
-                                        <th>Client</th>
-                                        <th>Chef Projet</th>
-                                        <th>Budget</th>
+                                        <!-- <th>Client</th>
+                                        <th>Chef Projet</th> -->
+                                        <!-- <th>Budget</th> -->
                                         <th>Avancement</th>
                                         <th>Début</th>
                                         <th>Fin prévue</th>
@@ -321,19 +321,19 @@
                                         </td>
 
                                         <!-- Client -->
-                                        <td>
+                                        <!-- <td>
                                             -
-                                        </td>
+                                        </td> -->
 
                                         <!-- Chef Projet -->
-                                        <td>
+                                        <!-- <td>
                                             -
-                                        </td>
+                                        </td> -->
 
                                         <!-- Budget -->
-                                        <td>
+                                        <!-- <td>
                                             -
-                                        </td>
+                                        </td> -->
 
                                         <!-- Avancement -->
                                         <td width="180">

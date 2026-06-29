@@ -86,3 +86,12 @@ $route['tech/project-store'] = 'TechController/project_store';
 $route['tech/project-edit-ajax'] = 'TechController/projectEditAjax';
 $route['tech/project-update'] = 'TechController/projectUpdate';
 $route['tech/project-delete-ajax'] = 'TechController/projectDeleteAjax';
+
+$route['chantiers'] = 'TechController/chantiers';
+
+$route['chantier-store'] = 'TechController/storeChantier';
+$route['chantier-edit-ajax'] = 'TechController/getChantier';
+$route['chantier-update'] = 'TechController/updateChantier';
+$route['chantier-delete-ajax'] = 'TechController/deleteChantierAjax';
+
+$route['sous-traitant'] = 'TechController/subTraitant';
