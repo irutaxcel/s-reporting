@@ -242,6 +242,27 @@ class TechController extends CI_Controller
         $this->load->view('v1/components/layout/footer');
     }
 
+    public function store_subcontractor()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $data = array(
+            'company_id'    => $this->input->post('company_id'),
+            'name'          => $this->input->post('name'),
+            'contact_name'  => $this->input->post('contact_name'),
+            'specialty'    => $this->input->post('speciality'),
+            'phone'         => $this->input->post('phone'),
+            'email'         => $this->input->post('email'),
+            'status'        => $this->input->post('status'),
+            'created_at'    => date('Y-m-d H:i:s')
+        );
+
+        $this->tech->insert_subcontractor($data);
+
+        $this->session->set_flashdata('success', 'Sous-traitant enregistré avec succès.');
+        redirect($_SERVER['HTTP_REFERER']);
+    }
+
     public function achatMateriels()
     {
 

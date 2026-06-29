@@ -95,3 +95,4 @@ $route['chantier-update'] = 'TechController/updateChantier';
 $route['chantier-delete-ajax'] = 'TechController/deleteChantierAjax';
 
 $route['sous-traitant'] = 'TechController/subTraitant';
+$route['subcontractor-store'] = 'TechController/store_subcontractor';

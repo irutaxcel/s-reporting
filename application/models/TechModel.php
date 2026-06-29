@@ -363,4 +363,9 @@ class TechModel extends CI_Model
 
         return $this->db->delete('chantiers');
     }
+
+    public function insert_subcontractor($data)
+    {
+        return $this->db->insert('subcontractors', $data);
+    }
 }
