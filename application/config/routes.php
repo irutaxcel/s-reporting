@@ -96,3 +96,11 @@ $route['chantier-delete-ajax'] = 'TechController/deleteChantierAjax';
 
 $route['sous-traitant'] = 'TechController/subTraitant';
 $route['subcontractor-store'] = 'TechController/store_subcontractor';
+$route['subcontractor-update'] = 'TechController/update_subcontractor';
+$route['subcontractor-delete/(:num)'] = 'TechController/delete_subcontractor/$1';
+
+$route['stock-general'] = 'TechController/stockGeneral';
+
+$route['stock-article-store'] = 'TechController/stockArticleStore';
+$route['stock-emplacement-store'] = 'TechController/stockEmplacementStore';
+$route['stock-quantite-store'] = 'TechController/stockQuantiteStore';

@@ -202,249 +202,97 @@
 
                             <tbody>
 
-                                <tr>
-                                    <td>1</td>
-                                    <td><strong>TUYISENGE</strong></td>
-                                    <td>Dieudonné</td>
-                                    <td><span class="badge badge-light border">Charpentier</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 62987670</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 09:10</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('TUYISENGE','Dieudonné','Charpentier','62987670','-','Actif','08/05/2026 09:10')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('TUYISENGE','Dieudonné','Charpentier','62987670','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                <?php $i = 1; ?>
+
+                                <?php foreach ($allSubTraitant as $item) { ?>
 
                                 <tr>
-                                    <td>2</td>
-                                    <td><strong>NDABARUSHIMANA</strong></td>
-                                    <td>Jean de Dieu</td>
-                                    <td><span class="badge badge-light border">Ferrailleur</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 68155404</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 10:44</td>
+
+                                    <td><?= $i++ ?></td>
+
+                                    <td>
+                                        <strong><?= $item->name ?></strong>
+                                    </td>
+
+                                    <td><?= $item->contact_name ?></td>
+
+                                    <td>
+                                        <span class="badge badge-light border">
+                                            <?= $item->specialty ?>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <i class="fas fa-phone text-success"></i>
+                                        <?= $item->phone ?>
+                                    </td>
+
+                                    <td>
+
+                                        <?php if (!empty($item->email)) { ?>
+
+                                        <?= $item->email ?>
+
+                                        <?php } else { ?>
+
+                                        -
+
+                                        <?php } ?>
+
+                                    </td>
+
+                                    <td>
+
+                                        <?php if ($item->status == 'active') { ?>
+
+                                        <span class="badge badge-success">
+                                            Actif
+                                        </span>
+
+                                        <?php } else { ?>
+
+                                        <span class="badge badge-danger">
+                                            Inactif
+                                        </span>
+
+                                        <?php } ?>
+
+                                    </td>
+
+                                    <td>
+                                        <?= date('d/m/Y H:i', strtotime($item->created_at)) ?>
+                                    </td>
+
                                     <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('NDABARUSHIMANA','Jean de Dieu','Ferrailleur','68155404','-','Actif','08/05/2026 10:44')">
+
+                                        <button class="btn btn-info btn-sm">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('NDABARUSHIMANA','Jean de Dieu','Ferrailleur','68155404','','active')">
+
+                                        <button type="button" class="btn btn-warning btn-sm" onclick="editSubTraitant(
+                                                    '<?= $item->id ?>',
+                                                    '<?= htmlspecialchars($item->name, ENT_QUOTES) ?>',
+                                                    '<?= htmlspecialchars($item->contact_name, ENT_QUOTES) ?>',
+                                                    '<?= htmlspecialchars($item->specialty, ENT_QUOTES) ?>',
+                                                    '<?= htmlspecialchars($item->phone, ENT_QUOTES) ?>',
+                                                    '<?= htmlspecialchars($item->email, ENT_QUOTES) ?>',
+                                                    '<?= htmlspecialchars($item->status, ENT_QUOTES) ?>'
+                                                )">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
+
+                                        <button type="button" class="btn btn-danger btn-sm"
+                                            onclick="deleteSubTraitant('<?= $item->id ?>')">
+
                                             <i class="fas fa-trash"></i>
+
                                         </button>
+
                                     </td>
+
                                 </tr>
 
-                                <tr>
-                                    <td>3</td>
-                                    <td><strong>NDARUBAYEMWO</strong></td>
-                                    <td>Willerme</td>
-                                    <td><span class="badge badge-light border">Maçonnerie et travaux
-                                            complémentaires</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 69514162</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 10:47</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('NDARUBAYEMWO','Willerme','Maçonnerie et travaux complémentaires','69514162','-','Actif','08/05/2026 10:47')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('NDARUBAYEMWO','Willerme','Maçonnerie et travaux complémentaires','69514162','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>4</td>
-                                    <td><strong>HABONIMANA</strong></td>
-                                    <td>Moise</td>
-                                    <td><span class="badge badge-light border">Soudeur</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 61222737</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 10:50</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('HABONIMANA','Moise','Soudeur','61222737','-','Actif','08/05/2026 10:50')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('HABONIMANA','Moise','Soudeur','61222737','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>5</td>
-                                    <td><strong>CISHAHAYO Elie Moses</strong></td>
-                                    <td>Elie Moses</td>
-                                    <td><span class="badge badge-light border">Électricien</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 69980120</td>
-                                    <td>elie.moses@email.com</td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 11:47</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('CISHAHAYO Elie Moses','Elie Moses','Électricien','69980120','elie.moses@email.com','Actif','08/05/2026 11:47')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('CISHAHAYO Elie Moses','Elie Moses','Électricien','69980120','elie.moses@email.com','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>6</td>
-                                    <td><strong>NIYINDAMUTSA</strong></td>
-                                    <td>Adelin</td>
-                                    <td><span class="badge badge-light border">Plombier</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 71856908</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 11:48</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('NIYINDAMUTSA','Adelin','Plombier','71856908','-','Actif','08/05/2026 11:48')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('NIYINDAMUTSA','Adelin','Plombier','71856908','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>7</td>
-                                    <td><strong>HATUNGIMANA</strong></td>
-                                    <td>Vincent</td>
-                                    <td><span class="badge badge-light border">Maçonnerie et travaux
-                                            complémentaires</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 61415334</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 11:49</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('HATUNGIMANA','Vincent','Maçonnerie et travaux complémentaires','61415334','-','Actif','08/05/2026 11:49')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('HATUNGIMANA','Vincent','Maçonnerie et travaux complémentaires','61415334','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>8</td>
-                                    <td><strong>NDUWIMANA</strong></td>
-                                    <td>Claude</td>
-                                    <td><span class="badge badge-light border">Maçonnerie et travaux
-                                            complémentaires</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 66584017</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 11:51</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('NDUWIMANA','Claude','Maçonnerie et travaux complémentaires','66584017','-','Actif','08/05/2026 11:51')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('NDUWIMANA','Claude','Maçonnerie et travaux complémentaires','66584017','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>9</td>
-                                    <td><strong>KWIZERA</strong></td>
-                                    <td>Simeon</td>
-                                    <td><span class="badge badge-light border">Peintre</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 72134633</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 11:53</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('KWIZERA','Simeon','Peintre','72134633','-','Actif','08/05/2026 11:53')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('KWIZERA','Simeon','Peintre','72134633','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>10</td>
-                                    <td><strong>NSHIMIRIMANA</strong></td>
-                                    <td>Dismas</td>
-                                    <td><span class="badge badge-light border">Carreleur et travaux divers
-                                            maçonnerie</span></td>
-                                    <td><i class="fas fa-phone text-success"></i> 68180628</td>
-                                    <td><span class="text-muted">-</span></td>
-                                    <td><span class="badge badge-success">Actif</span></td>
-                                    <td>08/05/2026 11:55</td>
-                                    <td class="text-center">
-                                        <button class="btn btn-info btn-sm"
-                                            onclick="viewSubcontractor('NSHIMIRIMANA','Dismas','Carreleur et travaux divers maçonnerie','68180628','-','Actif','08/05/2026 11:55')">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <button class="btn btn-warning btn-sm"
-                                            onclick="editSubcontractor('NSHIMIRIMANA','Dismas','Carreleur et travaux divers maçonnerie','68180628','','active')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-danger btn-sm" onclick="deleteSubcontractor()">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                                <?php } ?>
 
                             </tbody>
                         </table>
@@ -553,10 +401,12 @@
     </div>
 
     <!-- Modal Modification -->
-    <div class="modal fade" id="editSubcontractorModal">
+    <div class="modal fade" id="editSubTraitantModal">
         <div class="modal-dialog modal-lg">
 
-            <form action="#" method="post">
+            <form action="<?= base_url('subcontractor-update') ?>" method="post">
+
+                <input type="hidden" name="id" id="edit_id">
 
                 <div class="modal-content">
 
@@ -578,42 +428,43 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Entreprise / Nom *</label>
-                                    <input type="text" id="edit_name" class="form-control">
+                                    <input type="text" name="name" id="edit_name" class="form-control" required>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Nom du responsable</label>
-                                    <input type="text" id="edit_contact_name" class="form-control">
+                                    <input type="text" name="contact_name" id="edit_contact_name" class="form-control">
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Spécialité *</label>
-                                    <input type="text" id="edit_speciality" class="form-control">
+                                    <input type="text" name="speciality" id="edit_speciality" class="form-control"
+                                        required>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Téléphone</label>
-                                    <input type="text" id="edit_phone" class="form-control">
+                                    <input type="text" name="phone" id="edit_phone" class="form-control">
                                 </div>
                             </div>
 
                             <div class="col-md-8">
                                 <div class="form-group">
                                     <label>Email</label>
-                                    <input type="email" id="edit_email" class="form-control">
+                                    <input type="email" name="email" id="edit_email" class="form-control">
                                 </div>
                             </div>
 
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label>Statut</label>
-                                    <select id="edit_status" class="form-control">
+                                    <select name="status" id="edit_status" class="form-control">
                                         <option value="active">Actif</option>
                                         <option value="inactive">Inactif</option>
                                     </select>
@@ -629,7 +480,7 @@
                             Annuler
                         </button>
 
-                        <button type="button" class="btn btn-warning">
+                        <button type="submit" class="btn btn-warning">
                             <i class="fas fa-save"></i>
                             Modifier
                         </button>
@@ -641,6 +492,20 @@
 
         </div>
     </div>
+
+    <script>
+    function editSubTraitant(id, name, contact_name, speciality, phone, email, status) {
+        $('#edit_id').val(id);
+        $('#edit_name').val(name);
+        $('#edit_contact_name').val(contact_name);
+        $('#edit_speciality').val(speciality);
+        $('#edit_phone').val(phone);
+        $('#edit_email').val(email);
+        $('#edit_status').val(status);
+
+        $('#editSubTraitantModal').modal('show');
+    }
+    </script>
 
     <!-- Modal Voir -->
     <div class="modal fade" id="viewSubcontractorModal">
@@ -705,54 +570,40 @@
         </div>
     </div>
 
-    <script>
-    function editSubcontractor(name, contactName, speciality, phone, email, status) {
-        $('#edit_name').val(name);
-        $('#edit_contact_name').val(contactName);
-        $('#edit_speciality').val(speciality);
-        $('#edit_phone').val(phone);
-        $('#edit_email').val(email);
-        $('#edit_status').val(status);
 
-        $('#editSubcontractorModal').modal('show');
-    }
-
-    function viewSubcontractor(name, contactName, speciality, phone, email, status, createdAt) {
-        $('#view_name').text(name);
-        $('#view_contact_name').text(contactName);
-        $('#view_speciality').text(speciality);
-        $('#view_phone').text(phone);
-        $('#view_email').text(email);
-        $('#view_status').html('<span class="badge badge-success">' + status + '</span>');
-        $('#view_created_at').text(createdAt);
-
-        $('#viewSubcontractorModal').modal('show');
-    }
-
-    function deleteSubcontractor() {
-        Swal.fire({
-            title: 'Confirmation',
-            text: 'Voulez-vous vraiment supprimer ce sous-traitant ?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Oui, supprimer',
-            cancelButtonText: 'Annuler'
-        });
-    }
-
-    $(function() {
-        $('#subcontractorsTable').DataTable({
-            responsive: true,
-            lengthChange: true,
-            autoWidth: false,
-            language: {
-                url: "//cdn.datatables.net/plug-ins/1.10.24/i18n/French.json"
-            }
-        });
-    });
-    </script>
-    <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function deleteSubTraitant(id) {
+    Swal.fire({
+
+        title: 'Supprimer le sous-traitant ?',
+
+        text: "Cette action est irréversible.",
+
+        icon: 'warning',
+
+        showCancelButton: true,
+
+        confirmButtonColor: '#d33',
+
+        cancelButtonColor: '#6c757d',
+
+        confirmButtonText: 'Oui, supprimer',
+
+        cancelButtonText: 'Annuler'
+
+    }).then((result) => {
+
+        if (result.isConfirmed) {
+
+            window.location.href = "<?= base_url('subcontractor-delete/') ?>" + id;
+
+        }
+
+    });
+
+}
+</script>

@@ -1,21 +1,21 @@
 <style>
-.brand-link {
-    border-bottom: 1px solid rgba(255, 255, 255, .1);
-}
+    .brand-link {
+        border-bottom: 1px solid rgba(255, 255, 255, .1);
+    }
 
-.brand-link .brand-image {
-    max-height: 40px;
-    width: 40px;
-    object-fit: contain;
-    background: #fff;
-    padding: 3px;
-}
+    .brand-link .brand-image {
+        max-height: 40px;
+        width: 40px;
+        object-fit: contain;
+        background: #fff;
+        padding: 3px;
+    }
 
-.brand-link .brand-text {
-    color: #ffffff;
-    font-size: 18px;
-    font-weight: 700 !important;
-}
+    .brand-link .brand-text {
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 700 !important;
+    }
 </style>
 
 <!-- Main Sidebar Container -->
@@ -91,12 +91,12 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants') { ?>
-                <li class="nav-item menu-open">
-                    <a href="#" class="nav-link active">
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks') { ?>
+                    <li class="nav-item menu-open">
+                        <a href="#" class="nav-link active">
                         <?php } else { ?>
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
                         <?php } ?>
 
                         <i class="nav-icon fas fa-hard-hat"></i>
@@ -104,288 +104,296 @@
                             Direction Technique
                             <i class="right fas fa-angle-left"></i>
                         </p>
-                    </a>
+                        </a>
 
-                    <ul class="nav nav-treeview">
+                        <ul class="nav nav-treeview">
 
-                        <li class="nav-item">
-                            <?php if ($title == 'Projets') { ?>
-                            <a href="<?= base_url('projects') ?>" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Projets</p>
-                            </a>
-                            <?php } else { ?>
-                            <a href="<?= base_url('projects') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Projets</p>
-                            </a>
-                            <?php } ?>
+                            <li class="nav-item">
+                                <?php if ($title == 'Projets') { ?>
+                                    <a href="<?= base_url('projects') ?>" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Projets</p>
+                                    </a>
+                                <?php } else { ?>
+                                    <a href="<?= base_url('projects') ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Projets</p>
+                                    </a>
+                                <?php } ?>
 
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <?php if ($title == 'Chantiers & exécution') { ?>
-                            <a href="<?= base_url('chantiers') ?>" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Chantiers</p>
-                            </a>
-                            <?php } else { ?>
-                            <a href="<?= base_url('chantiers') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Chantiers</p>
-                            </a>
-                            <?php } ?>
+                            <li class="nav-item">
+                                <?php if ($title == 'Chantiers & exécution') { ?>
+                                    <a href="<?= base_url('chantiers') ?>" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Chantiers</p>
+                                    </a>
+                                <?php } else { ?>
+                                    <a href="<?= base_url('chantiers') ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Chantiers</p>
+                                    </a>
+                                <?php } ?>
 
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Demandes d'achat</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Demandes d'achat</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <?php if ($title == 'Achats & Approvisionnement') { ?>
-                            <a href="<?= base_url('achat') ?>" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Achats</p>
-                            </a>
-                            <?php } else { ?>
-                            <a href="<?= base_url('achat') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Achats</p>
-                            </a>
-                            <?php } ?>
+                            <li class="nav-item">
+                                <?php if ($title == 'Achats & Approvisionnement') { ?>
+                                    <a href="<?= base_url('achat') ?>" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Achats</p>
+                                    </a>
+                                <?php } else { ?>
+                                    <a href="<?= base_url('achat') ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Achats</p>
+                                    </a>
+                                <?php } ?>
 
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Fournisseurs</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Fournisseurs</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <?php if ($title == 'Sous-traitants') { ?>
-                            <a href="<?= base_url('sous-traitant') ?>" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Sous Traitant</p>
-                            </a>
-                            <?php } else { ?>
-                            <a href="<?= base_url('sous-traitant') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Sous Traitant</p>
-                            </a>
-                            <?php }
+                            <li class="nav-item">
+                                <?php if ($title == 'Sous-traitants') { ?>
+                                    <a href="<?= base_url('sous-traitant') ?>" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Sous Traitant</p>
+                                    </a>
+                                <?php } else { ?>
+                                    <a href="<?= base_url('sous-traitant') ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Sous Traitant</p>
+                                    </a>
+                                <?php }
                                 ?>
 
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Stocks</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <?php if ($title == 'Stocks') { ?>
+                                    <a href="<?= base_url('stock-general') ?>" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Stocks</p>
+                                    </a>
+                                <?php } else { ?>
+                                    <a href="<?= base_url('stock-general') ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Stocks</p>
+                                    </a>
+                                <?php } ?>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Engin & Materiel</p>
-                            </a>
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Maintenance & Carburant</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Engin & Materiel</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Journal Production</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Maintenance & Carburant</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Cout Reelle & Rentebilite</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Journal Production</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Evaluation Chantier</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Cout Reelle & Rentebilite</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <?php if ($title == 'Personnel Chantier') { ?>
-                            <a href="<?= base_url('personnel-chantier') ?>" class="nav-link active">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Personnel Chantier</p>
-                            </a>
-                            <?php } else { ?>
-                            <a href="<?= base_url('personnel-chantier') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Personnel Chantier</p>
-                            </a>
-                            <?php } ?>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Evaluation Chantier</p>
+                                </a>
+                            </li>
 
-                        </li>
+                            <li class="nav-item">
+                                <?php if ($title == 'Personnel Chantier') { ?>
+                                    <a href="<?= base_url('personnel-chantier') ?>" class="nav-link active">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Personnel Chantier</p>
+                                    </a>
+                                <?php } else { ?>
+                                    <a href="<?= base_url('personnel-chantier') ?>" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Personnel Chantier</p>
+                                    </a>
+                                <?php } ?>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Pointage</p>
-                            </a>
-                        </li>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Ordre service</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Pointage</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Ordre service</p>
+                                </a>
+                            </li>
 
-                <!-- FINANCE -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-money-bill-wave"></i>
-                        <p>
-                            DAF / Finance
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                        </ul>
+                    </li>
 
-                    <ul class="nav nav-treeview">
+                    <!-- FINANCE -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-money-bill-wave"></i>
+                            <p>
+                                DAF / Finance
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Trésorerie</p>
-                            </a>
-                        </li>
+                        <ul class="nav nav-treeview">
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Factures & Paiements</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Trésorerie</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Budgets</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Factures & Paiements</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Budgets</p>
+                                </a>
+                            </li>
 
-                <!-- RH -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-users"></i>
-                        <p>
-                            Ressources Humaines
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                        </ul>
+                    </li>
 
-                    <ul class="nav nav-treeview">
+                    <!-- RH -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-users"></i>
+                            <p>
+                                Ressources Humaines
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Employés</p>
-                            </a>
-                        </li>
+                        <ul class="nav nav-treeview">
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Paie</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Employés</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Paie</p>
+                                </a>
+                            </li>
 
-                <!-- CRM -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-handshake"></i>
-                        <p>
-                            CRM & Clients
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                        </ul>
+                    </li>
 
-                    <ul class="nav nav-treeview">
+                    <!-- CRM -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-handshake"></i>
+                            <p>
+                                CRM & Clients
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Clients</p>
-                            </a>
-                        </li>
+                        <ul class="nav nav-treeview">
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Devis</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Clients</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Devis</p>
+                                </a>
+                            </li>
 
-                <!-- ADMIN -->
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-cogs"></i>
-                        <p>
-                            Administration
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
+                        </ul>
+                    </li>
 
-                    <ul class="nav nav-treeview">
+                    <!-- ADMIN -->
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-cogs"></i>
+                            <p>
+                                Administration
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Utilisateurs</p>
-                            </a>
-                        </li>
+                        <ul class="nav nav-treeview">
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Rôles & Permissions</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Utilisateurs</p>
+                                </a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Paramètres</p>
-                            </a>
-                        </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Rôles & Permissions</p>
+                                </a>
+                            </li>
 
-                    </ul>
-                </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Paramètres</p>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </li>
 
             </ul>
         </nav>

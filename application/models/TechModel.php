@@ -368,4 +368,147 @@ class TechModel extends CI_Model
     {
         return $this->db->insert('subcontractors', $data);
     }
+
+    public function getAllSubTraitant()
+    {
+        return $this->db
+            ->order_by('id', 'DESC')
+            ->get('subcontractors')
+            ->result();
+    }
+
+    public function update_subcontractor($id, $data)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update('subcontractors', $data);
+    }
+
+    public function delete_subcontractor($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->delete('subcontractors');
+    }
+
+    public function insert_article($data)
+    {
+        return $this->db->insert('tbl_stock_article', $data);
+    }
+
+    public function insert_emplacement($data)
+    {
+        return $this->db->insert('tbl_stock_emplacement', $data);
+    }
+
+    public function insert_quantite_stock($data)
+    {
+        return $this->db->insert('tbl_stock_quantite', $data);
+    }
+
+    public function get_articles()
+    {
+        return $this->db->order_by('id', 'DESC')->get('tbl_stock_article')->result();
+    }
+
+    public function get_emplacements()
+    {
+        return $this->db->order_by('id', 'DESC')->get('tbl_stock_emplacement')->result();
+    }
+
+    public function get_stock_general()
+    {
+        $this->db->select('
+            q.id,
+            a.code_article,
+            a.designation,
+            a.unite,
+            e.nom_emplacement,
+            q.quantite
+        ');
+        $this->db->from('tbl_stock_quantite q');
+        $this->db->join('tbl_stock_article a', 'a.id = q.article_id');
+        $this->db->join('tbl_stock_emplacement e', 'e.id = q.emplacement_id');
+        $this->db->order_by('q.id', 'DESC');
+
+        return $this->db->get()->result();
+    }
+
+    public function get_stock_stats()
+    {
+        return [
+            'total_articles' => $this->db->count_all('tbl_stock_article'),
+            'total_emplacements' => $this->db->count_all('tbl_stock_emplacement'),
+            'total_lignes_stock' => $this->db->count_all('tbl_stock_quantite'),
+            'quantite_totale' => $this->db
+                ->select_sum('quantite')
+                ->get('tbl_stock_quantite')
+                ->row()
+                ->quantite ?? 0
+        ];
+    }
+
+    public function get_stock_general_filtered($article_id = null, $emplacement_id = null)
+    {
+        $this->db->select("
+            a.id AS article_id,
+            a.code_article,
+            a.designation,
+            a.unite,
+            a.categorie,
+            e.id AS emplacement_id,
+            e.nom_emplacement,
+
+            SUM(q.quantite) AS quantite_emplacement,
+
+            (
+                SELECT SUM(sq.quantite)
+                FROM tbl_stock_quantite sq
+                WHERE sq.article_id = q.article_id
+            ) AS total_article
+        ", false);
+
+        $this->db->from('tbl_stock_quantite q');
+        $this->db->join('tbl_stock_article a', 'a.id = q.article_id');
+        $this->db->join('tbl_stock_emplacement e', 'e.id = q.emplacement_id');
+
+        if (!empty($article_id)) {
+            $this->db->where('q.article_id', $article_id);
+        }
+
+        if (!empty($emplacement_id)) {
+            $this->db->where('q.emplacement_id', $emplacement_id);
+        }
+
+        $this->db->group_by([
+            'a.id',
+            'a.code_article',
+            'a.designation',
+            'a.unite',
+            'a.categorie',
+            'e.id',
+            'e.nom_emplacement'
+        ]);
+
+        $this->db->order_by('a.designation', 'ASC');
+        $this->db->order_by('e.nom_emplacement', 'ASC');
+
+        return $this->db->get()->result();
+    }
+
+    public function get_total_stock_by_article()
+    {
+        $this->db->select('
+        a.code_article,
+        a.designation,
+        a.unite,
+        SUM(q.quantite) AS total_quantite
+    ');
+        $this->db->from('tbl_stock_quantite q');
+        $this->db->join('tbl_stock_article a', 'a.id = q.article_id');
+        $this->db->group_by('q.article_id');
+        $this->db->order_by('a.designation', 'ASC');
+
+        return $this->db->get()->result();
+    }
 }

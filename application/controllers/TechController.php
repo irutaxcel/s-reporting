@@ -231,13 +231,15 @@ class TechController extends CI_Controller
 
         $title = 'Sous-traitants';
 
-
+        $allSubTraitant = $this->tech->getAllSubTraitant();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
         $this->load->view(
             'v1/components/modules/technique/subTraitant',
-
+            [
+                'allSubTraitant' => $allSubTraitant
+            ]
         );
         $this->load->view('v1/components/layout/footer');
     }
@@ -261,6 +263,124 @@ class TechController extends CI_Controller
 
         $this->session->set_flashdata('success', 'Sous-traitant enregistré avec succès.');
         redirect($_SERVER['HTTP_REFERER']);
+    }
+
+    public function update_subcontractor()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $this->load->model('TechModel', 'tech');
+
+        $id = $this->input->post('id');
+
+        $data = array(
+            'name'         => $this->input->post('name'),
+            'contact_name' => $this->input->post('contact_name'),
+            'specialty'    => $this->input->post('speciality'),
+            'phone'        => $this->input->post('phone'),
+            'email'        => $this->input->post('email'),
+            'status'       => $this->input->post('status')
+        );
+
+        $this->tech->update_subcontractor($id, $data);
+
+        $this->session->set_flashdata('success', 'Sous-traitant modifié avec succès.');
+        redirect($_SERVER['HTTP_REFERER']);
+    }
+
+    public function delete_subcontractor($id)
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $this->tech->delete_subcontractor($id);
+
+        $this->session->set_flashdata(
+            'success',
+            'Sous-traitant supprimé avec succès.'
+        );
+
+        redirect($_SERVER['HTTP_REFERER']);
+    }
+
+
+
+    public function stockGeneral()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $article_id = $this->input->get('article_id');
+        $emplacement_id = $this->input->get('emplacement_id');
+
+        $data['title'] = 'Stocks';
+
+        $data['articles'] = $this->tech->get_articles();
+        $data['emplacements'] = $this->tech->get_emplacements();
+
+        $data['stocks'] = $this->tech->get_stock_general_filtered($article_id, $emplacement_id);
+        $data['totaux_articles'] = $this->tech->get_total_stock_by_article();
+        $data['stats'] = $this->tech->get_stock_stats();
+
+        $data['filter_article_id'] = $article_id;
+        $data['filter_emplacement_id'] = $emplacement_id;
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/technique/stockGeneral', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function stockArticleStore()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $data = [
+            'code_article' => $this->input->post('code_article'),
+            'designation'  => $this->input->post('designation'),
+            'unite'        => $this->input->post('unite'),
+            'categorie'   => $this->input->post('categorie'),
+        ];
+
+        $this->tech->insert_article($data);
+
+        $this->session->set_flashdata('success', 'Article créé avec succès');
+        redirect('stock-general');
+    }
+
+    public function stockEmplacementStore()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $data = [
+            'nom_emplacement' => $this->input->post('nom_emplacement'),
+            'description'    => $this->input->post('description'),
+        ];
+
+        $this->tech->insert_emplacement($data);
+
+        $this->session->set_flashdata('success', 'Emplacement créé avec succès');
+        redirect('stock-general');
+    }
+
+    public function stockQuantiteStore()
+    {
+        $this->load->model('TechModel', 'tech');
+
+        $data = [
+            'article_id'     => $this->input->post('article_id'),
+            'emplacement_id' => $this->input->post('emplacement_id'),
+            'quantite'       => $this->input->post('quantite'),
+        ];
+
+        $this->tech->insert_quantite_stock($data);
+
+        $this->session->set_flashdata('success', 'Quantité ajoutée au stock');
+        redirect('stock-general');
     }
 
     public function achatMateriels()
