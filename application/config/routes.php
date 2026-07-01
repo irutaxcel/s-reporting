@@ -104,3 +104,8 @@ $route['stock-general'] = 'TechController/stockGeneral';
 $route['stock-article-store'] = 'TechController/stockArticleStore';
 $route['stock-emplacement-store'] = 'TechController/stockEmplacementStore';
 $route['stock-quantite-store'] = 'TechController/stockQuantiteStore';
+
+
+$route['finance-dashboard'] = 'FinanceController/financeDashboard';
+
+$route['exercices'] = 'FinanceController/exercicesfinance';
