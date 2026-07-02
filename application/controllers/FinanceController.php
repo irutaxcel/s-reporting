@@ -44,9 +44,184 @@ class FinanceController extends CI_Controller
 
         $title = 'Exercices Comptables';
 
+        $data['exercises'] = $this->finance->get_exercises();
+        $data['active_exercise'] = $this->finance->get_active_exercise();
+        $data['total_exercises'] = $this->finance->count_exercises();
+        $data['total_open'] = $this->finance->count_by_status('open');
+        $data['total_closed'] = $this->finance->count_by_status('closed');
+
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/finance/exercicesfinance');
+        $this->load->view('v1/components/modules/finance/exercicesfinance', $data);
         $this->load->view('v1/components/layout/footer');
+    }
+
+    public function exercise_store()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $data = [
+            'name'       => $this->input->post('name', true),
+            'year'       => $this->input->post('year', true),
+            'start_date' => $this->input->post('start_date', true),
+            'end_date'   => $this->input->post('end_date', true),
+            'status'     => $this->input->post('status', true),
+            'is_active'  => $this->input->post('is_active', true),
+            'created_by' => $this->session->userdata('id') ?? 1
+        ];
+
+        $this->finance->insert_exercise($data);
+
+        $this->session->set_flashdata('success', 'Exercice comptable créé avec succès.');
+        redirect('exercices');
+    }
+
+    public function exercise_close($id)
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $this->finance->close_exercise($id);
+
+        $this->session->set_flashdata('success', 'Exercice comptable clôturé avec succès.');
+        redirect('exercices');
+    }
+
+    public function exercise_update()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $id = $this->input->post('id');
+
+        $data = [
+            'name'       => $this->input->post('name', true),
+            'year'       => $this->input->post('year', true),
+            'start_date' => $this->input->post('start_date', true),
+            'end_date'   => $this->input->post('end_date', true),
+            'status'     => $this->input->post('status', true),
+            'is_active'  => $this->input->post('is_active', true),
+            'updated_at' => date('Y-m-d H:i:s')
+        ];
+
+        $this->finance->update_exercise($id, $data);
+
+        $this->session->set_flashdata('success', 'Exercice comptable modifié avec succès.');
+        redirect('exercices');
+    }
+
+    public function account_classes()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Classes de Comptes';
+
+        $allClasses = $this->finance->get_account_classes();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/account_classes', ['account_classes' => $allClasses]);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function account_class_update()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $id = $this->input->post('id');
+
+        $data = [
+            'class_number' => $this->input->post('class_number', true),
+            'class_name'   => $this->input->post('class_name', true),
+            'nature'       => $this->input->post('nature', true),
+            'description'  => $this->input->post('description', true),
+            'status'       => $this->input->post('status', true),
+            'updated_at'   => date('Y-m-d H:i:s')
+        ];
+
+        $this->finance->update_account_class($id, $data);
+
+        $this->session->set_flashdata('success', 'Classe comptable modifiée avec succès.');
+        redirect('account-classes');
+    }
+
+    public function account_class_delete($id)
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $this->finance->delete_account_class($id);
+
+        $this->session->set_flashdata('success', 'Classe comptable supprimée avec succès.');
+        redirect('account-classes');
+    }
+
+    public function chart_accounts()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Plan Comptable';
+
+        $allAccounts = $this->finance->get_chart_accounts();
+
+        $account_classes = $this->finance->get_account_classes();
+
+        $allChantier = $this->tech->getAllChantiers();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/chart_accounts', ['chart_accounts' => $allAccounts, 'account_classes' => $account_classes, 'chantiers' => $allChantier]);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function chart_account_store()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $data = [
+
+            'account_code'     => trim($this->input->post('account_code', true)),
+            'account_name'     => trim($this->input->post('account_name', true)),
+            'class_id'         => $this->input->post('class_id', true),
+            'account_type'     => $this->input->post('account_type', true),
+            'chantier_id'      => $this->input->post('chantier_id', true) ?: NULL,
+
+            'opening_balance'  => $this->input->post('opening_balance', true),
+            'current_balance'  => $this->input->post('opening_balance', true),
+
+            'currency'         => $this->input->post('currency', true),
+
+            'allow_entry'      => $this->input->post('allow_entry', true),
+
+            'status'           => $this->input->post('status', true),
+
+            'description'      => trim($this->input->post('description', true)),
+
+            'created_by'       => $this->session->userdata('id'),
+
+        ];
+
+        // Vérifier que le code n'existe pas déjà
+        if ($this->finance->chart_account_exist($data['account_code'])) {
+
+            $this->session->set_flashdata(
+                'error',
+                'Ce code comptable existe déjà.'
+            );
+
+            redirect('finance/chart-accounts');
+        }
+
+        $this->finance->insert_chart_account($data);
+
+        $this->session->set_flashdata(
+            'success',
+            'Compte comptable créé avec succès.'
+        );
+
+        redirect('chart-accounts');
     }
 }

@@ -109,3 +109,15 @@ $route['stock-quantite-store'] = 'TechController/stockQuantiteStore';
 $route['finance-dashboard'] = 'FinanceController/financeDashboard';
 
 $route['exercices'] = 'FinanceController/exercicesfinance';
+
+$route['finance/exercices'] = 'FinanceController/exercicesfinance';
+$route['finance/exercise-store'] = 'FinanceController/exercise_store';
+$route['finance/exercise-close/(:num)'] = 'FinanceController/exercise_close/$1';
+
+$route['finance/exercise-update'] = 'FinanceController/exercise_update';
+
+$route['account-classes'] = 'FinanceController/account_classes';
+$route['finance/account-class-update'] = 'FinanceController/account_class_update';
+$route['chart-accounts'] = 'FinanceController/chart_accounts';
+
+$route['finance/chart-account-store'] = 'FinanceController/chart_account_store';

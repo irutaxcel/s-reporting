@@ -1,4 +1,132 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class FinanceModel extends CI_Model {}
+class FinanceModel extends CI_Model
+{
+    public function get_exercises()
+    {
+        return $this->db
+            ->order_by('year', 'DESC')
+            ->get('tbl_finance_exercice')
+            ->result();
+    }
+
+    public function get_active_exercise()
+    {
+        return $this->db
+            ->where('is_active', 1)
+            ->where('status', 'open')
+            ->get('tbl_finance_exercice')
+            ->row();
+    }
+
+    public function count_exercises()
+    {
+        return $this->db->count_all('tbl_finance_exercice');
+    }
+
+    public function count_by_status($status)
+    {
+        return $this->db
+            ->where('status', $status)
+            ->count_all_results('tbl_finance_exercice');
+    }
+
+    public function insert_exercise($data)
+    {
+        if ((int)$data['is_active'] === 1) {
+            $this->db->update('tbl_finance_exercice', ['is_active' => 0]);
+        }
+
+        return $this->db->insert('tbl_finance_exercice', $data);
+    }
+
+    public function close_exercise($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update('tbl_finance_exercice', [
+                'status' => 'closed',
+                'is_active' => 0,
+                'closed_at' => date('Y-m-d H:i:s')
+            ]);
+    }
+
+    public function update_exercise($id, $data)
+    {
+        if ((int)$data['is_active'] === 1) {
+            $this->db->update('tbl_finance_exercice', ['is_active' => 0]);
+        }
+
+        return $this->db
+            ->where('id', $id)
+            ->update('tbl_finance_exercice', $data);
+    }
+
+    public function get_account_classes()
+    {
+        return $this->db
+            ->order_by('code_prefix', 'ASC')
+            ->get('tbl_finance_account_class')
+            ->result();
+    }
+
+    public function update_account_class($id, $data)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update('tbl_finance_account_class', $data);
+    }
+
+    public function delete_account_class($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->delete('tbl_finance_account_class');
+    }
+
+    public function get_chart_accounts()
+    {
+        return $this->db
+
+            ->select('
+            tbl_finance_chart_account.*,
+            tbl_finance_account_class.class_name,
+            tbl_finance_account_class.class_number,
+            chantiers.name AS chantier_name
+        ')
+
+            ->from('tbl_finance_chart_account')
+
+            ->join(
+                'tbl_finance_account_class',
+                'tbl_finance_account_class.id = tbl_finance_chart_account.class_id',
+                'left'
+            )
+
+            ->join(
+                'chantiers',
+                'chantiers.id = tbl_finance_chart_account.chantier_id',
+                'left'
+            )
+
+            ->order_by('tbl_finance_chart_account.account_code', 'ASC')
+
+            ->get()
+
+            ->result();
+    }
+
+    public function chart_account_exist($code)
+    {
+        return $this->db
+            ->where('account_code', $code)
+            ->count_all_results('tbl_finance_chart_account') > 0;
+    }
+
+    public function insert_chart_account($data)
+    {
+        return $this->db
+            ->insert('tbl_finance_chart_account', $data);
+    }
+}
