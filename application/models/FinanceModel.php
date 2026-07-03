@@ -129,4 +129,84 @@ class FinanceModel extends CI_Model
         return $this->db
             ->insert('tbl_finance_chart_account', $data);
     }
+
+    public function update_chart_account($id, $data)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update('tbl_finance_chart_account', $data);
+    }
+
+    public function delete_chart_account($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->delete('tbl_finance_chart_account');
+    }
+
+    public function get_journal_codes()
+    {
+        return $this->db
+            ->select('
+            tbl_finance_journal_code.*,
+            tbl_finance_chart_account.account_code,
+            tbl_finance_chart_account.account_name
+        ')
+            ->from('tbl_finance_journal_code')
+            ->join(
+                'tbl_finance_chart_account',
+                'tbl_finance_chart_account.id = tbl_finance_journal_code.default_account_id',
+                'left'
+            )
+            ->order_by('tbl_finance_journal_code.journal_code', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    public function insert_journal_code($data)
+    {
+        return $this->db->insert(
+            'tbl_finance_journal_code',
+            $data
+        );
+    }
+
+    public function update_journal_code($id, $data)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update('tbl_finance_journal_code', $data);
+    }
+
+    public function delete_journal_code($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->delete('tbl_finance_journal_code');
+    }
+
+    public function get_accounting_entries()
+    {
+        // return $this->db
+        //     ->select('
+        //         tbl_finance_accounting_entry.*,
+        //         tbl_finance_journal_code.journal_code,
+        //         tbl_finance_chart_account.account_code,
+        //         tbl_finance_chart_account.account_name
+        //     ')
+        //     ->from('tbl_finance_accounting_entry')
+        //     ->join(
+        //         'tbl_finance_journal_code',
+        //         'tbl_finance_journal_code.id = tbl_finance_accounting_entry.journal_code_id',
+        //         'left'
+        //     )
+        //     ->join(
+        //         'tbl_finance_chart_account',
+        //         'tbl_finance_chart_account.id = tbl_finance_accounting_entry.account_id',
+        //         'left'
+        //     )
+        //     ->order_by('tbl_finance_accounting_entry.entry_date', 'DESC')
+        //     ->get()
+        //     ->result();
+    }
 }

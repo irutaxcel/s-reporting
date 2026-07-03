@@ -190,6 +190,80 @@
                     text-align: center;
 
                 }
+
+                .finance-table {
+
+                    font-size: 14px;
+
+                }
+
+                .finance-table thead th {
+
+                    background: #132235;
+
+                    color: #fff;
+
+                    border: none;
+
+                    padding: 16px 14px;
+
+                    white-space: nowrap;
+
+                    font-weight: 700;
+
+                }
+
+                .finance-table tbody td {
+
+                    vertical-align: middle;
+
+                    padding: 18px 14px;
+
+                }
+
+                .finance-table tbody tr {
+
+                    transition: .2s;
+
+                }
+
+                .finance-table tbody tr:hover {
+
+                    background: #f5f9fc;
+
+                }
+
+                .account-code {
+
+                    background: #E9F8F0;
+
+                    color: #0f766e;
+
+                    font-weight: 700;
+
+                    padding: 8px 14px;
+
+                    border-radius: 30px;
+
+                    display: inline-block;
+
+                    min-width: 95px;
+
+                    text-align: center;
+
+                }
+
+                .finance-table .btn {
+
+                    width: 34px;
+
+                    height: 34px;
+
+                    padding: 0;
+
+                    margin: 2px;
+
+                }
             </style>
 
             <!-- Statistiques -->
@@ -328,6 +402,8 @@
                 </div>
             </div>
 
+
+
             <!-- Liste -->
             <div class="card finance-card">
 
@@ -354,165 +430,213 @@
                             <thead class="finance-header">
                                 <tr>
 
-                                    <th width="50">#</th>
+                                    <th style="width:140px">Code compte</th>
 
-                                    <th width="130">
-                                        <i class="fas fa-hashtag mr-1"></i>
-                                        Code compte
-                                    </th>
+                                    <th>Intitulé du compte</th>
 
-                                    <th>
-                                        <i class="fas fa-file-signature mr-1"></i>
-                                        Intitulé du compte
-                                    </th>
+                                    <th style="width:110px">Classe</th>
 
-                                    <th width="110">
-                                        <i class="fas fa-layer-group mr-1"></i>
-                                        Classe
-                                    </th>
+                                    <th style="width:130px">Type</th>
 
-                                    <th width="130">
-                                        <i class="fas fa-tags mr-1"></i>
-                                        Type
-                                    </th>
+                                    <th style="width:180px">Chantier</th>
 
-                                    <th width="170">
-                                        <i class="fas fa-hard-hat mr-1"></i>
-                                        Chantier
-                                    </th>
+                                    <th class="text-right" style="width:140px">Solde initial</th>
 
-                                    <th width="120" class="text-right">
-                                        <i class="fas fa-wallet mr-1"></i>
-                                        Solde
-                                    </th>
+                                    <th class="text-center" style="width:90px">Devise</th>
 
-                                    <th width="90" class="text-center">
-                                        Devise
-                                    </th>
+                                    <th class="text-center" style="width:110px">Statut</th>
 
-                                    <th width="110" class="text-center">
-                                        Statut
-                                    </th>
-
-                                    <th width="140" class="text-center">
-                                        Actions
-                                    </th>
+                                    <th class="text-center" style="width:150px">Actions</th>
 
                                 </tr>
                             </thead>
 
                             <tbody>
 
-                                <?php $i = 1;
-                                foreach ($chart_accounts as $account): ?>
+                                <?php if (!empty($chart_accounts)): ?>
 
-                                    <tr>
+                                    <?php foreach ($chart_accounts as $account): ?>
 
-                                        <td>
-                                            <span class="account-code">
-                                                <?= $account->account_code ?>
-                                            </span>
-                                        </td>
+                                        <tr>
 
-                                        <td>
+                                            <td>
 
-                                            <strong>
-                                                <?= $account->account_name ?>
-                                            </strong>
+                                                <span class="account-code">
 
-                                        </td>
-
-                                        <td>
-
-                                            Classe <?= $account->class_number ?>
-
-                                        </td>
-
-                                        <td>
-
-                                            <span class="badge-cash">
-
-                                                <?= $account->account_type ?>
-
-                                            </span>
-
-                                        </td>
-
-                                        <td>
-
-                                            <?php if (!empty($account->chantier_name)): ?>
-
-                                                <span class="badge-site">
-
-                                                    <?= $account->chantier_name ?>
+                                                    <?= $account->account_code; ?>
 
                                                 </span>
 
-                                            <?php else: ?>
+                                            </td>
 
-                                                <span class="text-muted">
+                                            <td>
 
-                                                    —
+                                                <div class="font-weight-bold">
 
-                                                </span>
+                                                    <?= $account->account_name; ?>
 
-                                            <?php endif; ?>
+                                                </div>
 
-                                        </td>
+                                                <small class="text-muted">
 
-                                        <td class="text-right">
+                                                    <?= $account->description; ?>
 
-                                            <?= number_format($account->current_balance, 2, '.', ' ') ?>
+                                                </small>
 
-                                        </td>
+                                            </td>
 
-                                        <td>
+                                            <td>
 
-                                            <?php if ($account->status == 'active'): ?>
+                                                <span class="badge badge-secondary">
 
-                                                <span class="badge-active">
-
-                                                    Actif
+                                                    <?= $account->class_number; ?>
 
                                                 </span>
 
-                                            <?php else: ?>
+                                            </td>
 
-                                                <span class="badge-inactive">
+                                            <td>
 
-                                                    Inactif
+                                                <?php
+
+                                                switch ($account->account_type) {
+
+                                                    case 'Banque':
+                                                        $color = 'primary';
+                                                        break;
+
+                                                    case 'Caisse':
+                                                        $color = 'success';
+                                                        break;
+
+                                                    case 'Client':
+                                                        $color = 'info';
+                                                        break;
+
+                                                    case 'Fournisseur':
+                                                        $color = 'warning';
+                                                        break;
+
+                                                    case 'Charge':
+                                                        $color = 'danger';
+                                                        break;
+
+                                                    case 'Produit':
+                                                        $color = 'purple';
+                                                        break;
+
+                                                    case 'Immobilisation':
+                                                        $color = 'dark';
+                                                        break;
+
+                                                    default:
+                                                        $color = 'secondary';
+                                                }
+
+                                                ?>
+
+                                                <span class="badge badge-<?= $color; ?>">
+
+                                                    <?= $account->account_type; ?>
 
                                                 </span>
 
-                                            <?php endif; ?>
+                                            </td>
 
-                                        </td>
+                                            <td>
 
-                                        <td class="text-right">
+                                                <?php if (!empty($account->chantier_name)): ?>
 
-                                            <button class="btn btn-info btn-sm">
+                                                    <span class="badge badge-light">
 
-                                                <i class="fas fa-eye"></i>
+                                                        <?= $account->chantier_name; ?>
 
-                                            </button>
+                                                    </span>
 
-                                            <button class="btn btn-warning btn-sm">
+                                                <?php else: ?>
 
-                                                <i class="fas fa-edit"></i>
+                                                    <span class="text-muted">
 
-                                            </button>
+                                                        Aucun
 
-                                            <button class="btn btn-danger btn-sm">
+                                                    </span>
 
-                                                <i class="fas fa-trash"></i>
+                                                <?php endif; ?>
 
-                                            </button>
+                                            </td>
 
-                                        </td>
+                                            <td class="text-right font-weight-bold">
 
-                                    </tr>
+                                                <?= number_format($account->opening_balance, 2, ',', ' '); ?>
 
-                                <?php endforeach; ?>
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                <?= $account->currency; ?>
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                <?php if ($account->status == 'active'): ?>
+
+                                                    <span class="badge badge-success">
+
+                                                        Actif
+
+                                                    </span>
+
+                                                <?php else: ?>
+
+                                                    <span class="badge badge-danger">
+
+                                                        Inactif
+
+                                                    </span>
+
+                                                <?php endif; ?>
+
+                                            </td>
+
+                                            <td class="text-center">
+
+                                                <button class="btn btn-info btn-sm">
+
+                                                    <i class="fas fa-eye"></i>
+
+                                                </button>
+
+                                                <button type="button" class="btn btn-warning btn-sm" onclick="editChartAccount(
+                                                        '<?= $account->id ?>',
+                                                        '<?= htmlspecialchars($account->account_code, ENT_QUOTES) ?>',
+                                                        '<?= htmlspecialchars($account->account_name, ENT_QUOTES) ?>',
+                                                        '<?= $account->class_id ?>',
+                                                        '<?= htmlspecialchars($account->account_type, ENT_QUOTES) ?>',
+                                                        '<?= $account->chantier_id ?>',
+                                                        '<?= $account->opening_balance ?>',
+                                                        '<?= htmlspecialchars($account->currency, ENT_QUOTES) ?>',
+                                                        '<?= htmlspecialchars($account->status, ENT_QUOTES) ?>',
+                                                        '<?= $account->allow_entry ?>',
+                                                        '<?= htmlspecialchars($account->description, ENT_QUOTES) ?>'
+                                                    )">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+
+                                                <button type="button" class="btn btn-danger btn-sm"
+                                                    onclick="deleteChartAccount('<?= $account->id ?>')">
+
+                                                    <i class="fas fa-trash"></i>
+
+                                                </button>
+
+                                            </td>
+
+                                        </tr>
+
+                                    <?php endforeach; ?>
+
+                                <?php endif; ?>
 
                             </tbody>
                         </table>
@@ -691,3 +815,208 @@
 
     </div>
 </div>
+
+<div class="modal fade" id="editAccountModal">
+    <div class="modal-dialog modal-lg">
+        <form action="<?= base_url('finance/chart-account-update') ?>" method="post">
+
+            <input type="hidden" name="id" id="edit_id">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit mr-1"></i>
+                        Modifier le compte comptable
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Code compte *</label>
+                                <input type="text" name="account_code" id="edit_account_code" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label>Intitulé du compte *</label>
+                                <input type="text" name="account_name" id="edit_account_name" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Classe comptable *</label>
+                                <select name="class_id" id="edit_class_id" class="form-control" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <?php foreach ($account_classes as $class) : ?>
+                                        <option value="<?= $class->id ?>">
+                                            Classe <?= $class->class_number ?> - <?= $class->class_name ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Type de compte *</label>
+                                <select name="account_type" id="edit_account_type" class="form-control" required>
+                                    <option value="Caisse">Caisse</option>
+                                    <option value="Banque">Banque</option>
+                                    <option value="Client">Client</option>
+                                    <option value="Fournisseur">Fournisseur</option>
+                                    <option value="Charge">Charge</option>
+                                    <option value="Produit">Produit</option>
+                                    <option value="Stock">Stock</option>
+                                    <option value="Immobilisation">Immobilisation</option>
+                                    <option value="Personnel">Personnel</option>
+                                    <option value="Etat">Etat</option>
+                                    <option value="Autre">Autre</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Chantier lié</label>
+                                <select name="chantier_id" id="edit_chantier_id" class="form-control">
+                                    <option value="">Aucun chantier</option>
+                                    <?php foreach ($chantiers as $chantier) : ?>
+                                        <option value="<?= $chantier->id ?>">
+                                            <?= $chantier->name ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Solde initial</label>
+                                <input type="number" name="opening_balance" id="edit_opening_balance"
+                                    class="form-control" step="0.01">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Devise</label>
+                                <select name="currency" id="edit_currency" class="form-control">
+                                    <option value="FBU">FBU</option>
+                                    <option value="USD">USD</option>
+                                    <option value="EUR">EUR</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Statut</label>
+                                <select name="status" id="edit_status" class="form-control">
+                                    <option value="active">Actif</option>
+                                    <option value="inactive">Inactif</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Compte utilisable en saisie ?</label>
+                                <select name="allow_entry" id="edit_allow_entry" class="form-control">
+                                    <option value="1">Oui</option>
+                                    <option value="0">Non</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Description / Observation</label>
+                                <textarea name="description" id="edit_description" class="form-control"
+                                    rows="3"></textarea>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">
+                        Annuler
+                    </button>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save mr-1"></i>
+                        Modifier
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function editChartAccount(id, account_code, account_name, class_id, account_type, chantier_id, opening_balance,
+        currency, status, allow_entry, description) {
+        $('#edit_id').val(id);
+        $('#edit_account_code').val(account_code);
+        $('#edit_account_name').val(account_name);
+        $('#edit_class_id').val(class_id);
+        $('#edit_account_type').val(account_type);
+        $('#edit_chantier_id').val(chantier_id);
+        $('#edit_opening_balance').val(opening_balance);
+        $('#edit_currency').val(currency);
+        $('#edit_status').val(status);
+        $('#edit_allow_entry').val(allow_entry);
+        $('#edit_description').val(description);
+
+        $('#editAccountModal').modal('show');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function deleteChartAccount(id) {
+        Swal.fire({
+
+            title: 'Supprimer ce compte ?',
+
+            text: "Cette opération est irréversible.",
+
+            icon: 'warning',
+
+            showCancelButton: true,
+
+            confirmButtonColor: '#dc3545',
+
+            cancelButtonColor: '#6c757d',
+
+            confirmButtonText: '<i class="fas fa-trash"></i> Oui, supprimer',
+
+            cancelButtonText: '<i class="fas fa-times"></i> Annuler',
+
+            reverseButtons: true
+
+        }).then((result) => {
+
+            if (result.isConfirmed) {
+
+                window.location.href = "<?= base_url('finance/chart-account-delete/') ?>" + id;
+
+            }
+
+        });
+
+    }
+</script>

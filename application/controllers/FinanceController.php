@@ -224,4 +224,160 @@ class FinanceController extends CI_Controller
 
         redirect('chart-accounts');
     }
+
+    public function chart_account_update()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $id = $this->input->post('id');
+
+        $data = [
+            'account_code'    => trim($this->input->post('account_code', true)),
+            'account_name'    => trim($this->input->post('account_name', true)),
+            'class_id'        => $this->input->post('class_id', true),
+            'account_type'    => $this->input->post('account_type', true),
+            'chantier_id'     => $this->input->post('chantier_id', true) ?: NULL,
+            'opening_balance' => $this->input->post('opening_balance', true),
+            'current_balance' => $this->input->post('opening_balance', true),
+            'currency'        => $this->input->post('currency', true),
+            'allow_entry'     => $this->input->post('allow_entry', true),
+            'status'          => $this->input->post('status', true),
+            'description'     => trim($this->input->post('description', true)),
+            'updated_at'      => date('Y-m-d H:i:s')
+        ];
+
+        $this->finance->update_chart_account($id, $data);
+
+        $this->session->set_flashdata('success', 'Compte comptable modifié avec succès.');
+        redirect('chart-accounts');
+    }
+
+    public function chart_account_delete($id)
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $this->finance->delete_chart_account($id);
+
+        $this->session->set_flashdata(
+            'success',
+            'Compte comptable supprimé avec succès.'
+        );
+
+        redirect('chart-accounts');
+    }
+
+    public function journal_codes()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Codes journaux';
+
+        $allAccounts = $this->finance->get_chart_accounts();
+
+        $allJournalCodes = $this->finance->get_journal_codes();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/journal_codes', ['journalCodes' => $allJournalCodes, 'chart_accounts' => $allAccounts]);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function journal_code_store()
+    {
+        $data = array(
+
+            'journal_code'       => strtoupper(trim($this->input->post('journal_code'))),
+            'journal_name'       => trim($this->input->post('journal_name')),
+            'journal_type'       => $this->input->post('journal_type'),
+
+            'default_account_id' => !empty($this->input->post('default_account_id'))
+                ? $this->input->post('default_account_id')
+                : NULL,
+
+            'allow_entry'        => $this->input->post('allow_entry'),
+
+            'status'             => $this->input->post('status'),
+
+            'description'        => trim($this->input->post('description')),
+
+            'created_by'         => $this->session->userdata('user_id'),
+
+            'created_at'         => date('Y-m-d H:i:s')
+
+        );
+
+        $this->finance->insert_journal_code($data);
+
+        $this->session->set_flashdata(
+            'success',
+            'Code journal enregistré avec succès.'
+        );
+
+        redirect('journal-codes');
+    }
+
+    public function journal_code_update()
+    {
+        $id = $this->input->post('id');
+
+        $data = array(
+
+            'journal_code'       => $this->input->post('journal_code'),
+            'journal_name'       => $this->input->post('journal_name'),
+            'journal_type'       => $this->input->post('journal_type'),
+            'default_account_id' => $this->input->post('default_account_id') ?: NULL,
+            'allow_entry'        => $this->input->post('allow_entry'),
+            'status'             => $this->input->post('status'),
+            'description'        => $this->input->post('description'),
+            'updated_at'         => date('Y-m-d H:i:s')
+
+        );
+
+        $this->finance->update_journal_code($id, $data);
+
+        $this->session->set_flashdata(
+            'success',
+            'Code journal modifié avec succès.'
+        );
+
+        redirect('journal-codes');
+    }
+
+    public function journal_code_delete($id)
+    {
+        $this->finance->delete_journal_code($id);
+
+        $this->session->set_flashdata(
+            'success',
+            'Code journal supprimé avec succès.'
+        );
+
+        redirect('journal-codes');
+    }
+
+    public function accounting_entries()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Écritures Comptables';
+
+        $data['title'] = $title;
+
+        $data['accounting_entries'] = $this->finance->get_accounting_entries();
+        $data['exercises'] = $this->finance->get_exercises();
+        $data['journalCodes'] = $this->finance->get_journal_codes();
+        $data['chart_accounts'] = $this->finance->get_chart_accounts();
+        $data['chantiers'] = $this->tech->getAllChantier();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/accounting_entries', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
 }

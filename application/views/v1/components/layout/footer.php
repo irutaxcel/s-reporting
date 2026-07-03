@@ -75,6 +75,27 @@ $.widget.bridge('uibutton', $.ui.button)
 <script src="<?= base_url('assets/v1/dist/') ?>js/demo.js"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 <script src="<?= base_url('assets/v1/dist/') ?>js/pages/dashboard.js"></script>
+
+
+<?php if ($this->session->flashdata('success')): ?>
+
+<script>
+Swal.fire({
+
+    icon: 'success',
+
+    title: 'Succès',
+
+    text: '<?= $this->session->flashdata('success'); ?>',
+
+    timer: 1800,
+
+    showConfirmButton: false
+
+});
+</script>
+
+<?php endif; ?>
 </body>
 
 </html>

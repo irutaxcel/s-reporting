@@ -121,3 +121,13 @@ $route['finance/account-class-update'] = 'FinanceController/account_class_update
 $route['chart-accounts'] = 'FinanceController/chart_accounts';
 
 $route['finance/chart-account-store'] = 'FinanceController/chart_account_store';
+$route['finance/chart-account-update'] = 'FinanceController/chart_account_update';
+$route['finance/chart-account-delete/(:num)'] = 'FinanceController/chart_account_delete/$1';
+
+
+$route['journal-codes'] = 'FinanceController/journal_codes';
+$route['finance/journal-code-store'] = 'FinanceController/journal_code_store';
+$route['finance/journal-code-update'] = 'FinanceController/journal_code_update';
+$route['finance/journal-code-delete/(:num)'] = 'FinanceController/journal_code_delete/$1';
+
+$route['accounting-entrys'] = 'FinanceController/accounting_entries';
