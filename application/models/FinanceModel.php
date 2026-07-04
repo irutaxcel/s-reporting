@@ -209,4 +209,15 @@ class FinanceModel extends CI_Model
         //     ->get()
         //     ->result();
     }
+
+    public function insert_accounting_entry($data)
+    {
+        $this->db->insert('tbl_finance_accounting_entry', $data);
+        return $this->db->insert_id();
+    }
+
+    public function insert_accounting_entry_line($data)
+    {
+        return $this->db->insert('tbl_finance_accounting_entry_line', $data);
+    }
 }

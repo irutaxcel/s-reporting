@@ -25,138 +25,138 @@
             <!-- ici le contenu de la page d'ecriture comptable -->
 
             <style>
-                .finance-card {
-                    border: none;
-                    border-radius: 16px;
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
-                }
+            .finance-card {
+                border: none;
+                border-radius: 16px;
+                box-shadow: 0 8px 25px rgba(0, 0, 0, .06);
+            }
 
-                .entry-header-card {
-                    background: linear-gradient(135deg, #0f766e, #102033);
-                    color: #fff;
-                    border-radius: 16px;
-                    padding: 22px;
-                }
+            .entry-header-card {
+                background: linear-gradient(135deg, #0f766e, #102033);
+                color: #fff;
+                border-radius: 16px;
+                padding: 22px;
+            }
 
-                .entry-header-card h4 {
-                    font-weight: 800;
-                    margin-bottom: 5px;
-                }
+            .entry-header-card h4 {
+                font-weight: 800;
+                margin-bottom: 5px;
+            }
 
-                .section-title-finance {
-                    font-weight: 800;
-                    color: #102033;
-                }
+            .section-title-finance {
+                font-weight: 800;
+                color: #102033;
+            }
 
-                .btn-finance {
-                    background: #0f766e;
-                    color: #fff;
-                    border-radius: 10px;
-                    font-weight: 700;
-                }
+            .btn-finance {
+                background: #0f766e;
+                color: #fff;
+                border-radius: 10px;
+                font-weight: 700;
+            }
 
-                .btn-finance:hover {
-                    background: #0b5f59;
-                    color: #fff;
-                }
+            .btn-finance:hover {
+                background: #0b5f59;
+                color: #fff;
+            }
 
-                .entry-form label {
-                    font-weight: 700;
-                    color: #1f2937;
-                    font-size: 14px;
-                }
+            .entry-form label {
+                font-weight: 700;
+                color: #1f2937;
+                font-size: 14px;
+            }
 
-                .entry-form .form-control {
-                    border-radius: 10px;
-                    min-height: 42px;
-                }
+            .entry-form .form-control {
+                border-radius: 10px;
+                min-height: 42px;
+            }
 
-                .entry-table thead th {
-                    background: #102033;
-                    color: #fff;
-                    border: none;
-                    padding: 14px 10px;
-                    font-size: 13px;
-                    text-transform: uppercase;
-                    white-space: nowrap;
-                }
+            .entry-table thead th {
+                background: #102033;
+                color: #fff;
+                border: none;
+                padding: 14px 10px;
+                font-size: 13px;
+                text-transform: uppercase;
+                white-space: nowrap;
+            }
 
-                .entry-table tbody td {
-                    vertical-align: middle;
-                    padding: 10px;
-                }
+            .entry-table tbody td {
+                vertical-align: middle;
+                padding: 10px;
+            }
 
-                .entry-table input,
-                .entry-table select {
-                    border-radius: 8px;
-                    min-height: 38px;
-                }
+            .entry-table input,
+            .entry-table select {
+                border-radius: 8px;
+                min-height: 38px;
+            }
 
-                .amount-input {
-                    text-align: right;
-                    font-weight: 700;
-                }
+            .amount-input {
+                text-align: right;
+                font-weight: 700;
+            }
 
-                .total-box {
-                    border-radius: 14px;
-                    padding: 16px;
-                    background: #f8fafc;
-                    border: 1px solid #e5e7eb;
-                }
+            .total-box {
+                border-radius: 14px;
+                padding: 16px;
+                background: #f8fafc;
+                border: 1px solid #e5e7eb;
+            }
 
-                .total-box h5 {
-                    font-weight: 800;
-                    margin-bottom: 0;
-                }
+            .total-box h5 {
+                font-weight: 800;
+                margin-bottom: 0;
+            }
 
-                .total-balanced {
-                    background: #dcfce7;
-                    color: #166534;
-                    border-radius: 30px;
-                    padding: 8px 14px;
-                    font-weight: 800;
-                    display: inline-block;
-                }
+            .total-balanced {
+                background: #dcfce7;
+                color: #166534;
+                border-radius: 30px;
+                padding: 8px 14px;
+                font-weight: 800;
+                display: inline-block;
+            }
 
-                .total-unbalanced {
-                    background: #fee2e2;
-                    color: #991b1b;
-                    border-radius: 30px;
-                    padding: 8px 14px;
-                    font-weight: 800;
-                    display: inline-block;
-                }
+            .total-unbalanced {
+                background: #fee2e2;
+                color: #991b1b;
+                border-radius: 30px;
+                padding: 8px 14px;
+                font-weight: 800;
+                display: inline-block;
+            }
 
-                .help-panel {
-                    background: #ecfdf5;
-                    border-left: 5px solid #0f766e;
-                    border-radius: 14px;
-                    padding: 16px;
-                }
+            .help-panel {
+                background: #ecfdf5;
+                border-left: 5px solid #0f766e;
+                border-radius: 14px;
+                padding: 16px;
+            }
 
-                .piece-badge {
-                    background: #dbeafe;
-                    color: #1d4ed8;
-                    padding: 7px 12px;
-                    border-radius: 30px;
-                    font-weight: 700;
-                }
+            .piece-badge {
+                background: #dbeafe;
+                color: #1d4ed8;
+                padding: 7px 12px;
+                border-radius: 30px;
+                font-weight: 700;
+            }
 
-                .entry-actions {
-                    position: sticky;
-                    bottom: 0;
-                    background: #fff;
-                    border-top: 1px solid #e5e7eb;
-                    padding: 15px;
-                    z-index: 20;
-                }
+            .entry-actions {
+                position: sticky;
+                bottom: 0;
+                background: #fff;
+                border-top: 1px solid #e5e7eb;
+                padding: 15px;
+                z-index: 20;
+            }
 
-                .btn-remove-line {
-                    width: 34px;
-                    height: 34px;
-                    padding: 0;
-                    border-radius: 8px;
-                }
+            .btn-remove-line {
+                width: 34px;
+                height: 34px;
+                padding: 0;
+                border-radius: 8px;
+            }
             </style>
 
             <!-- Bandeau principal -->
@@ -206,11 +206,11 @@
                                     <select name="exercise_id" class="form-control" required>
                                         <option value="">-- Sélectionner --</option>
                                         <?php if (!empty($exercises)) : ?>
-                                            <?php foreach ($exercises as $ex) : ?>
-                                                <option value="<?= $ex->id ?>" <?= $ex->is_active ? 'selected' : '' ?>>
-                                                    <?= $ex->name ?>
-                                                </option>
-                                            <?php endforeach; ?>
+                                        <?php foreach ($exercises as $ex) : ?>
+                                        <option value="<?= $ex->id ?>" <?= $ex->is_active ? 'selected' : '' ?>>
+                                            <?= $ex->name ?>
+                                        </option>
+                                        <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
                                 </div>
@@ -230,11 +230,11 @@
                                     <select name="journal_id" class="form-control" required>
                                         <option value="">-- Sélectionner --</option>
                                         <?php if (!empty($journalCodes)) : ?>
-                                            <?php foreach ($journalCodes as $journal) : ?>
-                                                <option value="<?= $journal->id ?>">
-                                                    <?= $journal->journal_code ?> - <?= $journal->journal_name ?>
-                                                </option>
-                                            <?php endforeach; ?>
+                                        <?php foreach ($journalCodes as $journal) : ?>
+                                        <option value="<?= $journal->id ?>">
+                                            <?= $journal->journal_code ?> - <?= $journal->journal_name ?>
+                                        </option>
+                                        <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
                                 </div>
@@ -262,11 +262,11 @@
                                     <select name="chantier_id" class="form-control">
                                         <option value="">Aucun chantier</option>
                                         <?php if (!empty($chantiers)) : ?>
-                                            <?php foreach ($chantiers as $chantier) : ?>
-                                                <option value="<?= $chantier->id ?>">
-                                                    <?= $chantier->name ?>
-                                                </option>
-                                            <?php endforeach; ?>
+                                        <?php foreach ($chantiers as $chantier) : ?>
+                                        <option value="<?= $chantier->id ?>">
+                                            <?= $chantier->name ?>
+                                        </option>
+                                        <?php endforeach; ?>
                                         <?php endif; ?>
                                     </select>
                                 </div>
@@ -309,7 +309,7 @@
                                     Lignes de l’écriture
                                 </h5>
                                 <small class="text-muted">
-                                    Saisissez les comptes concernés par l’opération.
+                                    Saisissez les comptes débit/crédit concernés par l’opération.
                                 </small>
                             </div>
 
@@ -321,39 +321,55 @@
                     </div>
 
                     <div class="card-body p-0">
-
                         <div class="table-responsive">
-                            <table class="table entry-table mb-0" id="entryLinesTable">
 
+                            <table class="table entry-table mb-0" id="entryLinesTable">
                                 <thead>
                                     <tr>
-                                        <th style="width:32%;">Compte comptable *</th>
-                                        <th>Libellé ligne</th>
-                                        <th style="width:15%;" class="text-right">Débit</th>
-                                        <th style="width:15%;" class="text-right">Crédit</th>
+                                        <th style="width:20%;">Compte débit *</th>
+                                        <th style="width:20%;">Compte crédit *</th>
+                                        <th style="width:18%;">Libellé ligne</th>
+                                        <th style="width:10%;" class="text-right">Débit</th>
+                                        <th style="width:10%;" class="text-right">Crédit</th>
+                                        <th style="width:8%;" class="text-center">TVA ?</th>
+                                        <th style="width:8%;" class="text-right">Taux</th>
+                                        <th style="width:10%;" class="text-right">Mt TVA</th>
                                         <th style="width:70px;" class="text-center">Action</th>
                                     </tr>
                                 </thead>
 
                                 <tbody id="entryLinesBody">
-
+                                    <?php for ($r = 0; $r < 2; $r++) : ?>
                                     <tr>
                                         <td>
-                                            <select name="account_id[]" class="form-control" required>
-                                                <option value="">-- Compte --</option>
+                                            <select name="debit_account_id[]" class="form-control" required>
+                                                <option value="">-- Débit --</option>
                                                 <?php if (!empty($chart_accounts)) : ?>
-                                                    <?php foreach ($chart_accounts as $account) : ?>
-                                                        <option value="<?= $account->id ?>">
-                                                            <?= $account->account_code ?> - <?= $account->account_name ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
+                                                <?php foreach ($chart_accounts as $account) : ?>
+                                                <option value="<?= $account->id ?>">
+                                                    <?= $account->account_code ?> - <?= $account->account_name ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </select>
+                                        </td>
+
+                                        <td>
+                                            <select name="credit_account_id[]" class="form-control" required>
+                                                <option value="">-- Crédit --</option>
+                                                <?php if (!empty($chart_accounts)) : ?>
+                                                <?php foreach ($chart_accounts as $account) : ?>
+                                                <option value="<?= $account->id ?>">
+                                                    <?= $account->account_code ?> - <?= $account->account_name ?>
+                                                </option>
+                                                <?php endforeach; ?>
                                                 <?php endif; ?>
                                             </select>
                                         </td>
 
                                         <td>
                                             <input type="text" name="line_label[]" class="form-control"
-                                                placeholder="Libellé de la ligne">
+                                                placeholder="Libellé">
                                         </td>
 
                                         <td>
@@ -368,43 +384,24 @@
                                                 oninput="calculateTotals()">
                                         </td>
 
-                                        <td class="text-center">
-                                            <button type="button" class="btn btn-danger btn-sm btn-remove-line"
-                                                onclick="removeEntryLine(this)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
                                         <td>
-                                            <select name="account_id[]" class="form-control" required>
-                                                <option value="">-- Compte --</option>
-                                                <?php if (!empty($chart_accounts)) : ?>
-                                                    <?php foreach ($chart_accounts as $account) : ?>
-                                                        <option value="<?= $account->id ?>">
-                                                            <?= $account->account_code ?> - <?= $account->account_name ?>
-                                                        </option>
-                                                    <?php endforeach; ?>
-                                                <?php endif; ?>
+                                            <select name="has_tva[]" class="form-control has-tva"
+                                                onchange="toggleTva(this)">
+                                                <option value="0">Non</option>
+                                                <option value="1">Oui</option>
                                             </select>
                                         </td>
 
                                         <td>
-                                            <input type="text" name="line_label[]" class="form-control"
-                                                placeholder="Libellé de la ligne">
+                                            <input type="number" name="tva_rate[]"
+                                                class="form-control amount-input tva-rate" value="0" step="0.01"
+                                                readonly oninput="calculateTotals()">
                                         </td>
 
                                         <td>
-                                            <input type="number" name="debit[]"
-                                                class="form-control amount-input debit-input" value="0" step="0.01"
-                                                oninput="calculateTotals()">
-                                        </td>
-
-                                        <td>
-                                            <input type="number" name="credit[]"
-                                                class="form-control amount-input credit-input" value="0" step="0.01"
-                                                oninput="calculateTotals()">
+                                            <input type="number" name="tva_amount[]"
+                                                class="form-control amount-input tva-amount" value="0" step="0.01"
+                                                readonly>
                                         </td>
 
                                         <td class="text-center">
@@ -414,41 +411,44 @@
                                             </button>
                                         </td>
                                     </tr>
-
+                                    <?php endfor; ?>
                                 </tbody>
-
                             </table>
-                        </div>
 
+                        </div>
                     </div>
 
-                    <!-- Totaux -->
                     <div class="card-footer bg-white">
-
                         <div class="row align-items-center">
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="total-box">
                                     <small class="text-muted">Total débit</small>
                                     <h5 id="totalDebit">0.00</h5>
                                 </div>
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <div class="total-box">
                                     <small class="text-muted">Total crédit</small>
                                     <h5 id="totalCredit">0.00</h5>
                                 </div>
                             </div>
 
-                            <div class="col-md-4 text-right">
+                            <div class="col-md-3">
+                                <div class="total-box">
+                                    <small class="text-muted">Total TVA</small>
+                                    <h5 id="totalTva">0.00</h5>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3 text-right">
                                 <span id="balanceStatus" class="total-unbalanced">
                                     Non équilibré
                                 </span>
                             </div>
 
                         </div>
-
                     </div>
 
                 </div>
@@ -480,101 +480,169 @@
             </form>
 
             <script>
-                function addEntryLine() {
-                    let row = `
-            <tr>
-                <td>
-                    <select name="account_id[]" class="form-control" required>
-                        <option value="">-- Compte --</option>
-                        <?php if (!empty($chart_accounts)) : ?>
-                            <?php foreach ($chart_accounts as $account) : ?>
-                                <option value="<?= $account->id ?>">
-                                    <?= $account->account_code ?> - <?= addslashes($account->account_name) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                    </select>
-                </td>
+            function accountOptions() {
+                return `
+                    <option value="">-- Sélectionner --</option>
+                    <?php if (!empty($chart_accounts)) : ?>
+                        <?php foreach ($chart_accounts as $account) : ?>
+                            <option value="<?= $account->id ?>">
+                                <?= $account->account_code ?> - <?= addslashes($account->account_name) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                `;
+            }
 
-                <td>
-                    <input type="text" name="line_label[]" class="form-control" placeholder="Libellé de la ligne">
-                </td>
+            function addEntryLine() {
+                let row = `
+                    <tr>
+                        <td>
+                            <select name="debit_account_id[]" class="form-control" required>
+                                ${accountOptions()}
+                            </select>
+                        </td>
 
-                <td>
-                    <input type="number" name="debit[]" class="form-control amount-input debit-input" value="0" step="0.01" oninput="calculateTotals()">
-                </td>
+                        <td>
+                            <select name="credit_account_id[]" class="form-control" required>
+                                ${accountOptions()}
+                            </select>
+                        </td>
 
-                <td>
-                    <input type="number" name="credit[]" class="form-control amount-input credit-input" value="0" step="0.01" oninput="calculateTotals()">
-                </td>
+                        <td>
+                            <input type="text" name="line_label[]" class="form-control" placeholder="Libellé">
+                        </td>
 
-                <td class="text-center">
-                    <button type="button" class="btn btn-danger btn-sm btn-remove-line" onclick="removeEntryLine(this)">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `;
+                        <td>
+                            <input type="number" name="debit[]" class="form-control amount-input debit-input"
+                                value="0" step="0.01" oninput="calculateTotals()">
+                        </td>
 
-                    $('#entryLinesBody').append(row);
-                }
+                        <td>
+                            <input type="number" name="credit[]" class="form-control amount-input credit-input"
+                                value="0" step="0.01" oninput="calculateTotals()">
+                        </td>
 
-                function removeEntryLine(button) {
-                    let totalRows = $('#entryLinesBody tr').length;
+                        <td>
+                            <select name="has_tva[]" class="form-control has-tva" onchange="toggleTva(this)">
+                                <option value="0">Non</option>
+                                <option value="1">Oui</option>
+                            </select>
+                        </td>
 
-                    if (totalRows <= 2) {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Attention',
-                            text: 'Une écriture comptable doit contenir au minimum deux lignes.'
-                        });
-                        return;
-                    }
+                        <td>
+                            <input type="number" name="tva_rate[]" class="form-control amount-input tva-rate"
+                                value="0" step="0.01" readonly oninput="calculateTotals()">
+                        </td>
 
-                    $(button).closest('tr').remove();
-                    calculateTotals();
-                }
+                        <td>
+                            <input type="number" name="tva_amount[]" class="form-control amount-input tva-amount"
+                                value="0" step="0.01" readonly>
+                        </td>
 
-                function calculateTotals() {
-                    let totalDebit = 0;
-                    let totalCredit = 0;
+                        <td class="text-center">
+                            <button type="button" class="btn btn-danger btn-sm btn-remove-line" onclick="removeEntryLine(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
 
-                    $('.debit-input').each(function() {
-                        totalDebit += parseFloat($(this).val()) || 0;
-                    });
+                $('#entryLinesBody').append(row);
+                calculateTotals();
+            }
 
-                    $('.credit-input').each(function() {
-                        totalCredit += parseFloat($(this).val()) || 0;
-                    });
+            function toggleTva(select) {
+                let row = $(select).closest('tr');
+                let rateInput = row.find('.tva-rate');
 
-                    $('#totalDebit').text(totalDebit.toLocaleString('fr-FR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }));
-
-                    $('#totalCredit').text(totalCredit.toLocaleString('fr-FR', {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                    }));
-
-                    if (totalDebit > 0 && totalDebit === totalCredit) {
-                        $('#balanceStatus')
-                            .removeClass('total-unbalanced')
-                            .addClass('total-balanced')
-                            .text('Écriture équilibrée');
-
-                        $('#submitEntryBtn').prop('disabled', false);
-                    } else {
-                        $('#balanceStatus')
-                            .removeClass('total-balanced')
-                            .addClass('total-unbalanced')
-                            .text('Non équilibré');
-
-                        $('#submitEntryBtn').prop('disabled', true);
-                    }
+                if ($(select).val() === '1') {
+                    rateInput.prop('readonly', false);
+                    rateInput.val(rateInput.val() == 0 ? 18 : rateInput.val());
+                } else {
+                    rateInput.val(0);
+                    rateInput.prop('readonly', true);
+                    row.find('.tva-amount').val(0);
                 }
 
                 calculateTotals();
+            }
+
+            function removeEntryLine(button) {
+                let totalRows = $('#entryLinesBody tr').length;
+
+                if (totalRows <= 2) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Attention',
+                        text: 'Une écriture comptable doit contenir au minimum deux lignes.'
+                    });
+                    return;
+                }
+
+                $(button).closest('tr').remove();
+                calculateTotals();
+            }
+
+            function calculateTotals() {
+                let totalDebit = 0;
+                let totalCredit = 0;
+                let totalTva = 0;
+
+                $('#entryLinesBody tr').each(function() {
+                    let row = $(this);
+
+                    let debit = parseFloat(row.find('.debit-input').val()) || 0;
+                    let credit = parseFloat(row.find('.credit-input').val()) || 0;
+                    let hasTva = row.find('.has-tva').val();
+                    let rate = parseFloat(row.find('.tva-rate').val()) || 0;
+
+                    let baseAmount = debit > 0 ? debit : credit;
+                    let tvaAmount = 0;
+
+                    if (hasTva === '1' && rate > 0) {
+                        tvaAmount = baseAmount * rate / 100;
+                    }
+
+                    row.find('.tva-amount').val(tvaAmount.toFixed(2));
+
+                    totalDebit += debit;
+                    totalCredit += credit;
+                    totalTva += tvaAmount;
+                });
+
+                $('#totalDebit').text(totalDebit.toLocaleString('fr-FR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+
+                $('#totalCredit').text(totalCredit.toLocaleString('fr-FR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+
+                $('#totalTva').text(totalTva.toLocaleString('fr-FR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }));
+
+                if (totalDebit > 0 && totalDebit === totalCredit) {
+                    $('#balanceStatus')
+                        .removeClass('total-unbalanced')
+                        .addClass('total-balanced')
+                        .text('Écriture équilibrée');
+
+                    $('#submitEntryBtn').prop('disabled', false);
+                } else {
+                    $('#balanceStatus')
+                        .removeClass('total-balanced')
+                        .addClass('total-unbalanced')
+                        .text('Non équilibré');
+
+                    $('#submitEntryBtn').prop('disabled', true);
+                }
+            }
+
+            calculateTotals();
             </script>
 
         </div><!-- /.container-fluid -->

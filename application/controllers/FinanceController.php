@@ -212,7 +212,7 @@ class FinanceController extends CI_Controller
                 'Ce code comptable existe déjà.'
             );
 
-            redirect('finance/chart-accounts');
+            redirect('chart-accounts');
         }
 
         $this->finance->insert_chart_account($data);
@@ -379,5 +379,70 @@ class FinanceController extends CI_Controller
         $this->load->view('v1/components/layout/sidebar', $data);
         $this->load->view('v1/components/modules/finance/accounting_entries', $data);
         $this->load->view('v1/components/layout/footer', $data);
+    }
+
+
+    public function accounting_entry_store()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $debits  = $this->input->post('debit');
+        $credits = $this->input->post('credit');
+
+        $totalDebit  = 0;
+        $totalCredit = 0;
+        $totalTva    = 0;
+
+        foreach ($debits as $k => $debit) {
+            $totalDebit  += (float) $debit;
+            $totalCredit += (float) $credits[$k];
+            $totalTva    += (float) $this->input->post('tva_amount')[$k];
+        }
+
+        if ($totalDebit <= 0 || $totalDebit != $totalCredit) {
+            $this->session->set_flashdata('error', 'Écriture non équilibrée. Le total débit doit être égal au total crédit.');
+            redirect('accounting-entrys');
+            return;
+        }
+
+        $pieceNumber = 'PC-' . date('Y') . '-' . str_pad(time() % 100000, 5, '0', STR_PAD_LEFT);
+
+        $entryData = [
+            'piece_number'  => $this->input->post('piece_number') ?: $pieceNumber,
+            'exercise_id'   => $this->input->post('exercise_id'),
+            'journal_id'    => $this->input->post('journal_id'),
+            'operation_date' => $this->input->post('entry_date'),
+            'reference'     => $this->input->post('piece_number'),
+            'general_label' => $this->input->post('label'),
+            'chantier_id'   => $this->input->post('chantier_id') ?: NULL,
+            'currency'      => $this->input->post('currency'),
+            'total_debit'   => $totalDebit,
+            'total_credit'  => $totalCredit,
+            'total_tva'     => $totalTva,
+            'observation'   => $this->input->post('note'),
+            'status'        => 'draft',
+            'created_by'    => $this->session->userdata('user_id')
+        ];
+
+        $entryId = $this->finance->insert_accounting_entry($entryData);
+
+        foreach ($this->input->post('debit_account_id') as $k => $debitAccountId) {
+            $lineData = [
+                'entry_id'          => $entryId,
+                'debit_account_id'  => $debitAccountId,
+                'credit_account_id' => $this->input->post('credit_account_id')[$k],
+                'line_label'        => $this->input->post('line_label')[$k],
+                'debit'             => (float) $this->input->post('debit')[$k],
+                'credit'            => (float) $this->input->post('credit')[$k],
+                'has_tva'           => $this->input->post('has_tva')[$k],
+                'tva_rate'          => (float) $this->input->post('tva_rate')[$k],
+                'tva_amount'        => (float) $this->input->post('tva_amount')[$k],
+            ];
+
+            $this->finance->insert_accounting_entry_line($lineData);
+        }
+
+        $this->session->set_flashdata('success', 'Écriture comptable enregistrée avec succès.');
+        redirect('accounting-entrys');
     }
 }
