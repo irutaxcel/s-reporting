@@ -393,7 +393,7 @@
                 <!-- ==========================
                     DAF / FINANCE
                 =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables') { ?>
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -424,7 +424,7 @@
                         </li>
 
                         <!-- COMPTABILITE -->
-                        <?php if ($title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables') { ?>
+                        <?php if ($title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable') { ?>
                         <li class="nav-item has-treeview menu-open">
 
                             <a href="#" class="nav-link active">
@@ -510,10 +510,17 @@
                             </li>
 
                             <li class="nav-item">
-                                <a href="<?= base_url('finance/journal') ?>" class="nav-link">
+                                <?php if ($title == 'Journal Comptable') { ?>
+                                <a href="<?= base_url('journal') ?>" class="nav-link active">
                                     <i class="far fa-file-alt nav-icon"></i>
                                     <p>Journal comptable</p>
                                 </a>
+                                <?php } else { ?>
+                                <a href="<?= base_url('journal') ?>" class="nav-link">
+                                    <i class="far fa-file-alt nav-icon"></i>
+                                    <p>Journal comptable</p>
+                                </a>
+                                <?php } ?>
                             </li>
 
                             <li class="nav-item">

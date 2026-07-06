@@ -370,10 +370,12 @@ class FinanceController extends CI_Controller
         $data['title'] = $title;
 
         $data['accounting_entries'] = $this->finance->get_accounting_entries();
+
         $data['exercises'] = $this->finance->get_exercises();
         $data['journalCodes'] = $this->finance->get_journal_codes();
         $data['chart_accounts'] = $this->finance->get_chart_accounts();
         $data['chantiers'] = $this->tech->getAllChantier();
+
 
         $this->load->view('v1/components/layout/header', $data);
         $this->load->view('v1/components/layout/sidebar', $data);
@@ -386,8 +388,21 @@ class FinanceController extends CI_Controller
     {
         $this->load->model('FinanceModel', 'finance');
 
-        $debits  = $this->input->post('debit');
-        $credits = $this->input->post('credit');
+        $debitAccounts  = $this->input->post('debit_account_id');
+        $creditAccounts = $this->input->post('credit_account_id');
+        $lineLabels     = $this->input->post('line_label');
+        $debits         = $this->input->post('debit');
+        $credits        = $this->input->post('credit');
+        $hasTva         = $this->input->post('has_tva');
+        $tvaTypes       = $this->input->post('tva_type');
+        $tvaRates       = $this->input->post('tva_rate');
+        $tvaAmounts     = $this->input->post('tva_amount');
+
+        if (empty($debitAccounts) || count($debitAccounts) < 2) {
+            $this->session->set_flashdata('error', 'Une écriture comptable doit contenir au minimum deux lignes.');
+            redirect('accounting-entrys');
+            return;
+        }
 
         $totalDebit  = 0;
         $totalCredit = 0;
@@ -396,22 +411,150 @@ class FinanceController extends CI_Controller
         foreach ($debits as $k => $debit) {
             $totalDebit  += (float) $debit;
             $totalCredit += (float) $credits[$k];
-            $totalTva    += (float) $this->input->post('tva_amount')[$k];
+            $totalTva    += (float) $tvaAmounts[$k];
         }
 
-        if ($totalDebit <= 0 || $totalDebit != $totalCredit) {
+        if ($totalDebit <= 0 || round($totalDebit, 2) != round($totalCredit, 2)) {
             $this->session->set_flashdata('error', 'Écriture non équilibrée. Le total débit doit être égal au total crédit.');
             redirect('accounting-entrys');
             return;
         }
 
-        $pieceNumber = 'PC-' . date('Y') . '-' . str_pad(time() % 100000, 5, '0', STR_PAD_LEFT);
+        $pieceNumber = $this->input->post('piece_number');
+
+        if (empty($pieceNumber)) {
+            $pieceNumber = 'PC-' . date('Y') . '-' . str_pad(time() % 100000, 5, '0', STR_PAD_LEFT);
+        }
 
         $entryData = [
-            'piece_number'  => $this->input->post('piece_number') ?: $pieceNumber,
+            'piece_number'   => $pieceNumber,
+            'exercise_id'    => $this->input->post('exercise_id'),
+            'journal_id'     => $this->input->post('journal_id'),
+            'operation_date' => $this->input->post('entry_date'),
+            'reference'      => $this->input->post('piece_number'),
+            'general_label'  => $this->input->post('label'),
+            'chantier_id'    => $this->input->post('chantier_id') ?: NULL,
+            'currency'       => $this->input->post('currency'),
+            'total_debit'    => $totalDebit,
+            'total_credit'   => $totalCredit,
+            'total_tva'      => $totalTva,
+            'observation'    => $this->input->post('note'),
+            'status'         => 'draft',
+            'created_by'     => $this->session->userdata('user_id')
+        ];
+
+        $this->db->trans_start();
+
+        $entryId = $this->finance->insert_accounting_entry($entryData);
+
+        foreach ($debitAccounts as $k => $debitAccountId) {
+
+            if (empty($debitAccountId) || empty($creditAccounts[$k])) {
+                continue;
+            }
+
+            $lineHasTva = isset($hasTva[$k]) ? (int) $hasTva[$k] : 0;
+
+            $lineData = [
+                'entry_id'          => $entryId,
+                'debit_account_id'  => $debitAccountId,
+                'credit_account_id' => $creditAccounts[$k],
+                'line_label'        => $lineLabels[$k],
+                'debit'             => (float) $debits[$k],
+                'credit'            => (float) $credits[$k],
+                'has_tva'           => $lineHasTva,
+                'tva_type'          => $lineHasTva == 1 ? ($tvaTypes[$k] ?? NULL) : NULL,
+                'tva_rate'          => $lineHasTva == 1 ? (float) $tvaRates[$k] : 0,
+                'tva_amount'        => $lineHasTva == 1 ? (float) $tvaAmounts[$k] : 0,
+            ];
+
+            $this->finance->insert_accounting_entry_line($lineData);
+        }
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->session->set_flashdata('error', 'Erreur lors de l’enregistrement de l’écriture comptable.');
+            redirect('accounting-entrys');
+            return;
+        }
+
+        $this->session->set_flashdata('success', 'Écriture comptable enregistrée avec succès.');
+        redirect('accounting-entrys');
+    }
+
+    public function accounting_entry_edit($id)
+    {
+        $entry = $this->finance->get_accounting_entry_by_id($id);
+        $lines = $this->finance->get_accounting_entry_lines($id);
+
+        echo json_encode([
+            'entry' => $entry,
+            'lines' => $lines
+        ]);
+    }
+
+    public function accounting_entry_update()
+    {
+        $this->load->model('FinanceModel', 'finance');
+
+        $entryId = $this->input->post('id');
+
+        if (!$entryId) {
+            show_404();
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Récupération des données
+    |--------------------------------------------------------------------------
+    */
+
+        $debitAccounts  = $this->input->post('debit_account_id');
+        $creditAccounts = $this->input->post('credit_account_id');
+        $lineLabels     = $this->input->post('line_label');
+        $debits         = $this->input->post('debit');
+        $credits        = $this->input->post('credit');
+
+        $hasTva         = $this->input->post('has_tva');
+        $tvaTypes       = $this->input->post('tva_type');
+        $tvaRates       = $this->input->post('tva_rate');
+        $tvaAmounts     = $this->input->post('tva_amount');
+
+        $totalDebit  = 0;
+        $totalCredit = 0;
+        $totalTva    = 0;
+
+        foreach ($debits as $k => $value) {
+
+            $totalDebit  += (float)$debits[$k];
+            $totalCredit += (float)$credits[$k];
+            $totalTva    += (float)$tvaAmounts[$k];
+        }
+
+        if ($totalDebit <= 0 || round($totalDebit, 2) != round($totalCredit, 2)) {
+
+            $this->session->set_flashdata(
+                'error',
+                'Le débit doit être égal au crédit.'
+            );
+
+            redirect('accounting-entrys');
+            return;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Mise à jour entête
+    |--------------------------------------------------------------------------
+    */
+
+        $entryData = [
+
             'exercise_id'   => $this->input->post('exercise_id'),
             'journal_id'    => $this->input->post('journal_id'),
             'operation_date' => $this->input->post('entry_date'),
+            'piece_number'  => $this->input->post('piece_number'),
             'reference'     => $this->input->post('piece_number'),
             'general_label' => $this->input->post('label'),
             'chantier_id'   => $this->input->post('chantier_id') ?: NULL,
@@ -419,30 +562,131 @@ class FinanceController extends CI_Controller
             'total_debit'   => $totalDebit,
             'total_credit'  => $totalCredit,
             'total_tva'     => $totalTva,
-            'observation'   => $this->input->post('note'),
-            'status'        => 'draft',
-            'created_by'    => $this->session->userdata('user_id')
+            'observation'   => $this->input->post('note')
+
         ];
 
-        $entryId = $this->finance->insert_accounting_entry($entryData);
+        $this->finance->update_accounting_entry($entryId, $entryData);
 
-        foreach ($this->input->post('debit_account_id') as $k => $debitAccountId) {
-            $lineData = [
-                'entry_id'          => $entryId,
-                'debit_account_id'  => $debitAccountId,
-                'credit_account_id' => $this->input->post('credit_account_id')[$k],
-                'line_label'        => $this->input->post('line_label')[$k],
-                'debit'             => (float) $this->input->post('debit')[$k],
-                'credit'            => (float) $this->input->post('credit')[$k],
-                'has_tva'           => $this->input->post('has_tva')[$k],
-                'tva_rate'          => (float) $this->input->post('tva_rate')[$k],
-                'tva_amount'        => (float) $this->input->post('tva_amount')[$k],
+        /*
+    |--------------------------------------------------------------------------
+    | Suppression anciennes lignes
+    |--------------------------------------------------------------------------
+    */
+
+        $this->finance->delete_accounting_entry_lines($entryId);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Réinsertion
+    |--------------------------------------------------------------------------
+    */
+
+        foreach ($debitAccounts as $k => $debitAccountId) {
+
+            if (empty($debitAccountId) || empty($creditAccounts[$k])) {
+                continue;
+            }
+
+            $lineHasTva = isset($hasTva[$k]) ? (int)$hasTva[$k] : 0;
+
+            $line = [
+
+                'entry_id' => $entryId,
+
+                'debit_account_id' => $debitAccountId,
+
+                'credit_account_id' => $creditAccounts[$k],
+
+                'line_label' => $lineLabels[$k],
+
+                'debit' => (float)$debits[$k],
+
+                'credit' => (float)$credits[$k],
+
+                'has_tva' => $lineHasTva,
+
+                'tva_type' => $lineHasTva ? $tvaTypes[$k] : NULL,
+
+                'tva_rate' => $lineHasTva ? (float)$tvaRates[$k] : 0,
+
+                'tva_amount' => $lineHasTva ? (float)$tvaAmounts[$k] : 0
+
             ];
 
-            $this->finance->insert_accounting_entry_line($lineData);
+            $this->finance->insert_accounting_entry_line($line);
         }
 
-        $this->session->set_flashdata('success', 'Écriture comptable enregistrée avec succès.');
+        $this->session->set_flashdata(
+            'success',
+            'Écriture comptable modifiée avec succès.'
+        );
+
         redirect('accounting-entrys');
+    }
+
+    public function accounting_entry_delete()
+    {
+        $id = $this->input->post('id');
+
+        if (empty($id)) {
+            echo json_encode([
+                'status' => false,
+                'message' => 'Identifiant invalide.'
+            ]);
+            return;
+        }
+
+        /*
+    |------------------------------------------------------------
+    | Suppression des lignes
+    |------------------------------------------------------------
+    */
+
+        $this->finance->delete_accounting_entry_lines($id);
+
+        /*
+    |------------------------------------------------------------
+    | Suppression de l'entête
+    |------------------------------------------------------------
+    */
+
+        $this->finance->delete_accounting_entry($id);
+
+        echo json_encode([
+
+            'status' => true,
+
+            'message' => 'Écriture comptable supprimée avec succès.'
+
+        ]);
+    }
+
+    public function accounting_entry_view($id)
+    {
+        $entry = $this->finance->get_accounting_entry_by_id($id);
+        $lines = $this->finance->get_accounting_entry_lines_details($id);
+
+        echo json_encode([
+            'entry' => $entry,
+            'lines' => $lines
+        ]);
+    }
+
+    public function journal()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Journal Comptable';
+
+        $data['title'] = $title;
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/journal', $data);
+        $this->load->view('v1/components/layout/footer', $data);
     }
 }

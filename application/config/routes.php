@@ -133,3 +133,11 @@ $route['finance/journal-code-delete/(:num)'] = 'FinanceController/journal_code_d
 
 $route['accounting-entrys'] = 'FinanceController/accounting_entries';
 $route['finance/accounting-entry-store'] = 'FinanceController/accounting_entry_store';
+
+$route['finance/accounting-entry-edit/(:num)'] = 'FinanceController/accounting_entry_edit/$1';
+$route['finance/accounting-entry-update'] = 'FinanceController/accounting_entry_update';
+$route['finance/accounting-entry-delete'] = 'FinanceController/accounting_entry_delete';
+
+$route['finance/accounting-entry-view/(:num)'] = 'FinanceController/accounting_entry_view/$1';
+
+$route['journal'] = 'FinanceController/journal';

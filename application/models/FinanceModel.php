@@ -187,27 +187,38 @@ class FinanceModel extends CI_Model
 
     public function get_accounting_entries()
     {
-        // return $this->db
-        //     ->select('
-        //         tbl_finance_accounting_entry.*,
-        //         tbl_finance_journal_code.journal_code,
-        //         tbl_finance_chart_account.account_code,
-        //         tbl_finance_chart_account.account_name
-        //     ')
-        //     ->from('tbl_finance_accounting_entry')
-        //     ->join(
-        //         'tbl_finance_journal_code',
-        //         'tbl_finance_journal_code.id = tbl_finance_accounting_entry.journal_code_id',
-        //         'left'
-        //     )
-        //     ->join(
-        //         'tbl_finance_chart_account',
-        //         'tbl_finance_chart_account.id = tbl_finance_accounting_entry.account_id',
-        //         'left'
-        //     )
-        //     ->order_by('tbl_finance_accounting_entry.entry_date', 'DESC')
-        //     ->get()
-        //     ->result();
+        $this->db->select("
+            e.*,
+            ex.name AS exercise_name,
+            j.journal_code,
+            j.journal_name,
+            c.name AS chantier_name
+        ");
+
+        $this->db->from('tbl_finance_accounting_entry e');
+
+        $this->db->join(
+            'tbl_finance_exercice ex',
+            'ex.id = e.exercise_id',
+            'left'
+        );
+
+        $this->db->join(
+            'tbl_finance_journal_code j',
+            'j.id = e.journal_id',
+            'left'
+        );
+
+        $this->db->join(
+            'chantiers c',
+            'c.id = e.chantier_id',
+            'left'
+        );
+
+        $this->db->order_by('e.operation_date', 'DESC');
+        $this->db->order_by('e.id', 'DESC');
+
+        return $this->db->get()->result();
     }
 
     public function insert_accounting_entry($data)
@@ -219,5 +230,64 @@ class FinanceModel extends CI_Model
     public function insert_accounting_entry_line($data)
     {
         return $this->db->insert('tbl_finance_accounting_entry_line', $data);
+    }
+
+
+    public function get_accounting_entry_by_id($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->get('tbl_finance_accounting_entry')
+            ->row();
+    }
+
+    public function get_accounting_entry_lines($entry_id)
+    {
+        return $this->db
+            ->where('entry_id', $entry_id)
+            ->get('tbl_finance_accounting_entry_line')
+            ->result();
+    }
+
+    public function update_accounting_entry($id, $data)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->update(
+                'tbl_finance_accounting_entry',
+                $data
+            );
+    }
+
+    public function delete_accounting_entry_lines($entryId)
+    {
+        return $this->db
+            ->where('entry_id', $entryId)
+            ->delete('tbl_finance_accounting_entry_line');
+    }
+
+    public function delete_accounting_entry($id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->delete('tbl_finance_accounting_entry');
+    }
+
+    public function get_accounting_entry_lines_details($entry_id)
+    {
+        return $this->db
+            ->select('
+            l.*,
+            d.account_code AS debit_code,
+            d.account_name AS debit_name,
+            c.account_code AS credit_code,
+            c.account_name AS credit_name
+        ')
+            ->from('tbl_finance_accounting_entry_line l')
+            ->join('tbl_finance_chart_account d', 'd.id = l.debit_account_id', 'left')
+            ->join('tbl_finance_chart_account c', 'c.id = l.credit_account_id', 'left')
+            ->where('l.entry_id', $entry_id)
+            ->get()
+            ->result();
     }
 }
