@@ -664,6 +664,11 @@ class FinanceController extends CI_Controller
 
     public function accounting_entry_view($id)
     {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $entry = $this->finance->get_accounting_entry_by_id($id);
         $lines = $this->finance->get_accounting_entry_lines_details($id);
 
@@ -683,10 +688,86 @@ class FinanceController extends CI_Controller
         $title = 'Journal Comptable';
 
         $data['title'] = $title;
+        $data['entries'] = $this->finance->get_journal_entries();
+
+        foreach ($data['entries'] as $entry) {
+            $entry->lines = $this->finance->get_journal_entry_lines($entry->id);
+        }
 
         $this->load->view('v1/components/layout/header', $data);
         $this->load->view('v1/components/layout/sidebar', $data);
         $this->load->view('v1/components/modules/finance/journal', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function grand_livre()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Grand Livre Comptable';
+
+        $data['title'] = $title;
+
+        $rows = $this->finance->get_grand_livre_entries();
+
+        $accounts = [];
+
+        foreach ($rows as $row) {
+
+            $accountId = $row->account_id;
+
+            if (!isset($accounts[$accountId])) {
+                $accounts[$accountId] = [
+                    'account_code' => $row->account_code,
+                    'account_name' => $row->account_name,
+                    'total_debit'  => 0,
+                    'total_credit' => 0,
+                    'balance'      => 0,
+                    'lines'        => []
+                ];
+            }
+
+            $accounts[$accountId]['total_debit']  += (float) $row->debit_amount;
+            $accounts[$accountId]['total_credit'] += (float) $row->credit_amount;
+
+            $accounts[$accountId]['balance'] =
+                $accounts[$accountId]['total_debit'] -
+                $accounts[$accountId]['total_credit'];
+
+            $row->running_balance = $accounts[$accountId]['balance'];
+
+            $accounts[$accountId]['lines'][] = $row;
+        }
+
+        $data['accounts'] = $accounts;
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/grand_livre', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function balance_generale()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $this->load->model('FinanceModel', 'finance');
+
+        $title = 'Balance Générale';
+
+        $data['title'] = $title;
+
+        $data['balance'] = $this->finance->get_balance_generale();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/balance_generale', $data);
         $this->load->view('v1/components/layout/footer', $data);
     }
 }

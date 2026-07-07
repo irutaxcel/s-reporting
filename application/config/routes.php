@@ -141,3 +141,7 @@ $route['finance/accounting-entry-delete'] = 'FinanceController/accounting_entry_
 $route['finance/accounting-entry-view/(:num)'] = 'FinanceController/accounting_entry_view/$1';
 
 $route['journal'] = 'FinanceController/journal';
+
+$route['grand-livre'] = 'FinanceController/grand_livre';
+
+$route['balance-generale'] = 'FinanceController/balance_generale';

@@ -290,4 +290,150 @@ class FinanceModel extends CI_Model
             ->get()
             ->result();
     }
+
+    public function get_journal_entries()
+    {
+        return $this->db
+            ->select('
+            e.*,
+            j.journal_code,
+            j.journal_name,
+            ch.name AS chantier_name
+        ')
+            ->from('tbl_finance_accounting_entry e')
+            ->join('tbl_finance_journal_code j', 'j.id = e.journal_id', 'left')
+            ->join('chantiers ch', 'ch.id = e.chantier_id', 'left')
+            ->order_by('e.operation_date', 'DESC')
+            ->order_by('e.id', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    public function get_journal_entry_lines($entry_id)
+    {
+        return $this->db
+            ->select('
+            l.*,
+            d.account_code AS debit_code,
+            d.account_name AS debit_name,
+            c.account_code AS credit_code,
+            c.account_name AS credit_name
+        ')
+            ->from('tbl_finance_accounting_entry_line l')
+            ->join('tbl_finance_chart_account d', 'd.id = l.debit_account_id', 'left')
+            ->join('tbl_finance_chart_account c', 'c.id = l.credit_account_id', 'left')
+            ->where('l.entry_id', $entry_id)
+            ->get()
+            ->result();
+    }
+
+    public function get_grand_livre_entries()
+    {
+        $sql = "
+            SELECT 
+                ca.id AS account_id,
+                ca.account_code,
+                ca.account_name,
+
+                e.id AS entry_id,
+                e.piece_number,
+                e.operation_date,
+                e.reference,
+                e.general_label,
+                e.currency,
+
+                j.journal_code,
+                j.journal_name,
+
+                l.line_label,
+                l.debit_account_id,
+                l.credit_account_id,
+                l.debit,
+                l.credit,
+                l.has_tva,
+                l.tva_type,
+                l.tva_rate,
+                l.tva_amount,
+
+                CASE 
+                    WHEN l.debit_account_id = ca.id THEN l.debit
+                    ELSE 0
+                END AS debit_amount,
+
+                CASE 
+                    WHEN l.credit_account_id = ca.id THEN l.credit
+                    ELSE 0
+                END AS credit_amount
+
+            FROM tbl_finance_chart_account ca
+
+            INNER JOIN tbl_finance_accounting_entry_line l 
+                ON l.debit_account_id = ca.id 
+                OR l.credit_account_id = ca.id
+
+            INNER JOIN tbl_finance_accounting_entry e 
+                ON e.id = l.entry_id
+
+            LEFT JOIN tbl_finance_journal_code j 
+                ON j.id = e.journal_id
+
+            ORDER BY 
+                ca.account_code ASC,
+                e.operation_date ASC,
+                e.id ASC
+        ";
+
+        return $this->db->query($sql)->result();
+    }
+
+    public function get_balance_generale()
+    {
+        $this->db->select("
+        ca.account_code,
+        ca.account_name,
+        cc.class_code,
+        cc.class_name,
+
+        SUM(IFNULL(l.debit,0))  AS total_debit,
+        SUM(IFNULL(l.credit,0)) AS total_credit
+    ");
+
+        $this->db->from('tbl_finance_chart_account ca');
+
+        $this->db->join(
+            'tbl_finance_account_class cc',
+            'cc.id = ca.class_id',
+            'left'
+        );
+
+        $this->db->join(
+            'tbl_finance_accounting_entry_line l',
+            'l.debit_account_id = ca.id
+        OR l.credit_account_id = ca.id',
+            'left'
+        );
+
+        $this->db->group_by('ca.id');
+
+        $this->db->order_by('ca.account_code', 'ASC');
+
+        $accounts = $this->db->get()->result();
+
+        foreach ($accounts as &$acc) {
+
+            $balance = $acc->total_debit - $acc->total_credit;
+
+            if ($balance >= 0) {
+
+                $acc->debit_balance = $balance;
+                $acc->credit_balance = 0;
+            } else {
+
+                $acc->debit_balance = 0;
+                $acc->credit_balance = abs($balance);
+            }
+        }
+
+        return $accounts;
+    }
 }
