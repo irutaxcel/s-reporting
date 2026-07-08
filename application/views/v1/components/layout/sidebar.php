@@ -393,7 +393,7 @@
                 <!-- ==========================
                     DAF / FINANCE
                 =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale') { ?>
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -424,7 +424,7 @@
                         </li>
 
                         <!-- COMPTABILITE -->
-                        <?php if ($title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale') { ?>
+                        <?php if ($title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable') { ?>
                         <li class="nav-item has-treeview menu-open">
 
                             <a href="#" class="nav-link active">
@@ -553,13 +553,13 @@
 
                             <li class="nav-item">
                                 <?php if ($title == 'Clôture Comptable') { ?>
-                                <a href="<?= base_url('finance/cloture') ?>" class="nav-link active">
-                                    <i class="far fa-lock nav-icon"></i>
+                                <a href="<?= base_url('cloture-comptable') ?>" class="nav-link active">
+                                    <i class="fas fa-lock nav-icon"></i>
                                     <p>Clôture comptable</p>
                                 </a>
                                 <?php } else { ?>
-                                <a href="<?= base_url('finance/cloture') ?>" class="nav-link">
-                                    <i class="far fa-lock nav-icon"></i>
+                                <a href="<?= base_url('cloture-comptable') ?>" class="nav-link">
+                                    <i class="fas fa-lock nav-icon"></i>
                                     <p>Clôture comptable</p>
                                 </a>
                                 <?php } ?>

@@ -770,4 +770,28 @@ class FinanceController extends CI_Controller
         $this->load->view('v1/components/modules/finance/balance_generale', $data);
         $this->load->view('v1/components/layout/footer', $data);
     }
+
+    public function cloture_comptable()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $this->load->model('FinanceModel', 'finance');
+
+        $title = 'Clôture Comptable';
+
+        $data['title'] = $title;
+        $data['exercises'] = $this->finance->get_exercises();
+        $data['active_exercise'] = $this->finance->get_active_exercise();
+        $data['closing_stats'] = $this->finance->get_closing_stats();
+        $data['closing_checks'] = $this->finance->get_closing_checks();
+        $data['closing_history'] = $this->finance->get_closing_history();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/cloture_comptable', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
 }

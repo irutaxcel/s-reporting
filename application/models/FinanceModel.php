@@ -388,52 +388,105 @@ class FinanceModel extends CI_Model
 
     public function get_balance_generale()
     {
-        $this->db->select("
-        ca.account_code,
-        ca.account_name,
-        cc.class_code,
-        cc.class_name,
+        $sql = "
+        SELECT
+            ca.id AS account_id,
+            ca.account_code,
+            ca.account_name,
+            ca.currency,
+            cc.class_number,
+            cc.code_prefix,
+            cc.class_name,
 
-        SUM(IFNULL(l.debit,0))  AS total_debit,
-        SUM(IFNULL(l.credit,0)) AS total_credit
-    ");
+            SUM(CASE WHEN l.debit_account_id = ca.id THEN IFNULL(l.debit, 0) ELSE 0 END) AS total_debit,
+            SUM(CASE WHEN l.credit_account_id = ca.id THEN IFNULL(l.credit, 0) ELSE 0 END) AS total_credit
 
-        $this->db->from('tbl_finance_chart_account ca');
+        FROM tbl_finance_chart_account ca
 
-        $this->db->join(
-            'tbl_finance_account_class cc',
-            'cc.id = ca.class_id',
-            'left'
-        );
+        LEFT JOIN tbl_finance_account_class cc
+            ON cc.id = ca.class_id
 
-        $this->db->join(
-            'tbl_finance_accounting_entry_line l',
-            'l.debit_account_id = ca.id
-        OR l.credit_account_id = ca.id',
-            'left'
-        );
+        LEFT JOIN tbl_finance_accounting_entry_line l
+            ON l.debit_account_id = ca.id
+            OR l.credit_account_id = ca.id
 
-        $this->db->group_by('ca.id');
+        GROUP BY ca.id
 
-        $this->db->order_by('ca.account_code', 'ASC');
+        ORDER BY ca.account_code ASC
+    ";
 
-        $accounts = $this->db->get()->result();
+        $accounts = $this->db->query($sql)->result();
 
         foreach ($accounts as &$acc) {
 
-            $balance = $acc->total_debit - $acc->total_credit;
+            $balance = (float)$acc->total_debit - (float)$acc->total_credit;
 
             if ($balance >= 0) {
-
                 $acc->debit_balance = $balance;
                 $acc->credit_balance = 0;
             } else {
-
                 $acc->debit_balance = 0;
                 $acc->credit_balance = abs($balance);
             }
         }
 
         return $accounts;
+    }
+
+    public function get_active_exercise()
+    {
+        return $this->db
+            ->where('status', 'open')
+            ->order_by('id', 'DESC')
+            ->get('tbl_finance_exercise')
+            ->row();
+    }
+
+    public function get_closing_stats()
+    {
+        return $this->db
+            ->select("
+            COUNT(id) AS total_entries,
+            SUM(total_debit) AS total_debit,
+            SUM(total_credit) AS total_credit,
+            SUM(total_tva) AS total_tva
+        ")
+            ->from('tbl_finance_accounting_entry')
+            ->get()
+            ->row();
+    }
+
+    public function get_closing_checks()
+    {
+        $stats = $this->get_closing_stats();
+
+        $drafts = $this->db
+            ->where('status', 'draft')
+            ->count_all_results('tbl_finance_accounting_entry');
+
+        $withoutJournal = $this->db
+            ->where('journal_id IS NULL', null, false)
+            ->or_where('journal_id', 0)
+            ->count_all_results('tbl_finance_accounting_entry');
+
+        $withoutChantier = $this->db
+            ->where('chantier_id IS NULL', null, false)
+            ->count_all_results('tbl_finance_accounting_entry');
+
+        return [
+            'balance_ok' => round((float)$stats->total_debit, 2) == round((float)$stats->total_credit, 2),
+            'drafts' => $drafts,
+            'without_journal' => $withoutJournal,
+            'without_chantier' => $withoutChantier,
+            'tva_total' => (float)$stats->total_tva
+        ];
+    }
+
+    public function get_closing_history()
+    {
+        return $this->db
+            ->order_by('id', 'DESC')
+            ->get('tbl_finance_exercise')
+            ->result();
     }
 }

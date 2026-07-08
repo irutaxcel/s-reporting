@@ -296,6 +296,7 @@
                 $totalDebitBalance = 0;
                 $totalCreditBalance = 0;
 
+                /** @var array $balance */
                 foreach ($balance as $b) {
 
                     $totalDebit += $b->total_debit;
@@ -307,7 +308,7 @@
 
                 ?>
 
-                <?= count($balance) ?>
+                <!-- <?= count($balance) ?>
 
                 <?= number_format($totalDebit, 2, ',', ' ') ?>
 
@@ -315,7 +316,7 @@
 
                 <?= number_format($totalDebitBalance, 2, ',', ' ') ?>
 
-                <?= number_format($totalCreditBalance, 2, ',', ' ') ?>
+                <?= number_format($totalCreditBalance, 2, ',', ' ') ?> -->
 
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -360,7 +361,7 @@
 
                                         <span class="class-badge">
 
-                                            <?= $row->class_code ?>
+                                            Classe <?= $row->class_number ?>
 
                                             -
 

@@ -191,6 +191,8 @@
 
                     </div>
 
+
+
                     <div class="table-responsive">
                         <table class="table journal-line-table mb-0">
 
@@ -205,8 +207,7 @@
                                     <th>Type TVA</th>
                                     <th class="text-right">Taux</th>
                                     <th class="text-right">Mt TVA</th>
-                                    <!-- Nouvelle colonne -->
-                                    <th class="text-right">MT TVAC</th>
+
                                 </tr>
                             </thead>
 
@@ -215,6 +216,27 @@
                                 <?php if (!empty($entry->lines)) : ?>
 
                                 <?php foreach ($entry->lines as $line) : ?>
+
+                                <?php
+                                                $debit  = (float) $line->debit;
+                                                $credit = (float) $line->credit;
+                                                $tva    = (float) $line->tva_amount;
+
+                                                $debitDisplay  = $debit;
+                                                $creditDisplay = $credit;
+
+                                                if ($line->has_tva == 1 && $line->tva_type == 'deductible') {
+                                                    // TVA déductible : TVA côté débit, donc crédit = montant + TVA
+                                                    $creditDisplay = $credit + $tva;
+                                                }
+
+                                                if ($line->has_tva == 1 && $line->tva_type == 'collected') {
+                                                    // TVA collectée : TVA côté crédit, donc débit = montant + TVA
+                                                    $debitDisplay = $debit + $tva;
+                                                }
+
+                                                $mtTvac = $debit + $credit + $tva;
+                                                ?>
 
                                 <tr>
                                     <td>
@@ -232,11 +254,25 @@
                                     </td>
 
                                     <td class="text-right font-weight-bold">
-                                        <?= number_format($line->debit, 2, ',', ' ') ?>
+                                        <?= number_format($debitDisplay, 2, ',', ' ') ?>
+
+                                        <?php if ($line->has_tva == 1 && $line->tva_type == 'deductible') : ?>
+                                        <br>
+                                        <small class="text-success">
+                                            TVA : <?= number_format($tva, 2, ',', ' ') ?>
+                                        </small>
+                                        <?php endif; ?>
                                     </td>
 
                                     <td class="text-right font-weight-bold">
-                                        <?= number_format($line->credit, 2, ',', ' ') ?>
+                                        <?= number_format($creditDisplay, 2, ',', ' ') ?>
+
+                                        <?php if ($line->has_tva == 1 && $line->tva_type == 'collected') : ?>
+                                        <br>
+                                        <small class="text-warning">
+                                            TVA : <?= number_format($tva, 2, ',', ' ') ?>
+                                        </small>
+                                        <?php endif; ?>
                                     </td>
 
                                     <td class="text-center">
@@ -261,9 +297,7 @@
                                         <?= number_format($line->tva_amount, 2, ',', ' ') ?>
                                     </td>
 
-                                    <td class="text-right font-weight-bold">
-                                        <?= number_format(($line->debit + $line->tva_amount), 2, ',', ' ') ?>
-                                    </td>
+
                                 </tr>
 
                                 <?php endforeach; ?>

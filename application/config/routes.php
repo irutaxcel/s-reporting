@@ -145,3 +145,5 @@ $route['journal'] = 'FinanceController/journal';
 $route['grand-livre'] = 'FinanceController/grand_livre';
 
 $route['balance-generale'] = 'FinanceController/balance_generale';
+
+$route['cloture-comptable'] = 'FinanceController/cloture_comptable';
