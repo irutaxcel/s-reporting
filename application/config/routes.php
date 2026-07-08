@@ -105,6 +105,8 @@ $route['stock-article-store'] = 'TechController/stockArticleStore';
 $route['stock-emplacement-store'] = 'TechController/stockEmplacementStore';
 $route['stock-quantite-store'] = 'TechController/stockQuantiteStore';
 
+$route['engin-materiel'] = 'TechController/enginMateriel';
+
 
 $route['finance-dashboard'] = 'FinanceController/financeDashboard';
 

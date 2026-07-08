@@ -216,7 +216,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -263,12 +263,12 @@
 
                         </li>
 
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Demandes d'achat</p>
                             </a>
-                        </li>
+                        </li> -->
 
                         <li class="nav-item">
                             <?php if ($title == 'Achats & Approvisionnement') { ?>
@@ -324,10 +324,17 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Engin & Materiel') { ?>
+                            <a href="<?= base_url('engin-materiel') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Engin & Materiel</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('engin-materiel') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Engin & Materiel</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">

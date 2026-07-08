@@ -743,6 +743,23 @@ class TechController extends CI_Controller
         redirect('personnel-chantier');
     }
 
+    public function enginMateriel()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Engin & Materiel';
+
+        // $data['allEngins'] = $this->tech->getAllEngins();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/enginMateriel', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
     public function personnelChantierPrint()
     {
         if (!$this->session->userdata('user_id')) {

@@ -149,7 +149,7 @@
             </style>
 
             <?php
-            $exerciseName = !empty($active_exercise) ? $active_exercise->exercise_name : 'Aucun exercice';
+            $exerciseName = !empty($active_exercise) ? $active_exercise->name : 'Aucun exercice';
 
             $totalDebit  = !empty($closing_stats->total_debit) ? (float) $closing_stats->total_debit : 0;
             $totalCredit = !empty($closing_stats->total_credit) ? (float) $closing_stats->total_credit : 0;
@@ -173,12 +173,10 @@
                         </p>
                     </div>
 
-                    <div>
-                        <button class="btn btn-light btn-sm">
-                            <i class="fas fa-print mr-1"></i>
-                            Imprimer le rapport
-                        </button>
-                    </div>
+                    <button class="btn btn-light btn-sm" onclick="window.print()">
+                        <i class="fas fa-print mr-1"></i>
+                        Imprimer le rapport
+                    </button>
                 </div>
             </div>
 
@@ -186,22 +184,26 @@
                 <div class="row">
                     <div class="col-md-3 summary-item">
                         <strong>Exercice concerné</strong>
-                        <span>2026</span>
+                        <span><?= $exerciseName ?></span>
                     </div>
 
                     <div class="col-md-3 summary-item">
                         <strong>Total débit</strong>
-                        <span>9 416 000 FBU</span>
+                        <span><?= number_format($totalDebit, 2, ',', ' ') ?> FBU</span>
                     </div>
 
                     <div class="col-md-3 summary-item">
                         <strong>Total crédit</strong>
-                        <span>9 416 000 FBU</span>
+                        <span><?= number_format($totalCredit, 2, ',', ' ') ?> FBU</span>
                     </div>
 
                     <div class="col-md-3 summary-item">
                         <strong>État</strong>
+                        <?php if ($isBalanced) : ?>
                         <span class="text-success">Équilibré</span>
+                        <?php else : ?>
+                        <span class="text-danger">Non équilibré</span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -229,7 +231,12 @@
                                 <div class="step-title">Balance générale équilibrée</div>
                                 <div class="step-desc">Le total débit est égal au total crédit.</div>
                             </div>
+                            <!-- Balance générale -->
+                            <?php if ($isBalanced) : ?>
                             <span class="badge-ready">Validé</span>
+                            <?php else : ?>
+                            <span class="badge-danger-soft">Non équilibré</span>
+                            <?php endif; ?>
                         </div>
 
                         <div class="closing-step">
@@ -240,7 +247,12 @@
                                 <div class="step-title">Journaux comptables contrôlés</div>
                                 <div class="step-desc">Toutes les écritures sont rattachées à un code journal.</div>
                             </div>
+                            <!-- Journaux -->
+                            <?php if ($withoutJournal == 0) : ?>
                             <span class="badge-ready">Validé</span>
+                            <?php else : ?>
+                            <span class="badge-danger-soft"><?= $withoutJournal ?> sans journal</span>
+                            <?php endif; ?>
                         </div>
 
                         <div class="closing-step">
@@ -251,7 +263,12 @@
                                 <div class="step-title">TVA vérifiée</div>
                                 <div class="step-desc">TVA déductible et TVA collectée contrôlées.</div>
                             </div>
-                            <span class="badge-warning-soft">À vérifier</span>
+                            <!-- TVA -->
+                            <?php if ($totalTva > 0) : ?>
+                            <span class="badge-ready">TVA détectée</span>
+                            <?php else : ?>
+                            <span class="badge-warning-soft">Aucune TVA</span>
+                            <?php endif; ?>
                         </div>
 
                         <div class="closing-step">
@@ -262,7 +279,12 @@
                                 <div class="step-title">Chantiers et caisses contrôlés</div>
                                 <div class="step-desc">Les soldes par chantier doivent être validés.</div>
                             </div>
-                            <span class="badge-warning-soft">À vérifier</span>
+                            <!-- Chantiers -->
+                            <?php if ($withoutChantier == 0) : ?>
+                            <span class="badge-ready">Validé</span>
+                            <?php else : ?>
+                            <span class="badge-warning-soft"><?= $withoutChantier ?> sans chantier</span>
+                            <?php endif; ?>
                         </div>
 
                         <div class="closing-step">
@@ -273,7 +295,12 @@
                                 <div class="step-title">Écritures brouillon</div>
                                 <div class="step-desc">Aucune écriture en brouillon ne doit rester avant clôture.</div>
                             </div>
-                            <span class="badge-danger-soft">3 brouillons</span>
+                            <!-- Brouillons -->
+                            <?php if ($drafts == 0) : ?>
+                            <span class="badge-ready">Validé</span>
+                            <?php else : ?>
+                            <span class="badge-danger-soft"><?= $drafts ?> brouillons</span>
+                            <?php endif; ?>
                         </div>
                     </div>
 
@@ -292,9 +319,17 @@
                         <div class="card-body">
                             <div class="form-group">
                                 <label>Exercice comptable</label>
-                                <select class="form-control">
-                                    <option>Exercice 2026</option>
-                                    <option>Exercice 2025</option>
+                                <select name="exercise_id" class="form-control">
+                                    <?php if (!empty($exercises)) : ?>
+                                    <?php foreach ($exercises as $ex) : ?>
+                                    <option value="<?= $ex->id ?>"
+                                        <?= (!empty($active_exercise) && $active_exercise->id == $ex->id) ? 'selected' : '' ?>>
+                                        <?= $ex->name ?>
+                                    </option>
+                                    <?php endforeach; ?>
+                                    <?php else : ?>
+                                    <option value="">Aucun exercice</option>
+                                    <?php endif; ?>
                                 </select>
                             </div>
 
@@ -356,36 +391,47 @@
                         </thead>
 
                         <tbody>
+                            <?php if (!empty($closing_history)) : ?>
+                            <?php foreach ($closing_history as $history) : ?>
                             <tr>
-                                <td><strong>Exercice 2025</strong></td>
-                                <td>31/12/2025</td>
-                                <td>125 400 000 FBU</td>
-                                <td>125 400 000 FBU</td>
-                                <td>Chef comptable</td>
-                                <td><span class="badge-ready">Clôturé</span></td>
+                                <td><strong><?= $history->name ?></strong></td>
+
+                                <td>
+                                    <?= !empty($history->closed_at) ? date('d/m/Y', strtotime($history->closed_at)) : '-' ?>
+                                </td>
+
+                                <td><?= number_format((float)($history->total_debit ?? 0), 2, ',', ' ') ?> FBU</td>
+
+                                <td><?= number_format((float)($history->total_credit ?? 0), 2, ',', ' ') ?> FBU</td>
+
+                                <td><?= !empty($history->closed_by_name) ? $history->closed_by_name : '-' ?></td>
+
+                                <td>
+                                    <?php if ($history->status == 'closed') : ?>
+                                    <span class="badge-ready">Clôturé</span>
+                                    <?php else : ?>
+                                    <span class="badge-warning-soft">En cours</span>
+                                    <?php endif; ?>
+                                </td>
+
                                 <td class="text-center">
                                     <button class="btn btn-info btn-sm">
                                         <i class="fas fa-eye"></i>
                                     </button>
+
                                     <button class="btn btn-secondary btn-sm">
                                         <i class="fas fa-print"></i>
                                     </button>
                                 </td>
                             </tr>
-
+                            <?php endforeach; ?>
+                            <?php else : ?>
                             <tr>
-                                <td><strong>Exercice 2026</strong></td>
-                                <td>-</td>
-                                <td>9 416 000 FBU</td>
-                                <td>9 416 000 FBU</td>
-                                <td>-</td>
-                                <td><span class="badge-warning-soft">En cours</span></td>
-                                <td class="text-center">
-                                    <button class="btn btn-info btn-sm">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                <td colspan="7" class="text-center text-muted py-3">
+                                    Aucun historique de clôture trouvé.
                                 </td>
                             </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>

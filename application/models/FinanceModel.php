@@ -189,7 +189,7 @@ class FinanceModel extends CI_Model
     {
         $this->db->select("
             e.*,
-            ex.name AS exercise_name,
+            ex.name,
             j.journal_code,
             j.journal_name,
             c.name AS chantier_name
@@ -433,14 +433,14 @@ class FinanceModel extends CI_Model
         return $accounts;
     }
 
-    public function get_active_exercise()
-    {
-        return $this->db
-            ->where('status', 'open')
-            ->order_by('id', 'DESC')
-            ->get('tbl_finance_exercise')
-            ->row();
-    }
+    // public function get_active_exercise()
+    // {
+    //     return $this->db
+    //         ->where('status', 'open')
+    //         ->order_by('id', 'DESC')
+    //         ->get('tbl_finance_exercise')
+    //         ->row();
+    // }
 
     public function get_closing_stats()
     {
@@ -482,11 +482,41 @@ class FinanceModel extends CI_Model
         ];
     }
 
+    // public function get_closing_history()
+    // {
+    //     return $this->db
+    //         ->order_by('id', 'DESC')
+    //         ->get('tbl_finance_exercice')
+    //         ->result();
+    // }
+
     public function get_closing_history()
     {
-        return $this->db
-            ->order_by('id', 'DESC')
-            ->get('tbl_finance_exercise')
-            ->result();
+        $this->db->select("
+        ex.*,
+        SUM(IFNULL(e.total_debit,0))  AS total_debit,
+        SUM(IFNULL(e.total_credit,0)) AS total_credit,
+        u.first_name AS closed_by_name
+    ");
+
+        $this->db->from('tbl_finance_exercice ex');
+
+        $this->db->join(
+            'tbl_finance_accounting_entry e',
+            'e.exercise_id = ex.id',
+            'left'
+        );
+
+        $this->db->join(
+            'users u',
+            'u.id = ex.created_by',
+            'left'
+        );
+
+        $this->db->group_by('ex.id');
+
+        $this->db->order_by('ex.year', 'DESC');
+
+        return $this->db->get()->result();
     }
 }

@@ -134,7 +134,6 @@
             <div class="journal-entry-card">
 
                 <div class="journal-entry-header">
-
                     <div class="row align-items-center">
 
                         <div class="col-md-3">
@@ -162,7 +161,6 @@
                         </div>
 
                     </div>
-
                 </div>
 
                 <div class="p-3">
@@ -191,8 +189,6 @@
 
                     </div>
 
-
-
                     <div class="table-responsive">
                         <table class="table journal-line-table mb-0">
 
@@ -207,7 +203,6 @@
                                     <th>Type TVA</th>
                                     <th class="text-right">Taux</th>
                                     <th class="text-right">Mt TVA</th>
-
                                 </tr>
                             </thead>
 
@@ -225,17 +220,28 @@
                                                 $debitDisplay  = $debit;
                                                 $creditDisplay = $credit;
 
-                                                if ($line->has_tva == 1 && $line->tva_type == 'deductible') {
-                                                    // TVA déductible : TVA côté débit, donc crédit = montant + TVA
+                                                $isDeductible = ($line->has_tva == 1 && $line->tva_type == 'deductible');
+                                                $isCollected  = ($line->has_tva == 1 && $line->tva_type == 'collected');
+
+                                                /*
+                                                    ACHAT = TVA déductible
+                                                    Débit : HT + TVA affichée en dessous
+                                                    Crédit : TTC
+                                                */
+                                                if ($isDeductible) {
+                                                    $debitDisplay  = $debit;
                                                     $creditDisplay = $credit + $tva;
                                                 }
 
-                                                if ($line->has_tva == 1 && $line->tva_type == 'collected') {
-                                                    // TVA collectée : TVA côté crédit, donc débit = montant + TVA
-                                                    $debitDisplay = $debit + $tva;
+                                                /*
+                                                    VENTE = TVA collectée
+                                                    Débit : TTC
+                                                    Crédit : HT + TVA affichée en dessous
+                                                */
+                                                if ($isCollected) {
+                                                    $debitDisplay  = $debit + $tva;
+                                                    $creditDisplay = $credit;
                                                 }
-
-                                                $mtTvac = $debit + $credit + $tva;
                                                 ?>
 
                                 <tr>
@@ -249,14 +255,13 @@
                                         <small class="text-muted"><?= $line->credit_name ?></small>
                                     </td>
 
-                                    <td>
-                                        <?= $line->line_label ?>
-                                    </td>
+                                    <td><?= $line->line_label ?></td>
 
+                                    <!-- DÉBIT -->
                                     <td class="text-right font-weight-bold">
                                         <?= number_format($debitDisplay, 2, ',', ' ') ?>
 
-                                        <?php if ($line->has_tva == 1 && $line->tva_type == 'deductible') : ?>
+                                        <?php if ($isDeductible) : ?>
                                         <br>
                                         <small class="text-success">
                                             TVA : <?= number_format($tva, 2, ',', ' ') ?>
@@ -264,10 +269,11 @@
                                         <?php endif; ?>
                                     </td>
 
+                                    <!-- CRÉDIT -->
                                     <td class="text-right font-weight-bold">
                                         <?= number_format($creditDisplay, 2, ',', ' ') ?>
 
-                                        <?php if ($line->has_tva == 1 && $line->tva_type == 'collected') : ?>
+                                        <?php if ($isCollected) : ?>
                                         <br>
                                         <small class="text-warning">
                                             TVA : <?= number_format($tva, 2, ',', ' ') ?>
@@ -280,35 +286,58 @@
                                     </td>
 
                                     <td>
+                                        <?php
+                                                        $journalCode = strtoupper($entry->journal_code);
+                                                        $tvaPosition = '';
+
+                                                        if ($line->has_tva == 1 && $line->tva_type == 'deductible') {
+                                                            $tvaPosition = 'Crédit';
+                                                        }
+
+                                                        if ($line->has_tva == 1 && $line->tva_type == 'collected') {
+                                                            $tvaPosition = 'Débit';
+                                                        }
+                                                        ?>
+
                                         <?php if ($line->has_tva == 1 && $line->tva_type == 'deductible') : ?>
-                                        <span class="tva-deductible">TVA déductible</span>
+
+                                        <span class="tva-deductible">
+                                            TVA déductible
+                                        </span>
+                                        <br>
+                                        <small class="text-primary font-weight-bold">
+                                            Position : <?= $tvaPosition ?>
+                                        </small>
+
                                         <?php elseif ($line->has_tva == 1 && $line->tva_type == 'collected') : ?>
-                                        <span class="tva-collected">TVA collectée</span>
+
+                                        <span class="tva-collected">
+                                            TVA collectée
+                                        </span>
+                                        <br>
+                                        <small class="text-warning font-weight-bold">
+                                            Position : <?= $tvaPosition ?>
+                                        </small>
+
                                         <?php else : ?>
-                                        <span class="tva-none">Aucune TVA</span>
+
+                                        <span class="tva-none">
+                                            Aucune TVA
+                                        </span>
+
                                         <?php endif; ?>
                                     </td>
 
                                     <td class="text-right">
-                                        <?= number_format($line->tva_rate, 2, ',', ' ') ?> %
+                                        <?= number_format((float) $line->tva_rate, 2, ',', ' ') ?> %
                                     </td>
 
                                     <td class="text-right font-weight-bold">
-                                        <?= number_format($line->tva_amount, 2, ',', ' ') ?>
+                                        <?= number_format($tva, 2, ',', ' ') ?>
                                     </td>
-
-
                                 </tr>
 
                                 <?php endforeach; ?>
-
-                                <?php else : ?>
-
-                                <tr>
-                                    <td colspan="9" class="text-center text-muted py-3">
-                                        Aucune ligne enregistrée pour cette écriture.
-                                    </td>
-                                </tr>
 
                                 <?php endif; ?>
 
@@ -320,25 +349,30 @@
                 </div>
 
                 <div class="entry-total-box">
-
                     <div class="row">
 
                         <div class="col-md-3">
                             Total débit :
-                            <?= number_format($entry->total_debit, 2, ',', ' ') ?>
-                            <?= $entry->currency ?>
+                            <strong>
+                                <?= number_format($entry->total_debit, 2, ',', ' ') ?>
+                                <?= $entry->currency ?>
+                            </strong>
                         </div>
 
                         <div class="col-md-3">
                             Total crédit :
-                            <?= number_format($entry->total_credit, 2, ',', ' ') ?>
-                            <?= $entry->currency ?>
+                            <strong>
+                                <?= number_format($entry->total_credit, 2, ',', ' ') ?>
+                                <?= $entry->currency ?>
+                            </strong>
                         </div>
 
                         <div class="col-md-3">
                             Total TVA :
-                            <?= number_format($entry->total_tva, 2, ',', ' ') ?>
-                            <?= $entry->currency ?>
+                            <strong>
+                                <?= number_format($entry->total_tva, 2, ',', ' ') ?>
+                                <?= $entry->currency ?>
+                            </strong>
                         </div>
 
                         <div class="col-md-3 text-right">
@@ -354,7 +388,6 @@
                         </div>
 
                     </div>
-
                 </div>
 
             </div>
