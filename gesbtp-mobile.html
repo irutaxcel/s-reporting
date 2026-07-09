@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GES BTP PRO — Mobile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal: #1A1D21;
+    --charcoal-2: #23272B;
+    --paper: #F3F1EC;
+    --paper-dim: #C9C6BE;
+    --orange: #FF6A1A;
+    --blueprint: #2E6CB0;
+    --green-ok: #4E9A63;
+    --line: rgba(255,255,255,0.08);
+  }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  body{
+    background: #0e1012;
+    min-height: 100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding: 40px 16px;
+    font-family: 'Work Sans', sans-serif;
+  }
+  .device{
+    width: 390px;
+    max-width: 100%;
+    background: var(--charcoal);
+    border-radius: 36px;
+    border: 8px solid #000;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    position: relative;
+  }
+  .notch{
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width: 120px; height: 22px; background:#000; border-radius: 0 0 14px 14px; z-index: 50;
+  }
+  .screen{ height: 780px; overflow-y:auto; position:relative; -webkit-overflow-scrolling:touch; }
+  .screen::-webkit-scrollbar{ display:none; }
+
+  /* status bar */
+  .status{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 14px 20px 6px; font-size: 12px; color: var(--paper); font-weight:600;
+  }
+
+  /* header */
+  .topbar{
+    padding: 6px 20px 18px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{
+    font-family:'Oswald', sans-serif; font-weight:700; font-size:19px; letter-spacing:0.5px;
+    color: var(--paper); text-transform:uppercase;
+  }
+  .brand span{ color: var(--orange); }
+  .avatar{
+    width:34px; height:34px; border-radius:8px; background: var(--blueprint);
+    display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:13px;
+  }
+
+  /* stripe divider - measuring tape motif */
+  .tape{
+    height: 10px;
+    background-image: repeating-linear-gradient(90deg, var(--orange) 0 2px, transparent 2px 14px);
+    background-color: rgba(255,106,26,0.12);
+    margin: 0 0 18px 0;
+  }
+
+  .section{ padding: 0 20px 6px; }
+  .section-title{
+    font-family:'Oswald', sans-serif; text-transform:uppercase; font-size:12px; letter-spacing:1.5px;
+    color: var(--paper-dim); margin-bottom:12px; display:flex; align-items:center; gap:8px;
+  }
+  .section-title::before{ content:''; width:14px; height:2px; background:var(--orange); display:inline-block; }
+
+  /* KPI row */
+  .kpi-row{ display:flex; gap:10px; padding: 0 20px 22px; overflow-x:auto; }
+  .kpi{
+    flex: 0 0 auto; min-width: 108px;
+    background: var(--charcoal-2); border:1px solid var(--line); border-radius:14px;
+    padding: 14px 14px 12px;
+  }
+  .kpi-num{ font-family:'JetBrains Mono', monospace; font-size:24px; font-weight:600; color:var(--paper); }
+  .kpi-label{ font-size:11px; color: var(--paper-dim); margin-top:2px; text-transform:uppercase; letter-spacing:0.5px; }
+  .kpi.alert .kpi-num{ color: var(--orange); }
+  .kpi.ok .kpi-num{ color: var(--green-ok); }
+
+  /* project card */
+  .chantier{
+    background: var(--charcoal-2);
+    border:1px solid var(--line);
+    border-radius:16px;
+    margin: 0 20px 14px;
+    padding: 16px;
+    position:relative;
+  }
+  .chantier-top{ display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; }
+  .chantier-name{ font-family:'Oswald', sans-serif; font-size:16px; color:var(--paper); font-weight:600; }
+  .chantier-loc{ font-size:12px; color:var(--paper-dim); margin-top:2px; }
+  .badge{
+    font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;
+    padding: 4px 9px; border-radius: 20px; white-space:nowrap;
+  }
+  .badge.retard{ background: rgba(255,106,26,0.15); color: var(--orange); }
+  .badge.cours{ background: rgba(46,108,176,0.18); color: #6fa8dc; }
+  .badge.ok{ background: rgba(78,154,99,0.18); color: var(--green-ok); }
+
+  .progress-wrap{ margin: 10px 0 4px; }
+  .progress-labels{ display:flex; justify-content:space-between; font-size:11px; color:var(--paper-dim); margin-bottom:5px; font-family:'JetBrains Mono', monospace; }
+  .progress-bar{ height:6px; border-radius:4px; background: rgba(255,255,255,0.08); overflow:hidden; }
+  .progress-fill{ height:100%; border-radius:4px; background: linear-gradient(90deg, var(--orange), #ffab6e); }
+
+  .chantier-meta{ display:flex; gap:16px; margin-top:12px; }
+  .meta-item{ display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--paper-dim); }
+  .meta-item svg{ width:14px; height:14px; stroke:var(--paper-dim); flex-shrink:0; }
+
+  /* FAB */
+  .fab{
+    position:absolute; right:20px; bottom:96px;
+    width:52px; height:52px; border-radius:16px;
+    background: var(--orange); display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 8px 20px rgba(255,106,26,0.4); z-index:40;
+  }
+  .fab svg{ width:24px; height:24px; stroke:#161616; }
+
+  /* bottom nav */
+  .navbar{
+    position:sticky; bottom:0; left:0; right:0;
+    background: rgba(26,29,33,0.92); backdrop-filter: blur(10px);
+    border-top:1px solid var(--line);
+    display:flex; justify-content:space-around; padding: 10px 0 14px;
+  }
+  .nav-item{ display:flex; flex-direction:column; align-items:center; gap:4px; color: var(--paper-dim); font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.3px; }
+  .nav-item.active{ color: var(--orange); }
+  .nav-item svg{ width:20px; height:20px; stroke:currentColor; fill:none; }
+
+  .greeting{ padding: 0 20px 4px; }
+  .greeting .hello{ font-size:12px; color:var(--paper-dim); text-transform:uppercase; letter-spacing:1px; }
+  .greeting .name{ font-family:'Oswald', sans-serif; font-size:22px; color:var(--paper); font-weight:600; margin-top:2px; }
+
+  .bottom-pad{ height:30px; }
+</style>
+</head>
+<body>
+
+<div class="device">
+  <div class="notch"></div>
+  <div class="screen">
+
+    <div class="status">
+      <span>9:41</span>
+      <span>●●●● 5G 🔋</span>
+    </div>
+
+    <div class="topbar">
+      <div class="brand">GES BTP <span>PRO</span></div>
+      <div class="avatar">AX</div>
+    </div>
+
+    <div class="greeting">
+      <div class="hello">Bonjour</div>
+      <div class="name">Axcel Kouadio</div>
+    </div>
+
+    <div style="height:16px;"></div>
+    <div class="tape"></div>
+
+    <div class="kpi-row">
+      <div class="kpi ok">
+        <div class="kpi-num">08</div>
+        <div class="kpi-label">Chantiers actifs</div>
+      </div>
+      <div class="kpi alert">
+        <div class="kpi-num">02</div>
+        <div class="kpi-label">En retard</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">14</div>
+        <div class="kpi-label">Équipes</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num">3.2M</div>
+        <div class="kpi-label">Budget FCFA</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Chantiers en cours</div>
+    </div>
+
+    <!-- Chantier 1 -->
+    <div class="chantier">
+      <div class="chantier-top">
+        <div>
+          <div class="chantier-name">Résidence Les Palmiers</div>
+          <div class="chantier-loc">Cocody, Abidjan</div>
+        </div>
+        <span class="badge retard">Retard</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-labels"><span>Avancement</span><span>62%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:62%;"></div></div>
+      </div>
+      <div class="chantier-meta">
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          12 Août
+        </div>
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg>
+          6 ouvriers
+        </div>
+      </div>
+    </div>
+
+    <!-- Chantier 2 -->
+    <div class="chantier">
+      <div class="chantier-top">
+        <div>
+          <div class="chantier-name">Voirie Zone Industrielle</div>
+          <div class="chantier-loc">Yopougon, Abidjan</div>
+        </div>
+        <span class="badge cours">En cours</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-labels"><span>Avancement</span><span>34%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:34%; background: linear-gradient(90deg, var(--blueprint), #6fa8dc);"></div></div>
+      </div>
+      <div class="chantier-meta">
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          28 Sept
+        </div>
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg>
+          11 ouvriers
+        </div>
+      </div>
+    </div>
+
+    <!-- Chantier 3 -->
+    <div class="chantier">
+      <div class="chantier-top">
+        <div>
+          <div class="chantier-name">Entrepôt SATRACO</div>
+          <div class="chantier-loc">Vridi, Abidjan</div>
+        </div>
+        <span class="badge ok">Livré</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-labels"><span>Avancement</span><span>100%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%; background: linear-gradient(90deg, var(--green-ok), #7bc492);"></div></div>
+      </div>
+      <div class="chantier-meta">
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          03 Juil
+        </div>
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 014-4h6a4 4 0 014 4v2"/></svg>
+          9 ouvriers
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-pad"></div>
+
+    <div class="fab">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+    </div>
+
+    <div class="navbar">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+        Accueil
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        Chantiers
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        Docs
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a8 8 0 0116 0v1"/></svg>
+        Profil
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

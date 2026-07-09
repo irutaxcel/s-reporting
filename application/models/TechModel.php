@@ -511,4 +511,56 @@ class TechModel extends CI_Model
 
         return $this->db->get()->result();
     }
+
+    public function getDatas()
+    {
+        return $this->db
+            ->where('status', 1)
+            ->get('tbl_engin_categorie')
+            ->result();
+    }
+
+    public function insertData($table, $data)
+    {
+        $this->db->insert($table, $data);
+
+        return $this->db->insert_id();
+    }
+
+    // public function getDatas($table, $where = [])
+    // {
+    //     return $this->db->get_where($table, $where)->result();
+    // }
+
+    public function getData($table, $where = [])
+    {
+        return $this->db->get_where($table, $where)->row();
+    }
+
+    public function updateData($table, $where, $data)
+    {
+        $this->db->where($where);
+        return $this->db->update($table, $data);
+    }
+
+
+    public function getAllEngins()
+    {
+        return $this->db
+            ->select('
+                e.*,
+                c.nom_categorie,
+                ch.name AS chantier_name,
+                p.photo AS photo_principale
+            ')
+            ->from('tbl_engin_materiel e')
+            ->join('tbl_engin_categorie c', 'c.id = e.categorie_id', 'left')
+            ->join('chantiers ch', 'ch.id = e.chantier_id', 'left')
+            ->join('tbl_engin_photo p', 'p.engin_id = e.id', 'left')
+            ->where('e.status', 1)
+            ->group_by('e.id')
+            ->order_by('e.id', 'DESC')
+            ->get()
+            ->result();
+    }
 }

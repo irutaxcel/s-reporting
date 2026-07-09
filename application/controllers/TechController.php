@@ -12,6 +12,7 @@ class TechController extends CI_Controller
         $this->load->helper(['url', 'form']);
         $this->load->model('AuthModel', 'auth');
         $this->load->model('TechModel', 'tech');
+        $this->load->library('upload');
     }
 
     public function index()
@@ -752,13 +753,224 @@ class TechController extends CI_Controller
 
         $data['title'] = 'Engin & Materiel';
 
-        // $data['allEngins'] = $this->tech->getAllEngins();
+        $data['categories'] = $this->tech->getDatas();
+
+        $data['chantiers'] = $this->tech->getAllChantier();
+
+        $annee = date('Y');
+        $prefixe = 'ENG';
+
+        $codeData = $this->db
+            ->where('prefixe', $prefixe)
+            ->where('annee', $annee)
+            ->get('tbl_engin_code')
+            ->row();
+
+        if (!$codeData) {
+
+            $this->db->insert('tbl_engin_code', [
+                'prefixe' => $prefixe,
+                'annee' => $annee,
+                'dernier_numero' => 0
+            ]);
+
+            $dernierNumero = 0;
+        } else {
+
+            $dernierNumero = $codeData->dernier_numero;
+        }
+
+        $nouveauNumero = $dernierNumero + 1;
+
+        $data['codeEngin'] = $prefixe . '-' .
+            $annee . '-' .
+            str_pad($nouveauNumero, 5, '0', STR_PAD_LEFT);
+
+        $data['allEngins'] = $this->tech->getAllEngins();
 
         $this->load->view('v1/components/layout/header', $data);
         $this->load->view('v1/components/layout/sidebar', $data);
         $this->load->view('v1/components/modules/technique/enginMateriel', $data);
         $this->load->view('v1/components/layout/footer', $data);
     }
+
+    private function uploadMultipleFiles($inputName, $uploadPath, $allowedTypes, $table, $column, $enginId)
+    {
+        if (empty($_FILES[$inputName]['name'][0])) {
+            return;
+        }
+
+        $count = count($_FILES[$inputName]['name']);
+
+        for ($i = 0; $i < $count; $i++) {
+
+            $_FILES['file']['name']     = $_FILES[$inputName]['name'][$i];
+            $_FILES['file']['type']     = $_FILES[$inputName]['type'][$i];
+            $_FILES['file']['tmp_name'] = $_FILES[$inputName]['tmp_name'][$i];
+            $_FILES['file']['error']    = $_FILES[$inputName]['error'][$i];
+            $_FILES['file']['size']     = $_FILES[$inputName]['size'][$i];
+
+            $config = [
+                'upload_path'   => $uploadPath,
+                'allowed_types' => $allowedTypes,
+                'encrypt_name'  => true
+            ];
+
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('file')) {
+                $upload = $this->upload->data();
+
+                $this->tech->insertData($table, [
+                    'engin_id'   => $enginId,
+                    $column      => $upload['file_name'],
+                    'created_at' => date('Y-m-d H:i:s')
+                ]);
+            }
+        }
+    }
+
+    private function updateEnginCode($codeEngin)
+    {
+        $parts = explode('-', $codeEngin);
+
+        if (count($parts) < 3) {
+            return;
+        }
+
+        $prefixe = $parts[0];
+        $annee = $parts[1];
+        $nouveauNumero = (int) $parts[2];
+
+        $this->tech->updateData(
+            'tbl_engin_code',
+            [
+                'prefixe' => $prefixe,
+                'annee'  => $annee
+            ],
+            [
+                'dernier_numero' => $nouveauNumero,
+                'updated_at'     => date('Y-m-d H:i:s')
+            ]
+        );
+    }
+
+    public function enginMaterielStore()
+    {
+        $this->load->library('upload');
+
+        $codeEngin = $this->input->post('code_engin');
+
+        $data = [
+            'code_engin'       => $codeEngin,
+            'designation'      => $this->input->post('designation'),
+            'categorie_id'     => $this->input->post('categorie_id'),
+            'marque'           => $this->input->post('marque'),
+            'modele'           => $this->input->post('modele'),
+            'plaque'           => $this->input->post('plaque'),
+            'numero_serie'     => $this->input->post('numero_serie'),
+            'date_acquisition' => $this->input->post('date_acquisition') ?: null,
+            'valeur_achat'     => $this->input->post('valeur_achat') ?: 0,
+            'etat'             => $this->input->post('etat'),
+            'localisation'     => $this->input->post('localisation'),
+            'chantier_id'      => $this->input->post('chantier_id') ?: null,
+            'observation'      => $this->input->post('observation'),
+            'status'           => 1,
+            'created_at'       => date('Y-m-d H:i:s')
+        ];
+
+        $enginId = $this->tech->insertData('tbl_engin_materiel', $data);
+
+        if (!$enginId) {
+            $this->session->set_flashdata('error', 'Erreur lors de l’enregistrement.');
+            redirect('engin-materiel');
+        }
+
+        $this->uploadMultipleFiles(
+            'photos',
+            './uploads/engins/photos/',
+            'jpg|jpeg|png|webp',
+            'tbl_engin_photo',
+            'photo',
+            $enginId
+        );
+
+        $this->uploadMultipleFiles(
+            'documents',
+            './uploads/engins/documents/',
+            'pdf|doc|docx|xls|xlsx|jpg|jpeg|png',
+            'tbl_engin_document',
+            'document',
+            $enginId
+        );
+
+        $this->updateEnginCode($codeEngin);
+
+        $this->session->set_flashdata('success', 'Engin enregistré avec succès.');
+        redirect('engin-materiel');
+    }
+
+
+    public function enginMaterielFiles()
+    {
+        $engin_id = $this->input->post('engin_id');
+
+        $photos = $this->db
+            ->where('engin_id', $engin_id)
+            ->get('tbl_engin_photo')
+            ->result();
+
+        $documents = $this->db
+            ->where('engin_id', $engin_id)
+            ->get('tbl_engin_document')
+            ->result();
+
+        echo json_encode([
+            'photos' => $photos,
+            'documents' => $documents
+        ]);
+    }
+
+
+    public function enginPhotoDelete()
+    {
+        $id = $this->input->post('id');
+
+        $photo = $this->db->where('id', $id)->get('tbl_engin_photo')->row();
+
+        if ($photo) {
+            $path = './uploads/engins/photos/' . $photo->photo;
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            $this->db->where('id', $id)->delete('tbl_engin_photo');
+        }
+
+        echo json_encode(['status' => 'success']);
+    }
+
+    public function enginDocumentDelete()
+    {
+        $id = $this->input->post('id');
+
+        $doc = $this->db->where('id', $id)->get('tbl_engin_document')->row();
+
+        if ($doc) {
+            $path = './uploads/engins/documents/' . $doc->document;
+
+            if (file_exists($path)) {
+                unlink($path);
+            }
+
+            $this->db->where('id', $id)->delete('tbl_engin_document');
+        }
+
+        echo json_encode(['status' => 'success']);
+    }
+
+
 
     public function personnelChantierPrint()
     {

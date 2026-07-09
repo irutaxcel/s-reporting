@@ -106,6 +106,18 @@ $route['stock-emplacement-store'] = 'TechController/stockEmplacementStore';
 $route['stock-quantite-store'] = 'TechController/stockQuantiteStore';
 
 $route['engin-materiel'] = 'TechController/enginMateriel';
+$route['engin-materiel-store'] = 'TechController/enginMaterielStore';
+
+$route['engin-materiel-update'] = 'TechController/enginMaterielUpdate';
+$route['engin-materiel-delete'] = 'TechController/enginMaterielDelete';
+
+$route['engin-materiel-files'] = 'TechController/enginMaterielFiles';
+$route['engin-materiel-update'] = 'TechController/enginMaterielUpdate';
+
+$route['engin-photo-delete'] = 'TechController/enginPhotoDelete';
+$route['engin-document-delete'] = 'TechController/enginDocumentDelete';
+
+
 
 
 $route['finance-dashboard'] = 'FinanceController/financeDashboard';

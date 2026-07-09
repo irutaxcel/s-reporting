@@ -25,184 +25,278 @@
             <!-- le contenu de la page ici  -->
 
             <style>
-            .engin-page {
-                font-family: "Segoe UI", sans-serif;
-            }
+                .engin-page {
+                    font-family: "Segoe UI", sans-serif;
+                }
 
-            .stat-card {
-                border: 0;
-                border-radius: 18px;
-                color: #fff;
-                overflow: hidden;
-                position: relative;
-                box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
-            }
+                .stat-card {
+                    border: 0;
+                    border-radius: 18px;
+                    color: #fff;
+                    overflow: hidden;
+                    position: relative;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+                }
 
-            .stat-card .icon-bg {
-                position: absolute;
-                right: 18px;
-                bottom: 10px;
-                font-size: 55px;
-                opacity: .18;
-            }
+                .stat-card .icon-bg {
+                    position: absolute;
+                    right: 18px;
+                    bottom: 10px;
+                    font-size: 55px;
+                    opacity: .18;
+                }
 
-            .stat-card h3 {
-                font-weight: 800;
-                margin-bottom: 2px;
-            }
+                .stat-card h3 {
+                    font-weight: 800;
+                    margin-bottom: 2px;
+                }
 
-            .stat-card p {
-                margin: 0;
-                font-size: 13px;
-                opacity: .9;
-            }
+                .stat-card p {
+                    margin: 0;
+                    font-size: 13px;
+                    opacity: .9;
+                }
 
-            .bg-grad-green {
-                background: linear-gradient(135deg, #0f766e, #22c55e);
-            }
+                .bg-grad-green {
+                    background: linear-gradient(135deg, #0f766e, #22c55e);
+                }
 
-            .bg-grad-blue {
-                background: linear-gradient(135deg, #0f172a, #2563eb);
-            }
+                .bg-grad-blue {
+                    background: linear-gradient(135deg, #0f172a, #2563eb);
+                }
 
-            .bg-grad-orange {
-                background: linear-gradient(135deg, #92400e, #f59e0b);
-            }
+                .bg-grad-orange {
+                    background: linear-gradient(135deg, #92400e, #f59e0b);
+                }
 
-            .bg-grad-red {
-                background: linear-gradient(135deg, #7f1d1d, #ef4444);
-            }
+                .bg-grad-red {
+                    background: linear-gradient(135deg, #7f1d1d, #ef4444);
+                }
 
-            .engin-card {
-                border: 0;
-                border-radius: 18px;
-                box-shadow: 0 10px 25px rgba(15, 23, 42, .08);
-                overflow: hidden;
-            }
+                .engin-card {
+                    border: 0;
+                    border-radius: 18px;
+                    box-shadow: 0 10px 25px rgba(15, 23, 42, .08);
+                    overflow: hidden;
+                }
 
-            .engin-card .card-header {
-                background: #fff;
-                border-bottom: 1px solid #eef2f7;
-                padding: 18px 22px;
-            }
+                .engin-card .card-header {
+                    background: #fff;
+                    border-bottom: 1px solid #eef2f7;
+                    padding: 18px 22px;
+                }
 
-            .engin-title {
-                font-weight: 800;
-                color: #0f172a;
-                margin-bottom: 0;
-            }
+                .engin-title {
+                    font-weight: 800;
+                    color: #0f172a;
+                    margin-bottom: 0;
+                }
 
-            .engin-subtitle {
-                color: #64748b;
-                font-size: 13px;
-            }
+                .engin-subtitle {
+                    color: #64748b;
+                    font-size: 13px;
+                }
 
-            .btn-satraco {
-                background: linear-gradient(135deg, #0f766e, #22c55e);
-                color: #fff;
-                border: 0;
-                border-radius: 10px;
-                font-weight: 600;
-                box-shadow: 0 8px 18px rgba(34, 197, 94, .25);
-            }
+                .btn-satraco {
+                    background: linear-gradient(135deg, #0f766e, #22c55e);
+                    color: #fff;
+                    border: 0;
+                    border-radius: 10px;
+                    font-weight: 600;
+                    box-shadow: 0 8px 18px rgba(34, 197, 94, .25);
+                }
 
-            .btn-satraco:hover {
-                color: #fff;
-                opacity: .92;
-            }
+                .btn-satraco:hover {
+                    color: #fff;
+                    opacity: .92;
+                }
 
-            .filter-box {
-                background: #f8fafc;
-                border: 1px solid #e5e7eb;
-                border-radius: 16px;
-                padding: 16px;
-            }
+                .filter-box {
+                    background: #f8fafc;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 16px;
+                    padding: 16px;
+                }
 
-            .materiel-item {
-                border: 1px solid #e5e7eb;
-                border-radius: 16px;
-                padding: 15px;
-                background: #fff;
-                transition: .2s;
-            }
+                .materiel-item {
+                    border: 1px solid #e5e7eb;
+                    border-radius: 16px;
+                    padding: 15px;
+                    background: #fff;
+                    transition: .2s;
+                }
 
-            .materiel-item:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 10px 22px rgba(0, 0, 0, .08);
-            }
+                .materiel-item:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 10px 22px rgba(0, 0, 0, .08);
+                }
 
-            .materiel-icon {
-                width: 55px;
-                height: 55px;
-                border-radius: 15px;
-                background: #ecfdf5;
-                color: #0f766e;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 25px;
-            }
+                .materiel-icon {
+                    width: 55px;
+                    height: 55px;
+                    border-radius: 15px;
+                    background: #ecfdf5;
+                    color: #0f766e;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 25px;
+                }
 
-            .badge-state {
-                border-radius: 50px;
-                padding: 6px 12px;
-                font-size: 11px;
-                font-weight: 700;
-            }
+                .badge-state {
+                    border-radius: 50px;
+                    padding: 6px 12px;
+                    font-size: 11px;
+                    font-weight: 700;
+                }
 
-            .badge-dispo {
-                background: #dcfce7;
-                color: #166534;
-            }
+                .badge-dispo {
+                    background: #dcfce7;
+                    color: #166534;
+                }
 
-            .badge-chantier {
-                background: #dbeafe;
-                color: #1d4ed8;
-            }
+                .badge-chantier {
+                    background: #dbeafe;
+                    color: #1d4ed8;
+                }
 
-            .badge-maintenance {
-                background: #fef3c7;
-                color: #92400e;
-            }
+                .badge-maintenance {
+                    background: #fef3c7;
+                    color: #92400e;
+                }
 
-            .badge-panne {
-                background: #fee2e2;
-                color: #991b1b;
-            }
+                .badge-panne {
+                    background: #fee2e2;
+                    color: #991b1b;
+                }
 
-            .table thead th {
-                background: #f8fafc;
-                border-bottom: 1px solid #e5e7eb;
-                color: #334155;
-                font-size: 12px;
-                text-transform: uppercase;
-            }
+                .table thead th {
+                    background: #f8fafc;
+                    border-bottom: 1px solid #e5e7eb;
+                    color: #334155;
+                    font-size: 12px;
+                    text-transform: uppercase;
+                }
 
-            .progress {
-                height: 8px;
-                border-radius: 30px;
-            }
+                .progress {
+                    height: 8px;
+                    border-radius: 30px;
+                }
 
-            .quick-action {
-                border: 1px dashed #cbd5e1;
-                border-radius: 16px;
-                padding: 16px;
-                background: #f8fafc;
-                text-align: center;
-                transition: .2s;
-                cursor: pointer;
-            }
+                .quick-action {
+                    border: 1px dashed #cbd5e1;
+                    border-radius: 16px;
+                    padding: 16px;
+                    background: #f8fafc;
+                    text-align: center;
+                    transition: .2s;
+                    cursor: pointer;
+                }
 
-            .quick-action:hover {
-                background: #ecfdf5;
-                border-color: #0f766e;
-            }
+                .quick-action:hover {
+                    background: #ecfdf5;
+                    border-color: #0f766e;
+                }
 
-            .quick-action i {
-                font-size: 24px;
-                color: #0f766e;
-                margin-bottom: 8px;
-            }
+                .quick-action i {
+                    font-size: 24px;
+                    color: #0f766e;
+                    margin-bottom: 8px;
+                }
+
+                .preview-box {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 10px;
+                }
+
+                .preview-img-card {
+                    width: 95px;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    background: #fff;
+                    box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
+                }
+
+                .preview-img-card img {
+                    width: 100%;
+                    height: 70px;
+                    object-fit: cover;
+                }
+
+                .preview-img-card span {
+                    display: block;
+                    padding: 6px;
+                    font-size: 11px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .preview-doc-card {
+                    width: 100%;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 12px;
+                    padding: 10px;
+                    background: #f8fafc;
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                }
+
+                .preview-doc-card i {
+                    font-size: 22px;
+                    color: #0f766e;
+                }
+
+                .preview-doc-card span {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #334155;
+                }
+
+                .delete-file-btn {
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    border-radius: 50%;
+                    width: 22px;
+                    height: 22px;
+                    padding: 0;
+                    font-size: 11px;
+                    z-index: 5;
+                }
+
+                .preview-img-card {
+                    position: relative;
+                }
+
+                .preview-new-img {
+                    width: 90px;
+                    height: 90px;
+                    object-fit: cover;
+                    border-radius: 10px;
+                    border: 1px solid #ddd;
+                    margin-right: 10px;
+                    margin-bottom: 10px;
+                }
+
+                .preview-new-doc {
+                    display: flex;
+                    align-items: center;
+                    padding: 10px;
+                    border: 1px solid #ddd;
+                    border-radius: 8px;
+                    margin-bottom: 8px;
+                    background: #f8f9fa;
+                }
+
+                .preview-new-doc i {
+                    font-size: 22px;
+                    margin-right: 10px;
+                    color: #dc3545;
+                }
             </style>
 
             <div class="engin-page">
@@ -380,98 +474,115 @@
 
                             <div class="card-body">
 
-                                <div class="materiel-item mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="materiel-icon mr-3">
-                                            <i class="fas fa-truck"></i>
-                                        </div>
+                                <?php if (!empty($allEngins)): ?>
 
-                                        <div class="flex-fill">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1 font-weight-bold">Camion Benne Mercedes Actros</h6>
-                                                <span class="badge-state badge-chantier">Sur chantier</span>
+                                    <?php foreach ($allEngins as $engin): ?>
+
+                                        <?php
+                                        if ($engin->etat == 'Disponible') {
+                                            $badgeClass = 'badge-dispo';
+                                            $progressClass = 'bg-success';
+                                            $progress = 95;
+                                        } elseif ($engin->etat == 'Sur chantier') {
+                                            $badgeClass = 'badge-chantier';
+                                            $progressClass = 'bg-primary';
+                                            $progress = 75;
+                                        } elseif ($engin->etat == 'Maintenance') {
+                                            $badgeClass = 'badge-maintenance';
+                                            $progressClass = 'bg-warning';
+                                            $progress = 45;
+                                        } else {
+                                            $badgeClass = 'badge-panne';
+                                            $progressClass = 'bg-danger';
+                                            $progress = 25;
+                                        }
+
+                                        $photo = !empty($engin->photo_principale)
+                                            ? base_url('uploads/engins/photos/' . $engin->photo_principale)
+                                            : base_url('assets/v1/dist/img/no-image.png');
+                                        ?>
+
+                                        <div class="materiel-item mb-3">
+                                            <div class="d-flex align-items-center">
+
+                                                <img src="<?= $photo ?>" class="mr-3"
+                                                    style="width:75px;height:75px;object-fit:cover;border-radius:15px;border:1px solid #e5e7eb;">
+
+                                                <div class="flex-fill">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <h6 class="mb-1 font-weight-bold">
+                                                            <?= $engin->designation ?>
+                                                        </h6>
+
+                                                        <!-- <span class="badge-state <?= $badgeClass ?>">
+                                                    <?= $engin->etat ?>
+                                                </span> -->
+                                                    </div>
+
+                                                    <small class="text-muted">
+                                                        Code : <?= $engin->code_engin ?>
+                                                        | Catégorie : <?= $engin->nom_categorie ?? '-' ?>
+                                                        | Marque : <?= $engin->marque ?? '-' ?>
+                                                        | Plaque : <?= $engin->plaque ?? '-' ?>
+                                                        | Chantier :
+                                                        <?= $engin->chantier_name ?: ($engin->localisation ?: '-') ?>
+                                                    </small>
+
+                                                    <div class="progress mt-2">
+                                                        <div class="progress-bar <?= $progressClass ?>"
+                                                            style="width: <?= $progress ?>%"></div>
+                                                    </div>
+
+
+                                                </div>
+
+                                                <div class="d-flex align-items-center">
+                                                    <span class="badge-state <?= $badgeClass ?> mr-2">
+                                                        <?= $engin->etat ?>
+                                                    </span>
+
+                                                    <button type="button" class="btn btn-sm btn-warning mr-1" onclick="editEngin(
+                                                        '<?= $engin->id ?>',
+                                                        '<?= addslashes($engin->code_engin) ?>',
+                                                        '<?= addslashes($engin->designation) ?>',
+                                                        '<?= $engin->categorie_id ?>',
+                                                        '<?= addslashes($engin->marque) ?>',
+                                                        '<?= addslashes($engin->modele) ?>',
+                                                        '<?= addslashes($engin->plaque) ?>',
+                                                        '<?= addslashes($engin->numero_serie) ?>',
+                                                        '<?= $engin->date_acquisition ?>',
+                                                        '<?= $engin->valeur_achat ?>',
+                                                        '<?= $engin->etat ?>',
+                                                        '<?= addslashes($engin->localisation) ?>',
+                                                        '<?= $engin->chantier_id ?>',
+                                                        '<?= addslashes($engin->observation) ?>'
+                                                    )">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+
+                                                    <button type="button" class="btn btn-sm btn-danger"
+                                                        onclick="deleteEngin('<?= $engin->id ?>')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+
                                             </div>
 
-                                            <small class="text-muted">
-                                                Code : ENG-001 | Plaque : BA 4587 | Chantier : Gitega
-                                            </small>
 
-                                            <div class="progress mt-2">
-                                                <div class="progress-bar bg-success" style="width: 78%"></div>
-                                            </div>
+
                                         </div>
+
+
+
+                                    <?php endforeach; ?>
+
+                                <?php else: ?>
+
+                                    <div class="alert alert-info mb-0">
+                                        Aucun engin enregistré pour le moment.
                                     </div>
-                                </div>
 
-                                <div class="materiel-item mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="materiel-icon mr-3">
-                                            <i class="fas fa-tractor"></i>
-                                        </div>
-
-                                        <div class="flex-fill">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1 font-weight-bold">Bulldozer Caterpillar D6</h6>
-                                                <span class="badge-state badge-dispo">Disponible</span>
-                                            </div>
-
-                                            <small class="text-muted">
-                                                Code : ENG-002 | Localisation : Dépôt central | Dernier entretien :
-                                                05/07/2026
-                                            </small>
-
-                                            <div class="progress mt-2">
-                                                <div class="progress-bar bg-primary" style="width: 92%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="materiel-item mb-3">
-                                    <div class="d-flex align-items-center">
-                                        <div class="materiel-icon mr-3">
-                                            <i class="fas fa-tools"></i>
-                                        </div>
-
-                                        <div class="flex-fill">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1 font-weight-bold">Groupe électrogène 50 KVA</h6>
-                                                <span class="badge-state badge-maintenance">Maintenance</span>
-                                            </div>
-
-                                            <small class="text-muted">
-                                                Code : MAT-011 | Intervention : Vidange + filtre | Responsable : Atelier
-                                            </small>
-
-                                            <div class="progress mt-2">
-                                                <div class="progress-bar bg-warning" style="width: 55%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="materiel-item">
-                                    <div class="d-flex align-items-center">
-                                        <div class="materiel-icon mr-3">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                        </div>
-
-                                        <div class="flex-fill">
-                                            <div class="d-flex justify-content-between">
-                                                <h6 class="mb-1 font-weight-bold">Bétonnière électrique 350L</h6>
-                                                <span class="badge-state badge-panne">En panne</span>
-                                            </div>
-
-                                            <small class="text-muted">
-                                                Code : MAT-021 | Problème : moteur bloqué | Signalé le : 08/07/2026
-                                            </small>
-
-                                            <div class="progress mt-2">
-                                                <div class="progress-bar bg-danger" style="width: 28%"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php endif; ?>
 
                             </div>
                         </div>
@@ -671,7 +782,7 @@
                             <div class="form-group">
                                 <label>Code engin *</label>
                                 <input type="text" name="code_engin" class="form-control" placeholder="Ex : ENG-001"
-                                    required>
+                                    value="<?= $codeEngin ?>" readonly required>
                             </div>
                         </div>
 
@@ -686,13 +797,14 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Catégorie *</label>
-                                <select name="categorie" class="form-control" required>
-                                    <option value="">-- Sélectionner --</option>
-                                    <option value="Engin lourd">Engin lourd</option>
-                                    <option value="Camion">Camion</option>
-                                    <option value="Matériel léger">Matériel léger</option>
-                                    <option value="Outillage">Outillage</option>
-                                    <option value="Véhicule">Véhicule</option>
+                                <select name="categorie_id" class="form-control" required>
+                                    <option value="">Sélectionner une catégorie</option>
+
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat->id ?>">
+                                            <?= $cat->nom_categorie ?>
+                                        </option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
@@ -779,9 +891,9 @@
                                 <label>Chantier affecté</label>
                                 <select name="chantier_id" class="form-control">
                                     <option value="">Aucun chantier</option>
-                                    <option value="1">Chantier Gitega</option>
-                                    <option value="2">Chantier Rumonge</option>
-                                    <option value="3">Chantier Ngozi</option>
+                                    <?php foreach ($chantiers as $chantier): ?>
+                                        <option value="<?= $chantier->id ?>"><?= $chantier->name ?></option>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
                         </div>
@@ -793,15 +905,28 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Photo de l’engin</label>
-                                <input type="file" name="photo" class="form-control" accept="image/*">
+                                <input type="file" name="photos[]" id="photosInput" class="form-control"
+                                    accept="image/*" multiple>
+
+                                <small class="text-muted">
+                                    Vous pouvez sélectionner plusieurs images.
+                                </small>
+
+                                <div id="photosPreview" class="preview-box mt-3"></div>
                             </div>
                         </div>
 
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label>Document / Carte grise</label>
-                                <input type="file" name="document" class="form-control"
-                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                <input type="file" name="documents[]" id="documentsInput" class="form-control"
+                                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
+
+                                <small class="text-muted">
+                                    Carte grise, assurance, contrôle technique, facture, etc.
+                                </small>
+
+                                <div id="documentsPreview" class="preview-box mt-3"></div>
                             </div>
                         </div>
 
@@ -832,3 +957,447 @@
         </form>
     </div>
 </div>
+
+<!-- MODAL MODIFICATION ENGIN -->
+<div class="modal fade" id="editEnginModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <form action="<?= base_url('engin-materiel-update') ?>" method="post" enctype="multipart/form-data">
+
+            <input type="hidden" name="id" id="edit_id">
+
+            <div class="modal-content" style="border-radius:18px; overflow:hidden;">
+
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">
+                        <i class="fas fa-edit mr-2"></i>
+                        Modifier un engin / matériel
+                    </h5>
+
+                    <button type="button" class="close" data-dismiss="modal">
+                        &times;
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Code engin</label>
+                                <input type="text" id="edit_code_engin" class="form-control" readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Désignation *</label>
+                                <input type="text" name="designation" id="edit_designation" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label>Catégorie *</label>
+                                <select name="categorie_id" id="edit_categorie_id" class="form-control" required>
+                                    <option value="">Sélectionner une catégorie</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                        <option value="<?= $cat->id ?>"><?= $cat->nom_categorie ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <label>Marque</label>
+                            <input type="text" name="marque" id="edit_marque" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Modèle</label>
+                            <input type="text" name="modele" id="edit_modele" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Numéro de plaque</label>
+                            <input type="text" name="plaque" id="edit_plaque" class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-3">
+
+                        <div class="col-md-4">
+                            <label>Numéro de série</label>
+                            <input type="text" name="numero_serie" id="edit_numero_serie" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Date d’acquisition</label>
+                            <input type="date" name="date_acquisition" id="edit_date_acquisition" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Valeur d’achat</label>
+                            <input type="number" name="valeur_achat" id="edit_valeur_achat" class="form-control">
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-3">
+
+                        <div class="col-md-4">
+                            <label>État actuel *</label>
+                            <select name="etat" id="edit_etat" class="form-control" required>
+                                <option value="Disponible">Disponible</option>
+                                <option value="Sur chantier">Sur chantier</option>
+                                <option value="Maintenance">Maintenance</option>
+                                <option value="En panne">En panne</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Localisation</label>
+                            <input type="text" name="localisation" id="edit_localisation" class="form-control">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label>Chantier affecté</label>
+                            <select name="chantier_id" id="edit_chantier_id" class="form-control">
+                                <option value="">Aucun chantier</option>
+                                <?php foreach ($chantiers as $chantier): ?>
+                                    <option value="<?= $chantier->id ?>"><?= $chantier->name ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <label>Observation</label>
+                        <textarea name="observation" id="edit_observation" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="font-weight-bold">Photos existantes</h6>
+                    <div id="editPhotosPreview" class="preview-box mb-3"></div>
+
+                    <h6 class="font-weight-bold">Documents existants</h6>
+                    <div id="editDocumentsPreview" class="preview-box mb-3"></div>
+
+                    <div class="row">
+
+                        <div class="col-md-6">
+                            <label>Ajouter d’autres photos</label>
+
+                            <input type="file" name="photos[]" id="editPhotosInput" class="form-control"
+                                accept="image/*" multiple>
+
+                            <!-- aperçu -->
+                            <div id="editNewPhotosPreview" class="mt-3"></div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Ajouter d’autres documents</label>
+
+                            <input type="file" name="documents[]" id="editDocumentsInput" class="form-control"
+                                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
+
+                            <!-- aperçu -->
+                            <div id="editNewDocumentsPreview" class="mt-3"></div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        Annuler
+                    </button>
+
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-save mr-1"></i>
+                        Modifier
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+<script>
+    document.getElementById('photosInput').addEventListener('change', function() {
+        let preview = document.getElementById('photosPreview');
+        preview.innerHTML = '';
+
+        Array.from(this.files).forEach(function(file) {
+            let reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.innerHTML += `
+                <div class="preview-img-card">
+                    <img src="${e.target.result}" alt="photo">
+                    <span>${file.name}</span>
+                </div>
+            `;
+            };
+
+            reader.readAsDataURL(file);
+        });
+    });
+
+    document.getElementById('documentsInput').addEventListener('change', function() {
+        let preview = document.getElementById('documentsPreview');
+        preview.innerHTML = '';
+
+        Array.from(this.files).forEach(function(file) {
+            let icon = 'fas fa-file';
+
+            if (file.name.match(/\.pdf$/i)) {
+                icon = 'fas fa-file-pdf';
+            } else if (file.name.match(/\.(doc|docx)$/i)) {
+                icon = 'fas fa-file-word';
+            } else if (file.name.match(/\.(xls|xlsx)$/i)) {
+                icon = 'fas fa-file-excel';
+            } else if (file.name.match(/\.(jpg|jpeg|png)$/i)) {
+                icon = 'fas fa-file-image';
+            }
+
+            preview.innerHTML += `
+            <div class="preview-doc-card">
+                <i class="${icon}"></i>
+                <span>${file.name}</span>
+            </div>
+        `;
+        });
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function deleteEngin(id) {
+        Swal.fire({
+            title: 'Supprimer cet engin ?',
+            text: 'Cette action va retirer l’engin de la liste.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#dc3545'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("<?= base_url('engin-materiel-delete') ?>", {
+                    id: id
+                }, function() {
+                    Swal.fire('Supprimé', 'Engin supprimé avec succès.', 'success')
+                        .then(() => location.reload());
+                });
+            }
+        });
+    }
+</script>
+
+<script>
+    function editEngin(
+        id,
+        code_engin,
+        designation,
+        categorie_id,
+        marque,
+        modele,
+        plaque,
+        numero_serie,
+        date_acquisition,
+        valeur_achat,
+        etat,
+        localisation,
+        chantier_id,
+        observation
+    ) {
+        $('#edit_id').val(id);
+        $('#edit_code_engin').val(code_engin);
+        $('#edit_designation').val(designation);
+        $('#edit_categorie_id').val(categorie_id);
+        $('#edit_marque').val(marque);
+        $('#edit_modele').val(modele);
+        $('#edit_plaque').val(plaque);
+        $('#edit_numero_serie').val(numero_serie);
+        $('#edit_date_acquisition').val(date_acquisition);
+        $('#edit_valeur_achat').val(valeur_achat);
+        $('#edit_etat').val(etat);
+        $('#edit_localisation').val(localisation);
+        $('#edit_chantier_id').val(chantier_id);
+        $('#edit_observation').val(observation);
+
+        $('#editPhotosPreview').html('');
+        $('#editDocumentsPreview').html('');
+
+        $('#editPhotosInput').val('');
+        $('#editDocumentsInput').val('');
+        $('#editNewPhotosPreview').html('');
+        $('#editNewDocumentsPreview').html('');
+
+        $.post("<?= base_url('engin-materiel-files') ?>", {
+            engin_id: id
+        }, function(response) {
+
+            let data = JSON.parse(response);
+
+            if (data.photos.length > 0) {
+                data.photos.forEach(function(item) {
+                    $('#editPhotosPreview').append(`
+                        <div class="preview-img-card" id="photo-${item.id}">
+                            <button type="button"
+                                    class="btn btn-danger btn-xs delete-file-btn"
+                                    onclick="deletePhoto(${item.id})">
+                                <i class="fas fa-times"></i>
+                            </button>
+
+                            <img src="<?= base_url('uploads/engins/photos/') ?>${item.photo}">
+                            <span>${item.photo}</span>
+                        </div>
+                    `);
+                });
+            } else {
+                $('#editPhotosPreview').html('<small class="text-muted">Aucune photo disponible.</small>');
+            }
+
+            if (data.documents.length > 0) {
+                data.documents.forEach(function(item) {
+                    $('#editDocumentsPreview').append(`
+                        <div class="preview-doc-card" id="document-${item.id}">
+                            <i class="fas fa-file-pdf"></i>
+                            <span class="flex-fill">${item.document}</span>
+
+                            <button type="button"
+                                    class="btn btn-danger btn-sm"
+                                    onclick="deleteDocument(${item.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    `);
+                });
+            } else {
+                $('#editDocumentsPreview').html('<small class="text-muted">Aucun document disponible.</small>');
+            }
+
+        });
+
+
+
+        $('#editEnginModal').modal('show');
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    function deletePhoto(id) {
+        Swal.fire({
+            title: 'Supprimer cette image ?',
+            text: 'Cette image sera supprimée définitivement.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#dc3545'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("<?= base_url('engin-photo-delete') ?>", {
+                    id: id
+                }, function() {
+                    $('#photo-' + id).remove();
+                    Swal.fire('Supprimée', 'Image supprimée avec succès.', 'success');
+                });
+            }
+        });
+    }
+
+    function deleteDocument(id) {
+        Swal.fire({
+            title: 'Supprimer ce document ?',
+            text: 'Ce document sera supprimé définitivement.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui, supprimer',
+            cancelButtonText: 'Annuler',
+            confirmButtonColor: '#dc3545'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.post("<?= base_url('engin-document-delete') ?>", {
+                    id: id
+                }, function() {
+                    $('#document-' + id).remove();
+                    Swal.fire('Supprimé', 'Document supprimé avec succès.', 'success');
+                });
+            }
+        });
+    }
+</script>
+
+
+<script>
+    $(document).ready(function() {
+
+        $(document).on('change', '#editPhotosInput', function() {
+
+            let preview = $('#editNewPhotosPreview');
+            preview.html('');
+
+            Array.from(this.files).forEach(function(file) {
+                let reader = new FileReader();
+
+                reader.onload = function(e) {
+                    preview.append(`
+                    <div class="preview-img-card">
+                        <img src="${e.target.result}" alt="photo">
+                        <span>${file.name}</span>
+                    </div>
+                `);
+                };
+
+                reader.readAsDataURL(file);
+            });
+        });
+
+        $(document).on('change', '#editDocumentsInput', function() {
+
+            let preview = $('#editNewDocumentsPreview');
+            preview.html('');
+
+            Array.from(this.files).forEach(function(file) {
+                let icon = 'fas fa-file';
+
+                if (file.name.match(/\.pdf$/i)) {
+                    icon = 'fas fa-file-pdf';
+                } else if (file.name.match(/\.(doc|docx)$/i)) {
+                    icon = 'fas fa-file-word';
+                } else if (file.name.match(/\.(xls|xlsx)$/i)) {
+                    icon = 'fas fa-file-excel';
+                } else if (file.name.match(/\.(jpg|jpeg|png)$/i)) {
+                    icon = 'fas fa-file-image';
+                }
+
+                preview.append(`
+                <div class="preview-doc-card">
+                    <i class="${icon}"></i>
+                    <span>${file.name}</span>
+                </div>
+            `);
+            });
+        });
+
+    });
+</script>
