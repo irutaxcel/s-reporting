@@ -794,4 +794,1002 @@ class FinanceController extends CI_Controller
         $this->load->view('v1/components/modules/finance/cloture_comptable', $data);
         $this->load->view('v1/components/layout/footer', $data);
     }
+
+    public function caisse()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data = [
+            'title'           => 'Caisse',
+            'allChantiers'    => $this->tech->getAllChantiers(),
+            'allCashboxes'    => $this->finance->getAllCashboxes(),
+            'nextCashboxCode' => $this->finance->getNextCashboxCode(),
+        ];
+
+        $this->load->view(
+            'v1/components/layout/header',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/sidebar',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/modules/finance/caisse',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer'
+        );
+    }
+
+    public function caisseStore()
+    {
+        if ($this->input->method(TRUE) !== 'POST') {
+            show_404();
+        }
+
+        /*
+     * Règles de validation.
+     */
+        $this->form_validation->set_rules(
+            'name',
+            'Intitulé de la caisse',
+            'trim|required|min_length[3]|max_length[150]'
+        );
+
+        $this->form_validation->set_rules(
+            'type',
+            'Type de caisse',
+            'trim|required|in_list[siege,chantier]'
+        );
+
+        $this->form_validation->set_rules(
+            'responsable',
+            'Responsable de caisse',
+            'trim|max_length[150]'
+        );
+
+        $this->form_validation->set_rules(
+            'devise',
+            'Devise',
+            'trim|required|in_list[BIF,USD,EUR]'
+        );
+
+        $this->form_validation->set_rules(
+            'opening_balance',
+            'Solde initial',
+            'trim|required|numeric|greater_than_equal_to[0]'
+        );
+
+        $this->form_validation->set_rules(
+            'alert_threshold',
+            'Seuil d’alerte',
+            'trim|required|numeric|greater_than_equal_to[0]'
+        );
+
+        $type = $this->input->post(
+            'type',
+            true
+        );
+
+        /*
+     * Le chantier est obligatoire uniquement pour une caisse chantier.
+     */
+        if ($type === 'chantier') {
+            $this->form_validation->set_rules(
+                'chantier_id',
+                'Chantier associé',
+                'trim|required|integer'
+            );
+        }
+
+        $this->form_validation->set_message(
+            'required',
+            'Le champ {field} est obligatoire.'
+        );
+
+        $this->form_validation->set_message(
+            'in_list',
+            'La valeur sélectionnée pour {field} est invalide.'
+        );
+
+        $this->form_validation->set_message(
+            'numeric',
+            'Le champ {field} doit contenir un montant valide.'
+        );
+
+        $this->form_validation->set_message(
+            'greater_than_equal_to',
+            'Le champ {field} ne peut pas être négatif.'
+        );
+
+        if ($this->form_validation->run() === false) {
+            $this->session->set_flashdata(
+                'error',
+                validation_errors('<div>', '</div>')
+            );
+
+            /*
+         * old_input permettra de conserver les valeurs dans le formulaire.
+         */
+            $this->session->set_flashdata(
+                'old_input',
+                $this->input->post(NULL, true)
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        $chantierId = null;
+
+        if ($type === 'chantier') {
+            $chantierId = (int) $this->input->post(
+                'chantier_id',
+                true
+            );
+
+            /*
+         * Empêcher deux caisses actives sur un même chantier.
+         */
+            if ($this->finance->chantierHasCashbox($chantierId)) {
+                $this->session->set_flashdata(
+                    'error',
+                    'Ce chantier possède déjà une caisse active.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+        }
+
+        /*
+     * Pour une caisse siège, chantier_id reste obligatoirement NULL.
+     */
+        if ($type === 'siege') {
+            $chantierId = null;
+        }
+
+        $openingBalance = (float) $this->input->post(
+            'opening_balance',
+            true
+        );
+
+        $cashboxData = [
+            /*
+         * Le champ code n'est pas récupéré ici.
+         * Il sera généré automatiquement dans le modèle.
+         */
+            'name'            => trim(
+                $this->input->post('name', true)
+            ),
+
+            'type'            => $type,
+            'chantier_id'     => $chantierId,
+
+            'responsable'     => trim(
+                (string) $this->input->post('responsable', true)
+            ) ?: null,
+
+            'devise'          => $this->input->post(
+                'devise',
+                true
+            ),
+
+            'opening_balance' => $openingBalance,
+            'current_balance' => $openingBalance,
+
+            'alert_threshold' => (float) $this->input->post(
+                'alert_threshold',
+                true
+            ),
+
+            'observation'     => trim(
+                (string) $this->input->post('observation', true)
+            ) ?: null,
+
+            'status'          => 'active',
+
+            'created_by'      => $this->session->userdata('user_id')
+                ?: null,
+
+            'created_at'      => date('Y-m-d H:i:s'),
+        ];
+
+        $result = $this->finance->createCashbox(
+            $cashboxData
+        );
+
+        if (!$result['status']) {
+            $this->session->set_flashdata(
+                'error',
+                $result['message']
+                    ?? 'Une erreur est survenue pendant la création de la caisse.'
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        $this->session->set_flashdata(
+            'success',
+            'La caisse '
+                . $result['code']
+                . ' a été créée avec succès.'
+        );
+
+        redirect('caisse');
+    }
+
+    public function cashboxOperationStore()
+    {
+        /*
+     * Autoriser uniquement les requêtes POST.
+     */
+        if ($this->input->method(TRUE) !== 'POST') {
+            show_404();
+        }
+
+        $this->load->library('form_validation');
+
+        /*
+     * =========================================================
+     * 1. RÈGLES DE VALIDATION
+     * =========================================================
+     */
+
+        $this->form_validation->set_rules(
+            'operation_type',
+            'Type d’opération',
+            'trim|required|in_list[encaissement,decaissement,approvisionnement]'
+        );
+
+        $this->form_validation->set_rules(
+            'operation_date',
+            'Date de l’opération',
+            'trim|required'
+        );
+
+        $this->form_validation->set_rules(
+            'cashbox_id',
+            'Caisse concernée',
+            'trim|required|integer'
+        );
+
+        $this->form_validation->set_rules(
+            'amount',
+            'Montant',
+            'trim|required|numeric|greater_than[0]'
+        );
+
+        $this->form_validation->set_rules(
+            'category',
+            'Catégorie',
+            'trim|max_length[100]'
+        );
+
+        $this->form_validation->set_rules(
+            'third_party',
+            'Bénéficiaire / Provenance',
+            'trim|max_length[180]'
+        );
+
+        $this->form_validation->set_rules(
+            'payment_method',
+            'Mode de règlement',
+            'trim|required|in_list[cash,bank,cheque,mobile]'
+        );
+
+        $this->form_validation->set_rules(
+            'document_number',
+            'Numéro de pièce',
+            'trim|max_length[100]'
+        );
+
+        $this->form_validation->set_rules(
+            'observation',
+            'Observation',
+            'trim'
+        );
+
+        /*
+     * Récupérer le type d’opération avant la validation,
+     * afin d’ajouter les règles conditionnelles.
+     */
+        $operationType = trim(
+            (string) $this->input->post(
+                'operation_type',
+                TRUE
+            )
+        );
+
+        /*
+     * La caisse destination est obligatoire uniquement
+     * pour un approvisionnement/transfert interne.
+     */
+        if ($operationType === 'approvisionnement') {
+            $this->form_validation->set_rules(
+                'destination_cashbox_id',
+                'Caisse destination',
+                'trim|required|integer'
+            );
+        }
+
+        /*
+     * Messages personnalisés.
+     */
+        $this->form_validation->set_message(
+            'required',
+            'Le champ {field} est obligatoire.'
+        );
+
+        $this->form_validation->set_message(
+            'integer',
+            'La valeur sélectionnée pour {field} est invalide.'
+        );
+
+        $this->form_validation->set_message(
+            'numeric',
+            'Le champ {field} doit contenir un nombre valide.'
+        );
+
+        $this->form_validation->set_message(
+            'greater_than',
+            'Le montant doit être supérieur à zéro.'
+        );
+
+        $this->form_validation->set_message(
+            'in_list',
+            'La valeur sélectionnée pour {field} est invalide.'
+        );
+
+        /*
+     * Arrêter si la validation échoue.
+     */
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata(
+                'error',
+                validation_errors('<div>', '</div>')
+            );
+
+            /*
+         * Conserver les valeurs pour éventuellement
+         * rouvrir la modale avec les anciennes données.
+         */
+            $this->session->set_flashdata(
+                'operation_old_input',
+                $this->input->post(NULL, TRUE)
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 2. RÉCUPÉRATION ET NORMALISATION DES DONNÉES
+     * =========================================================
+     */
+
+        $operationDate = trim(
+            (string) $this->input->post(
+                'operation_date',
+                TRUE
+            )
+        );
+
+        $cashboxId = (int) $this->input->post(
+            'cashbox_id',
+            TRUE
+        );
+
+        $amount = (float) $this->input->post(
+            'amount',
+            TRUE
+        );
+
+        $category = trim(
+            (string) $this->input->post(
+                'category',
+                TRUE
+            )
+        );
+
+        $thirdParty = trim(
+            (string) $this->input->post(
+                'third_party',
+                TRUE
+            )
+        );
+
+        $paymentMethod = trim(
+            (string) $this->input->post(
+                'payment_method',
+                TRUE
+            )
+        );
+
+        $documentNumber = trim(
+            (string) $this->input->post(
+                'document_number',
+                TRUE
+            )
+        );
+
+        $observation = trim(
+            (string) $this->input->post(
+                'observation',
+                TRUE
+            )
+        );
+
+        /*
+     * Vérifier que la date est réellement valide.
+     */
+        $dateObject = DateTime::createFromFormat(
+            'Y-m-d',
+            $operationDate
+        );
+
+        if (
+            !$dateObject
+            || $dateObject->format('Y-m-d') !== $operationDate
+        ) {
+            $this->session->set_flashdata(
+                'error',
+                'La date de l’opération est invalide.'
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        /*
+     * Sécurisation supplémentaire.
+     */
+        if ($amount <= 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Le montant doit être supérieur à zéro.'
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 3. DÉTERMINER LA CAISSE SOURCE ET LA DESTINATION
+     * =========================================================
+     */
+
+        $sourceCashboxId = NULL;
+        $destinationCashboxId = NULL;
+
+        /*
+     * Encaissement :
+     * la caisse concernée reçoit l’argent.
+     */
+        if ($operationType === 'encaissement') {
+            $destinationCashboxId = $cashboxId;
+        }
+
+        /*
+     * Décaissement :
+     * la caisse concernée envoie ou dépense l’argent.
+     */ elseif ($operationType === 'decaissement') {
+            $sourceCashboxId = $cashboxId;
+        }
+
+        /*
+     * Approvisionnement :
+     * la caisse concernée est la source ;
+     * la deuxième caisse est la destination.
+     */ elseif ($operationType === 'approvisionnement') {
+            $sourceCashboxId = $cashboxId;
+
+            $destinationCashboxId = (int) $this->input->post(
+                'destination_cashbox_id',
+                TRUE
+            );
+
+            if ($destinationCashboxId <= 0) {
+                $this->session->set_flashdata(
+                    'error',
+                    'La caisse destination est obligatoire.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+
+            if ($sourceCashboxId === $destinationCashboxId) {
+                $this->session->set_flashdata(
+                    'error',
+                    'La caisse source et la caisse destination doivent être différentes.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 4. RÉCUPÉRER LES CAISSES
+     * =========================================================
+     */
+
+        $sourceCashbox = NULL;
+        $destinationCashbox = NULL;
+
+        if ($sourceCashboxId !== NULL) {
+            $sourceCashbox = $this->db
+                ->where('id', $sourceCashboxId)
+                ->get('tbl_finance_cashbox')
+                ->row();
+
+            if (!$sourceCashbox) {
+                $this->session->set_flashdata(
+                    'error',
+                    'La caisse source sélectionnée est introuvable.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+
+            if ($sourceCashbox->status !== 'active') {
+                $this->session->set_flashdata(
+                    'error',
+                    'La caisse source sélectionnée n’est pas active.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+        }
+
+        if ($destinationCashboxId !== NULL) {
+            $destinationCashbox = $this->db
+                ->where('id', $destinationCashboxId)
+                ->get('tbl_finance_cashbox')
+                ->row();
+
+            if (!$destinationCashbox) {
+                $this->session->set_flashdata(
+                    'error',
+                    'La caisse destination sélectionnée est introuvable.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+
+            if ($destinationCashbox->status !== 'active') {
+                $this->session->set_flashdata(
+                    'error',
+                    'La caisse destination sélectionnée n’est pas active.'
+                );
+
+                redirect('caisse');
+                return;
+            }
+        }
+
+        /*
+     * Pour un approvisionnement, les deux caisses doivent
+     * utiliser la même devise.
+     */
+        if (
+            $operationType === 'approvisionnement'
+            && $sourceCashbox
+            && $destinationCashbox
+            && $sourceCashbox->devise !== $destinationCashbox->devise
+        ) {
+            $this->session->set_flashdata(
+                'error',
+                'Le transfert est impossible entre deux caisses de devises différentes.'
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        /*
+     * Vérification informative avant l’appel du modèle.
+     * Le modèle devra refaire la vérification dans la transaction.
+     */
+        if (
+            in_array(
+                $operationType,
+                ['decaissement', 'approvisionnement'],
+                TRUE
+            )
+            && $sourceCashbox
+            && (float) $sourceCashbox->current_balance < $amount
+        ) {
+            $this->session->set_flashdata(
+                'error',
+                'Le solde disponible dans la caisse source est insuffisant.'
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 5. UPLOAD DE LA PIÈCE JUSTIFICATIVE
+     * =========================================================
+     */
+
+        $attachmentName = NULL;
+
+        if (
+            isset($_FILES['attachment'])
+            && isset($_FILES['attachment']['name'])
+            && $_FILES['attachment']['name'] !== ''
+        ) {
+            $uploadPath = FCPATH
+                . 'uploads/finance/cashbox_operations/';
+
+            /*
+         * Créer le dossier s’il n’existe pas.
+         */
+            if (!is_dir($uploadPath)) {
+                $created = mkdir(
+                    $uploadPath,
+                    0755,
+                    TRUE
+                );
+
+                if (!$created && !is_dir($uploadPath)) {
+                    $this->session->set_flashdata(
+                        'error',
+                        'Impossible de créer le dossier des pièces justificatives.'
+                    );
+
+                    redirect('caisse');
+                    return;
+                }
+            }
+
+            $config = [
+                'upload_path'   => $uploadPath,
+                'allowed_types' => 'pdf|jpg|jpeg|png|doc|docx|xls|xlsx',
+                'max_size'      => 5120,
+                'encrypt_name'  => TRUE,
+                'remove_spaces' => TRUE,
+            ];
+
+            $this->load->library(
+                'upload',
+                $config
+            );
+
+            $this->upload->initialize(
+                $config
+            );
+
+            if (!$this->upload->do_upload('attachment')) {
+                $this->session->set_flashdata(
+                    'error',
+                    strip_tags(
+                        $this->upload->display_errors()
+                    )
+                );
+
+                redirect('caisse');
+                return;
+            }
+
+            $uploadedFile = $this->upload->data();
+
+            $attachmentName = $uploadedFile['file_name'];
+        }
+
+        /*
+     * =========================================================
+     * 6. GÉNÉRATION AUTOMATIQUE DU LIBELLÉ
+     * =========================================================
+     */
+
+        $automaticLabel = '';
+
+        switch ($operationType) {
+            case 'encaissement':
+
+                $automaticLabel = 'Encaissement';
+
+                if ($category !== '') {
+                    $automaticLabel .= ' - ' . $category;
+                }
+
+                if ($thirdParty !== '') {
+                    $automaticLabel .=
+                        ' - Provenance : '
+                        . $thirdParty;
+                }
+
+                if ($destinationCashbox) {
+                    $automaticLabel .=
+                        ' - Caisse : '
+                        . $destinationCashbox->name;
+                }
+
+                break;
+
+            case 'decaissement':
+
+                $automaticLabel = 'Décaissement';
+
+                if ($category !== '') {
+                    $automaticLabel .= ' - ' . $category;
+                }
+
+                if ($thirdParty !== '') {
+                    $automaticLabel .=
+                        ' - Bénéficiaire : '
+                        . $thirdParty;
+                }
+
+                if ($sourceCashbox) {
+                    $automaticLabel .=
+                        ' - Caisse : '
+                        . $sourceCashbox->name;
+                }
+
+                break;
+
+            case 'approvisionnement':
+
+                $sourceName = $sourceCashbox
+                    ? $sourceCashbox->name
+                    : 'Caisse source';
+
+                $destinationName = $destinationCashbox
+                    ? $destinationCashbox->name
+                    : 'Caisse destination';
+
+                $automaticLabel =
+                    'Approvisionnement de '
+                    . $sourceName
+                    . ' vers '
+                    . $destinationName;
+
+                /*
+             * Pour un transfert interne, la provenance peut
+             * être générée automatiquement.
+             */
+                if ($thirdParty === '') {
+                    $thirdParty = $sourceName;
+                }
+
+                /*
+             * Forcer la catégorie si elle n’a pas été envoyée.
+             */
+                if ($category === '') {
+                    $category = 'Approvisionnement';
+                }
+
+                break;
+        }
+
+        if ($documentNumber !== '') {
+            $automaticLabel .=
+                ' - Pièce : '
+                . $documentNumber;
+        }
+
+        /*
+     * Sécurité pour la taille maximale de la colonne VARCHAR(255).
+     */
+        $automaticLabel = mb_substr(
+            $automaticLabel,
+            0,
+            255,
+            'UTF-8'
+        );
+
+        /*
+     * =========================================================
+     * 7. DÉTERMINER LA DEVISE
+     * =========================================================
+     */
+
+        $currency = 'BIF';
+
+        if ($sourceCashbox) {
+            $currency = $sourceCashbox->devise;
+        } elseif ($destinationCashbox) {
+            $currency = $destinationCashbox->devise;
+        }
+
+        /*
+     * =========================================================
+     * 8. PRÉPARER LES DONNÉES POUR LE MODÈLE
+     * =========================================================
+     */
+
+        $currentUserId = $this->session->userdata('user_id')
+            ?: NULL;
+
+        $operationData = [
+            /*
+         * La référence sera générée dans le modèle.
+         */
+            'operation_type' => $operationType,
+
+            'operation_date' => $operationDate,
+
+            'source_cashbox_id' => $sourceCashboxId,
+
+            'destination_cashbox_id' => $destinationCashboxId,
+
+            'amount' => $amount,
+
+            'currency' => $currency,
+
+            'category' => $category !== ''
+                ? $category
+                : NULL,
+
+            'third_party' => $thirdParty !== ''
+                ? $thirdParty
+                : NULL,
+
+            'payment_method' => $paymentMethod,
+
+            'document_number' => $documentNumber !== ''
+                ? $documentNumber
+                : NULL,
+
+            'attachment' => $attachmentName,
+
+            /*
+         * Le libellé est généré automatiquement.
+         */
+            'label' => $automaticLabel,
+
+            'observation' => $observation !== ''
+                ? $observation
+                : NULL,
+
+            'status' => 'validated',
+
+            'created_by' => $currentUserId,
+
+            'validated_by' => $currentUserId,
+
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+
+        /*
+     * =========================================================
+     * 9. APPEL DU MODÈLE
+     * =========================================================
+     */
+
+        $result = $this->finance->createCashboxOperation(
+            $operationData
+        );
+
+        /*
+     * =========================================================
+     * 10. GESTION DE L’ÉCHEC
+     * =========================================================
+     */
+
+        if (
+            !is_array($result)
+            || empty($result['status'])
+        ) {
+            /*
+         * Supprimer le fichier si la base n’a pas été mise à jour.
+         */
+            if ($attachmentName) {
+                $filePath = FCPATH
+                    . 'uploads/finance/cashbox_operations/'
+                    . $attachmentName;
+
+                if (is_file($filePath)) {
+                    @unlink($filePath);
+                }
+            }
+
+            $errorMessage =
+                is_array($result)
+                && !empty($result['message'])
+                ? $result['message']
+                : 'L’opération n’a pas pu être enregistrée.';
+
+            $this->session->set_flashdata(
+                'error',
+                $errorMessage
+            );
+
+            redirect('caisse');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 11. MESSAGE DE SUCCÈS
+     * =========================================================
+     */
+
+        $operationLabels = [
+            'encaissement' => 'L’encaissement',
+            'decaissement' => 'Le décaissement',
+            'approvisionnement' => 'Le transfert interne',
+        ];
+
+        $successLabel = isset(
+            $operationLabels[$operationType]
+        )
+            ? $operationLabels[$operationType]
+            : 'L’opération';
+
+        $reference = !empty($result['reference'])
+            ? $result['reference']
+            : '';
+
+        $this->session->set_flashdata(
+            'success',
+            trim(
+                $successLabel
+                    . ' '
+                    . $reference
+                    . ' a été enregistré avec succès.'
+            )
+        );
+
+        redirect('caisse');
+    }
+
+    public function encaissements()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Encaissements';
+
+        $data['allChantiers'] = $this->tech->getAllChantier();
+
+        // $data['encaissementsData'] = $this->tech->getEncaissementsData();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/encaissements', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function decaissements()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Décaissements';
+
+        $data['allChantiers'] = $this->tech->getAllChantier();
+
+        // $data['decaissementsData'] = $this->tech->getDecaissementsData();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/decaissements', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
 }

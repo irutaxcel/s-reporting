@@ -216,7 +216,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel' || $title == 'Maintenance & Carburant' || $title == 'Coût Réel & Rentabilité') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -338,24 +338,38 @@
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Maintenance & Carburant') { ?>
+                            <a href="<?= base_url('maintenance-carburant') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Maintenance & Carburant</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('maintenance-carburant') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Maintenance & Carburant</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <a href="<?= base_url('journal-production') ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Journal Production</p>
                             </a>
                         </li>
 
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
+                            <?php if ($title == 'Coût Réel & Rentabilité') { ?>
+                            <a href="<?= base_url('cout-reelle-rentebilite') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
-                                <p>Cout Reelle & Rentebilite</p>
+                                <p>Coût Réel & Rentabilité</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('cout-reelle-rentebilite') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Coût Réel & Rentabilité</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">
@@ -400,7 +414,7 @@
                 <!-- ==========================
                     DAF / FINANCE
                 =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable') { ?>
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -576,56 +590,93 @@
                 </li>
 
                 <!-- TRESORERIE -->
+                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements') { ?>
+                <li class="nav-item has-treeview menu-open">
+
+                    <a href="#" class="nav-link active">
+                        <?php } else { ?>
                 <li class="nav-item has-treeview">
 
                     <a href="#" class="nav-link">
+                        <?php } ?>
+
+
                         <i class="fas fa-wallet nav-icon"></i>
                         <p>Trésorerie</p>
                         <i class="right fas fa-angle-left"></i>
                     </a>
 
                     <ul class="nav nav-treeview">
+
+                        <!-- Caisse -->
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/caisse') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
+                            <?php if ($title == 'Caisse') { ?>
+                            <a href="<?= base_url('caisse') ?>" class="nav-link active">
+                                <i class="fas fa-cash-register nav-icon text-success"></i>
                                 <p>Caisse</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('caisse') ?>" class="nav-link">
+                                <i class="fas fa-cash-register nav-icon text-success"></i>
+                                <p>Caisse</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
+                        <!-- Comptes bancaires -->
                         <li class="nav-item">
                             <a href="<?= base_url('finance/banques') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="fas fa-university nav-icon text-primary"></i>
                                 <p>Comptes bancaires</p>
                             </a>
                         </li>
 
+                        <!-- Encaissements -->
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/banques') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
+                            <?php if ($title == 'Encaissements') { ?>
+                            <a href="<?= base_url('encaissements') ?>" class="nav-link active">
+                                <i class="fas fa-arrow-circle-down nav-icon text-success"></i>
                                 <p>Encaissements</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('encaissements') ?>" class="nav-link">
+                                <i class="fas fa-arrow-circle-down nav-icon text-success"></i>
+                                <p>Encaissements</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
+                        <!-- Décaissements -->
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/banques') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
+                            <?php if ($title == 'Décaissements') { ?>
+                            <a href="<?= base_url('decaissements') ?>" class="nav-link active">
+                                <i class="fas fa-arrow-circle-up nav-icon text-danger"></i>
                                 <p>Décaissements</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('decaissements') ?>" class="nav-link">
+                                <i class="fas fa-arrow-circle-up nav-icon text-danger"></i>
+                                <p>Décaissements</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
+                        <!-- Rapprochement bancaire -->
                         <li class="nav-item">
                             <a href="<?= base_url('finance/rapprochement') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="fas fa-exchange-alt nav-icon text-warning"></i>
                                 <p>Rapprochement bancaire</p>
                             </a>
                         </li>
 
+                        <!-- Prévisions de trésorerie -->
                         <li class="nav-item">
                             <a href="<?= base_url('finance/prevision') ?>" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
+                                <i class="fas fa-chart-line nav-icon text-info"></i>
                                 <p>Prévisions de trésorerie</p>
                             </a>
                         </li>
+
                     </ul>
                 </li>
 

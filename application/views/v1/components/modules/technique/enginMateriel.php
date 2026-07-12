@@ -677,7 +677,7 @@
                 </div>
 
                 <!-- TABLEAU HISTORIQUE -->
-                <div class="card engin-card mb-4">
+                <!-- <div class="card engin-card mb-4">
                     <div class="card-header">
                         <h5 class="engin-title">
                             <i class="fas fa-history mr-2 text-success"></i>
@@ -746,7 +746,7 @@
 
                         </table>
                     </div>
-                </div>
+                </div> -->
 
             </div>
 
@@ -985,7 +985,7 @@
                         <div class="col-md-4">
                             <div class="form-group">
                                 <label>Code engin</label>
-                                <input type="text" id="edit_code_engin" class="form-control" readonly>
+                                <input type="text" name="code_engin" id="edit_code_engin" class="form-control" readonly>
                             </div>
                         </div>
 
@@ -1085,11 +1085,20 @@
 
                     <hr>
 
-                    <h6 class="font-weight-bold">Photos existantes</h6>
-                    <div id="editPhotosPreview" class="preview-box mb-3"></div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="font-weight-bold">Photos existantes</h6>
+                            <div id="editPhotosPreview" class="preview-box mb-3"></div>
+                        </div>
 
-                    <h6 class="font-weight-bold">Documents existants</h6>
-                    <div id="editDocumentsPreview" class="preview-box mb-3"></div>
+                        <div class="col-md-6">
+                            <h6 class="font-weight-bold">Documents existants</h6>
+                            <div id="editDocumentsPreview" class="preview-box mb-3"></div>
+                        </div>
+                    </div>
+
+
+
 
                     <div class="row">
 

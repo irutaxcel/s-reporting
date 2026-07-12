@@ -970,7 +970,640 @@ class TechController extends CI_Controller
         echo json_encode(['status' => 'success']);
     }
 
+    private function uploadEnginFiles(
+        $inputName,
+        $uploadPath,
+        $allowedTypes,
+        $table,
+        $column,
+        $enginId
+    ) {
+        if (
+            empty($_FILES[$inputName]) ||
+            empty($_FILES[$inputName]['name'][0])
+        ) {
+            return;
+        }
 
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0775, true);
+        }
+
+        $this->load->library('upload');
+
+        $fileCount = count($_FILES[$inputName]['name']);
+
+        for ($i = 0; $i < $fileCount; $i++) {
+
+            if ($_FILES[$inputName]['error'][$i] !== UPLOAD_ERR_OK) {
+                continue;
+            }
+
+            $_FILES['engin_file'] = [
+                'name'     => $_FILES[$inputName]['name'][$i],
+                'type'     => $_FILES[$inputName]['type'][$i],
+                'tmp_name' => $_FILES[$inputName]['tmp_name'][$i],
+                'error'    => $_FILES[$inputName]['error'][$i],
+                'size'     => $_FILES[$inputName]['size'][$i]
+            ];
+
+            $config = [
+                'upload_path'      => $uploadPath,
+                'allowed_types'    => $allowedTypes,
+                'encrypt_name'     => true,
+                'remove_spaces'    => true,
+                'max_size'         => 10240,
+                'file_ext_tolower' => true
+            ];
+
+            $this->upload->initialize($config);
+
+            if ($this->upload->do_upload('engin_file')) {
+                $uploadedFile = $this->upload->data();
+
+                $this->tech->insertData(
+                    $table,
+                    [
+                        'engin_id'   => $enginId,
+                        $column      => $uploadedFile['file_name'],
+                        'created_at' => date('Y-m-d H:i:s')
+                    ]
+                );
+            } else {
+                log_message(
+                    'error',
+                    'Erreur upload ' . $inputName . ' : ' .
+                        strip_tags($this->upload->display_errors('', ''))
+                );
+            }
+
+            unset($_FILES['engin_file']);
+        }
+    }
+
+
+    public function enginMaterielUpdate()
+    {
+        $enginId = (int) $this->input->post('id');
+
+        if ($enginId <= 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Identifiant de l’engin invalide.'
+            );
+
+            redirect('engin-materiel');
+            return;
+        }
+
+        $dateAcquisition = $this->input->post('date_acquisition');
+        $chantierId = $this->input->post('chantier_id');
+        $valeurAchat = $this->input->post('valeur_achat');
+
+        $data = [
+            'designation'      => trim($this->input->post('designation')),
+            'categorie_id'     => (int) $this->input->post('categorie_id'),
+            'marque'           => trim($this->input->post('marque')),
+            'modele'           => trim($this->input->post('modele')),
+            'plaque'           => trim($this->input->post('plaque')),
+            'numero_serie'     => trim($this->input->post('numero_serie')),
+            'date_acquisition' => !empty($dateAcquisition) ? $dateAcquisition : null,
+            'valeur_achat'     => !empty($valeurAchat) ? $valeurAchat : 0,
+            'etat'             => $this->input->post('etat'),
+            'localisation'     => trim($this->input->post('localisation')),
+            'chantier_id'      => !empty($chantierId) ? (int) $chantierId : null,
+            'observation'      => trim($this->input->post('observation')),
+            'updated_at'       => date('Y-m-d H:i:s')
+        ];
+
+        $updated = $this->tech->updateData(
+            'tbl_engin_materiel',
+            ['id' => $enginId],
+            $data
+        );
+
+        if (!$updated) {
+            $this->session->set_flashdata(
+                'error',
+                'La modification de l’engin a échoué.'
+            );
+
+            redirect('engin-materiel');
+            return;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ajout des nouvelles photos
+    |--------------------------------------------------------------------------
+    */
+
+        $this->uploadEnginFiles(
+            'photos',
+            './uploads/engins/photos/',
+            'jpg|jpeg|png|webp',
+            'tbl_engin_photo',
+            'photo',
+            $enginId
+        );
+
+        /*
+    |--------------------------------------------------------------------------
+    | Ajout des nouveaux documents
+    |--------------------------------------------------------------------------
+    */
+
+        $this->uploadEnginFiles(
+            'documents',
+            './uploads/engins/documents/',
+            'pdf|doc|docx|xls|xlsx|jpg|jpeg|png',
+            'tbl_engin_document',
+            'document',
+            $enginId
+        );
+
+        $this->session->set_flashdata(
+            'success',
+            'Engin / matériel modifié avec succès.'
+        );
+
+        redirect('engin-materiel');
+    }
+
+    public function maintenanceCarburant()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Maintenance & Carburant';
+
+        $data['chantiers'] = $this->tech->getAllChantier();
+        $data['allEngins'] = $this->tech->getAllEngins();
+
+        $data['allEnginsWithFuel'] =
+            $this->tech->getAllEnginsWithFuel(10);
+
+        $data['allMaintenances'] =
+            $this->tech->getAllMaintenances(10);
+
+        $data['maintenanceAlerts'] =
+            $this->tech->getMaintenanceAlerts(6);
+
+        $data['mostExpensiveEngins'] =
+            $this->tech->getMostExpensiveEnginsCurrentMonth(5);
+
+        $data['recentOperations'] =
+            $this->tech->getRecentTechnicalOperations(20);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Statistiques
+    |--------------------------------------------------------------------------
+    */
+
+        $data['maintenanceFuelStats'] =
+            $this->tech->getMaintenanceFuelStatistics();
+
+        $this->load->view(
+            'v1/components/layout/header',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/sidebar',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/modules/technique/maintenanceCarburant',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer',
+            $data
+        );
+    }
+
+    public function addNewRavitaillement()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $enginId = (int) $this->input->post('engin_id');
+        $chantierId = $this->input->post('chantier_id');
+
+        $quantityLitre = (float) $this->input->post('quantity_litre');
+        $unitPrice = (float) $this->input->post('unit_price');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Toujours recalculer côté serveur
+        |--------------------------------------------------------------------------
+        | Ne pas faire confiance uniquement au total envoyé par JavaScript.
+        */
+
+        $totalAmount = $quantityLitre * $unitPrice;
+
+        if ($enginId <= 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Veuillez sélectionner un engin ou un matériel.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        if ($quantityLitre <= 0 || $unitPrice <= 0) {
+            $this->session->set_flashdata(
+                'error',
+                'La quantité et le prix par litre doivent être supérieurs à zéro.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        $data = [
+            'engin_id'       => $enginId,
+            'chantier_id'    => !empty($chantierId) ? (int) $chantierId : null,
+            'operation_date' => $this->input->post('operation_date'),
+
+            'quantity_litre' => $quantityLitre,
+            'unit_price'     => $unitPrice,
+            'total_amount'   => $totalAmount,
+
+            'kilometrage'    => $this->input->post('kilometrage') !== ''
+                ? (float) $this->input->post('kilometrage')
+                : null,
+
+            'hour_meter'     => $this->input->post('hour_meter') !== ''
+                ? (float) $this->input->post('hour_meter')
+                : null,
+
+            'operator_name'  => trim((string) $this->input->post('operator_name')),
+            'supplier'       => trim((string) $this->input->post('supplier')),
+            'observation'    => trim((string) $this->input->post('observation')),
+
+            'status'         => 1,
+            'created_at'     => date('Y-m-d H:i:s')
+        ];
+
+        $fuelId = $this->tech->insertData('tbl_engin_fuel', $data);
+
+        if (!$fuelId) {
+            $this->session->set_flashdata(
+                'error',
+                'Une erreur est survenue pendant l’enregistrement du ravitaillement.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        $this->session->set_flashdata(
+            'success',
+            'Ravitaillement enregistré avec succès.'
+        );
+
+        redirect('maintenance-carburant');
+    }
+
+
+    private function uploadMaintenanceDocuments($maintenanceId)
+    {
+        if (
+            empty($_FILES['documents']) ||
+            empty($_FILES['documents']['name'][0])
+        ) {
+            return [
+                'success' => true,
+                'message' => ''
+            ];
+        }
+
+        $uploadPath = './uploads/engins/maintenance/';
+
+        if (!is_dir($uploadPath)) {
+            mkdir($uploadPath, 0775, true);
+        }
+
+        if (!is_writable($uploadPath)) {
+            return [
+                'success' => false,
+                'message' => 'Le dossier des pièces jointes n’est pas accessible en écriture.'
+            ];
+        }
+
+        $this->load->library('upload');
+
+        $fileCount = count($_FILES['documents']['name']);
+
+        for ($i = 0; $i < $fileCount; $i++) {
+
+            if ($_FILES['documents']['error'][$i] === UPLOAD_ERR_NO_FILE) {
+                continue;
+            }
+
+            if ($_FILES['documents']['error'][$i] !== UPLOAD_ERR_OK) {
+                return [
+                    'success' => false,
+                    'message' => 'Une pièce jointe contient une erreur d’envoi.'
+                ];
+            }
+
+            $_FILES['maintenance_file'] = [
+                'name'     => $_FILES['documents']['name'][$i],
+                'type'     => $_FILES['documents']['type'][$i],
+                'tmp_name' => $_FILES['documents']['tmp_name'][$i],
+                'error'    => $_FILES['documents']['error'][$i],
+                'size'     => $_FILES['documents']['size'][$i]
+            ];
+
+            $config = [
+                'upload_path'      => $uploadPath,
+                'allowed_types'    => 'pdf|doc|docx|xls|xlsx|jpg|jpeg|png',
+                'encrypt_name'     => true,
+                'remove_spaces'    => true,
+                'file_ext_tolower' => true,
+                'max_size'         => 10240
+            ];
+
+            $this->upload->initialize($config);
+
+            if (!$this->upload->do_upload('maintenance_file')) {
+                $error = strip_tags(
+                    $this->upload->display_errors('', '')
+                );
+
+                unset($_FILES['maintenance_file']);
+
+                return [
+                    'success' => false,
+                    'message' => 'Erreur pièce jointe : ' . $error
+                ];
+            }
+
+            $uploadedFile = $this->upload->data();
+
+            $documentData = [
+                'maintenance_id' => $maintenanceId,
+                'document'       => $uploadedFile['file_name'],
+                'original_name'  => $uploadedFile['orig_name'],
+                'file_type'      => $uploadedFile['file_type'],
+                'file_size'      => (int) $_FILES['documents']['size'][$i],
+                'created_at'     => date('Y-m-d H:i:s')
+            ];
+
+            $documentId = $this->tech->insertData(
+                'tbl_engin_maintenance_document',
+                $documentData
+            );
+
+            if (!$documentId) {
+                $uploadedPath = $uploadPath . $uploadedFile['file_name'];
+
+                if (is_file($uploadedPath)) {
+                    unlink($uploadedPath);
+                }
+
+                unset($_FILES['maintenance_file']);
+
+                return [
+                    'success' => false,
+                    'message' => 'Impossible d’enregistrer une pièce jointe dans la base.'
+                ];
+            }
+
+            unset($_FILES['maintenance_file']);
+        }
+
+        return [
+            'success' => true,
+            'message' => ''
+        ];
+    }
+
+    public function newTechniqueMaintenance()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $enginId = (int) $this->input->post('engin_id');
+        $chantierId = $this->input->post('chantier_id');
+
+        $partsCost = (float) $this->input->post('parts_cost');
+        $laborCost = (float) $this->input->post('labor_cost');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Toujours recalculer côté serveur
+    |--------------------------------------------------------------------------
+    */
+
+        $totalCost = $partsCost + $laborCost;
+
+        if ($enginId <= 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Veuillez sélectionner un engin ou un matériel.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        if (empty($this->input->post('maintenance_type'))) {
+            $this->session->set_flashdata(
+                'error',
+                'Veuillez sélectionner le type de maintenance.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        if (empty($this->input->post('intervention'))) {
+            $this->session->set_flashdata(
+                'error',
+                'Veuillez renseigner la nature de l’intervention.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        if (empty($this->input->post('planned_date'))) {
+            $this->session->set_flashdata(
+                'error',
+                'Veuillez renseigner la date prévue.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        $maintenanceData = [
+            'engin_id'             => $enginId,
+            'chantier_id'          => !empty($chantierId)
+                ? (int) $chantierId
+                : null,
+
+            'maintenance_type'     => trim(
+                (string) $this->input->post('maintenance_type')
+            ),
+
+            'intervention'         => trim(
+                (string) $this->input->post('intervention')
+            ),
+
+            'planned_date'         => $this->input->post('planned_date'),
+
+            'start_date'           => $this->input->post('start_date')
+                ?: null,
+
+            'end_date'             => $this->input->post('end_date')
+                ?: null,
+
+            'next_maintenance_date' => $this->input->post('next_maintenance_date')
+                ?: null,
+
+            'supplier'             => trim(
+                (string) $this->input->post('supplier')
+            ),
+
+            'technician'           => trim(
+                (string) $this->input->post('technician')
+            ),
+
+            'parts_cost'           => $partsCost,
+            'labor_cost'           => $laborCost,
+            'total_cost'           => $totalCost,
+
+            'description'          => trim(
+                (string) $this->input->post('description')
+            ),
+
+            'maintenance_status'   => $this->input->post('status'),
+
+            'record_status'        => 1,
+            'created_at'           => date('Y-m-d H:i:s')
+        ];
+
+        /*
+    |--------------------------------------------------------------------------
+    | Transaction
+    |--------------------------------------------------------------------------
+    */
+
+        $this->db->trans_begin();
+
+        $maintenanceId = $this->tech->insertData(
+            'tbl_engin_maintenance',
+            $maintenanceData
+        );
+
+        if (!$maintenanceId) {
+            $this->db->trans_rollback();
+
+            $this->session->set_flashdata(
+                'error',
+                'Erreur lors de l’enregistrement de la maintenance.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Upload des pièces jointes
+    |--------------------------------------------------------------------------
+    */
+
+        $uploadResult = $this->uploadMaintenanceDocuments($maintenanceId);
+
+        if (!$uploadResult['success']) {
+            $this->db->trans_rollback();
+
+            $this->session->set_flashdata(
+                'error',
+                $uploadResult['message']
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Mettre l’engin en maintenance si nécessaire
+    |--------------------------------------------------------------------------
+    */
+
+        $maintenanceStatus = $this->input->post('status');
+
+        if (
+            $maintenanceStatus === 'En cours' ||
+            $maintenanceStatus === 'Programmé'
+        ) {
+            $this->tech->updateData(
+                'tbl_engin_materiel',
+                ['id' => $enginId],
+                [
+                    'etat'       => 'Maintenance',
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]
+            );
+        }
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+
+            $this->session->set_flashdata(
+                'error',
+                'La maintenance n’a pas pu être enregistrée.'
+            );
+
+            redirect('maintenance-carburant');
+            return;
+        }
+
+        $this->db->trans_commit();
+
+        $this->session->set_flashdata(
+            'success',
+            'Maintenance enregistrée avec succès.'
+        );
+
+        redirect('maintenance-carburant');
+    }
+
+    public function coutReelleRentebilite()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Coût Réel & Rentabilité';
+
+        $data['allChantiers'] = $this->tech->getAllChantier();
+
+        // $data['coutReelleRentabilite'] = $this->tech->getCoutReelleRentabilite();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/coutReelleRentabilite', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
 
     public function personnelChantierPrint()
     {

@@ -563,4 +563,406 @@ class TechModel extends CI_Model
             ->get()
             ->result();
     }
+
+    public function getAllEnginsWithFuel($limit = null)
+    {
+        $this->db
+            ->select('
+            f.*,
+            e.code_engin,
+            e.designation,
+            e.marque,
+            e.modele,
+            ch.name AS chantier_name
+        ')
+            ->from('tbl_engin_fuel f')
+            ->join(
+                'tbl_engin_materiel e',
+                'e.id = f.engin_id',
+                'left'
+            )
+            ->join(
+                'chantiers ch',
+                'ch.id = f.chantier_id',
+                'left'
+            )
+            ->where('f.status', 1)
+            ->order_by('f.operation_date', 'DESC')
+            ->order_by('f.id', 'DESC');
+
+        if (!empty($limit)) {
+            $this->db->limit((int) $limit);
+        }
+
+        return $this->db->get()->result();
+    }
+
+    public function getAllMaintenances($limit = null)
+    {
+        $this->db
+            ->select('
+            m.*,
+            e.code_engin,
+            e.designation,
+            e.marque,
+            e.modele,
+            ch.name AS chantier_name,
+            COUNT(md.id) AS documents_count
+        ')
+            ->from('tbl_engin_maintenance m')
+            ->join(
+                'tbl_engin_materiel e',
+                'e.id = m.engin_id',
+                'left'
+            )
+            ->join(
+                'chantiers ch',
+                'ch.id = m.chantier_id',
+                'left'
+            )
+            ->join(
+                'tbl_engin_maintenance_document md',
+                'md.maintenance_id = m.id',
+                'left'
+            )
+            ->where('m.record_status', 1)
+            ->group_by('m.id')
+            ->order_by('m.planned_date', 'DESC')
+            ->order_by('m.id', 'DESC');
+
+        if (!empty($limit)) {
+            $this->db->limit((int) $limit);
+        }
+
+        return $this->db->get()->result();
+    }
+
+    public function getMaintenanceAlerts($limit = 6)
+    {
+        return $this->db
+            ->select("
+            m.id,
+            m.engin_id,
+            m.maintenance_type,
+            m.intervention,
+            m.planned_date,
+            m.next_maintenance_date,
+            m.maintenance_status,
+            m.description,
+            e.code_engin,
+            e.designation,
+            DATEDIFF(
+                COALESCE(m.next_maintenance_date, m.planned_date),
+                CURDATE()
+            ) AS days_remaining
+        ", false)
+            ->from('tbl_engin_maintenance m')
+            ->join(
+                'tbl_engin_materiel e',
+                'e.id = m.engin_id',
+                'left'
+            )
+            ->where('m.record_status', 1)
+            ->where_in(
+                'm.maintenance_status',
+                ['Programmé', 'En cours']
+            )
+            ->where(
+                "COALESCE(m.next_maintenance_date, m.planned_date) IS NOT NULL",
+                null,
+                false
+            )
+            ->where(
+                "COALESCE(m.next_maintenance_date, m.planned_date) <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)",
+                null,
+                false
+            )
+            ->order_by(
+                'COALESCE(m.next_maintenance_date, m.planned_date)',
+                'ASC',
+                false
+            )
+            ->limit((int) $limit)
+            ->get()
+            ->result();
+    }
+
+    public function getMostExpensiveEnginsCurrentMonth($limit = 5)
+    {
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        $sql = "
+        SELECT
+            e.id,
+            e.code_engin,
+            e.designation,
+            e.marque,
+            e.modele,
+
+            COALESCE(f.total_fuel_cost, 0) AS fuel_cost,
+            COALESCE(m.total_maintenance_cost, 0) AS maintenance_cost,
+
+            (
+                COALESCE(f.total_fuel_cost, 0)
+                +
+                COALESCE(m.total_maintenance_cost, 0)
+            ) AS total_cost
+
+        FROM tbl_engin_materiel e
+
+        LEFT JOIN
+        (
+            SELECT
+                engin_id,
+                SUM(total_amount) AS total_fuel_cost
+            FROM tbl_engin_fuel
+            WHERE status = 1
+              AND operation_date BETWEEN ? AND ?
+            GROUP BY engin_id
+        ) f
+            ON f.engin_id = e.id
+
+        LEFT JOIN
+        (
+            SELECT
+                engin_id,
+                SUM(total_cost) AS total_maintenance_cost
+            FROM tbl_engin_maintenance
+            WHERE record_status = 1
+              AND planned_date BETWEEN ? AND ?
+            GROUP BY engin_id
+        ) m
+            ON m.engin_id = e.id
+
+        WHERE e.status = 1
+
+          AND (
+                COALESCE(f.total_fuel_cost, 0)
+                +
+                COALESCE(m.total_maintenance_cost, 0)
+              ) > 0
+
+        ORDER BY total_cost DESC
+
+        LIMIT " . (int) $limit;
+
+        return $this->db
+            ->query(
+                $sql,
+                [
+                    $monthStart,
+                    $monthEnd,
+                    $monthStart,
+                    $monthEnd
+                ]
+            )
+            ->result();
+    }
+
+    public function getRecentTechnicalOperations($limit = 20)
+    {
+        $limit = (int) $limit;
+
+        if ($limit <= 0) {
+            $limit = 20;
+        }
+
+        $sql = "
+        SELECT *
+        FROM
+        (
+            /*
+            |--------------------------------------------------------------------------
+            | Ravitaillements
+            |--------------------------------------------------------------------------
+            */
+
+            SELECT
+                f.id AS operation_id,
+                'fuel' AS operation_source,
+
+                f.operation_date AS operation_date,
+
+                CONCAT(
+                    'CAR-',
+                    YEAR(f.operation_date),
+                    '-',
+                    LPAD(f.id, 5, '0')
+                ) AS reference,
+
+                f.engin_id,
+                e.code_engin,
+                e.designation,
+
+                'Ravitaillement carburant' AS operation_name,
+                'Carburant' AS operation_type,
+
+                f.chantier_id,
+                ch.name AS chantier_name,
+
+                f.total_amount AS amount,
+                f.operator_name AS responsible,
+
+                CASE
+                    WHEN f.status = 1 THEN 'Validé'
+                    ELSE 'Annulé'
+                END AS operation_status,
+
+                f.observation AS description,
+
+                0 AS documents_count
+
+            FROM tbl_engin_fuel f
+
+            LEFT JOIN tbl_engin_materiel e
+                ON e.id = f.engin_id
+
+            LEFT JOIN chantiers ch
+                ON ch.id = f.chantier_id
+
+            /*
+            |--------------------------------------------------------------------------
+            | Maintenance
+            |--------------------------------------------------------------------------
+            */
+
+            UNION ALL
+
+            SELECT
+                m.id AS operation_id,
+                'maintenance' AS operation_source,
+
+                m.planned_date AS operation_date,
+
+                CONCAT(
+                    'MAI-',
+                    YEAR(m.planned_date),
+                    '-',
+                    LPAD(m.id, 5, '0')
+                ) AS reference,
+
+                m.engin_id,
+                e.code_engin,
+                e.designation,
+
+                m.intervention AS operation_name,
+                m.maintenance_type AS operation_type,
+
+                m.chantier_id,
+                ch.name AS chantier_name,
+
+                m.total_cost AS amount,
+                m.technician AS responsible,
+
+                m.maintenance_status AS operation_status,
+
+                m.description AS description,
+
+                (
+                    SELECT COUNT(md.id)
+                    FROM tbl_engin_maintenance_document md
+                    WHERE md.maintenance_id = m.id
+                ) AS documents_count
+
+            FROM tbl_engin_maintenance m
+
+            LEFT JOIN tbl_engin_materiel e
+                ON e.id = m.engin_id
+
+            LEFT JOIN chantiers ch
+                ON ch.id = m.chantier_id
+
+            WHERE m.record_status = 1
+
+        ) AS operations
+
+        ORDER BY
+            operation_date DESC,
+            operation_id DESC
+
+        LIMIT {$limit}
+    ";
+
+        return $this->db
+            ->query($sql)
+            ->result();
+    }
+
+    public function getMaintenanceFuelStatistics()
+    {
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Carburant consommé ce mois
+    |--------------------------------------------------------------------------
+    */
+
+        $fuel = $this->db
+            ->select('
+            COALESCE(SUM(quantity_litre), 0) AS total_litres,
+            COALESCE(SUM(total_amount), 0) AS total_fuel_cost
+        ')
+            ->from('tbl_engin_fuel')
+            ->where('status', 1)
+            ->where('operation_date >=', $monthStart)
+            ->where('operation_date <=', $monthEnd)
+            ->get()
+            ->row();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Maintenances programmées
+    |--------------------------------------------------------------------------
+    */
+
+        $programmedMaintenance = $this->db
+            ->from('tbl_engin_maintenance')
+            ->where('record_status', 1)
+            ->where('maintenance_status', 'Programmé')
+            ->count_all_results();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Engins actuellement en atelier
+    |--------------------------------------------------------------------------
+    */
+
+        $enginsInWorkshop = $this->db
+            ->from('tbl_engin_materiel')
+            ->where('status', 1)
+            ->where('etat', 'Maintenance')
+            ->count_all_results();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Coût d’exploitation du mois
+    |--------------------------------------------------------------------------
+    */
+
+        $maintenance = $this->db
+            ->select('COALESCE(SUM(total_cost), 0) AS total_maintenance_cost')
+            ->from('tbl_engin_maintenance')
+            ->where('record_status', 1)
+            ->where('planned_date >=', $monthStart)
+            ->where('planned_date <=', $monthEnd)
+            ->get()
+            ->row();
+
+        $totalFuelCost = (float) ($fuel->total_fuel_cost ?? 0);
+
+        $totalMaintenanceCost =
+            (float) ($maintenance->total_maintenance_cost ?? 0);
+
+        return (object) [
+            'total_litres'              => (float) ($fuel->total_litres ?? 0),
+            'programmed_maintenance'    => (int) $programmedMaintenance,
+            'engins_in_workshop'        => (int) $enginsInWorkshop,
+            'total_fuel_cost'           => $totalFuelCost,
+            'total_maintenance_cost'    => $totalMaintenanceCost,
+            'total_operation_cost'      => $totalFuelCost + $totalMaintenanceCost
+        ];
+    }
 }

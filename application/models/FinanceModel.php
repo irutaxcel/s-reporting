@@ -482,13 +482,7 @@ class FinanceModel extends CI_Model
         ];
     }
 
-    // public function get_closing_history()
-    // {
-    //     return $this->db
-    //         ->order_by('id', 'DESC')
-    //         ->get('tbl_finance_exercice')
-    //         ->result();
-    // }
+
 
     public function get_closing_history()
     {
@@ -518,5 +512,542 @@ class FinanceModel extends CI_Model
         $this->db->order_by('ex.year', 'DESC');
 
         return $this->db->get()->result();
+    }
+
+    /**
+     * Génère le prochain code caisse pour une année.
+     *
+     * Exemple :
+     * CAI-2026-001
+     * CAI-2026-002
+     */
+    public function getNextCashboxCode(?int $year = null): string
+    {
+        $year = $year ?? (int) date('Y');
+
+        $prefix = 'CAI-' . $year . '-';
+
+        $sql = "
+        SELECT code
+        FROM tbl_finance_cashbox
+        WHERE code LIKE ?
+        ORDER BY CAST(SUBSTRING_INDEX(code, '-', -1) AS UNSIGNED) DESC
+        LIMIT 1
+    ";
+
+        $query = $this->db->query($sql, [$prefix . '%']);
+        $lastCashbox = $query->row();
+
+        $nextNumber = 1;
+
+        if ($lastCashbox && !empty($lastCashbox->code)) {
+            $parts = explode('-', $lastCashbox->code);
+            $lastNumber = (int) end($parts);
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return sprintf(
+            'CAI-%d-%03d',
+            $year,
+            $nextNumber
+        );
+    }
+
+    public function chantierHasCashbox(int $chantierId): bool
+    {
+        return $this->db
+            ->where('chantier_id', $chantierId)
+            ->where('type', 'chantier')
+            ->where('status !=', 'closed')
+            ->count_all_results('tbl_finance_cashbox') > 0;
+    }
+
+    /**
+     * Crée une caisse avec un code séquentiel.
+     *
+     * La transaction et GET_LOCK évitent que deux utilisateurs
+     * obtiennent simultanément le même code.
+     */
+    public function createCashbox(array $data)
+    {
+        $year = (int) date('Y');
+        $lockName = 'cashbox_code_' . $year;
+
+        $this->db->trans_begin();
+
+        try {
+            /*
+         * Verrou MySQL pour éviter les doublons lorsque deux
+         * utilisateurs enregistrent au même moment.
+         */
+            $lockQuery = $this->db->query(
+                'SELECT GET_LOCK(?, 10) AS lock_status',
+                [$lockName]
+            );
+
+            $lockResult = $lockQuery->row();
+
+            if (!$lockResult || (int) $lockResult->lock_status !== 1) {
+                throw new RuntimeException(
+                    'Impossible de réserver le numéro de caisse.'
+                );
+            }
+
+            /*
+         * Le code est généré côté serveur.
+         * La valeur envoyée par le formulaire n'est pas utilisée.
+         */
+            $data['code'] = $this->getNextCashboxCode($year);
+
+            $this->db->insert(
+                'tbl_finance_cashbox',
+                $data
+            );
+
+            if ($this->db->affected_rows() !== 1) {
+                throw new RuntimeException(
+                    'La caisse n’a pas pu être enregistrée.'
+                );
+            }
+
+            $cashboxId = $this->db->insert_id();
+
+            $this->db->query(
+                'SELECT RELEASE_LOCK(?)',
+                [$lockName]
+            );
+
+            $this->db->trans_commit();
+
+            return [
+                'status' => true,
+                'id'     => $cashboxId,
+                'code'   => $data['code'],
+            ];
+        } catch (Throwable $exception) {
+            $this->db->trans_rollback();
+
+            /*
+         * On tente de libérer le verrou même après une erreur.
+         */
+            $this->db->query(
+                'SELECT RELEASE_LOCK(?)',
+                [$lockName]
+            );
+
+            log_message(
+                'error',
+                'Erreur création caisse : ' . $exception->getMessage()
+            );
+
+            return [
+                'status'  => false,
+                'message' => $exception->getMessage(),
+            ];
+        }
+    }
+
+    public function getAllCashboxes(): array
+    {
+        return $this->db
+            ->select([
+                'c.id',
+                'c.code',
+                'c.name',
+                'c.type',
+                'c.chantier_id',
+                'c.responsable',
+                'c.devise',
+                'c.opening_balance',
+                'c.current_balance',
+                'c.alert_threshold',
+                'c.observation',
+                'c.status',
+                'c.created_at',
+                'ch.name AS chantier_name',
+            ])
+            ->from('tbl_finance_cashbox c')
+            ->join(
+                'chantiers ch',
+                'ch.id = c.chantier_id',
+                'left'
+            )
+            ->order_by('c.id', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    public function getNextCashboxOperationReference(?int $year = null): string
+    {
+        $year = $year ?? (int) date('Y');
+
+        $prefix = 'MVT-' . $year . '-';
+
+        $sql = "
+        SELECT reference
+        FROM tbl_finance_cashbox_operation
+        WHERE reference LIKE ?
+        ORDER BY
+            CAST(
+                SUBSTRING_INDEX(reference, '-', -1)
+                AS UNSIGNED
+            ) DESC
+        LIMIT 1
+    ";
+
+        $query = $this->db->query(
+            $sql,
+            [$prefix . '%']
+        );
+
+        $lastOperation = $query->row();
+
+        $nextNumber = 1;
+
+        if ($lastOperation && !empty($lastOperation->reference)) {
+            $parts = explode(
+                '-',
+                $lastOperation->reference
+            );
+
+            $lastNumber = (int) end($parts);
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return sprintf(
+            'MVT-%d-%05d',
+            $year,
+            $nextNumber
+        );
+    }
+
+    private function getCashboxForUpdate(int $cashboxId)
+    {
+        $sql = "
+        SELECT
+            id,
+            code,
+            name,
+            devise,
+            current_balance,
+            status
+        FROM tbl_finance_cashbox
+        WHERE id = ?
+        LIMIT 1
+        FOR UPDATE
+    ";
+
+        return $this->db
+            ->query($sql, [$cashboxId])
+            ->row();
+    }
+
+    public function createCashboxOperation(array $data): array
+    {
+        $year = (int) date(
+            'Y',
+            strtotime($data['operation_date'])
+        );
+
+        $lockName = 'cashbox_operation_reference_' . $year;
+
+        $this->db->trans_begin();
+
+        try {
+            /*
+         * Verrou de génération de référence.
+         */
+            $lockQuery = $this->db->query(
+                'SELECT GET_LOCK(?, 10) AS lock_status',
+                [$lockName]
+            );
+
+            $lockResult = $lockQuery->row();
+
+            if (
+                !$lockResult
+                || (int) $lockResult->lock_status !== 1
+            ) {
+                throw new RuntimeException(
+                    'Impossible de générer la référence de l’opération.'
+                );
+            }
+
+            $data['reference'] =
+                $this->getNextCashboxOperationReference($year);
+
+            $operationType = $data['operation_type'];
+            $amount = (float) $data['amount'];
+
+            if ($amount <= 0) {
+                throw new RuntimeException(
+                    'Le montant doit être supérieur à zéro.'
+                );
+            }
+
+            /*
+         * ENCAISSEMENT
+         */
+            if ($operationType === 'encaissement') {
+                $destinationId = (int) $data['destination_cashbox_id'];
+
+                $destinationCashbox =
+                    $this->getCashboxForUpdate($destinationId);
+
+                if (!$destinationCashbox) {
+                    throw new RuntimeException(
+                        'La caisse sélectionnée est introuvable.'
+                    );
+                }
+
+                if ($destinationCashbox->status !== 'active') {
+                    throw new RuntimeException(
+                        'La caisse sélectionnée n’est pas active.'
+                    );
+                }
+
+                if ($destinationCashbox->devise !== $data['currency']) {
+                    throw new RuntimeException(
+                        'La devise de l’opération ne correspond pas à celle de la caisse.'
+                    );
+                }
+
+                $newBalance =
+                    (float) $destinationCashbox->current_balance
+                    + $amount;
+
+                $this->db
+                    ->where('id', $destinationId)
+                    ->update(
+                        'tbl_finance_cashbox',
+                        [
+                            'current_balance' => $newBalance,
+                            'updated_at'      => date('Y-m-d H:i:s'),
+                        ]
+                    );
+
+                $data['source_cashbox_id'] = null;
+            }
+
+            /*
+         * DÉCAISSEMENT
+         */ elseif ($operationType === 'decaissement') {
+                $sourceId = (int) $data['source_cashbox_id'];
+
+                $sourceCashbox =
+                    $this->getCashboxForUpdate($sourceId);
+
+                if (!$sourceCashbox) {
+                    throw new RuntimeException(
+                        'La caisse sélectionnée est introuvable.'
+                    );
+                }
+
+                if ($sourceCashbox->status !== 'active') {
+                    throw new RuntimeException(
+                        'La caisse sélectionnée n’est pas active.'
+                    );
+                }
+
+                if ($sourceCashbox->devise !== $data['currency']) {
+                    throw new RuntimeException(
+                        'La devise de l’opération ne correspond pas à celle de la caisse.'
+                    );
+                }
+
+                if (
+                    (float) $sourceCashbox->current_balance
+                    < $amount
+                ) {
+                    throw new RuntimeException(
+                        'Le solde disponible dans la caisse est insuffisant.'
+                    );
+                }
+
+                $newBalance =
+                    (float) $sourceCashbox->current_balance
+                    - $amount;
+
+                $this->db
+                    ->where('id', $sourceId)
+                    ->update(
+                        'tbl_finance_cashbox',
+                        [
+                            'current_balance' => $newBalance,
+                            'updated_at'      => date('Y-m-d H:i:s'),
+                        ]
+                    );
+
+                $data['destination_cashbox_id'] = null;
+            }
+
+            /*
+         * APPROVISIONNEMENT / TRANSFERT INTERNE
+         */ elseif ($operationType === 'approvisionnement') {
+                $sourceId = (int) $data['source_cashbox_id'];
+                $destinationId =
+                    (int) $data['destination_cashbox_id'];
+
+                if ($sourceId === $destinationId) {
+                    throw new RuntimeException(
+                        'La caisse source et la caisse destination doivent être différentes.'
+                    );
+                }
+
+                /*
+             * On verrouille dans l’ordre croissant des IDs
+             * pour réduire le risque d’interblocage.
+             */
+                $firstId = min($sourceId, $destinationId);
+                $secondId = max($sourceId, $destinationId);
+
+                $firstCashbox =
+                    $this->getCashboxForUpdate($firstId);
+
+                $secondCashbox =
+                    $this->getCashboxForUpdate($secondId);
+
+                if (!$firstCashbox || !$secondCashbox) {
+                    throw new RuntimeException(
+                        'Une des caisses sélectionnées est introuvable.'
+                    );
+                }
+
+                $sourceCashbox = $sourceId === $firstId
+                    ? $firstCashbox
+                    : $secondCashbox;
+
+                $destinationCashbox =
+                    $destinationId === $firstId
+                    ? $firstCashbox
+                    : $secondCashbox;
+
+                if (
+                    $sourceCashbox->status !== 'active'
+                    || $destinationCashbox->status !== 'active'
+                ) {
+                    throw new RuntimeException(
+                        'Les deux caisses doivent être actives.'
+                    );
+                }
+
+                if (
+                    $sourceCashbox->devise
+                    !== $destinationCashbox->devise
+                ) {
+                    throw new RuntimeException(
+                        'Le transfert ne peut pas être effectué entre deux caisses de devises différentes.'
+                    );
+                }
+
+                if (
+                    $sourceCashbox->devise
+                    !== $data['currency']
+                ) {
+                    throw new RuntimeException(
+                        'La devise de l’opération est incorrecte.'
+                    );
+                }
+
+                if (
+                    (float) $sourceCashbox->current_balance
+                    < $amount
+                ) {
+                    throw new RuntimeException(
+                        'Le solde de la caisse source est insuffisant.'
+                    );
+                }
+
+                $newSourceBalance =
+                    (float) $sourceCashbox->current_balance
+                    - $amount;
+
+                $newDestinationBalance =
+                    (float) $destinationCashbox->current_balance
+                    + $amount;
+
+                $this->db
+                    ->where('id', $sourceId)
+                    ->update(
+                        'tbl_finance_cashbox',
+                        [
+                            'current_balance' => $newSourceBalance,
+                            'updated_at'      => date('Y-m-d H:i:s'),
+                        ]
+                    );
+
+                $this->db
+                    ->where('id', $destinationId)
+                    ->update(
+                        'tbl_finance_cashbox',
+                        [
+                            'current_balance' =>
+                            $newDestinationBalance,
+
+                            'updated_at' =>
+                            date('Y-m-d H:i:s'),
+                        ]
+                    );
+            } else {
+                throw new RuntimeException(
+                    'Type d’opération invalide.'
+                );
+            }
+
+            /*
+         * Insertion du mouvement.
+         */
+            $this->db->insert(
+                'tbl_finance_cashbox_operation',
+                $data
+            );
+
+            if ($this->db->affected_rows() !== 1) {
+                throw new RuntimeException(
+                    'L’opération n’a pas pu être enregistrée.'
+                );
+            }
+
+            $operationId = $this->db->insert_id();
+
+            $this->db->query(
+                'SELECT RELEASE_LOCK(?)',
+                [$lockName]
+            );
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException(
+                    'Erreur pendant la transaction.'
+                );
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status'    => true,
+                'id'        => $operationId,
+                'reference' => $data['reference'],
+            ];
+        } catch (Throwable $exception) {
+            $this->db->trans_rollback();
+
+            $this->db->query(
+                'SELECT RELEASE_LOCK(?)',
+                [$lockName]
+            );
+
+            log_message(
+                'error',
+                'Erreur opération caisse : '
+                    . $exception->getMessage()
+            );
+
+            return [
+                'status'  => false,
+                'message' => $exception->getMessage(),
+            ];
+        }
     }
 }

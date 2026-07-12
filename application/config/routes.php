@@ -109,15 +109,20 @@ $route['engin-materiel'] = 'TechController/enginMateriel';
 $route['engin-materiel-store'] = 'TechController/enginMaterielStore';
 
 $route['engin-materiel-update'] = 'TechController/enginMaterielUpdate';
+
 $route['engin-materiel-delete'] = 'TechController/enginMaterielDelete';
 
 $route['engin-materiel-files'] = 'TechController/enginMaterielFiles';
-$route['engin-materiel-update'] = 'TechController/enginMaterielUpdate';
 
 $route['engin-photo-delete'] = 'TechController/enginPhotoDelete';
 $route['engin-document-delete'] = 'TechController/enginDocumentDelete';
 
+$route['maintenance-carburant'] = 'TechController/maintenanceCarburant';
+$route['add-new-ravitaillement'] = 'TechController/addNewRavitaillement';
 
+$route['new-technique-maintenance'] = 'TechController/newTechniqueMaintenance';
+
+$route['cout-reelle-rentebilite'] = 'TechController/coutReelleRentebilite';
 
 
 $route['finance-dashboard'] = 'FinanceController/financeDashboard';
@@ -161,3 +166,13 @@ $route['grand-livre'] = 'FinanceController/grand_livre';
 $route['balance-generale'] = 'FinanceController/balance_generale';
 
 $route['cloture-comptable'] = 'FinanceController/cloture_comptable';
+
+
+$route['caisse'] = 'FinanceController/caisse';
+$route['finance/caisse-store'] = 'FinanceController/caisseStore';
+$route['finance/cashbox-operation-store']
+    = 'FinanceController/cashboxOperationStore';
+
+$route['encaissements'] = 'FinanceController/encaissements';
+
+$route['decaissements'] = 'FinanceController/decaissements';
