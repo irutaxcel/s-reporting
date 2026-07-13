@@ -795,6 +795,40 @@ class FinanceController extends CI_Controller
         $this->load->view('v1/components/layout/footer', $data);
     }
 
+    // public function caisse()
+    // {
+    //     if (!$this->session->userdata('user_id')) {
+    //         redirect('sign-in');
+    //         return;
+    //     }
+
+    //     $data = [
+    //         'title'           => 'Caisse',
+    //         'allChantiers'    => $this->tech->getAllChantiers(),
+    //         'allCashboxes'    => $this->finance->getAllCashboxes(),
+    //         'nextCashboxCode' => $this->finance->getNextCashboxCode(),
+    //     ];
+
+    //     $this->load->view(
+    //         'v1/components/layout/header',
+    //         $data
+    //     );
+
+    //     $this->load->view(
+    //         'v1/components/layout/sidebar',
+    //         $data
+    //     );
+
+    //     $this->load->view(
+    //         'v1/components/modules/finance/caisse',
+    //         $data
+    //     );
+
+    //     $this->load->view(
+    //         'v1/components/layout/footer'
+    //     );
+    // }
+
     public function caisse()
     {
         if (!$this->session->userdata('user_id')) {
@@ -802,12 +836,217 @@ class FinanceController extends CI_Controller
             return;
         }
 
-        $data = [
-            'title'           => 'Caisse',
-            'allChantiers'    => $this->tech->getAllChantiers(),
-            'allCashboxes'    => $this->finance->getAllCashboxes(),
-            'nextCashboxCode' => $this->finance->getNextCashboxCode(),
+        $data = [];
+
+        $data['title'] = 'Caisse';
+
+        /*
+     * =========================================================
+     * FILTRES DES CAISSES
+     * =========================================================
+     */
+
+        $cashboxSearch = trim(
+            (string) $this->input->get(
+                'cashbox_search',
+                true
+            )
+        );
+
+        $cashboxType = trim(
+            (string) $this->input->get(
+                'cashbox_type',
+                true
+            )
+        );
+
+        $cashboxChantierId = (int) $this->input->get(
+            'chantier_id',
+            true
+        );
+
+        $cashboxSituation = trim(
+            (string) $this->input->get(
+                'cashbox_situation',
+                true
+            )
+        );
+
+        if (
+            !in_array(
+                $cashboxType,
+                ['', 'siege', 'chantier'],
+                true
+            )
+        ) {
+            $cashboxType = '';
+        }
+
+        if (
+            !in_array(
+                $cashboxSituation,
+                ['', 'normal', 'faible', 'critique'],
+                true
+            )
+        ) {
+            $cashboxSituation = '';
+        }
+
+        $cashboxFilters = [
+            'search'       => $cashboxSearch,
+            'type'         => $cashboxType,
+            'chantier_id'  => $cashboxChantierId,
+            'situation'    => $cashboxSituation,
         ];
+
+        $data['cashboxFilters'] =
+            $cashboxFilters;
+
+        /*
+     * =========================================================
+     * STATISTIQUES PRINCIPALES
+     * =========================================================
+     */
+
+        $data['cashboxMainStatistics'] =
+            $this->finance
+            ->getCashboxMainStatistics();
+
+        /*
+     * =========================================================
+     * LISTE ET SITUATION DES CAISSES
+     * =========================================================
+     */
+
+        $data['allCashboxes'] =
+            $this->finance
+            ->getAllCashboxes();
+
+        $data['cashboxSituations'] =
+            $this->finance
+            ->getCashboxSituations(
+                $cashboxFilters
+            );
+
+        $data['filteredCashboxesCount'] =
+            count(
+                $data['cashboxSituations']
+            );
+
+        $data['activeCashboxesCount'] =
+            $this->finance
+            ->countActiveCashboxes();
+
+        /*
+     * =========================================================
+     * ÉVOLUTION DE LA TRÉSORERIE
+     * =========================================================
+     */
+
+        $allowedCashFlowPeriods = [
+            '7days',
+            '30days',
+            'month',
+            'year',
+        ];
+
+        $cashFlowPeriod = trim(
+            (string) $this->input->get(
+                'cashflow_period',
+                true
+            )
+        );
+
+        if (
+            !in_array(
+                $cashFlowPeriod,
+                $allowedCashFlowPeriods,
+                true
+            )
+        ) {
+            $cashFlowPeriod = '7days';
+        }
+
+        $data['cashFlowPeriod'] =
+            $cashFlowPeriod;
+
+        $data['cashFlowEvolution'] =
+            $this->finance
+            ->getCashFlowEvolution(
+                $cashFlowPeriod
+            );
+
+        /*
+     * =========================================================
+     * ALERTES
+     * =========================================================
+     */
+
+        $data['treasuryAlerts'] =
+            $this->finance
+            ->getTreasuryAlerts(8);
+
+        $data['treasuryAlertsCount'] =
+            $this->finance
+            ->countTreasuryAlerts();
+
+        /*
+     * =========================================================
+     * MOUVEMENTS RÉCENTS
+     * =========================================================
+     */
+
+        $data['recentCashboxMovements'] =
+            $this->finance
+            ->getRecentCashboxMovements(10);
+
+        $data['cashboxMovementsCount'] =
+            $this->finance
+            ->countCashboxMovements();
+
+        /*
+     * =========================================================
+     * DÉPENSES ET SYNTHÈSE CHANTIER
+     * =========================================================
+     */
+
+        $data['monthlyMainExpenses'] =
+            $this->finance
+            ->getMonthlyMainExpenses(5);
+
+        $data['cashboxSummaryByChantier'] =
+            $this->finance
+            ->getCashboxSummaryByChantier();
+
+        /*
+     * =========================================================
+     * CODES AUTOMATIQUES
+     * =========================================================
+     */
+
+        $data['nextCashboxCode'] =
+            $this->finance
+            ->getNextCashboxCode();
+
+        $data['nextOperationReference'] =
+            $this->finance
+            ->getNextCashboxOperationReference();
+
+        /*
+     * =========================================================
+     * CHANTIERS
+     * =========================================================
+     */
+
+        $data['allChantiers'] =
+            $this->tech
+            ->getAllChantiers();
+
+        /*
+     * =========================================================
+     * VUES
+     * =========================================================
+     */
 
         $this->load->view(
             'v1/components/layout/header',
@@ -1031,8 +1270,8 @@ class FinanceController extends CI_Controller
     public function cashboxOperationStore()
     {
         /*
-     * Autoriser uniquement les requêtes POST.
-     */
+        * Autoriser uniquement les requêtes POST.
+        */
         if ($this->input->method(TRUE) !== 'POST') {
             show_404();
         }
@@ -1040,10 +1279,10 @@ class FinanceController extends CI_Controller
         $this->load->library('form_validation');
 
         /*
-     * =========================================================
-     * 1. RÈGLES DE VALIDATION
-     * =========================================================
-     */
+        * =========================================================
+        * 1. RÈGLES DE VALIDATION
+        * =========================================================
+        */
 
         $this->form_validation->set_rules(
             'operation_type',
@@ -1753,6 +1992,58 @@ class FinanceController extends CI_Controller
         );
 
         redirect('caisse');
+    }
+
+    public function banques()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['title'] = 'Comptes bancaires';
+
+        // $data['allChantiers'] = $this->tech->getAllChantier();
+
+        // $data['encaissementsData'] = $this->tech->getEncaissementsData();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/banques', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function bankAccountStore()
+    {
+        $data = [
+
+            'code'              => $this->input->post('code'),
+            'name'              => $this->input->post('name'),
+            'bank_name'         => $this->input->post('bank_name'),
+            'account_number'    => $this->input->post('account_number'),
+            'account_type'      => $this->input->post('account_type'),
+            'currency'          => $this->input->post('currency'),
+            'opening_balance'   => $this->input->post('opening_balance'),
+            'current_balance'   => $this->input->post('opening_balance'),
+            'alert_threshold'   => $this->input->post('alert_threshold'),
+            'branch_name'       => $this->input->post('branch_name'),
+            'swift_code'        => $this->input->post('swift_code'),
+            'observation'       => $this->input->post('observation'),
+            'status'            => 'active',
+            'created_by'        => $this->session->userdata('id')
+        ];
+
+        $this->finance->insert(
+            'tbl_finance_bank_account',
+            $data
+        );
+
+        $this->session->set_flashdata(
+            'success',
+            'Compte bancaire créé avec succès.'
+        );
+
+        redirect('finance/banques');
     }
 
     public function encaissements()

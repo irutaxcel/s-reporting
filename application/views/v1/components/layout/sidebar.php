@@ -414,7 +414,7 @@
                 <!-- ==========================
                     DAF / FINANCE
                 =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements') { ?>
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -590,7 +590,7 @@
                 </li>
 
                 <!-- TRESORERIE -->
-                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements') { ?>
+                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -625,10 +625,18 @@
 
                         <!-- Comptes bancaires -->
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/banques') ?>" class="nav-link">
+                            <?php if ($title == 'Comptes bancaires') { ?>
+                            <a href="<?= base_url('compte-banques') ?>" class="nav-link active">
                                 <i class="fas fa-university nav-icon text-primary"></i>
                                 <p>Comptes bancaires</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('compte-banques') ?>" class="nav-link">
+                                <i class="fas fa-university nav-icon text-primary"></i>
+                                <p>Comptes bancaires</p>
+                            </a>
+                            <?php } ?>
+
                         </li>
 
                         <!-- Encaissements -->

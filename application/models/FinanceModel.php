@@ -1050,4 +1050,1706 @@ class FinanceModel extends CI_Model
             ];
         }
     }
+
+    /**
+     * Retourne la situation des caisses avec filtres.
+     *
+     * Filtres disponibles :
+     * - search       : code, nom, responsable ou chantier ;
+     * - type         : siege ou chantier ;
+     * - chantier_id  : chantier associé ;
+     * - situation    : normal, faible ou critique.
+     */
+    public function getCashboxSituations(array $filters = []): array
+    {
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        /*
+        * =========================================================
+        * NORMALISATION DES FILTRES
+        * =========================================================
+        */
+
+        $search = isset($filters['search'])
+            ? trim((string) $filters['search'])
+            : '';
+
+        $type = isset($filters['type'])
+            ? trim((string) $filters['type'])
+            : '';
+
+        $chantierId = isset($filters['chantier_id'])
+            ? (int) $filters['chantier_id']
+            : 0;
+
+        $situation = isset($filters['situation'])
+            ? trim((string) $filters['situation'])
+            : '';
+
+        /*
+            * =========================================================
+            * REQUÊTE PRINCIPALE
+            * =========================================================
+            */
+
+        $sql = "
+            SELECT
+                c.id,
+                c.code,
+                c.name,
+                c.type,
+                c.chantier_id,
+                c.responsable,
+                c.devise,
+                c.opening_balance,
+                c.current_balance,
+                c.alert_threshold,
+                c.observation,
+                c.status,
+                c.created_at,
+                c.updated_at,
+
+                ch.name AS chantier_name,
+                ch.ref_chantier,
+                ch.location,
+
+                COALESCE(
+                    movements.monthly_entries,
+                    0
+                ) AS monthly_entries,
+
+                COALESCE(
+                    movements.monthly_outputs,
+                    0
+                ) AS monthly_outputs,
+
+                COALESCE(
+                    movements.monthly_operations,
+                    0
+                ) AS monthly_operations,
+
+                CASE
+
+                    /*
+                    * Critique :
+                    * solde inférieur ou égal au seuil.
+                    */
+                    WHEN
+                        c.alert_threshold > 0
+                        AND c.current_balance
+                            <= c.alert_threshold
+
+                    THEN 'critique'
+
+                    /*
+                    * Faible :
+                    * solde supérieur au seuil,
+                    * mais inférieur ou égal au double du seuil.
+                    */
+                    WHEN
+                        c.alert_threshold > 0
+                        AND c.current_balance
+                            > c.alert_threshold
+                        AND c.current_balance
+                            <= (c.alert_threshold * 2)
+
+                    THEN 'faible'
+
+                    /*
+                    * Sinon la situation est normale.
+                    */
+                    ELSE 'normal'
+
+                END AS balance_situation
+
+            FROM tbl_finance_cashbox c
+
+            LEFT JOIN chantiers ch
+                ON ch.id = c.chantier_id
+
+            LEFT JOIN
+            (
+                SELECT
+                    all_movements.cashbox_id,
+
+                    SUM(
+                        all_movements.entry_amount
+                    ) AS monthly_entries,
+
+                    SUM(
+                        all_movements.output_amount
+                    ) AS monthly_outputs,
+
+                    COUNT(
+                        DISTINCT all_movements.operation_id
+                    ) AS monthly_operations
+
+                FROM
+                (
+                    /*
+                    * Entrées dans les caisses.
+                    */
+                    SELECT
+                        op.id AS operation_id,
+                        op.destination_cashbox_id AS cashbox_id,
+                        op.amount AS entry_amount,
+                        0 AS output_amount
+
+                    FROM tbl_finance_cashbox_operation op
+
+                    WHERE op.destination_cashbox_id IS NOT NULL
+                    AND op.status = 'validated'
+                    AND op.operation_date BETWEEN ? AND ?
+
+                    UNION ALL
+
+                    /*
+                    * Sorties depuis les caisses.
+                    */
+                    SELECT
+                        op.id AS operation_id,
+                        op.source_cashbox_id AS cashbox_id,
+                        0 AS entry_amount,
+                        op.amount AS output_amount
+
+                    FROM tbl_finance_cashbox_operation op
+
+                    WHERE op.source_cashbox_id IS NOT NULL
+                    AND op.status = 'validated'
+                    AND op.operation_date BETWEEN ? AND ?
+
+                ) all_movements
+
+                GROUP BY all_movements.cashbox_id
+
+            ) movements
+                ON movements.cashbox_id = c.id
+
+            WHERE c.status = 'active'
+        ";
+
+        $queryParameters = [
+            $monthStart,
+            $monthEnd,
+            $monthStart,
+            $monthEnd,
+        ];
+
+        /*
+        * =========================================================
+        * FILTRE DE RECHERCHE
+        * =========================================================
+        */
+
+        if ($search !== '') {
+            $sql .= "
+            AND
+            (
+                c.code LIKE ?
+                OR c.name LIKE ?
+                OR c.responsable LIKE ?
+                OR ch.name LIKE ?
+                OR ch.ref_chantier LIKE ?
+                OR ch.location LIKE ?
+            )
+        ";
+
+            $searchValue = '%' . $search . '%';
+
+            $queryParameters[] = $searchValue;
+            $queryParameters[] = $searchValue;
+            $queryParameters[] = $searchValue;
+            $queryParameters[] = $searchValue;
+            $queryParameters[] = $searchValue;
+            $queryParameters[] = $searchValue;
+        }
+
+        /*
+        * =========================================================
+        * FILTRE PAR TYPE
+        * =========================================================
+        */
+
+        if (
+            in_array(
+                $type,
+                ['siege', 'chantier'],
+                true
+            )
+        ) {
+            $sql .= "
+            AND c.type = ?
+        ";
+
+            $queryParameters[] = $type;
+        }
+
+        /*
+        * =========================================================
+        * FILTRE PAR CHANTIER
+        * =========================================================
+        */
+
+        if ($chantierId > 0) {
+            $sql .= "
+            AND c.chantier_id = ?
+        ";
+
+            $queryParameters[] = $chantierId;
+        }
+
+        /*
+        * =========================================================
+        * FILTRE PAR SITUATION
+        * =========================================================
+        */
+
+        if ($situation === 'critique') {
+            $sql .= "
+            AND c.alert_threshold > 0
+            AND c.current_balance
+                <= c.alert_threshold
+        ";
+        } elseif ($situation === 'faible') {
+            $sql .= "
+            AND c.alert_threshold > 0
+            AND c.current_balance
+                > c.alert_threshold
+            AND c.current_balance
+                <= (c.alert_threshold * 2)
+        ";
+        } elseif ($situation === 'normal') {
+            $sql .= "
+            AND
+            (
+                c.alert_threshold <= 0
+                OR c.current_balance
+                    > (c.alert_threshold * 2)
+            )
+        ";
+        }
+
+        /*
+        * =========================================================
+        * TRI
+        * =========================================================
+        *
+        * Ordre :
+        * 1. caisse siège ;
+        * 2. caisses critiques ;
+        * 3. caisses faibles ;
+        * 4. caisses normales ;
+        * 5. nom de la caisse.
+        */
+
+        $sql .= "
+            ORDER BY
+
+                CASE
+                    WHEN c.type = 'siege'
+                        THEN 0
+                    ELSE 1
+                END ASC,
+
+                CASE
+
+                    WHEN
+                        c.alert_threshold > 0
+                        AND c.current_balance
+                            <= c.alert_threshold
+                        THEN 0
+
+                    WHEN
+                        c.alert_threshold > 0
+                        AND c.current_balance
+                            <= (c.alert_threshold * 2)
+                        THEN 1
+
+                    ELSE 2
+
+                END ASC,
+
+                c.name ASC
+        ";
+
+        return $this->db
+            ->query(
+                $sql,
+                $queryParameters
+            )
+            ->result();
+    }
+
+    public function countActiveCashboxes(): int
+    {
+        return (int) $this->db
+            ->where('status', 'active')
+            ->count_all_results('tbl_finance_cashbox');
+    }
+
+    /**
+     * Récupère les mouvements récents de caisse.
+     *
+     * Pour chaque opération :
+     * - encaissement : on affiche la caisse destination ;
+     * - décaissement : on affiche la caisse source ;
+     * - approvisionnement : on affiche la caisse source.
+     *
+     * Le solde après opération est recalculé à partir :
+     * - du solde initial ;
+     * - des entrées validées ;
+     * - des sorties validées.
+     */
+    public function getRecentCashboxMovements(int $limit = 10): array
+    {
+        $limit = max(1, min($limit, 100));
+
+        $sql = "
+            SELECT
+                movement.id,
+                movement.reference,
+                movement.operation_type,
+                movement.operation_date,
+                movement.source_cashbox_id,
+                movement.destination_cashbox_id,
+                movement.amount,
+                movement.currency,
+                movement.category,
+                movement.third_party,
+                movement.payment_method,
+                movement.document_number,
+                movement.attachment,
+                movement.label,
+                movement.observation,
+                movement.status,
+                movement.created_by,
+                movement.validated_by,
+                movement.created_at,
+                movement.updated_at,
+                movement.cashbox_id,
+
+                cashbox.code AS cashbox_code,
+                cashbox.name AS cashbox_name,
+                cashbox.type AS cashbox_type,
+                cashbox.devise AS cashbox_currency,
+                cashbox.opening_balance,
+
+                source_cashbox.code AS source_cashbox_code,
+                source_cashbox.name AS source_cashbox_name,
+
+                destination_cashbox.code AS destination_cashbox_code,
+                destination_cashbox.name AS destination_cashbox_name,
+
+                (
+                    cashbox.opening_balance
+
+                    +
+
+                    COALESCE(
+                        (
+                            SELECT SUM(incoming.amount)
+
+                            FROM tbl_finance_cashbox_operation incoming
+
+                            WHERE incoming.destination_cashbox_id
+                                = movement.cashbox_id
+
+                            AND incoming.status = 'validated'
+
+                            AND
+                            (
+                                incoming.operation_date
+                                    < movement.operation_date
+
+                                OR
+                                (
+                                    incoming.operation_date
+                                        = movement.operation_date
+
+                                    AND incoming.created_at
+                                        < movement.created_at
+                                )
+
+                                OR
+                                (
+                                    incoming.operation_date
+                                        = movement.operation_date
+
+                                    AND incoming.created_at
+                                        = movement.created_at
+
+                                    AND incoming.id
+                                        <= movement.id
+                                )
+                            )
+                        ),
+                        0
+                    )
+
+                    -
+
+                    COALESCE(
+                        (
+                            SELECT SUM(outgoing.amount)
+
+                            FROM tbl_finance_cashbox_operation outgoing
+
+                            WHERE outgoing.source_cashbox_id
+                                = movement.cashbox_id
+
+                            AND outgoing.status = 'validated'
+
+                            AND
+                            (
+                                outgoing.operation_date
+                                    < movement.operation_date
+
+                                OR
+                                (
+                                    outgoing.operation_date
+                                        = movement.operation_date
+
+                                    AND outgoing.created_at
+                                        < movement.created_at
+                                )
+
+                                OR
+                                (
+                                    outgoing.operation_date
+                                        = movement.operation_date
+
+                                    AND outgoing.created_at
+                                        = movement.created_at
+
+                                    AND outgoing.id
+                                        <= movement.id
+                                )
+                            )
+                        ),
+                        0
+                    )
+                ) AS balance_after
+
+            FROM
+            (
+                SELECT
+                    operation.*,
+
+                    CASE
+                        WHEN operation.operation_type = 'encaissement'
+                            THEN operation.destination_cashbox_id
+
+                        WHEN operation.operation_type = 'decaissement'
+                            THEN operation.source_cashbox_id
+
+                        WHEN operation.operation_type = 'approvisionnement'
+                            THEN operation.source_cashbox_id
+
+                        ELSE operation.source_cashbox_id
+                    END AS cashbox_id
+
+                FROM tbl_finance_cashbox_operation operation
+
+            ) movement
+
+            INNER JOIN tbl_finance_cashbox cashbox
+                ON cashbox.id = movement.cashbox_id
+
+            LEFT JOIN tbl_finance_cashbox source_cashbox
+                ON source_cashbox.id = movement.source_cashbox_id
+
+            LEFT JOIN tbl_finance_cashbox destination_cashbox
+                ON destination_cashbox.id
+                    = movement.destination_cashbox_id
+
+            ORDER BY
+                movement.operation_date DESC,
+                movement.created_at DESC,
+                movement.id DESC
+
+            LIMIT {$limit}
+        ";
+
+        return $this->db
+            ->query($sql)
+            ->result();
+    }
+
+    public function countCashboxMovements(): int
+    {
+        return (int) $this->db
+            ->where('status !=', 'cancelled')
+            ->count_all_results(
+                'tbl_finance_cashbox_operation'
+            );
+    }
+
+    /**
+     * Retourne les principales dépenses du mois en cours,
+     * regroupées par catégorie.
+     *
+     * Seuls les décaissements validés sont considérés comme dépenses.
+     */
+    public function getMonthlyMainExpenses(int $limit = 5): array
+    {
+        $limit = max(1, min($limit, 20));
+
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        $sql = "
+        SELECT
+            CASE
+                WHEN category IS NULL OR TRIM(category) = ''
+                    THEN 'Autre'
+                ELSE category
+            END AS category,
+
+            SUM(amount) AS total_amount,
+
+            COUNT(id) AS total_operations
+
+        FROM tbl_finance_cashbox_operation
+
+        WHERE operation_type = 'decaissement'
+        AND status = 'validated'
+        AND operation_date BETWEEN ? AND ?
+
+        GROUP BY
+            CASE
+                WHEN category IS NULL OR TRIM(category) = ''
+                    THEN 'Autre'
+                ELSE category
+            END
+
+        ORDER BY total_amount DESC
+
+        LIMIT {$limit}
+    ";
+
+        $expenses = $this->db
+            ->query(
+                $sql,
+                [
+                    $monthStart,
+                    $monthEnd,
+                ]
+            )
+            ->result();
+
+        /*
+     * Le montant le plus élevé servira de référence
+     * pour calculer la largeur des barres.
+     */
+        $maximumAmount = 0;
+
+        if (!empty($expenses)) {
+            $maximumAmount = (float) $expenses[0]->total_amount;
+        }
+
+        foreach ($expenses as $expense) {
+            $expense->total_amount = (float) $expense->total_amount;
+
+            if ($maximumAmount > 0) {
+                $expense->percentage = (
+                    $expense->total_amount / $maximumAmount
+                ) * 100;
+            } else {
+                $expense->percentage = 0;
+            }
+
+            /*
+         * Empêcher une barre trop petite d’être invisible.
+         */
+            if (
+                $expense->total_amount > 0
+                && $expense->percentage < 5
+            ) {
+                $expense->percentage = 5;
+            }
+
+            $expense->percentage = min(
+                100,
+                $expense->percentage
+            );
+        }
+
+        return $expenses;
+    }
+
+    /**
+     * Retourne la synthèse financière de chaque caisse chantier.
+     *
+     * Approvisionné :
+     * solde initial + toutes les entrées validées.
+     *
+     * Consommé :
+     * uniquement les décaissements validés.
+     *
+     * Disponible :
+     * solde actuel enregistré dans la caisse.
+     */
+    public function getCashboxSummaryByChantier(): array
+    {
+        $sql = "
+        SELECT
+            c.id AS cashbox_id,
+            c.code AS cashbox_code,
+            c.name AS cashbox_name,
+            c.chantier_id,
+            c.devise,
+            c.opening_balance,
+            c.current_balance,
+            c.alert_threshold,
+            c.status AS cashbox_status,
+
+            ch.name AS chantier_name,
+            ch.ref_chantier,
+            ch.location,
+            ch.status AS chantier_status,
+
+            /*
+             * Total de toutes les entrées reçues par la caisse.
+             *
+             * Cela inclut :
+             * - les encaissements directs ;
+             * - les approvisionnements internes reçus.
+             */
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN op.destination_cashbox_id = c.id
+                        AND op.status = 'validated'
+                        THEN op.amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_entries,
+
+            /*
+             * Consommation réelle :
+             * uniquement les décaissements.
+             */
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN op.source_cashbox_id = c.id
+                        AND op.operation_type = 'decaissement'
+                        AND op.status = 'validated'
+                        THEN op.amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_consumed,
+
+            /*
+             * Transferts envoyés vers une autre caisse.
+             *
+             * Ce montant ne représente pas une dépense,
+             * mais il réduit quand même le solde disponible.
+             */
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN op.source_cashbox_id = c.id
+                        AND op.operation_type = 'approvisionnement'
+                        AND op.status = 'validated'
+                        THEN op.amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_transferred_out,
+
+            /*
+             * Nombre total des mouvements liés à la caisse.
+             */
+            COUNT(
+                DISTINCT CASE
+                    WHEN
+                        (
+                            op.source_cashbox_id = c.id
+                            OR op.destination_cashbox_id = c.id
+                        )
+                        AND op.status = 'validated'
+                    THEN op.id
+                    ELSE NULL
+                END
+            ) AS total_operations
+
+        FROM tbl_finance_cashbox c
+
+        LEFT JOIN chantiers ch
+            ON ch.id = c.chantier_id
+
+        LEFT JOIN tbl_finance_cashbox_operation op
+            ON
+            (
+                op.source_cashbox_id = c.id
+                OR op.destination_cashbox_id = c.id
+            )
+
+        WHERE c.type = 'chantier'
+        AND c.status = 'active'
+
+        GROUP BY
+            c.id,
+            c.code,
+            c.name,
+            c.chantier_id,
+            c.devise,
+            c.opening_balance,
+            c.current_balance,
+            c.alert_threshold,
+            c.status,
+            ch.name,
+            ch.ref_chantier,
+            ch.location,
+            ch.status
+
+        ORDER BY
+            CASE
+                WHEN c.current_balance <= c.alert_threshold
+                    THEN 0
+                ELSE 1
+            END ASC,
+
+            c.current_balance ASC,
+
+            ch.name ASC
+    ";
+
+        $results = $this->db
+            ->query($sql)
+            ->result();
+
+        foreach ($results as $result) {
+            $openingBalance = (float) $result->opening_balance;
+            $entries        = (float) $result->total_entries;
+            $consumed       = (float) $result->total_consumed;
+
+            /*
+         * Total des fonds mis à disposition de la caisse.
+         */
+            $result->total_funded =
+                $openingBalance + $entries;
+
+            /*
+         * Pourcentage de consommation réelle.
+         */
+            if ($result->total_funded > 0) {
+                $result->consumption_percentage = (
+                    $consumed / $result->total_funded
+                ) * 100;
+            } else {
+                $result->consumption_percentage = 0;
+            }
+
+            $result->consumption_percentage = max(
+                0,
+                min(
+                    100,
+                    $result->consumption_percentage
+                )
+            );
+
+            /*
+         * Conversion des valeurs en nombres.
+         */
+            $result->opening_balance =
+                $openingBalance;
+
+            $result->current_balance =
+                (float) $result->current_balance;
+
+            $result->total_entries =
+                $entries;
+
+            $result->total_consumed =
+                $consumed;
+
+            $result->total_transferred_out =
+                (float) $result->total_transferred_out;
+
+            $result->total_operations =
+                (int) $result->total_operations;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Évolution globale des encaissements et décaissements.
+     *
+     * Les approvisionnements internes sont volontairement exclus :
+     * ils représentent un transfert entre deux caisses de SATRACO
+     * et non une entrée ou une sortie réelle de l'entreprise.
+     *
+     * Périodes acceptées :
+     * - 7days
+     * - 30days
+     * - month
+     * - year
+     */
+    public function getCashFlowEvolution(string $period = '7days'): array
+    {
+        $today = date('Y-m-d');
+
+        switch ($period) {
+            case '30days':
+                $startDate = date(
+                    'Y-m-d',
+                    strtotime('-29 days')
+                );
+
+                $endDate = $today;
+                $groupFormat = '%Y-%m-%d';
+                break;
+
+            case 'month':
+                $startDate = date('Y-m-01');
+                $endDate = date('Y-m-t');
+                $groupFormat = '%Y-%m-%d';
+                break;
+
+            case 'year':
+                $startDate = date('Y-01-01');
+                $endDate = date('Y-12-31');
+                $groupFormat = '%Y-%m';
+                break;
+
+            case '7days':
+            default:
+                $period = '7days';
+
+                $startDate = date(
+                    'Y-m-d',
+                    strtotime('-6 days')
+                );
+
+                $endDate = $today;
+                $groupFormat = '%Y-%m-%d';
+                break;
+        }
+
+        /*
+     * =========================================================
+     * RÉCUPÉRATION DES MOUVEMENTS AGRÉGÉS
+     * =========================================================
+     */
+
+        $sql = "
+        SELECT
+            DATE_FORMAT(
+                operation_date,
+                ?
+            ) AS period_key,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'encaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_income,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'decaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_expense
+
+        FROM tbl_finance_cashbox_operation
+
+        WHERE status = 'validated'
+
+        AND operation_type IN (
+            'encaissement',
+            'decaissement'
+        )
+
+        AND operation_date BETWEEN ? AND ?
+
+        GROUP BY
+            DATE_FORMAT(
+                operation_date,
+                ?
+            )
+
+        ORDER BY period_key ASC
+    ";
+
+        $queryResults = $this->db
+            ->query(
+                $sql,
+                [
+                    $groupFormat,
+                    $startDate,
+                    $endDate,
+                    $groupFormat,
+                ]
+            )
+            ->result();
+
+        /*
+     * Indexer les résultats par date ou par mois.
+     */
+        $indexedResults = [];
+
+        foreach ($queryResults as $row) {
+            $indexedResults[$row->period_key] = [
+                'income'  => (float) $row->total_income,
+                'expense' => (float) $row->total_expense,
+            ];
+        }
+
+        $labels = [];
+        $incomes = [];
+        $expenses = [];
+
+        /*
+     * =========================================================
+     * PÉRIODE ANNUELLE : UN POINT PAR MOIS
+     * =========================================================
+     */
+        if ($period === 'year') {
+            $monthNames = [
+                1  => 'Janv.',
+                2  => 'Févr.',
+                3  => 'Mars',
+                4  => 'Avr.',
+                5  => 'Mai',
+                6  => 'Juin',
+                7  => 'Juil.',
+                8  => 'Août',
+                9  => 'Sept.',
+                10 => 'Oct.',
+                11 => 'Nov.',
+                12 => 'Déc.',
+            ];
+
+            for ($month = 1; $month <= 12; $month++) {
+                $key = date('Y')
+                    . '-'
+                    . str_pad(
+                        (string) $month,
+                        2,
+                        '0',
+                        STR_PAD_LEFT
+                    );
+
+                $labels[] = $monthNames[$month];
+
+                $incomes[] = isset($indexedResults[$key])
+                    ? $indexedResults[$key]['income']
+                    : 0;
+
+                $expenses[] = isset($indexedResults[$key])
+                    ? $indexedResults[$key]['expense']
+                    : 0;
+            }
+        }
+
+        /*
+     * =========================================================
+     * AUTRES PÉRIODES : UN POINT PAR JOUR
+     * =========================================================
+     */ else {
+            $startTimestamp = strtotime($startDate);
+            $endTimestamp = strtotime($endDate);
+
+            $monthNames = [
+                1  => 'Janv.',
+                2  => 'Févr.',
+                3  => 'Mars',
+                4  => 'Avr.',
+                5  => 'Mai',
+                6  => 'Juin',
+                7  => 'Juil.',
+                8  => 'Août',
+                9  => 'Sept.',
+                10 => 'Oct.',
+                11 => 'Nov.',
+                12 => 'Déc.',
+            ];
+
+            for (
+                $timestamp = $startTimestamp;
+                $timestamp <= $endTimestamp;
+                $timestamp = strtotime(
+                    '+1 day',
+                    $timestamp
+                )
+            ) {
+                $key = date(
+                    'Y-m-d',
+                    $timestamp
+                );
+
+                $day = date(
+                    'd',
+                    $timestamp
+                );
+
+                $monthNumber = (int) date(
+                    'n',
+                    $timestamp
+                );
+
+                $labels[] = $day
+                    . ' '
+                    . $monthNames[$monthNumber];
+
+                $incomes[] = isset($indexedResults[$key])
+                    ? $indexedResults[$key]['income']
+                    : 0;
+
+                $expenses[] = isset($indexedResults[$key])
+                    ? $indexedResults[$key]['expense']
+                    : 0;
+            }
+        }
+
+        return [
+            'period'     => $period,
+            'start_date' => $startDate,
+            'end_date'   => $endDate,
+            'labels'     => $labels,
+            'incomes'    => $incomes,
+            'expenses'   => $expenses,
+        ];
+    }
+
+    /**
+     * Retourne les alertes dynamiques de trésorerie.
+     *
+     * Types d’alertes :
+     * - solde critique ;
+     * - opération en attente ;
+     * - justificatif manquant.
+     */
+    public function getTreasuryAlerts(int $limit = 8): array
+    {
+        $limit = max(
+            1,
+            min(
+                $limit,
+                30
+            )
+        );
+
+        $alerts = [];
+
+        /*
+     * =========================================================
+     * 1. CAISSES AVEC SOLDE CRITIQUE
+     * =========================================================
+     */
+
+        $criticalCashboxes = $this->db
+            ->select([
+                'c.id',
+                'c.code',
+                'c.name',
+                'c.type',
+                'c.devise',
+                'c.current_balance',
+                'c.alert_threshold',
+                'ch.name AS chantier_name',
+            ])
+            ->from('tbl_finance_cashbox c')
+            ->join(
+                'chantiers ch',
+                'ch.id = c.chantier_id',
+                'left'
+            )
+            ->where('c.status', 'active')
+            ->where('c.alert_threshold >', 0)
+            ->where(
+                'c.current_balance <= c.alert_threshold',
+                null,
+                false
+            )
+            ->order_by('c.current_balance', 'ASC')
+            ->get()
+            ->result();
+
+        foreach ($criticalCashboxes as $cashbox) {
+            $displayName = !empty($cashbox->chantier_name)
+                ? $cashbox->chantier_name
+                : $cashbox->name;
+
+            $alerts[] = [
+                'type'       => 'danger',
+                'icon'       => 'fas fa-wallet',
+                'title'      => 'Solde critique — ' . $displayName,
+                'message'    =>
+                'Le solde disponible de '
+                    . number_format(
+                        (float) $cashbox->current_balance,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $cashbox->devise
+                    . ' est inférieur ou égal au seuil de '
+                    . number_format(
+                        (float) $cashbox->alert_threshold,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $cashbox->devise
+                    . '.',
+
+                'priority'   => 1,
+                'created_at' => null,
+            ];
+        }
+
+        /*
+     * =========================================================
+     * 2. OPÉRATIONS EN ATTENTE
+     * =========================================================
+     */
+
+        $pendingOperations = $this->db
+            ->select([
+                'op.id',
+                'op.reference',
+                'op.operation_type',
+                'op.amount',
+                'op.currency',
+                'op.label',
+                'op.created_at',
+                'source.name AS source_name',
+                'destination.name AS destination_name',
+            ])
+            ->from('tbl_finance_cashbox_operation op')
+            ->join(
+                'tbl_finance_cashbox source',
+                'source.id = op.source_cashbox_id',
+                'left'
+            )
+            ->join(
+                'tbl_finance_cashbox destination',
+                'destination.id = op.destination_cashbox_id',
+                'left'
+            )
+            ->where('op.status', 'pending')
+            ->order_by('op.created_at', 'ASC')
+            ->limit(5)
+            ->get()
+            ->result();
+
+        foreach ($pendingOperations as $operation) {
+            $operationLabel = 'Opération en attente';
+
+            if (
+                $operation->operation_type
+                === 'approvisionnement'
+            ) {
+                $operationLabel =
+                    'Approvisionnement en attente';
+            } elseif (
+                $operation->operation_type
+                === 'encaissement'
+            ) {
+                $operationLabel =
+                    'Encaissement en attente';
+            } elseif (
+                $operation->operation_type
+                === 'decaissement'
+            ) {
+                $operationLabel =
+                    'Décaissement en attente';
+            }
+
+            $message = $operation->reference
+                . ' — '
+                . number_format(
+                    (float) $operation->amount,
+                    0,
+                    ',',
+                    ' '
+                )
+                . ' '
+                . $operation->currency;
+
+            if (
+                $operation->operation_type
+                === 'approvisionnement'
+                && !empty($operation->destination_name)
+            ) {
+                $message .=
+                    ' vers '
+                    . $operation->destination_name;
+            }
+
+            $alerts[] = [
+                'type'       => 'warning',
+                'icon'       => 'fas fa-clock',
+                'title'      => $operationLabel,
+                'message'    => $message
+                    . ' attend une validation.',
+
+                'priority'   => 2,
+                'created_at' => $operation->created_at,
+            ];
+        }
+
+        /*
+     * =========================================================
+     * 3. DÉCAISSEMENTS SANS JUSTIFICATIF
+     * =========================================================
+     */
+
+        $missingAttachments = $this->db
+            ->select([
+                'op.id',
+                'op.reference',
+                'op.amount',
+                'op.currency',
+                'op.category',
+                'op.third_party',
+                'op.created_at',
+                'c.name AS cashbox_name',
+            ])
+            ->from('tbl_finance_cashbox_operation op')
+            ->join(
+                'tbl_finance_cashbox c',
+                'c.id = op.source_cashbox_id',
+                'left'
+            )
+            ->where(
+                'op.operation_type',
+                'decaissement'
+            )
+            ->where(
+                'op.status',
+                'validated'
+            )
+            ->group_start()
+            ->where(
+                'op.attachment IS NULL',
+                null,
+                false
+            )
+            ->or_where(
+                'op.attachment',
+                ''
+            )
+            ->group_end()
+            ->order_by('op.amount', 'DESC')
+            ->limit(5)
+            ->get()
+            ->result();
+
+        foreach ($missingAttachments as $operation) {
+            $alerts[] = [
+                'type'  => 'info',
+                'icon'  => 'fas fa-file-alt',
+                'title' => 'Justificatif manquant',
+
+                'message' =>
+                'Le décaissement '
+                    . $operation->reference
+                    . ' de '
+                    . number_format(
+                        (float) $operation->amount,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $operation->currency
+                    . ' dans '
+                    . (
+                        $operation->cashbox_name
+                        ?: 'une caisse'
+                    )
+                    . ' ne possède pas de pièce justificative.',
+
+                'priority'   => 3,
+                'created_at' => $operation->created_at,
+            ];
+        }
+
+        /*
+     * Trier les alertes :
+     * danger, warning, puis information.
+     */
+        usort(
+            $alerts,
+            function (
+                array $firstAlert,
+                array $secondAlert
+            ): int {
+                return $firstAlert['priority']
+                    <=> $secondAlert['priority'];
+            }
+        );
+
+        return array_slice(
+            $alerts,
+            0,
+            $limit
+        );
+    }
+
+    public function countTreasuryAlerts(): int
+    {
+        $criticalCashboxes = (int) $this->db
+            ->where('status', 'active')
+            ->where('alert_threshold >', 0)
+            ->where(
+                'current_balance <= alert_threshold',
+                null,
+                false
+            )
+            ->count_all_results(
+                'tbl_finance_cashbox'
+            );
+
+        $pendingOperations = (int) $this->db
+            ->where('status', 'pending')
+            ->count_all_results(
+                'tbl_finance_cashbox_operation'
+            );
+
+        $this->db
+            ->where(
+                'operation_type',
+                'decaissement'
+            )
+            ->where(
+                'status',
+                'validated'
+            )
+            ->group_start()
+            ->where(
+                'attachment IS NULL',
+                null,
+                false
+            )
+            ->or_where(
+                'attachment',
+                ''
+            )
+            ->group_end();
+
+        $missingAttachments = (int) $this->db
+            ->count_all_results(
+                'tbl_finance_cashbox_operation'
+            );
+
+        return
+            $criticalCashboxes
+            + $pendingOperations
+            + $missingAttachments;
+    }
+
+    /**
+     * Retourne les statistiques principales des caisses.
+     *
+     * Les montants affichés dans les cartes sont calculés en BIF.
+     *
+     * Résultats :
+     * - solde global disponible ;
+     * - solde des caisses siège ;
+     * - solde des caisses chantier ;
+     * - nombre de caisses chantier ;
+     * - décaissements du jour ;
+     * - nombre de décaissements du jour ;
+     * - variation du solde global depuis le début du mois.
+     */
+    public function getCashboxMainStatistics(): array
+    {
+        $currency = 'BIF';
+
+        $today = date('Y-m-d');
+        $monthStart = date('Y-m-01');
+
+        /*
+     * =========================================================
+     * 1. SOLDE GLOBAL DES CAISSES ACTIVES
+     * =========================================================
+     */
+
+        $globalRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(current_balance),
+                0
+            ) AS global_balance,
+
+            COUNT(id) AS total_cashboxes
+        ", false)
+            ->from('tbl_finance_cashbox')
+            ->where('status', 'active')
+            ->where('devise', $currency)
+            ->get()
+            ->row();
+
+        $globalBalance = $globalRow
+            ? (float) $globalRow->global_balance
+            : 0;
+
+        $totalCashboxes = $globalRow
+            ? (int) $globalRow->total_cashboxes
+            : 0;
+
+        /*
+     * =========================================================
+     * 2. CAISSES SIÈGE
+     * =========================================================
+     */
+
+        $headOfficeRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(current_balance),
+                0
+            ) AS head_office_balance,
+
+            COUNT(id) AS head_office_count
+        ", false)
+            ->from('tbl_finance_cashbox')
+            ->where('status', 'active')
+            ->where('type', 'siege')
+            ->where('devise', $currency)
+            ->get()
+            ->row();
+
+        $headOfficeBalance = $headOfficeRow
+            ? (float) $headOfficeRow->head_office_balance
+            : 0;
+
+        $headOfficeCount = $headOfficeRow
+            ? (int) $headOfficeRow->head_office_count
+            : 0;
+
+        /*
+     * =========================================================
+     * 3. CAISSES CHANTIERS
+     * =========================================================
+     */
+
+        $constructionRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(current_balance),
+                0
+            ) AS construction_balance,
+
+            COUNT(id) AS construction_count
+        ", false)
+            ->from('tbl_finance_cashbox')
+            ->where('status', 'active')
+            ->where('type', 'chantier')
+            ->where('devise', $currency)
+            ->get()
+            ->row();
+
+        $constructionBalance = $constructionRow
+            ? (float) $constructionRow->construction_balance
+            : 0;
+
+        $constructionCount = $constructionRow
+            ? (int) $constructionRow->construction_count
+            : 0;
+
+        /*
+     * =========================================================
+     * 4. DÉCAISSEMENTS DU JOUR
+     * =========================================================
+     *
+     * On compte uniquement les véritables décaissements.
+     * Les approvisionnements entre caisses sont exclus,
+     * car ce sont des transferts internes.
+     */
+
+        $todayDisbursementRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where('operation_type', 'decaissement')
+            ->where('status', 'validated')
+            ->where('operation_date', $today)
+            ->where('currency', $currency)
+            ->get()
+            ->row();
+
+        $todayDisbursementAmount = $todayDisbursementRow
+            ? (float) $todayDisbursementRow->total_amount
+            : 0;
+
+        $todayDisbursementCount = $todayDisbursementRow
+            ? (int) $todayDisbursementRow->total_operations
+            : 0;
+
+        /*
+     * =========================================================
+     * 5. MOUVEMENT NET DU MOIS
+     * =========================================================
+     *
+     * Encaissement :
+     * augmente la trésorerie globale.
+     *
+     * Décaissement :
+     * réduit la trésorerie globale.
+     *
+     * Approvisionnement :
+     * exclu, car le montant quitte une caisse mais entre
+     * dans une autre caisse de la même entreprise.
+     */
+
+        $monthlyFlowRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'encaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS monthly_income,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'decaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS monthly_expense
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where('status', 'validated')
+            ->where('currency', $currency)
+            ->where('operation_date >=', $monthStart)
+            ->where('operation_date <=', $today)
+            ->where_in(
+                'operation_type',
+                [
+                    'encaissement',
+                    'decaissement',
+                ]
+            )
+            ->get()
+            ->row();
+
+        $monthlyIncome = $monthlyFlowRow
+            ? (float) $monthlyFlowRow->monthly_income
+            : 0;
+
+        $monthlyExpense = $monthlyFlowRow
+            ? (float) $monthlyFlowRow->monthly_expense
+            : 0;
+
+        $monthlyNetFlow = $monthlyIncome - $monthlyExpense;
+
+        /*
+     * Solde global estimé au début du mois.
+     *
+     * Solde actuel =
+     * solde début du mois + flux net du mois
+     *
+     * Donc :
+     * solde début du mois =
+     * solde actuel - flux net du mois
+     */
+        $monthOpeningBalance = $globalBalance - $monthlyNetFlow;
+
+        /*
+     * Pourcentage d’évolution depuis le début du mois.
+     */
+        $globalVariationPercentage = 0;
+
+        if ($monthOpeningBalance != 0) {
+            $globalVariationPercentage = (
+                (
+                    $globalBalance
+                    - $monthOpeningBalance
+                )
+                / abs($monthOpeningBalance)
+            ) * 100;
+        }
+
+        /*
+     * Part de la caisse siège dans le solde global.
+     */
+        $headOfficePercentage = 0;
+
+        if ($globalBalance > 0) {
+            $headOfficePercentage = (
+                $headOfficeBalance
+                / $globalBalance
+            ) * 100;
+        }
+
+        /*
+     * Part des caisses chantier dans le solde global.
+     */
+        $constructionPercentage = 0;
+
+        if ($globalBalance > 0) {
+            $constructionPercentage = (
+                $constructionBalance
+                / $globalBalance
+            ) * 100;
+        }
+
+        return [
+            'currency' => $currency,
+
+            'global_balance' => $globalBalance,
+            'total_cashboxes' => $totalCashboxes,
+
+            'head_office_balance' => $headOfficeBalance,
+            'head_office_count' => $headOfficeCount,
+            'head_office_percentage' => $headOfficePercentage,
+
+            'construction_balance' => $constructionBalance,
+            'construction_count' => $constructionCount,
+            'construction_percentage' => $constructionPercentage,
+
+            'today_disbursement_amount' =>
+            $todayDisbursementAmount,
+
+            'today_disbursement_count' =>
+            $todayDisbursementCount,
+
+            'monthly_income' => $monthlyIncome,
+            'monthly_expense' => $monthlyExpense,
+            'monthly_net_flow' => $monthlyNetFlow,
+            'month_opening_balance' => $monthOpeningBalance,
+
+            'global_variation_percentage' =>
+            $globalVariationPercentage,
+        ];
+    }
 }
