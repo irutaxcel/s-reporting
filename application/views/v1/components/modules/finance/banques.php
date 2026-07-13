@@ -1,3 +1,16 @@
+<?php
+
+$bankAccountOldInput =
+    $this->session->flashdata(
+        'bank_account_old_input'
+    );
+
+$bankAccountOldInput =
+    is_array($bankAccountOldInput)
+    ? $bankAccountOldInput
+    : [];
+
+?>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -2590,7 +2603,10 @@
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <input type="text" name="name" class="form-control"
+                                            <input type="text" name="name" class="form-control" value="<?= html_escape(
+                                                                                                            $bankAccountOldInput['name']
+                                                                                                                ?? ''
+                                                                                                        ) ?>"
                                                 placeholder="Ex. CRDB BIF" required>
 
                                         </div>
@@ -2611,32 +2627,44 @@
                                                     Sélectionner
                                                 </option>
 
-                                                <option value="CRDB">
+                                                <option value="CRDB" <?= (
+                                                                            $bankAccountOldInput['bank_name']
+                                                                            ?? ''
+                                                                        ) === 'CRDB'
+                                                                            ? 'selected'
+                                                                            : ''
+                                                                        ?>>
                                                     CRDB Bank
                                                 </option>
 
-                                                <option value="BANCOBU">
+                                                <option value="BANCOBU" <?= (
+                                                                            $bankAccountOldInput['bank_name']
+                                                                            ?? ''
+                                                                        ) === 'BANCOBU'
+                                                                            ? 'selected'
+                                                                            : ''
+                                                                        ?>>
                                                     BANCOBU
                                                 </option>
 
-                                                <option value="ECOBANK">
+                                                <option value="ECOBANK" <?= (
+                                                                            $bankAccountOldInput['bank_name']
+                                                                            ?? ''
+                                                                        ) === 'ECOBANK'
+                                                                            ? 'selected'
+                                                                            : ''
+                                                                        ?>>
                                                     ECOBANK
                                                 </option>
 
-                                                <option value="KCB">
+                                                <option value="KCB" <?= (
+                                                                        $bankAccountOldInput['bank_name']
+                                                                        ?? ''
+                                                                    ) === 'KCB'
+                                                                        ? 'selected'
+                                                                        : ''
+                                                                    ?>>
                                                     KCB Bank
-                                                </option>
-
-                                                <option value="BCB">
-                                                    BCB
-                                                </option>
-
-                                                <option value="BHB">
-                                                    BHB
-                                                </option>
-
-                                                <option value="INTERBANK">
-                                                    Interbank Burundi
                                                 </option>
                                             </select>
 
@@ -2828,11 +2856,12 @@
 
 
             <!-- =========================================================
-     MODALE : OPÉRATION BANCAIRE
-========================================================== -->
+                MODALE : OPÉRATION BANCAIRE
+            ========================================================== -->
             <div class="modal fade modal-bank" id="bankOperationModal" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-                    <form action="#" method="post" enctype="multipart/form-data" style="width: 100%;">
+                    <form action="<?= base_url('bank-operation-store') ?>" method="post" enctype="multipart/form-data"
+                        id="bankOperationForm" style="width: 100%;">
 
                         <input type="hidden" name="operation_type" id="bankOperationType">
 
@@ -2885,8 +2914,10 @@
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <input type="text" name="reference" class="form-control"
-                                                value="BMV-2026-00049" readonly>
+                                            <input type="text" name="reference" class="form-control" value="<?= html_escape(
+                                                                                                                $nextBankOperationReference ?? ''
+                                                                                                            ) ?>"
+                                                readonly>
 
                                         </div>
 
@@ -2907,25 +2938,35 @@
                                                     Sélectionner le compte
                                                 </option>
 
-                                                <option value="1">
-                                                    CRDB BIF — 185 500 000 BIF
+                                                <?php if (!empty($allBankAccounts)): ?>
+
+                                                <?php foreach ($allBankAccounts as $account): ?>
+
+                                                <option value="<?= (int) $account->id ?>"
+                                                    data-currency="<?= html_escape($account->currency) ?>"
+                                                    data-balance="<?= (float) $account->current_balance ?>"
+                                                    data-name="<?= html_escape($account->name) ?>">
+                                                    <?= html_escape($account->code) ?>
+
+                                                    —
+
+                                                    <?= html_escape($account->name) ?>
+
+                                                    —
+
+                                                    <?= number_format(
+                                                                (float) $account->current_balance,
+                                                                2,
+                                                                ',',
+                                                                ' '
+                                                            ) ?>
+
+                                                    <?= html_escape($account->currency) ?>
                                                 </option>
 
-                                                <option value="2">
-                                                    CRDB USD — 8 500 USD
-                                                </option>
+                                                <?php endforeach; ?>
 
-                                                <option value="3">
-                                                    ECOBANK BIF — 95 250 000 BIF
-                                                </option>
-
-                                                <option value="4">
-                                                    BANCOBU BIF — 125 000 000 BIF
-                                                </option>
-
-                                                <option value="5">
-                                                    KCB USD — 17 600 USD
-                                                </option>
+                                                <?php endif; ?>
                                             </select>
 
                                         </div>
@@ -2947,25 +2988,34 @@
                                                     Sélectionner la destination
                                                 </option>
 
-                                                <option value="1">
-                                                    CRDB BIF
+                                                <?php if (!empty($allBankAccounts)): ?>
+
+                                                <?php foreach ($allBankAccounts as $account): ?>
+
+                                                <option value="<?= (int) $account->id ?>"
+                                                    data-currency="<?= html_escape($account->currency) ?>"
+                                                    data-balance="<?= (float) $account->current_balance ?>">
+                                                    <?= html_escape($account->code) ?>
+
+                                                    —
+
+                                                    <?= html_escape($account->name) ?>
+
+                                                    —
+
+                                                    <?= number_format(
+                                                                (float) $account->current_balance,
+                                                                2,
+                                                                ',',
+                                                                ' '
+                                                            ) ?>
+
+                                                    <?= html_escape($account->currency) ?>
                                                 </option>
 
-                                                <option value="2">
-                                                    CRDB USD
-                                                </option>
+                                                <?php endforeach; ?>
 
-                                                <option value="3">
-                                                    ECOBANK BIF
-                                                </option>
-
-                                                <option value="4">
-                                                    BANCOBU BIF
-                                                </option>
-
-                                                <option value="5">
-                                                    KCB USD
-                                                </option>
+                                                <?php endif; ?>
                                             </select>
 
                                         </div>
@@ -2987,7 +3037,7 @@
                                                     step="0.01" placeholder="0" required>
 
                                                 <div class="input-group-append">
-                                                    <span class="input-group-text">
+                                                    <span class="input-group-text" id="bankOperationCurrency">
                                                         BIF
                                                     </span>
                                                 </div>
@@ -3175,8 +3225,8 @@
 
 
             <!-- =========================================================
-     SCRIPTS
-========================================================== -->
+                SCRIPTS
+            ========================================================== -->
             <script>
             document.addEventListener('DOMContentLoaded', function() {
 
@@ -3393,74 +3443,74 @@
             });
 
 
-            function prepareBankOperation(type) {
+            // function prepareBankOperation(type) {
 
-                const title =
-                    document.getElementById(
-                        'bankOperationTitle'
-                    );
+            //     const title =
+            //         document.getElementById(
+            //             'bankOperationTitle'
+            //         );
 
-                const operationType =
-                    document.getElementById(
-                        'bankOperationType'
-                    );
+            //     const operationType =
+            //         document.getElementById(
+            //             'bankOperationType'
+            //         );
 
-                const destinationField =
-                    document.getElementById(
-                        'bankDestinationField'
-                    );
+            //     const destinationField =
+            //         document.getElementById(
+            //             'bankDestinationField'
+            //         );
 
-                const destinationSelect =
-                    document.getElementById(
-                        'bankDestinationAccount'
-                    );
+            //     const destinationSelect =
+            //         document.getElementById(
+            //             'bankDestinationAccount'
+            //         );
 
-                const sourceLabel =
-                    document.getElementById(
-                        'bankSourceLabel'
-                    );
+            //     const sourceLabel =
+            //         document.getElementById(
+            //             'bankSourceLabel'
+            //         );
 
-                operationType.value = type;
+            //     operationType.value = type;
 
-                destinationField.style.display = 'none';
-                destinationSelect.disabled = true;
-                destinationSelect.required = false;
-                destinationSelect.value = '';
+            //     destinationField.style.display = 'none';
+            //     destinationSelect.disabled = true;
+            //     destinationSelect.required = false;
+            //     destinationSelect.value = '';
 
-                if (type === 'encaissement') {
+            //     if (type === 'encaissement') {
 
-                    title.innerHTML =
-                        'Enregistrer un encaissement bancaire';
+            //         title.innerHTML =
+            //             'Enregistrer un encaissement bancaire';
 
-                    sourceLabel.innerHTML =
-                        'Compte à créditer ' +
-                        '<span class="required-star">*</span>';
-                }
+            //         sourceLabel.innerHTML =
+            //             'Compte à créditer ' +
+            //             '<span class="required-star">*</span>';
+            //     }
 
-                if (type === 'decaissement') {
+            //     if (type === 'decaissement') {
 
-                    title.innerHTML =
-                        'Enregistrer un décaissement bancaire';
+            //         title.innerHTML =
+            //             'Enregistrer un décaissement bancaire';
 
-                    sourceLabel.innerHTML =
-                        'Compte à débiter ' +
-                        '<span class="required-star">*</span>';
-                }
+            //         sourceLabel.innerHTML =
+            //             'Compte à débiter ' +
+            //             '<span class="required-star">*</span>';
+            //     }
 
-                if (type === 'transfert') {
+            //     if (type === 'transfert') {
 
-                    title.innerHTML =
-                        'Effectuer un transfert bancaire';
+            //         title.innerHTML =
+            //             'Effectuer un transfert bancaire';
 
-                    sourceLabel.innerHTML =
-                        'Compte source ' +
-                        '<span class="required-star">*</span>';
+            //         sourceLabel.innerHTML =
+            //             'Compte source ' +
+            //             '<span class="required-star">*</span>';
 
-                    destinationField.style.display = 'block';
-                    destinationSelect.disabled = false;
-                    destinationSelect.required = true;
-                }
-            }
+            //         destinationField.style.display = 'block';
+            //         destinationSelect.disabled = false;
+            //         destinationSelect.required = true;
+            //     }
+            // }
 
 
             $(document).on(
@@ -3489,3 +3539,265 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php if (
+    $this->session->flashdata('success')
+): ?>
+
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Compte bancaire créé',
+    html: <?= json_encode(
+                        $this->session->flashdata(
+                            'success'
+                        )
+                    ) ?>,
+    confirmButtonText: 'D’accord',
+    confirmButtonColor: '#0f766e'
+});
+</script>
+
+<?php endif; ?>
+
+<?php if (
+    $this->session->flashdata('error')
+): ?>
+
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Enregistrement impossible',
+    html: <?= json_encode(
+                        $this->session->flashdata(
+                            'error'
+                        )
+                    ) ?>,
+    confirmButtonText: 'Corriger',
+    confirmButtonColor: '#dc2626'
+});
+</script>
+
+<?php endif; ?>
+
+
+<script>
+function prepareBankOperation(type) {
+
+    const form =
+        document.getElementById(
+            'bankOperationForm'
+        );
+
+    const title =
+        document.getElementById(
+            'bankOperationTitle'
+        );
+
+    const operationType =
+        document.getElementById(
+            'bankOperationType'
+        );
+
+    const sourceLabel =
+        document.getElementById(
+            'bankSourceLabel'
+        );
+
+    const sourceAccount =
+        document.getElementById(
+            'bankSourceAccount'
+        );
+
+    const destinationField =
+        document.getElementById(
+            'bankDestinationField'
+        );
+
+    const destinationAccount =
+        document.getElementById(
+            'bankDestinationAccount'
+        );
+
+    if (!operationType) {
+        return;
+    }
+
+    /*
+     * Réinitialiser le formulaire.
+     */
+    if (form) {
+        form.reset();
+    }
+
+    operationType.value = type;
+
+    destinationField.style.display =
+        'none';
+
+    destinationAccount.disabled =
+        true;
+
+    destinationAccount.required =
+        false;
+
+    destinationAccount.value =
+        '';
+
+    /*
+     * Encaissement.
+     */
+    if (type === 'encaissement') {
+        title.textContent =
+            'Enregistrer un encaissement bancaire';
+
+        sourceLabel.innerHTML =
+            'Compte à créditer ' +
+            '<span class="required-star">*</span>';
+    }
+
+    /*
+     * Décaissement.
+     */
+    else if (type === 'decaissement') {
+        title.textContent =
+            'Enregistrer un décaissement bancaire';
+
+        sourceLabel.innerHTML =
+            'Compte à débiter ' +
+            '<span class="required-star">*</span>';
+    }
+
+    /*
+     * Transfert.
+     */
+    else if (type === 'transfert') {
+        title.textContent =
+            'Effectuer un transfert bancaire';
+
+        sourceLabel.innerHTML =
+            'Compte source ' +
+            '<span class="required-star">*</span>';
+
+        destinationField.style.display =
+            'block';
+
+        destinationAccount.disabled =
+            false;
+
+        destinationAccount.required =
+            true;
+    }
+
+    /*
+     * Remettre la date actuelle après reset.
+     */
+    const dateField =
+        form.querySelector(
+            '[name="operation_date"]'
+        );
+
+    if (dateField) {
+        dateField.value =
+            new Date()
+            .toISOString()
+            .split('T')[0];
+    }
+}
+
+
+/*
+ * Mettre à jour la devise affichée.
+ */
+$(document).on(
+    'change',
+    '#bankSourceAccount',
+    function() {
+
+        const option =
+            $(this)
+            .find('option:selected');
+
+        const currency =
+            option.data('currency') ||
+            'BIF';
+
+        $('#bankOperationCurrency')
+            .text(currency);
+    }
+);
+
+
+/*
+ * Empêcher la sélection du même compte
+ * comme source et destination.
+ */
+$(document).on(
+    'change',
+    '#bankSourceAccount, #bankDestinationAccount',
+    function() {
+
+        const sourceId =
+            $('#bankSourceAccount').val();
+
+        const destinationId =
+            $('#bankDestinationAccount').val();
+
+        if (
+            sourceId &&
+            destinationId &&
+            sourceId === destinationId
+        ) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Comptes identiques',
+                text: 'Le compte source et le compte destination doivent être différents.',
+                confirmButtonText: 'Corriger',
+                confirmButtonColor: '#0f766e'
+            });
+
+            $('#bankDestinationAccount')
+                .val('');
+        }
+    }
+);
+</script>
+
+
+<?php if ($this->session->flashdata('success')): ?>
+
+<script>
+Swal.fire({
+    icon: 'success',
+    title: 'Opération enregistrée',
+    html: <?= json_encode(
+                        $this->session->flashdata(
+                            'success'
+                        )
+                    ) ?>,
+    confirmButtonText: 'D’accord',
+    confirmButtonColor: '#0f766e'
+});
+</script>
+
+<?php endif; ?>
+
+<?php if ($this->session->flashdata('error')): ?>
+
+<script>
+Swal.fire({
+    icon: 'error',
+    title: 'Enregistrement impossible',
+    html: <?= json_encode(
+                        $this->session->flashdata(
+                            'error'
+                        )
+                    ) ?>,
+    confirmButtonText: 'Corriger',
+    confirmButtonColor: '#dc2626'
+});
+</script>
+
+<?php endif; ?>

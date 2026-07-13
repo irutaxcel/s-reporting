@@ -2752,4 +2752,528 @@ class FinanceModel extends CI_Model
             $globalVariationPercentage,
         ];
     }
+
+    /**
+     * Insère un nouveau compte bancaire.
+     */
+    public function createBankAccount(array $data): bool
+    {
+        return $this->db->insert(
+            'tbl_finance_bank_account',
+            $data
+        );
+    }
+
+    /**
+     * Recherche un compte bancaire par identifiant.
+     */
+    public function getBankAccountById(int $id)
+    {
+        return $this->db
+            ->where('id', $id)
+            ->get('tbl_finance_bank_account')
+            ->row();
+    }
+
+    /**
+     * Retourne le prochain code bancaire prévisionnel.
+     *
+     * La véritable génération reste effectuée
+     * pendant l’enregistrement.
+     */
+    public function getNextBankAccountCode(): string
+    {
+        $year = date('Y');
+
+        $prefix = 'BAN-' . $year . '-';
+
+        $lastAccount = $this->db
+            ->select('code')
+            ->from('tbl_finance_bank_account')
+            ->like(
+                'code',
+                $prefix,
+                'after'
+            )
+            ->order_by('code', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
+
+        $nextNumber = 1;
+
+        if (
+            $lastAccount
+            && !empty($lastAccount->code)
+        ) {
+            $parts = explode(
+                '-',
+                $lastAccount->code
+            );
+
+            $lastNumber = (int) end($parts);
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return $prefix
+            . str_pad(
+                (string) $nextNumber,
+                3,
+                '0',
+                STR_PAD_LEFT
+            );
+    }
+
+    /**
+     * Retourne les comptes bancaires actifs.
+     */
+    public function getAllActiveBankAccounts(): array
+    {
+        return $this->db
+            ->select([
+                'id',
+                'code',
+                'name',
+                'bank_name',
+                'account_number',
+                'account_type',
+                'currency',
+                'current_balance',
+                'status',
+            ])
+            ->from('tbl_finance_bank_account')
+            ->where('status', 'active')
+            ->order_by('bank_name', 'ASC')
+            ->order_by('name', 'ASC')
+            ->get()
+            ->result();
+    }
+
+
+    /**
+     * Génère une référence bancaire :
+     *
+     * BMV-2026-00001
+     * BMV-2026-00002
+     */
+    private function generateBankOperationReference(): string
+    {
+        $year = date('Y');
+
+        $prefix = 'BMV-' . $year . '-';
+
+        $lastOperation = $this->db
+            ->select('reference')
+            ->from('tbl_finance_bank_operation')
+            ->like(
+                'reference',
+                $prefix,
+                'after'
+            )
+            ->order_by('reference', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
+
+        $nextNumber = 1;
+
+        if (
+            $lastOperation
+            && !empty($lastOperation->reference)
+        ) {
+            $parts = explode(
+                '-',
+                $lastOperation->reference
+            );
+
+            $lastNumber = (int) end($parts);
+
+            $nextNumber =
+                $lastNumber + 1;
+        }
+
+        $reference = $prefix
+            . str_pad(
+                (string) $nextNumber,
+                5,
+                '0',
+                STR_PAD_LEFT
+            );
+
+        while (
+            $this->db
+            ->where(
+                'reference',
+                $reference
+            )
+            ->count_all_results(
+                'tbl_finance_bank_operation'
+            ) > 0
+        ) {
+            $nextNumber++;
+
+            $reference = $prefix
+                . str_pad(
+                    (string) $nextNumber,
+                    5,
+                    '0',
+                    STR_PAD_LEFT
+                );
+        }
+
+        return $reference;
+    }
+
+    /**
+     * Enregistre une opération bancaire et met à jour
+     * les soldes des comptes concernés.
+     */
+    public function createBankOperation(
+        array $operationData
+    ): array {
+        $this->db->trans_begin();
+
+        try {
+            $operationType =
+                $operationData['operation_type'];
+
+            $amount =
+                (float) $operationData['amount'];
+
+            $sourceAccountId =
+                !empty($operationData['source_bank_account_id'])
+                ? (int) $operationData['source_bank_account_id']
+                : NULL;
+
+            $destinationAccountId =
+                !empty($operationData['destination_bank_account_id'])
+                ? (int) $operationData['destination_bank_account_id']
+                : NULL;
+
+            /*
+         * =====================================================
+         * 1. VERROUILLER ET VÉRIFIER LA SOURCE
+         * =====================================================
+         */
+
+            $sourceAccount = NULL;
+
+            if ($sourceAccountId) {
+                $sourceAccount = $this->db
+                    ->query(
+                        "
+                    SELECT *
+                    FROM tbl_finance_bank_account
+                    WHERE id = ?
+                    FOR UPDATE
+                    ",
+                        [$sourceAccountId]
+                    )
+                    ->row();
+
+                if (!$sourceAccount) {
+                    throw new Exception(
+                        'Le compte bancaire source est introuvable.'
+                    );
+                }
+
+                if ($sourceAccount->status !== 'active') {
+                    throw new Exception(
+                        'Le compte bancaire source n’est pas actif.'
+                    );
+                }
+
+                if (
+                    (float) $sourceAccount
+                        ->current_balance
+                    < $amount
+                ) {
+                    throw new Exception(
+                        'Le solde du compte bancaire source est insuffisant.'
+                    );
+                }
+            }
+
+            /*
+         * =====================================================
+         * 2. VERROUILLER ET VÉRIFIER LA DESTINATION
+         * =====================================================
+         */
+
+            $destinationAccount = NULL;
+
+            if ($destinationAccountId) {
+                $destinationAccount = $this->db
+                    ->query(
+                        "
+                    SELECT *
+                    FROM tbl_finance_bank_account
+                    WHERE id = ?
+                    FOR UPDATE
+                    ",
+                        [$destinationAccountId]
+                    )
+                    ->row();
+
+                if (!$destinationAccount) {
+                    throw new Exception(
+                        'Le compte bancaire destination est introuvable.'
+                    );
+                }
+
+                if (
+                    $destinationAccount->status
+                    !== 'active'
+                ) {
+                    throw new Exception(
+                        'Le compte bancaire destination n’est pas actif.'
+                    );
+                }
+            }
+
+            /*
+         * =====================================================
+         * 3. CONTRÔLES DU TRANSFERT
+         * =====================================================
+         */
+
+            if ($operationType === 'transfert') {
+                if (
+                    !$sourceAccount
+                    || !$destinationAccount
+                ) {
+                    throw new Exception(
+                        'Le compte source et le compte destination sont obligatoires pour un transfert.'
+                    );
+                }
+
+                if (
+                    $sourceAccountId
+                    === $destinationAccountId
+                ) {
+                    throw new Exception(
+                        'Le compte source et le compte destination doivent être différents.'
+                    );
+                }
+
+                if (
+                    $sourceAccount->currency
+                    !== $destinationAccount->currency
+                ) {
+                    throw new Exception(
+                        'Les comptes source et destination doivent utiliser la même devise.'
+                    );
+                }
+            }
+
+            /*
+         * =====================================================
+         * 4. GÉNÉRER LA RÉFÉRENCE
+         * =====================================================
+         */
+
+            $reference =
+                $this->generateBankOperationReference();
+
+            $operationData['reference'] =
+                $reference;
+
+            /*
+         * =====================================================
+         * 5. INSÉRER L’OPÉRATION
+         * =====================================================
+         */
+
+            $inserted = $this->db->insert(
+                'tbl_finance_bank_operation',
+                $operationData
+            );
+
+            if (!$inserted) {
+                throw new Exception(
+                    'Impossible d’enregistrer l’opération bancaire.'
+                );
+            }
+
+            $operationId =
+                (int) $this->db->insert_id();
+
+            /*
+         * =====================================================
+         * 6. METTRE À JOUR LE COMPTE SOURCE
+         * =====================================================
+         */
+
+            if (
+                in_array(
+                    $operationType,
+                    ['decaissement', 'transfert'],
+                    TRUE
+                )
+            ) {
+                $newSourceBalance =
+                    (float) $sourceAccount
+                        ->current_balance
+                    - $amount;
+
+                $updatedSource = $this->db
+                    ->where(
+                        'id',
+                        $sourceAccountId
+                    )
+                    ->update(
+                        'tbl_finance_bank_account',
+                        [
+                            'current_balance' =>
+                            $newSourceBalance,
+
+                            'updated_at' =>
+                            date(
+                                'Y-m-d H:i:s'
+                            ),
+                        ]
+                    );
+
+                if (!$updatedSource) {
+                    throw new Exception(
+                        'Impossible de mettre à jour le solde du compte source.'
+                    );
+                }
+            }
+
+            /*
+         * =====================================================
+         * 7. METTRE À JOUR LA DESTINATION
+         * =====================================================
+         */
+
+            if (
+                in_array(
+                    $operationType,
+                    ['encaissement', 'transfert'],
+                    TRUE
+                )
+            ) {
+                $newDestinationBalance =
+                    (float) $destinationAccount
+                        ->current_balance
+                    + $amount;
+
+                $updatedDestination = $this->db
+                    ->where(
+                        'id',
+                        $destinationAccountId
+                    )
+                    ->update(
+                        'tbl_finance_bank_account',
+                        [
+                            'current_balance' =>
+                            $newDestinationBalance,
+
+                            'updated_at' =>
+                            date(
+                                'Y-m-d H:i:s'
+                            ),
+                        ]
+                    );
+
+                if (!$updatedDestination) {
+                    throw new Exception(
+                        'Impossible de mettre à jour le solde du compte destination.'
+                    );
+                }
+            }
+
+            /*
+         * =====================================================
+         * 8. VALIDER LA TRANSACTION
+         * =====================================================
+         */
+
+            if (
+                $this->db->trans_status()
+                === FALSE
+            ) {
+                throw new Exception(
+                    'Une erreur est survenue pendant la transaction bancaire.'
+                );
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status' =>
+                TRUE,
+
+                'operation_id' =>
+                $operationId,
+
+                'reference' =>
+                $reference,
+
+                'message' =>
+                'Opération bancaire enregistrée avec succès.',
+            ];
+        } catch (Throwable $exception) {
+            $this->db->trans_rollback();
+
+            log_message(
+                'error',
+                'Erreur opération bancaire : '
+                    . $exception->getMessage()
+            );
+
+            return [
+                'status' =>
+                FALSE,
+
+                'message' =>
+                $exception->getMessage(),
+            ];
+        }
+    }
+
+    public function getNextBankOperationReference(): string
+    {
+        $year = date('Y');
+
+        $prefix = 'BMV-' . $year . '-';
+
+        $lastOperation = $this->db
+            ->select('reference')
+            ->from('tbl_finance_bank_operation')
+            ->like(
+                'reference',
+                $prefix,
+                'after'
+            )
+            ->order_by('reference', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
+
+        $nextNumber = 1;
+
+        if (
+            $lastOperation
+            && !empty($lastOperation->reference)
+        ) {
+            $parts = explode(
+                '-',
+                $lastOperation->reference
+            );
+
+            $nextNumber =
+                ((int) end($parts)) + 1;
+        }
+
+        return $prefix
+            . str_pad(
+                (string) $nextNumber,
+                5,
+                '0',
+                STR_PAD_LEFT
+            );
+    }
 }

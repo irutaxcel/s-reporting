@@ -176,6 +176,8 @@ $route['finance/cashbox-operation-store']
 $route['compte-banques'] = 'FinanceController/banques';
 $route['bank-account-store']
     = 'FinanceController/bankAccountStore';
+$route['bank-operation-store']
+    = 'FinanceController/bankOperationStore';
 
 $route['encaissements'] = 'FinanceController/encaissements';
 

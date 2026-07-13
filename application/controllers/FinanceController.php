@@ -2007,43 +2007,1344 @@ class FinanceController extends CI_Controller
 
         // $data['encaissementsData'] = $this->tech->getEncaissementsData();
 
+        $data['nextBankAccountCode'] =
+            $this->finance->getNextBankAccountCode();
+
+        $data['allBankAccounts'] =
+            $this->finance->getAllActiveBankAccounts();
+
+        $data['nextBankOperationReference'] =
+            $this->finance->getNextBankOperationReference();
+
         $this->load->view('v1/components/layout/header', $data);
         $this->load->view('v1/components/layout/sidebar', $data);
         $this->load->view('v1/components/modules/finance/banques', $data);
         $this->load->view('v1/components/layout/footer', $data);
     }
 
+    /**
+     * Enregistre un nouveau compte bancaire.
+     */
     public function bankAccountStore()
     {
-        $data = [
+        /*
+     * =========================================================
+     * 1. AUTORISER UNIQUEMENT LES REQUÊTES POST
+     * =========================================================
+     */
 
-            'code'              => $this->input->post('code'),
-            'name'              => $this->input->post('name'),
-            'bank_name'         => $this->input->post('bank_name'),
-            'account_number'    => $this->input->post('account_number'),
-            'account_type'      => $this->input->post('account_type'),
-            'currency'          => $this->input->post('currency'),
-            'opening_balance'   => $this->input->post('opening_balance'),
-            'current_balance'   => $this->input->post('opening_balance'),
-            'alert_threshold'   => $this->input->post('alert_threshold'),
-            'branch_name'       => $this->input->post('branch_name'),
-            'swift_code'        => $this->input->post('swift_code'),
-            'observation'       => $this->input->post('observation'),
-            'status'            => 'active',
-            'created_by'        => $this->session->userdata('id')
+        if ($this->input->method(TRUE) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        /*
+     * Charger la bibliothèque de validation.
+     */
+        $this->load->library('form_validation');
+
+        /*
+     * =========================================================
+     * 2. RÈGLES DE VALIDATION
+     * =========================================================
+     */
+
+        $this->form_validation->set_rules(
+            'name',
+            'Intitulé du compte',
+            'trim|required|min_length[2]|max_length[150]'
+        );
+
+        $this->form_validation->set_rules(
+            'bank_name',
+            'Banque',
+            'trim|required|in_list[CRDB,BANCOBU,ECOBANK,KCB,BCB,BHB,INTERBANK]'
+        );
+
+        $this->form_validation->set_rules(
+            'account_number',
+            'Numéro de compte',
+            'trim|required|min_length[4]|max_length[100]'
+        );
+
+        $this->form_validation->set_rules(
+            'account_type',
+            'Type de compte',
+            'trim|required|in_list[courant,epargne,garantie,projet,credit]'
+        );
+
+        $this->form_validation->set_rules(
+            'currency',
+            'Devise',
+            'trim|required|in_list[BIF,USD,EUR]'
+        );
+
+        $this->form_validation->set_rules(
+            'opening_balance',
+            'Solde initial',
+            'trim|numeric|greater_than_equal_to[0]'
+        );
+
+        $this->form_validation->set_rules(
+            'alert_threshold',
+            'Seuil d’alerte',
+            'trim|numeric|greater_than_equal_to[0]'
+        );
+
+        $this->form_validation->set_rules(
+            'branch_name',
+            'Agence bancaire',
+            'trim|max_length[150]'
+        );
+
+        $this->form_validation->set_rules(
+            'swift_code',
+            'Code SWIFT',
+            'trim|max_length[50]'
+        );
+
+        $this->form_validation->set_rules(
+            'observation',
+            'Observation',
+            'trim|max_length[2000]'
+        );
+
+        /*
+     * =========================================================
+     * 3. MESSAGES DE VALIDATION
+     * =========================================================
+     */
+
+        $this->form_validation->set_message(
+            'required',
+            'Le champ {field} est obligatoire.'
+        );
+
+        $this->form_validation->set_message(
+            'min_length',
+            'Le champ {field} doit contenir au moins {param} caractères.'
+        );
+
+        $this->form_validation->set_message(
+            'max_length',
+            'Le champ {field} ne doit pas dépasser {param} caractères.'
+        );
+
+        $this->form_validation->set_message(
+            'numeric',
+            'Le champ {field} doit contenir un montant valide.'
+        );
+
+        $this->form_validation->set_message(
+            'greater_than_equal_to',
+            'Le champ {field} ne peut pas contenir une valeur négative.'
+        );
+
+        $this->form_validation->set_message(
+            'in_list',
+            'La valeur sélectionnée pour {field} est invalide.'
+        );
+
+        /*
+     * =========================================================
+     * 4. ARRÊTER EN CAS D’ERREUR DE VALIDATION
+     * =========================================================
+     */
+
+        if ($this->form_validation->run() === FALSE) {
+            /*
+         * Conserver temporairement les données saisies.
+         */
+            $this->session->set_flashdata(
+                'bank_account_old_input',
+                $this->input->post(NULL, TRUE)
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            $this->session->set_flashdata(
+                'error',
+                validation_errors('<div>', '</div>')
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 5. RÉCUPÉRER ET NETTOYER LES DONNÉES
+     * =========================================================
+     */
+
+        $name = trim(
+            (string) $this->input->post(
+                'name',
+                TRUE
+            )
+        );
+
+        $bankName = strtoupper(
+            trim(
+                (string) $this->input->post(
+                    'bank_name',
+                    TRUE
+                )
+            )
+        );
+
+        $accountNumber = trim(
+            (string) $this->input->post(
+                'account_number',
+                TRUE
+            )
+        );
+
+        $accountType = trim(
+            (string) $this->input->post(
+                'account_type',
+                TRUE
+            )
+        );
+
+        $currency = strtoupper(
+            trim(
+                (string) $this->input->post(
+                    'currency',
+                    TRUE
+                )
+            )
+        );
+
+        $openingBalance = (float) $this->input->post(
+            'opening_balance',
+            TRUE
+        );
+
+        $alertThreshold = (float) $this->input->post(
+            'alert_threshold',
+            TRUE
+        );
+
+        $branchName = trim(
+            (string) $this->input->post(
+                'branch_name',
+                TRUE
+            )
+        );
+
+        $swiftCode = strtoupper(
+            trim(
+                (string) $this->input->post(
+                    'swift_code',
+                    TRUE
+                )
+            )
+        );
+
+        $observation = trim(
+            (string) $this->input->post(
+                'observation',
+                TRUE
+            )
+        );
+
+        /*
+     * Retirer les espaces inutiles du numéro de compte
+     * pour éviter les doublons de forme :
+     *
+     * 0151 0010 02456
+     * 0151001002456
+     */
+        $normalizedAccountNumber = preg_replace(
+            '/[\s\-]+/',
+            '',
+            $accountNumber
+        );
+
+        if ($normalizedAccountNumber === '') {
+            $this->session->set_flashdata(
+                'error',
+                'Le numéro de compte bancaire est invalide.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * Le code SWIFT est généralement enregistré
+     * sans espaces.
+     */
+        if ($swiftCode !== '') {
+            $swiftCode = preg_replace(
+                '/\s+/',
+                '',
+                $swiftCode
+            );
+        }
+
+        /*
+     * =========================================================
+     * 6. CONTRÔLES SUPPLÉMENTAIRES
+     * =========================================================
+     */
+
+        if ($openingBalance < 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Le solde initial ne peut pas être négatif.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        if ($alertThreshold < 0) {
+            $this->session->set_flashdata(
+                'error',
+                'Le seuil d’alerte ne peut pas être négatif.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 7. VÉRIFIER SI LE NUMÉRO DE COMPTE EXISTE DÉJÀ
+     * =========================================================
+     */
+
+        $existingAccount = $this->db
+            ->where(
+                'account_number',
+                $normalizedAccountNumber
+            )
+            ->get('tbl_finance_bank_account')
+            ->row();
+
+        if ($existingAccount) {
+            $this->session->set_flashdata(
+                'error',
+                'Ce numéro de compte bancaire est déjà enregistré sous l’intitulé « '
+                    . html_escape($existingAccount->name)
+                    . ' ».'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * Vérifier également l’intitulé dans la même banque
+     * et dans la même devise.
+     */
+        $existingName = $this->db
+            ->where('bank_name', $bankName)
+            ->where('currency', $currency)
+            ->where('name', $name)
+            ->get('tbl_finance_bank_account')
+            ->row();
+
+        if ($existingName) {
+            $this->session->set_flashdata(
+                'error',
+                'Un compte bancaire portant cet intitulé existe déjà pour cette banque et cette devise.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 8. DÉMARRER UNE TRANSACTION
+     * =========================================================
+     */
+
+        $this->db->trans_begin();
+
+        try {
+            /*
+         * =====================================================
+         * 9. GÉNÉRER LE CODE AUTOMATIQUEMENT
+         * =====================================================
+         *
+         * Exemple :
+         *
+         * BAN-2026-001
+         * BAN-2026-002
+         * BAN-2026-003
+         */
+
+            $year = date('Y');
+
+            $codePrefix = 'BAN-' . $year . '-';
+
+            /*
+         * Rechercher le dernier code de l’année en cours.
+         */
+            $lastBankAccount = $this->db
+                ->select('code')
+                ->from('tbl_finance_bank_account')
+                ->like(
+                    'code',
+                    $codePrefix,
+                    'after'
+                )
+                ->order_by('code', 'DESC')
+                ->limit(1)
+                ->get()
+                ->row();
+
+            $nextNumber = 1;
+
+            if (
+                $lastBankAccount
+                && !empty($lastBankAccount->code)
+            ) {
+                /*
+             * Exemple :
+             * BAN-2026-007 devient 007.
+             */
+                $lastCodeParts = explode(
+                    '-',
+                    $lastBankAccount->code
+                );
+
+                $lastNumber = (int) end(
+                    $lastCodeParts
+                );
+
+                $nextNumber = $lastNumber + 1;
+            }
+
+            $bankAccountCode = $codePrefix
+                . str_pad(
+                    (string) $nextNumber,
+                    3,
+                    '0',
+                    STR_PAD_LEFT
+                );
+
+            /*
+         * Sécurité supplémentaire :
+         * vérifier que le code n’existe pas.
+         */
+            while (
+                $this->db
+                ->where('code', $bankAccountCode)
+                ->count_all_results(
+                    'tbl_finance_bank_account'
+                ) > 0
+            ) {
+                $nextNumber++;
+
+                $bankAccountCode = $codePrefix
+                    . str_pad(
+                        (string) $nextNumber,
+                        3,
+                        '0',
+                        STR_PAD_LEFT
+                    );
+            }
+
+            /*
+         * =====================================================
+         * 10. PRÉPARER LES DONNÉES
+         * =====================================================
+         */
+
+            $currentUserId = $this->session->userdata(
+                'user_id'
+            );
+
+            /*
+         * Selon ton système, l’identifiant peut aussi être
+         * stocké dans la session sous "id".
+         */
+            if (!$currentUserId) {
+                $currentUserId = $this->session->userdata(
+                    'id'
+                );
+            }
+
+            $bankAccountData = [
+                'code' => $bankAccountCode,
+
+                'name' => $name,
+
+                'bank_name' => $bankName,
+
+                'account_number' =>
+                $normalizedAccountNumber,
+
+                'account_type' => $accountType,
+
+                'currency' => $currency,
+
+                /*
+             * Lors de la création :
+             * current_balance = opening_balance.
+             */
+                'opening_balance' =>
+                $openingBalance,
+
+                'current_balance' =>
+                $openingBalance,
+
+                'alert_threshold' =>
+                $alertThreshold,
+
+                'branch_name' =>
+                $branchName !== ''
+                    ? $branchName
+                    : NULL,
+
+                'swift_code' =>
+                $swiftCode !== ''
+                    ? $swiftCode
+                    : NULL,
+
+                'observation' =>
+                $observation !== ''
+                    ? $observation
+                    : NULL,
+
+                'status' => 'active',
+
+                'created_by' =>
+                $currentUserId ?: NULL,
+
+                'updated_by' => NULL,
+
+                'created_at' =>
+                date('Y-m-d H:i:s'),
+
+                'updated_at' => NULL,
+            ];
+
+            /*
+         * =====================================================
+         * 11. INSERTION DANS LA BASE
+         * =====================================================
+         */
+
+            $inserted = $this->finance
+                ->createBankAccount(
+                    $bankAccountData
+                );
+
+            if (!$inserted) {
+                throw new Exception(
+                    'Le compte bancaire n’a pas pu être enregistré.'
+                );
+            }
+
+            $bankAccountId = (int)
+            $this->db->insert_id();
+
+            if ($bankAccountId <= 0) {
+                throw new Exception(
+                    'L’identifiant du compte bancaire n’a pas été généré.'
+                );
+            }
+
+            /*
+         * =====================================================
+         * 12. VÉRIFIER LA TRANSACTION
+         * =====================================================
+         */
+
+            if ($this->db->trans_status() === FALSE) {
+                throw new Exception(
+                    'Une erreur de base de données est survenue pendant l’enregistrement.'
+                );
+            }
+
+            /*
+         * Valider définitivement les modifications.
+         */
+            $this->db->trans_commit();
+
+            /*
+         * =====================================================
+         * 13. MESSAGE DE SUCCÈS
+         * =====================================================
+         */
+
+            $bankLabels = [
+                'CRDB' =>
+                'CRDB Bank',
+
+                'BANCOBU' =>
+                'BANCOBU',
+
+                'ECOBANK' =>
+                'ECOBANK',
+
+                'KCB' =>
+                'KCB Bank',
+
+                'BCB' =>
+                'Banque de Crédit de Bujumbura',
+
+                'BHB' =>
+                'Banque de l’Habitat du Burundi',
+
+                'INTERBANK' =>
+                'Interbank Burundi',
+            ];
+
+            $displayBankName = isset(
+                $bankLabels[$bankName]
+            )
+                ? $bankLabels[$bankName]
+                : $bankName;
+
+            $this->session->set_flashdata(
+                'success',
+                'Le compte bancaire '
+                    . $bankAccountCode
+                    . ' — '
+                    . $name
+                    . ' auprès de '
+                    . $displayBankName
+                    . ' a été créé avec succès.'
+            );
+
+            redirect('compte-banques');
+            return;
+        } catch (Throwable $exception) {
+            /*
+         * Annuler toutes les modifications en cas d’erreur.
+         */
+            if (
+                $this->db->trans_status() === FALSE
+                || $this->db->trans_depth() > 0
+            ) {
+                $this->db->trans_rollback();
+            }
+
+            log_message(
+                'error',
+                'Erreur création compte bancaire : '
+                    . $exception->getMessage()
+            );
+
+            /*
+         * Conserver les anciennes valeurs pour rouvrir
+         * la modale sans perdre la saisie.
+         */
+            $this->session->set_flashdata(
+                'bank_account_old_input',
+                $this->input->post(NULL, TRUE)
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_account_modal',
+                TRUE
+            );
+
+            $this->session->set_flashdata(
+                'error',
+                $exception->getMessage()
+                    ?: 'Le compte bancaire n’a pas pu être enregistré.'
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+    }
+
+    /**
+     * Enregistre une opération bancaire :
+     *
+     * - encaissement ;
+     * - décaissement ;
+     * - transfert entre comptes bancaires.
+     */
+    public function bankOperationStore()
+    {
+        /*
+     * =========================================================
+     * 1. AUTORISER UNIQUEMENT POST
+     * =========================================================
+     */
+
+        if ($this->input->method(TRUE) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $this->load->library('form_validation');
+
+        /*
+     * =========================================================
+     * 2. RÈGLES DE VALIDATION
+     * =========================================================
+     */
+
+        $this->form_validation->set_rules(
+            'operation_type',
+            'Type d’opération',
+            'trim|required|in_list[encaissement,decaissement,transfert]'
+        );
+
+        $this->form_validation->set_rules(
+            'operation_date',
+            'Date de l’opération',
+            'trim|required'
+        );
+
+        $this->form_validation->set_rules(
+            'bank_account_id',
+            'Compte bancaire concerné',
+            'trim|required|integer'
+        );
+
+        $this->form_validation->set_rules(
+            'amount',
+            'Montant',
+            'trim|required|numeric|greater_than[0]'
+        );
+
+        $this->form_validation->set_rules(
+            'category',
+            'Catégorie',
+            'trim|max_length[100]'
+        );
+
+        $this->form_validation->set_rules(
+            'third_party',
+            'Tiers ou bénéficiaire',
+            'trim|max_length[255]'
+        );
+
+        $this->form_validation->set_rules(
+            'payment_method',
+            'Mode d’opération',
+            'trim|required|in_list[transfer,deposit,cheque,withdrawal]'
+        );
+
+        $this->form_validation->set_rules(
+            'document_number',
+            'Numéro de pièce',
+            'trim|max_length[100]'
+        );
+
+        $this->form_validation->set_rules(
+            'label',
+            'Libellé de l’opération',
+            'trim|required|max_length[2000]'
+        );
+
+        /*
+     * Le compte destination est obligatoire
+     * uniquement pour un transfert.
+     */
+        $operationType = trim(
+            (string) $this->input->post(
+                'operation_type',
+                TRUE
+            )
+        );
+
+        if ($operationType === 'transfert') {
+            $this->form_validation->set_rules(
+                'destination_bank_account_id',
+                'Compte destination',
+                'trim|required|integer'
+            );
+        }
+
+        /*
+     * =========================================================
+     * 3. MESSAGES DE VALIDATION
+     * =========================================================
+     */
+
+        $this->form_validation->set_message(
+            'required',
+            'Le champ {field} est obligatoire.'
+        );
+
+        $this->form_validation->set_message(
+            'integer',
+            'La valeur du champ {field} est invalide.'
+        );
+
+        $this->form_validation->set_message(
+            'numeric',
+            'Le champ {field} doit contenir un montant valide.'
+        );
+
+        $this->form_validation->set_message(
+            'greater_than',
+            'Le montant doit être supérieur à zéro.'
+        );
+
+        $this->form_validation->set_message(
+            'in_list',
+            'La valeur sélectionnée pour {field} est invalide.'
+        );
+
+        $this->form_validation->set_message(
+            'max_length',
+            'Le champ {field} ne doit pas dépasser {param} caractères.'
+        );
+
+        /*
+     * =========================================================
+     * 4. ARRÊTER EN CAS D’ERREUR
+     * =========================================================
+     */
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata(
+                'bank_operation_old_input',
+                $this->input->post(NULL, TRUE)
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_operation_modal',
+                TRUE
+            );
+
+            $this->session->set_flashdata(
+                'error',
+                validation_errors('<div>', '</div>')
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 5. RÉCUPÉRATION DES DONNÉES
+     * =========================================================
+     */
+
+        $operationDate = trim(
+            (string) $this->input->post(
+                'operation_date',
+                TRUE
+            )
+        );
+
+        $bankAccountId = (int) $this->input->post(
+            'bank_account_id',
+            TRUE
+        );
+
+        $destinationBankAccountId = (int)
+        $this->input->post(
+            'destination_bank_account_id',
+            TRUE
+        );
+
+        $amount = (float) $this->input->post(
+            'amount',
+            TRUE
+        );
+
+        $category = trim(
+            (string) $this->input->post(
+                'category',
+                TRUE
+            )
+        );
+
+        $thirdParty = trim(
+            (string) $this->input->post(
+                'third_party',
+                TRUE
+            )
+        );
+
+        $paymentMethod = trim(
+            (string) $this->input->post(
+                'payment_method',
+                TRUE
+            )
+        );
+
+        $documentNumber = trim(
+            (string) $this->input->post(
+                'document_number',
+                TRUE
+            )
+        );
+
+        $label = trim(
+            (string) $this->input->post(
+                'label',
+                TRUE
+            )
+        );
+
+        /*
+     * =========================================================
+     * 6. DÉTERMINER SOURCE ET DESTINATION
+     * =========================================================
+     */
+
+        $sourceBankAccountId = NULL;
+        $finalDestinationBankAccountId = NULL;
+
+        /*
+     * Encaissement :
+     * le compte sélectionné reçoit l’argent.
+     */
+        if ($operationType === 'encaissement') {
+            $finalDestinationBankAccountId =
+                $bankAccountId;
+        }
+
+        /*
+     * Décaissement :
+     * le compte sélectionné fournit l’argent.
+     */ elseif ($operationType === 'decaissement') {
+            $sourceBankAccountId =
+                $bankAccountId;
+        }
+
+        /*
+     * Transfert :
+     * le compte sélectionné est la source,
+     * et destination_bank_account_id est la destination.
+     */ elseif ($operationType === 'transfert') {
+            $sourceBankAccountId =
+                $bankAccountId;
+
+            $finalDestinationBankAccountId =
+                $destinationBankAccountId;
+
+            if (
+                $sourceBankAccountId
+                === $finalDestinationBankAccountId
+            ) {
+                $this->session->set_flashdata(
+                    'error',
+                    'Le compte source et le compte destination doivent être différents.'
+                );
+
+                $this->session->set_flashdata(
+                    'open_bank_operation_modal',
+                    TRUE
+                );
+
+                redirect('compte-banques');
+                return;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 7. VÉRIFIER LE COMPTE PRINCIPAL
+     * =========================================================
+     */
+
+        $referenceAccountId =
+            $sourceBankAccountId
+            ?: $finalDestinationBankAccountId;
+
+        $referenceAccount = $this->db
+            ->where('id', $referenceAccountId)
+            ->get('tbl_finance_bank_account')
+            ->row();
+
+        if (!$referenceAccount) {
+            $this->session->set_flashdata(
+                'error',
+                'Le compte bancaire sélectionné est introuvable.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_operation_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        if ($referenceAccount->status !== 'active') {
+            $this->session->set_flashdata(
+                'error',
+                'Le compte bancaire sélectionné n’est pas actif.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_operation_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 8. VÉRIFIER LE COMPTE DESTINATION DU TRANSFERT
+     * =========================================================
+     */
+
+        if ($operationType === 'transfert') {
+            $destinationAccount = $this->db
+                ->where(
+                    'id',
+                    $finalDestinationBankAccountId
+                )
+                ->get('tbl_finance_bank_account')
+                ->row();
+
+            if (!$destinationAccount) {
+                $this->session->set_flashdata(
+                    'error',
+                    'Le compte bancaire destination est introuvable.'
+                );
+
+                $this->session->set_flashdata(
+                    'open_bank_operation_modal',
+                    TRUE
+                );
+
+                redirect('compte-banques');
+                return;
+            }
+
+            if ($destinationAccount->status !== 'active') {
+                $this->session->set_flashdata(
+                    'error',
+                    'Le compte bancaire destination n’est pas actif.'
+                );
+
+                $this->session->set_flashdata(
+                    'open_bank_operation_modal',
+                    TRUE
+                );
+
+                redirect('compte-banques');
+                return;
+            }
+
+            /*
+         * Sans gestion de taux de change,
+         * un transfert doit utiliser la même devise.
+         */
+            if (
+                $referenceAccount->currency
+                !== $destinationAccount->currency
+            ) {
+                $this->session->set_flashdata(
+                    'error',
+                    'Le transfert est impossible entre deux comptes de devises différentes. Ajoutez d’abord un système de taux de change.'
+                );
+
+                $this->session->set_flashdata(
+                    'open_bank_operation_modal',
+                    TRUE
+                );
+
+                redirect('compte-banques');
+                return;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 9. VÉRIFIER LE SOLDE DISPONIBLE
+     * =========================================================
+     */
+
+        if (
+            in_array(
+                $operationType,
+                ['decaissement', 'transfert'],
+                TRUE
+            )
+            && (float) $referenceAccount->current_balance
+            < $amount
+        ) {
+            $this->session->set_flashdata(
+                'error',
+                'Solde insuffisant. Le compte '
+                    . $referenceAccount->name
+                    . ' dispose seulement de '
+                    . number_format(
+                        (float) $referenceAccount
+                            ->current_balance,
+                        2,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $referenceAccount->currency
+                    . '.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_operation_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 10. UPLOAD FACULTATIF
+     * =========================================================
+     */
+
+        $attachmentName = NULL;
+
+        if (
+            isset($_FILES['attachment'])
+            && !empty($_FILES['attachment']['name'])
+        ) {
+            $uploadPath =
+                FCPATH
+                . 'uploads/finance/bank_operations/';
+
+            if (!is_dir($uploadPath)) {
+                mkdir(
+                    $uploadPath,
+                    0755,
+                    TRUE
+                );
+            }
+
+            $config = [
+                'upload_path' =>
+                $uploadPath,
+
+                'allowed_types' =>
+                'pdf|jpg|jpeg|png|doc|docx|xls|xlsx',
+
+                'max_size' =>
+                5120,
+
+                'encrypt_name' =>
+                TRUE,
+
+                'remove_spaces' =>
+                TRUE,
+            ];
+
+            $this->load->library(
+                'upload',
+                $config
+            );
+
+            if (
+                !$this->upload->do_upload(
+                    'attachment'
+                )
+            ) {
+                $this->session->set_flashdata(
+                    'error',
+                    strip_tags(
+                        $this->upload
+                            ->display_errors()
+                    )
+                );
+
+                $this->session->set_flashdata(
+                    'open_bank_operation_modal',
+                    TRUE
+                );
+
+                redirect('compte-banques');
+                return;
+            }
+
+            $uploadedFile =
+                $this->upload->data();
+
+            $attachmentName =
+                $uploadedFile['file_name'];
+        }
+
+        /*
+     * =========================================================
+     * 11. IDENTIFIANT UTILISATEUR
+     * =========================================================
+     */
+
+        $currentUserId =
+            $this->session->userdata(
+                'user_id'
+            );
+
+        if (!$currentUserId) {
+            $currentUserId =
+                $this->session->userdata(
+                    'id'
+                );
+        }
+
+        /*
+     * =========================================================
+     * 12. PRÉPARER LES DONNÉES
+     * =========================================================
+     */
+
+        $operationData = [
+            /*
+         * Référence générée par le modèle.
+         */
+            'operation_type' =>
+            $operationType,
+
+            'operation_date' =>
+            $operationDate,
+
+            'source_bank_account_id' =>
+            $sourceBankAccountId,
+
+            'destination_bank_account_id' =>
+            $finalDestinationBankAccountId,
+
+            'amount' =>
+            $amount,
+
+            'currency' =>
+            $referenceAccount->currency,
+
+            'category' =>
+            $category !== ''
+                ? $category
+                : NULL,
+
+            'third_party' =>
+            $thirdParty !== ''
+                ? $thirdParty
+                : NULL,
+
+            'payment_method' =>
+            $paymentMethod,
+
+            'document_number' =>
+            $documentNumber !== ''
+                ? $documentNumber
+                : NULL,
+
+            'attachment' =>
+            $attachmentName,
+
+            'label' =>
+            $label,
+
+            'status' =>
+            'validated',
+
+            'created_by' =>
+            $currentUserId ?: NULL,
+
+            'validated_by' =>
+            $currentUserId ?: NULL,
+
+            'created_at' =>
+            date('Y-m-d H:i:s'),
         ];
 
-        $this->finance->insert(
-            'tbl_finance_bank_account',
-            $data
-        );
+        /*
+     * =========================================================
+     * 13. ENREGISTRER VIA LE MODÈLE
+     * =========================================================
+     */
+
+        $result =
+            $this->finance
+            ->createBankOperation(
+                $operationData
+            );
+
+        if (
+            empty($result['status'])
+        ) {
+            if ($attachmentName) {
+                @unlink(
+                    FCPATH
+                        . 'uploads/finance/bank_operations/'
+                        . $attachmentName
+                );
+            }
+
+            $this->session->set_flashdata(
+                'error',
+                $result['message']
+                    ?? 'L’opération bancaire n’a pas pu être enregistrée.'
+            );
+
+            $this->session->set_flashdata(
+                'open_bank_operation_modal',
+                TRUE
+            );
+
+            redirect('compte-banques');
+            return;
+        }
+
+        /*
+     * =========================================================
+     * 14. MESSAGE DE SUCCÈS
+     * =========================================================
+     */
+
+        $operationLabels = [
+            'encaissement' =>
+            'L’encaissement bancaire',
+
+            'decaissement' =>
+            'Le décaissement bancaire',
+
+            'transfert' =>
+            'Le transfert bancaire',
+        ];
 
         $this->session->set_flashdata(
             'success',
-            'Compte bancaire créé avec succès.'
+            $operationLabels[$operationType]
+                . ' '
+                . $result['reference']
+                . ' a été enregistré avec succès.'
         );
 
-        redirect('finance/banques');
+        redirect('compte-banques');
     }
 
     public function encaissements()
