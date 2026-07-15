@@ -990,6 +990,99 @@ $bankAccountOldInput =
                     margin-right: 0 !important;
                 }
             }
+
+            /* =====================================================
+   RÉSUMÉ DES FLUX BANCAIRES
+===================================================== */
+
+            .bank-flow-summary {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 11px;
+                margin-bottom: 17px;
+            }
+
+            .bank-flow-summary-item {
+                padding: 10px 12px;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                background: #f8fafc;
+            }
+
+            .bank-flow-summary-item span {
+                display: block;
+                margin-bottom: 4px;
+                color: #64748b;
+                font-size: 8px;
+                font-weight: 800;
+                text-transform: uppercase;
+            }
+
+            .bank-flow-summary-item strong {
+                display: block;
+                font-size: 12px;
+                font-weight: 900;
+            }
+
+            @media (max-width: 767px) {
+                .bank-flow-summary {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            /* Code interne du compte */
+            .bank-account-code {
+                margin-top: 2px;
+                color: #0f766e;
+                font-size: 8px;
+                font-weight: 700;
+            }
+
+            /* Compte bloqué */
+            .bank-account-card-blocked {
+                border-color: #fecaca;
+                background:
+                    linear-gradient(180deg,
+                        #ffffff 0%,
+                        #fffafa 100%);
+            }
+
+            .bank-account-card-blocked .bank-logo-box {
+                color: #b91c1c;
+                background: #fee2e2;
+            }
+
+            /* État vide */
+            .bank-empty-state {
+                padding: 45px 20px;
+                text-align: center;
+            }
+
+            .bank-empty-state-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 62px;
+                height: 62px;
+                margin: 0 auto 14px;
+                color: #0f766e;
+                border-radius: 50%;
+                background: #ccfbf1;
+                font-size: 24px;
+            }
+
+            .bank-empty-state h5 {
+                margin-bottom: 6px;
+                color: #102033;
+                font-size: 15px;
+                font-weight: 800;
+            }
+
+            .bank-empty-state p {
+                margin-bottom: 16px;
+                color: #64748b;
+                font-size: 10px;
+            }
             </style>
 
 
@@ -1038,12 +1131,115 @@ $bankAccountOldInput =
 
                 </div>
 
+                <?php
+
+                /*
+                * =========================================================
+                * VALEURS DES STATISTIQUES BANCAIRES
+                * =========================================================
+                */
+
+                $bankStats = isset($bankMainStatistics)
+                    && is_array($bankMainStatistics)
+                    ? $bankMainStatistics
+                    : [];
+
+                $bankCurrency = !empty($bankStats['currency'])
+                    ? $bankStats['currency']
+                    : 'BIF';
+
+                $globalBankBalance = isset(
+                    $bankStats['global_balance']
+                )
+                    ? (float) $bankStats['global_balance']
+                    : 0;
+
+                $activeBankAccounts = isset(
+                    $bankStats['active_accounts']
+                )
+                    ? (int) $bankStats['active_accounts']
+                    : 0;
+
+                $activeBifAccounts = isset(
+                    $bankStats['active_bif_accounts']
+                )
+                    ? (int) $bankStats['active_bif_accounts']
+                    : 0;
+
+                $bankEstablishmentsCount = isset(
+                    $bankStats['bank_count']
+                )
+                    ? (int) $bankStats['bank_count']
+                    : 0;
+
+                $todayBankIncomeAmount = isset(
+                    $bankStats['today_income_amount']
+                )
+                    ? (float) $bankStats['today_income_amount']
+                    : 0;
+
+                $todayBankIncomeCount = isset(
+                    $bankStats['today_income_count']
+                )
+                    ? (int) $bankStats['today_income_count']
+                    : 0;
+
+                $todayBankExpenseAmount = isset(
+                    $bankStats['today_expense_amount']
+                )
+                    ? (float) $bankStats['today_expense_amount']
+                    : 0;
+
+                $todayBankExpenseCount = isset(
+                    $bankStats['today_expense_count']
+                )
+                    ? (int) $bankStats['today_expense_count']
+                    : 0;
+
+                $bankGlobalVariation = isset(
+                    $bankStats['global_variation_percentage']
+                )
+                    ? (float) $bankStats['global_variation_percentage']
+                    : 0;
+
+                /*
+                * Apparence du badge d’évolution.
+                */
+                $bankVariationClass =
+                    'badge-neutral';
+
+                $bankVariationIcon =
+                    'fas fa-minus';
+
+                $bankVariationPrefix = '';
+
+                if ($bankGlobalVariation > 0) {
+                    $bankVariationClass =
+                        'badge-positive';
+
+                    $bankVariationIcon =
+                        'fas fa-arrow-up';
+
+                    $bankVariationPrefix = '+';
+                } elseif ($bankGlobalVariation < 0) {
+                    $bankVariationClass =
+                        'badge-negative';
+
+                    $bankVariationIcon =
+                        'fas fa-arrow-down';
+                }
+
+                ?>
+
 
                 <!-- =====================================================
-         STATISTIQUES PRINCIPALES
-    ====================================================== -->
+                    STATISTIQUES PRINCIPALES
+                ====================================================== -->
                 <div class="row">
 
+                    <!-- =================================================
+                        SOLDE BANCAIRE GLOBAL
+                    ================================================== -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="bank-stat-card">
@@ -1051,32 +1247,86 @@ $bankAccountOldInput =
                             <div class="bank-stat-top">
 
                                 <div class="bank-stat-icon icon-green">
+
                                     <i class="fas fa-coins"></i>
+
                                 </div>
 
-                                <span class="bank-stat-badge badge-positive">
-                                    <i class="fas fa-arrow-up mr-1"></i>
-                                    6,8 %
+                                <span class="
+                                        bank-stat-badge
+                                        <?= html_escape(
+                                            $bankVariationClass
+                                        ) ?>
+                                    " title="Évolution depuis le début du mois">
+
+                                    <i class="
+                                        <?= html_escape(
+                                            $bankVariationIcon
+                                        ) ?>
+                                        mr-1
+                                    "></i>
+
+                                    <?= $bankVariationPrefix ?>
+
+                                    <?= number_format(
+                                        abs($bankGlobalVariation),
+                                        1,
+                                        ',',
+                                        ' '
+                                    ) ?>
+
+                                    %
+
                                 </span>
 
                             </div>
 
                             <div class="bank-stat-label">
+
                                 Solde bancaire global
+
                             </div>
 
                             <div class="bank-stat-value">
-                                485 750 000 BIF
+
+                                <?= number_format(
+                                    $globalBankBalance,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+
+                                <?= html_escape(
+                                    $bankCurrency
+                                ) ?>
+
                             </div>
 
                             <div class="bank-stat-footer">
-                                Tous les comptes actifs en BIF
+
+                                <?= $activeBifAccounts ?>
+
+                                compte<?= $activeBifAccounts > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
+                                actif<?= $activeBifAccounts > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
+                                en <?= html_escape($bankCurrency) ?>
+
                             </div>
 
                         </div>
 
                     </div>
 
+                    <!-- =================================================
+                        COMPTES ACTIFS
+                    ================================================== -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="bank-stat-card">
@@ -1084,31 +1334,69 @@ $bankAccountOldInput =
                             <div class="bank-stat-top">
 
                                 <div class="bank-stat-icon icon-blue">
+
                                     <i class="fas fa-university"></i>
+
                                 </div>
 
-                                <span class="bank-stat-badge badge-neutral">
-                                    6 comptes
+                                <span class="
+                                        bank-stat-badge
+                                        badge-neutral
+                                    ">
+
+                                    <?= $activeBankAccounts ?>
+
+                                    compte<?= $activeBankAccounts > 1
+                                                ? 's'
+                                                : ''
+                                            ?>
+
                                 </span>
 
                             </div>
 
                             <div class="bank-stat-label">
+
                                 Comptes actifs
+
                             </div>
 
                             <div class="bank-stat-value">
-                                6
+
+                                <?= $activeBankAccounts ?>
+
                             </div>
 
                             <div class="bank-stat-footer">
-                                Répartis dans 4 établissements bancaires
+
+                                Réparti<?= $activeBankAccounts > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
+                                dans
+
+                                <?= $bankEstablishmentsCount ?>
+
+                                établissement<?= $bankEstablishmentsCount > 1
+                                                    ? 's'
+                                                    : ''
+                                                ?>
+
+                                bancaire<?= $bankEstablishmentsCount > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
                             </div>
 
                         </div>
 
                     </div>
 
+                    <!-- =================================================
+                        ENCAISSEMENTS DU JOUR
+                    ================================================== -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="bank-stat-card">
@@ -1116,31 +1404,74 @@ $bankAccountOldInput =
                             <div class="bank-stat-top">
 
                                 <div class="bank-stat-icon icon-orange">
+
                                     <i class="fas fa-arrow-down"></i>
+
                                 </div>
 
-                                <span class="bank-stat-badge badge-warning">
-                                    12 opérations
+                                <span class="
+                                        bank-stat-badge
+                                        <?= $todayBankIncomeCount > 0
+                                            ? 'badge-warning'
+                                            : 'badge-neutral'
+                                        ?>
+                                    ">
+
+                                    <?= $todayBankIncomeCount ?>
+
+                                    opération<?= $todayBankIncomeCount > 1
+                                                    ? 's'
+                                                    : ''
+                                                ?>
+
                                 </span>
 
                             </div>
 
                             <div class="bank-stat-label">
+
                                 Encaissements bancaires du jour
+
                             </div>
 
                             <div class="bank-stat-value">
-                                48 500 000 BIF
+
+                                <?= number_format(
+                                    $todayBankIncomeAmount,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+
+                                <?= html_escape(
+                                    $bankCurrency
+                                ) ?>
+
                             </div>
 
                             <div class="bank-stat-footer">
-                                Virements et dépôts reçus aujourd’hui
+
+                                <?php if (
+                                    $todayBankIncomeCount > 0
+                                ): ?>
+
+                                Virements et dépôts validés aujourd’hui
+
+                                <?php else: ?>
+
+                                Aucun encaissement bancaire aujourd’hui
+
+                                <?php endif; ?>
+
                             </div>
 
                         </div>
 
                     </div>
 
+                    <!-- =================================================
+                        DÉCAISSEMENTS DU JOUR
+                    ================================================== -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="bank-stat-card">
@@ -1148,25 +1479,65 @@ $bankAccountOldInput =
                             <div class="bank-stat-top">
 
                                 <div class="bank-stat-icon icon-red">
+
                                     <i class="fas fa-arrow-up"></i>
+
                                 </div>
 
-                                <span class="bank-stat-badge badge-negative">
-                                    8 opérations
+                                <span class="
+                                        bank-stat-badge
+                                        <?= $todayBankExpenseCount > 0
+                                            ? 'badge-negative'
+                                            : 'badge-neutral'
+                                        ?>
+                                    ">
+
+                                    <?= $todayBankExpenseCount ?>
+
+                                    opération<?= $todayBankExpenseCount > 1
+                                                    ? 's'
+                                                    : ''
+                                                ?>
+
                                 </span>
 
                             </div>
 
                             <div class="bank-stat-label">
+
                                 Décaissements bancaires du jour
+
                             </div>
 
                             <div class="bank-stat-value">
-                                31 200 000 BIF
+
+                                <?= number_format(
+                                    $todayBankExpenseAmount,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+
+                                <?= html_escape(
+                                    $bankCurrency
+                                ) ?>
+
                             </div>
 
                             <div class="bank-stat-footer">
-                                Virements et paiements effectués aujourd’hui
+
+                                <?php if (
+                                    $todayBankExpenseCount > 0
+                                ): ?>
+
+                                Virements et paiements validés aujourd’hui
+
+                                <?php else: ?>
+
+                                Aucun décaissement bancaire aujourd’hui
+
+                                <?php endif; ?>
+
                             </div>
 
                         </div>
@@ -1177,8 +1548,8 @@ $bankAccountOldInput =
 
 
                 <!-- =====================================================
-         ACTIONS RAPIDES
-    ====================================================== -->
+                    ACTIONS RAPIDES
+                ====================================================== -->
                 <div class="bank-card">
 
                     <div class="bank-card-header">
@@ -1266,10 +1637,13 @@ $bankAccountOldInput =
 
 
                 <!-- =====================================================
-         GRAPHIQUE + RÉPARTITION PAR BANQUE
-    ====================================================== -->
+     GRAPHIQUE + RÉPARTITION PAR BANQUE
+====================================================== -->
                 <div class="row">
 
+                    <!-- =================================================
+         ÉVOLUTION DES FLUX BANCAIRES
+    ================================================== -->
                     <div class="col-xl-8 col-lg-8">
 
                         <div class="bank-card">
@@ -1277,30 +1651,169 @@ $bankAccountOldInput =
                             <div class="bank-card-header">
 
                                 <div>
+
                                     <h5 class="bank-card-title">
+
                                         <i class="fas fa-chart-line"></i>
+
                                         Évolution des flux bancaires
+
                                     </h5>
 
                                     <span class="bank-card-subtitle">
+
                                         Comparaison des encaissements et décaissements
-                                        des 7 derniers jours.
+                                        sur la période sélectionnée.
+
                                     </span>
+
                                 </div>
 
-                                <select class="form-control form-control-sm" style="width: 155px; border-radius: 8px;">
-                                    <option>7 derniers jours</option>
-                                    <option>30 derniers jours</option>
-                                    <option>Ce mois</option>
-                                    <option>Cette année</option>
-                                </select>
+                                <form action="<?= current_url() ?>" method="get" id="bankFlowPeriodForm">
+
+                                    <select name="bankflow_period" id="bankFlowPeriod"
+                                        class="form-control form-control-sm" style="
+                            width: 165px;
+                            border-radius: 8px;
+                        " onchange="
+                            document
+                                .getElementById(
+                                    'bankFlowPeriodForm'
+                                )
+                                .submit();
+                        ">
+
+                                        <option value="7days" <?= $bankFlowPeriod === '7days'
+                                                                    ? 'selected'
+                                                                    : ''
+                                                                ?>>
+                                            7 derniers jours
+                                        </option>
+
+                                        <option value="30days" <?= $bankFlowPeriod === '30days'
+                                                                    ? 'selected'
+                                                                    : ''
+                                                                ?>>
+                                            30 derniers jours
+                                        </option>
+
+                                        <option value="month" <?= $bankFlowPeriod === 'month'
+                                                                    ? 'selected'
+                                                                    : ''
+                                                                ?>>
+                                            Ce mois
+                                        </option>
+
+                                        <option value="year" <?= $bankFlowPeriod === 'year'
+                                                                    ? 'selected'
+                                                                    : ''
+                                                                ?>>
+                                            Cette année
+                                        </option>
+
+                                    </select>
+
+                                </form>
 
                             </div>
 
                             <div class="bank-card-body">
 
+                                <?php
+
+                                $bankFlowTotalIncome = array_sum(
+                                    $bankFlowEvolution['incomes']
+                                );
+
+                                $bankFlowTotalExpense = array_sum(
+                                    $bankFlowEvolution['expenses']
+                                );
+
+                                $bankFlowNet =
+                                    $bankFlowTotalIncome
+                                    - $bankFlowTotalExpense;
+
+                                ?>
+
+                                <div class="bank-flow-summary">
+
+                                    <div class="bank-flow-summary-item">
+
+                                        <span>
+                                            Encaissements
+                                        </span>
+
+                                        <strong class="text-success">
+
+                                            + <?= number_format(
+                                                    $bankFlowTotalIncome,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                            BIF
+
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="bank-flow-summary-item">
+
+                                        <span>
+                                            Décaissements
+                                        </span>
+
+                                        <strong class="text-danger">
+
+                                            - <?= number_format(
+                                                    $bankFlowTotalExpense,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                            BIF
+
+                                        </strong>
+
+                                    </div>
+
+                                    <div class="bank-flow-summary-item">
+
+                                        <span>
+                                            Flux net
+                                        </span>
+
+                                        <strong class="<?= $bankFlowNet >= 0
+                                                            ? 'text-success'
+                                                            : 'text-danger'
+                                                        ?>">
+
+                                            <?= $bankFlowNet >= 0
+                                                ? '+ '
+                                                : '- '
+                                            ?>
+
+                                            <?= number_format(
+                                                abs($bankFlowNet),
+                                                0,
+                                                ',',
+                                                ' '
+                                            ) ?>
+
+                                            BIF
+
+                                        </strong>
+
+                                    </div>
+
+                                </div>
+
                                 <div class="bank-chart-wrapper">
+
                                     <canvas id="bankFlowChart"></canvas>
+
                                 </div>
 
                             </div>
@@ -1309,6 +1822,9 @@ $bankAccountOldInput =
 
                     </div>
 
+                    <!-- =================================================
+         RÉPARTITION PAR BANQUE
+    ================================================== -->
                     <div class="col-xl-4 col-lg-4">
 
                         <div class="bank-card">
@@ -1316,14 +1832,21 @@ $bankAccountOldInput =
                             <div class="bank-card-header">
 
                                 <div>
+
                                     <h5 class="bank-card-title">
+
                                         <i class="fas fa-chart-pie"></i>
+
                                         Répartition par banque
+
                                     </h5>
 
                                     <span class="bank-card-subtitle">
+
                                         Solde disponible par établissement bancaire.
+
                                     </span>
+
                                 </div>
 
                             </div>
@@ -1332,77 +1855,98 @@ $bankAccountOldInput =
 
                                 <div class="bank-balance-list">
 
-                                    <div class="bank-balance-item">
+                                    <?php if (
+                                        !empty($bankBalanceDistribution)
+                                    ): ?>
 
-                                        <div class="bank-balance-item-top">
-                                            <span class="bank-balance-name">
-                                                CRDB Bank
-                                            </span>
-
-                                            <span class="bank-balance-amount">
-                                                210 500 000 BIF
-                                            </span>
-                                        </div>
-
-                                        <div class="bank-balance-progress">
-                                            <span style="width: 100%;"></span>
-                                        </div>
-
-                                    </div>
+                                    <?php foreach (
+                                            $bankBalanceDistribution
+                                            as $bankDistribution
+                                        ): ?>
 
                                     <div class="bank-balance-item">
 
                                         <div class="bank-balance-item-top">
+
                                             <span class="bank-balance-name">
-                                                BANCOBU
+
+                                                <?= html_escape(
+                                                            $bankDistribution['bank_name']
+                                                        ) ?>
+
+                                                <small class="d-block text-muted" style="font-size: 8px;">
+
+                                                    <?= (int) $bankDistribution['account_count'] ?>
+
+                                                    compte<?= $bankDistribution['account_count'] > 1
+                                                                        ? 's'
+                                                                        : ''
+                                                                    ?>
+
+                                                </small>
+
                                             </span>
 
                                             <span class="bank-balance-amount">
-                                                125 000 000 BIF
+
+                                                <?= number_format(
+                                                            $bankDistribution['total_balance'],
+                                                            0,
+                                                            ',',
+                                                            ' '
+                                                        ) ?>
+
+                                                BIF
+
                                             </span>
+
                                         </div>
 
                                         <div class="bank-balance-progress">
-                                            <span style="width: 59%;"></span>
+                                            <span style="width: <?= number_format(
+                                                                            max(
+                                                                                0,
+                                                                                min(
+                                                                                    100,
+                                                                                    (float) $bankDistribution['percentage']
+                                                                                )
+                                                                            ),
+                                                                            2,
+                                                                            '.',
+                                                                            ''
+                                                                        ) ?>%;"></span>
                                         </div>
 
                                     </div>
 
-                                    <div class="bank-balance-item">
+                                    <?php endforeach; ?>
 
-                                        <div class="bank-balance-item-top">
-                                            <span class="bank-balance-name">
-                                                ECOBANK
-                                            </span>
+                                    <?php else: ?>
 
-                                            <span class="bank-balance-amount">
-                                                95 250 000 BIF
-                                            </span>
-                                        </div>
+                                    <div class="text-center py-4">
 
-                                        <div class="bank-balance-progress">
-                                            <span style="width: 45%;"></span>
-                                        </div>
+                                        <i class="
+                                    fas
+                                    fa-university
+                                    fa-2x
+                                    text-muted
+                                    mb-2
+                                "></i>
 
-                                    </div>
+                                        <h6>
+                                            Aucun compte bancaire
+                                        </h6>
 
-                                    <div class="bank-balance-item">
+                                        <p class="text-muted mb-0">
 
-                                        <div class="bank-balance-item-top">
-                                            <span class="bank-balance-name">
-                                                KCB Bank
-                                            </span>
+                                            Aucun compte actif en BIF
+                                            n’a été trouvé.
 
-                                            <span class="bank-balance-amount">
-                                                55 000 000 BIF
-                                            </span>
-                                        </div>
-
-                                        <div class="bank-balance-progress">
-                                            <span style="width: 26%;"></span>
-                                        </div>
+                                        </p>
 
                                     </div>
+
+                                    <?php endif; ?>
 
                                 </div>
 
@@ -1416,29 +1960,42 @@ $bankAccountOldInput =
 
 
                 <!-- =====================================================
-         FILTRES
-    ====================================================== -->
+     FILTRES DES COMPTES BANCAIRES
+====================================================== -->
                 <div class="bank-filter-box">
 
-                    <div class="row align-items-end">
+                    <form action="<?= base_url('finance/banques') ?>" method="get" id="bankAccountFilterForm">
 
-                        <div class="col-xl-3 col-lg-3 col-md-6">
+                        <div class="row align-items-end">
 
-                            <div class="form-group mb-lg-0">
+                            <!-- =================================================
+                 RECHERCHE
+            ================================================== -->
+                            <div class="col-xl-3 col-lg-3 col-md-6">
 
-                                <label>
-                                    Rechercher un compte
-                                </label>
+                                <div class="form-group mb-lg-0">
 
-                                <div class="input-group">
+                                    <label for="bankSearch">
+                                        Rechercher un compte
+                                    </label>
 
-                                    <input type="text" class="form-control" placeholder="Banque, numéro ou intitulé...">
+                                    <div class="input-group">
 
-                                    <div class="input-group-append">
+                                        <input type="text" name="search" id="bankSearch" class="form-control" value="<?= html_escape(
+                                                        $bankFilters['search'] ?? ''
+                                                    ) ?>" placeholder="Banque, numéro ou intitulé..."
+                                            autocomplete="off">
 
-                                        <span class="input-group-text" style="border-radius: 0 8px 8px 0;">
-                                            <i class="fas fa-search"></i>
-                                        </span>
+                                        <div class="input-group-append">
+
+                                            <button type="submit" class="input-group-text" style="
+                                    border-radius: 0 8px 8px 0;
+                                    cursor: pointer;
+                                " title="Rechercher">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+
+                                        </div>
 
                                     </div>
 
@@ -1446,121 +2003,455 @@ $bankAccountOldInput =
 
                             </div>
 
-                        </div>
+                            <!-- =================================================
+                 BANQUE
+            ================================================== -->
+                            <div class="col-xl-2 col-lg-2 col-md-6">
 
-                        <div class="col-xl-2 col-lg-2 col-md-6">
+                                <div class="form-group mb-lg-0">
 
-                            <div class="form-group mb-lg-0">
+                                    <label for="bankNameFilter">
+                                        Banque
+                                    </label>
 
-                                <label>
-                                    Banque
-                                </label>
+                                    <select name="bank_name" id="bankNameFilter" class="form-control">
 
-                                <select class="form-control">
-                                    <option value="">Toutes les banques</option>
-                                    <option>CRDB Bank</option>
-                                    <option>BANCOBU</option>
-                                    <option>ECOBANK</option>
-                                    <option>KCB Bank</option>
-                                </select>
+                                        <option value="">
+                                            Toutes les banques
+                                        </option>
+
+                                        <?php if (!empty($availableBanks)): ?>
+
+                                        <?php foreach ($availableBanks as $bank): ?>
+
+                                        <?php
+
+                                                $bankName = is_object($bank)
+                                                    ? $bank->bank_name
+                                                    : $bank['bank_name'];
+
+                                                ?>
+
+                                        <option value="<?= html_escape($bankName) ?>" <?= (
+                                                        ($bankFilters['bank_name'] ?? '')
+                                                        === $bankName
+                                                    )
+                                                        ? 'selected'
+                                                        : ''
+                                                    ?>>
+                                            <?= html_escape($bankName) ?>
+                                        </option>
+
+                                        <?php endforeach; ?>
+
+                                        <?php endif; ?>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <!-- =================================================
+                 DEVISE
+            ================================================== -->
+                            <div class="col-xl-2 col-lg-2 col-md-6">
+
+                                <div class="form-group mb-lg-0">
+
+                                    <label for="bankCurrencyFilter">
+                                        Devise
+                                    </label>
+
+                                    <select name="currency" id="bankCurrencyFilter" class="form-control">
+
+                                        <option value="">
+                                            Toutes
+                                        </option>
+
+                                        <option value="BIF" <?= (
+                                                ($bankFilters['currency'] ?? '')
+                                                === 'BIF'
+                                            )
+                                                ? 'selected'
+                                                : ''
+                                            ?>>
+                                            BIF
+                                        </option>
+
+                                        <option value="USD" <?= (
+                                                ($bankFilters['currency'] ?? '')
+                                                === 'USD'
+                                            )
+                                                ? 'selected'
+                                                : ''
+                                            ?>>
+                                            USD
+                                        </option>
+
+                                        <option value="EUR" <?= (
+                                                ($bankFilters['currency'] ?? '')
+                                                === 'EUR'
+                                            )
+                                                ? 'selected'
+                                                : ''
+                                            ?>>
+                                            EUR
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <!-- =================================================
+                 STATUT
+            ================================================== -->
+                            <div class="col-xl-2 col-lg-2 col-md-6">
+
+                                <div class="form-group mb-lg-0">
+
+                                    <label for="bankStatusFilter">
+                                        Statut
+                                    </label>
+
+                                    <select name="status" id="bankStatusFilter" class="form-control">
+
+                                        <option value="">
+                                            Tous
+                                        </option>
+
+                                        <option value="active" <?= (
+                                                ($bankFilters['status'] ?? '')
+                                                === 'active'
+                                            )
+                                                ? 'selected'
+                                                : ''
+                                            ?>>
+                                            Actif
+                                        </option>
+
+                                        <option value="inactive" <?= (
+                                                ($bankFilters['status'] ?? '')
+                                                === 'inactive'
+                                            )
+                                                ? 'selected'
+                                                : ''
+                                            ?>>
+                                            Inactif
+                                        </option>
+
+                                        <option value="blocked" <?= (
+                                                ($bankFilters['status'] ?? '')
+                                                === 'blocked'
+                                            )
+                                                ? 'selected'
+                                                : ''
+                                            ?>>
+                                            Bloqué
+                                        </option>
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+                            <div class="col-xl-3 col-lg-3 col-md-12">
+
+                                <div class="bank-filter-actions">
+
+                                    <button type="submit" class="btn btn-bank-primary mr-1">
+                                        <i class="fas fa-filter mr-1"></i>
+                                        Appliquer
+                                    </button>
+
+                                    <a href="<?= base_url('finance/banques') ?>" class="btn btn-bank-outline">
+                                        <i class="fas fa-redo mr-1"></i>
+                                        Réinitialiser
+                                    </a>
+
+                                </div>
 
                             </div>
 
                         </div>
 
-                        <div class="col-xl-2 col-lg-2 col-md-6">
-
-                            <div class="form-group mb-lg-0">
-
-                                <label>
-                                    Devise
-                                </label>
-
-                                <select class="form-control">
-                                    <option value="">Toutes</option>
-                                    <option value="BIF">BIF</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-xl-2 col-lg-2 col-md-6">
-
-                            <div class="form-group mb-lg-0">
-
-                                <label>
-                                    Statut
-                                </label>
-
-                                <select class="form-control">
-                                    <option value="">Tous</option>
-                                    <option value="active">Actif</option>
-                                    <option value="inactive">Inactif</option>
-                                    <option value="blocked">Bloqué</option>
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-xl-3 col-lg-3 col-md-12">
-
-                            <div class="bank-filter-actions">
-
-                                <button class="btn btn-bank-primary mr-1">
-                                    <i class="fas fa-filter mr-1"></i>
-                                    Appliquer
-                                </button>
-
-                                <button class="btn btn-bank-outline">
-                                    <i class="fas fa-redo mr-1"></i>
-                                    Réinitialiser
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </div>
+                    </form>
 
                 </div>
 
+                <?php
+
+                /**
+                 * Formate un montant de manière compacte.
+                 *
+                 * Exemples :
+                 * 95 500 000 => 95,5 M
+                 * 425 000    => 425 K
+                 * 8 500      => 8 500
+                 */
+                if (!function_exists('formatBankCompactAmount')) {
+                    function formatBankCompactAmount($amount): string
+                    {
+                        $amount = (float) $amount;
+
+                        if (abs($amount) >= 1000000000) {
+                            return number_format(
+                                $amount / 1000000000,
+                                1,
+                                ',',
+                                ' '
+                            ) . ' Md';
+                        }
+
+                        if (abs($amount) >= 1000000) {
+                            return number_format(
+                                $amount / 1000000,
+                                1,
+                                ',',
+                                ' '
+                            ) . ' M';
+                        }
+
+                        if (abs($amount) >= 100000) {
+                            return number_format(
+                                $amount / 1000,
+                                0,
+                                ',',
+                                ' '
+                            ) . ' K';
+                        }
+
+                        return number_format(
+                            $amount,
+                            0,
+                            ',',
+                            ' '
+                        );
+                    }
+                }
+
+                ?>
+
 
                 <!-- =====================================================
-         LISTE DES COMPTES
-    ====================================================== -->
+                    LISTE DES COMPTES BANCAIRES
+                ====================================================== -->
                 <div class="bank-card">
 
                     <div class="bank-card-header">
 
                         <div>
+
                             <h5 class="bank-card-title">
+
                                 <i class="fas fa-university"></i>
+
                                 Situation des comptes bancaires
+
                             </h5>
 
                             <span class="bank-card-subtitle">
-                                Soldes, mouvements et informations des comptes actifs.
+
+                                Soldes, mouvements et informations des comptes bancaires.
+
                             </span>
+
                         </div>
 
                         <span class="badge badge-success">
-                            6 comptes actifs
+
+                            <?= (int) $activeBankAccountsCount ?>
+
+                            compte<?= $activeBankAccountsCount > 1
+                                        ? 's'
+                                        : ''
+                                    ?>
+
+                            actif<?= $activeBankAccountsCount > 1
+                                        ? 's'
+                                        : ''
+                                    ?>
+
                         </span>
 
                     </div>
 
                     <div class="bank-card-body pb-1">
 
+                        <?php if (
+                            !empty($bankAccountSituations)
+                        ): ?>
+
                         <div class="row">
 
-                            <!-- CRDB BIF -->
-                            <div class="col-xl-4 col-lg-6 col-md-6">
+                            <?php foreach (
+                                    $bankAccountSituations
+                                    as $bankAccount
+                                ): ?>
 
-                                <div class="bank-account-card">
+                            <?php
+
+                                    /*
+                     * =========================================
+                     * BANQUE
+                     * =========================================
+                     */
+
+                                    $bankLabels = [
+                                        'CRDB' =>
+                                        'CRDB Bank',
+
+                                        'BANCOBU' =>
+                                        'BANCOBU',
+
+                                        'ECOBANK' =>
+                                        'ECOBANK',
+
+                                        'KCB' =>
+                                        'KCB Bank',
+
+                                        'BCB' =>
+                                        'BCB',
+
+                                        'BHB' =>
+                                        'BHB',
+
+                                        'INTERBANK' =>
+                                        'Interbank Burundi',
+                                    ];
+
+                                    $displayBankName =
+                                        $bankLabels[$bankAccount->bank_name]
+                                        ?? $bankAccount->bank_name;
+
+                                    /*
+                     * =========================================
+                     * TYPE DE COMPTE
+                     * =========================================
+                     */
+
+                                    $accountTypeLabels = [
+                                        'courant' =>
+                                        'Compte courant',
+
+                                        'epargne' =>
+                                        'Compte épargne',
+
+                                        'garantie' =>
+                                        'Compte de garantie',
+
+                                        'projet' =>
+                                        'Compte projet',
+
+                                        'credit' =>
+                                        'Ligne de crédit',
+                                    ];
+
+                                    $displayAccountType =
+                                        $accountTypeLabels[$bankAccount->account_type]
+                                        ?? ucfirst(
+                                            $bankAccount->account_type
+                                        );
+
+                                    /*
+                     * =========================================
+                     * STATUT
+                     * =========================================
+                     */
+
+                                    $statusClass =
+                                        'inactive';
+
+                                    $statusLabel =
+                                        'Inactif';
+
+                                    if (
+                                        $bankAccount->status
+                                        === 'active'
+                                    ) {
+                                        $statusClass =
+                                            'active';
+
+                                        $statusLabel =
+                                            'Actif';
+                                    } elseif (
+                                        $bankAccount->status
+                                        === 'blocked'
+                                    ) {
+                                        $statusClass =
+                                            'blocked';
+
+                                        $statusLabel =
+                                            'Bloqué';
+                                    }
+
+                                    /*
+                     * =========================================
+                     * LIBELLÉ DU SOLDE
+                     * =========================================
+                     */
+
+                                    $balanceLabel =
+                                        $bankAccount->account_type
+                                        === 'garantie'
+                                        ? 'Solde réservé'
+                                        : 'Solde disponible';
+
+                                    /*
+                     * =========================================
+                     * ICÔNE DE LA DEVISE
+                     * =========================================
+                     */
+
+                                    $currencyIcon =
+                                        'fas fa-money-bill';
+
+                                    if (
+                                        $bankAccount->currency
+                                        === 'USD'
+                                    ) {
+                                        $currencyIcon =
+                                            'fas fa-dollar-sign';
+                                    } elseif (
+                                        $bankAccount->currency
+                                        === 'EUR'
+                                    ) {
+                                        $currencyIcon =
+                                            'fas fa-euro-sign';
+                                    }
+
+                                    /*
+                     * =========================================
+                     * BOUTON JOURNAL
+                     * =========================================
+                     */
+
+                                    $showJournalButton =
+                                        (int) $bankAccount
+                                            ->monthly_operations > 0;
+
+                                    ?>
+
+                            <div class="
+                            col-xl-4
+                            col-lg-6
+                            col-md-6
+                        ">
+
+                                <div class="
+                                bank-account-card
+                                <?= $bankAccount->status
+                                        === 'blocked'
+                                        ? 'bank-account-card-blocked'
+                                        : ''
+                                ?>
+                            ">
 
                                     <div class="bank-account-card-top">
 
@@ -1569,49 +2460,154 @@ $bankAccountOldInput =
                                             <div class="bank-account-name">
 
                                                 <div class="bank-logo-box">
-                                                    <i class="fas fa-university"></i>
+
+                                                    <i class="
+                                                    fas
+                                                    fa-university
+                                                "></i>
+
                                                 </div>
 
                                                 <div>
-                                                    <h6>CRDB BIF</h6>
 
-                                                    <div class="bank-account-number">
-                                                        0151001002456
+                                                    <h6 title="<?= html_escape(
+                                                                            $bankAccount->name
+                                                                        ) ?>">
+
+                                                        <?= html_escape(
+                                                                    $bankAccount->name
+                                                                ) ?>
+
+                                                    </h6>
+
+                                                    <div class="
+                                                    bank-account-number
+                                                ">
+
+                                                        <?= html_escape(
+                                                                    $bankAccount
+                                                                        ->account_number
+                                                                ) ?>
+
                                                     </div>
+
+                                                    <div class="
+                                                    bank-account-code
+                                                ">
+
+                                                        <?= html_escape(
+                                                                    $bankAccount->code
+                                                                ) ?>
+
+                                                    </div>
+
                                                 </div>
 
                                             </div>
 
-                                            <span class="bank-account-status active">
-                                                Actif
+                                            <span class="
+                                            bank-account-status
+                                            <?= html_escape(
+                                                $statusClass
+                                            ) ?>
+                                        ">
+
+                                                <?= html_escape(
+                                                            $statusLabel
+                                                        ) ?>
+
                                             </span>
 
                                         </div>
 
-                                        <div class="bank-account-balance-label">
-                                            Solde disponible
+                                        <div class="
+                                        bank-account-balance-label
+                                    ">
+
+                                            <?= html_escape(
+                                                        $balanceLabel
+                                                    ) ?>
+
                                         </div>
 
-                                        <div class="bank-account-balance">
-                                            185 500 000 BIF
+                                        <div class="
+                                        bank-account-balance
+                                    ">
+
+                                            <?= number_format(
+                                                        (float) $bankAccount
+                                                            ->current_balance,
+                                                        0,
+                                                        ',',
+                                                        ' '
+                                                    ) ?>
+
+                                            <?= html_escape(
+                                                        $bankAccount->currency
+                                                    ) ?>
+
                                         </div>
 
                                         <div class="bank-account-meta">
 
                                             <span>
-                                                <i class="fas fa-building"></i>
-                                                CRDB Bank
+
+                                                <i class="
+                                                fas
+                                                fa-building
+                                            "></i>
+
+                                                <?= html_escape(
+                                                            $displayBankName
+                                                        ) ?>
+
                                             </span>
 
                                             <span>
-                                                <i class="fas fa-money-bill"></i>
-                                                BIF
+
+                                                <i class="<?= html_escape(
+                                                                        $currencyIcon
+                                                                    ) ?>"></i>
+
+                                                <?= html_escape(
+                                                            $bankAccount->currency
+                                                        ) ?>
+
                                             </span>
 
                                             <span>
-                                                <i class="fas fa-tag"></i>
-                                                Compte courant
+
+                                                <i class="
+                                                fas
+                                                fa-tag
+                                            "></i>
+
+                                                <?= html_escape(
+                                                            $displayAccountType
+                                                        ) ?>
+
                                             </span>
+
+                                            <?php if (
+                                                        !empty($bankAccount
+                                                            ->branch_name)
+                                                    ): ?>
+
+                                            <span>
+
+                                                <i class="
+                                                    fas
+                                                    fa-map-marker-alt
+                                                "></i>
+
+                                                <?= html_escape(
+                                                                $bankAccount
+                                                                    ->branch_name
+                                                            ) ?>
+
+                                            </span>
+
+                                            <?php endif; ?>
 
                                         </div>
 
@@ -1619,36 +2615,107 @@ $bankAccountOldInput =
 
                                     <div class="bank-account-footer">
 
-                                        <div class="bank-account-footer-item">
-                                            <span>Entrées mois</span>
-                                            <strong>95,5 M</strong>
+                                        <div class="
+                                        bank-account-footer-item
+                                    ">
+
+                                            <span>
+                                                Entrées mois
+                                            </span>
+
+                                            <strong class="text-success">
+
+                                                <?= formatBankCompactAmount(
+                                                            $bankAccount
+                                                                ->monthly_entries
+                                                        ) ?>
+
+                                            </strong>
+
                                         </div>
 
-                                        <div class="bank-account-footer-item">
-                                            <span>Sorties mois</span>
-                                            <strong>68,2 M</strong>
+                                        <div class="
+                                        bank-account-footer-item
+                                    ">
+
+                                            <span>
+                                                Sorties mois
+                                            </span>
+
+                                            <strong class="text-danger">
+
+                                                <?= formatBankCompactAmount(
+                                                            $bankAccount
+                                                                ->monthly_outputs
+                                                        ) ?>
+
+                                            </strong>
+
                                         </div>
 
-                                        <div class="bank-account-footer-item">
-                                            <span>Opérations</span>
-                                            <strong>48</strong>
+                                        <div class="
+                                        bank-account-footer-item
+                                    ">
+
+                                            <span>
+                                                Opérations
+                                            </span>
+
+                                            <strong>
+
+                                                <?= (int) $bankAccount
+                                                            ->monthly_operations
+                                                        ?>
+
+                                            </strong>
+
                                         </div>
 
                                     </div>
 
                                     <div class="bank-account-actions">
 
-                                        <button class="bank-table-action" title="Voir">
+                                        <!-- Voir -->
+                                        <button type="button" class="
+                                        bank-table-action
+                                        btn-view-bank-account
+                                    " title="Voir le compte" onclick="viewBankAccount(
+                                        <?= (int) $bankAccount->id ?>
+                                    )">
+
                                             <i class="fas fa-eye"></i>
+
                                         </button>
 
-                                        <button class="bank-table-action" title="Modifier">
+                                        <!-- Modifier -->
+                                        <button type="button" class="
+                                        bank-table-action
+                                        btn-edit-bank-account
+                                    " title="Modifier le compte" onclick="editBankAccount(
+                                        <?= (int) $bankAccount->id ?>
+                                    )">
+
                                             <i class="fas fa-edit"></i>
+
                                         </button>
 
-                                        <button class="bank-table-action" title="Journal">
+                                        <!-- Journal -->
+                                        <?php if (
+                                                    $showJournalButton
+                                                ): ?>
+
+                                        <a href="<?= base_url(
+                                                                    'finance/banques/journal/'
+                                                                        . (int) $bankAccount->id
+                                                                ) ?>" class="
+                                            bank-table-action
+                                        " title="Voir le journal">
+
                                             <i class="fas fa-list"></i>
-                                        </button>
+
+                                        </a>
+
+                                        <?php endif; ?>
 
                                     </div>
 
@@ -1656,504 +2723,50 @@ $bankAccountOldInput =
 
                             </div>
 
-                            <!-- CRDB USD -->
-                            <div class="col-xl-4 col-lg-6 col-md-6">
-
-                                <div class="bank-account-card">
-
-                                    <div class="bank-account-card-top">
-
-                                        <div class="bank-account-header">
-
-                                            <div class="bank-account-name">
-
-                                                <div class="bank-logo-box">
-                                                    <i class="fas fa-university"></i>
-                                                </div>
-
-                                                <div>
-                                                    <h6>CRDB USD</h6>
-
-                                                    <div class="bank-account-number">
-                                                        0151001006892
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                            <span class="bank-account-status active">
-                                                Actif
-                                            </span>
-
-                                        </div>
-
-                                        <div class="bank-account-balance-label">
-                                            Solde disponible
-                                        </div>
-
-                                        <div class="bank-account-balance">
-                                            8 500 USD
-                                        </div>
-
-                                        <div class="bank-account-meta">
-
-                                            <span>
-                                                <i class="fas fa-building"></i>
-                                                CRDB Bank
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-dollar-sign"></i>
-                                                USD
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-tag"></i>
-                                                Compte courant
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-footer">
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Entrées mois</span>
-                                            <strong>12 500</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Sorties mois</span>
-                                            <strong>6 200</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Opérations</span>
-                                            <strong>16</strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-actions">
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-list"></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <!-- ECOBANK -->
-                            <div class="col-xl-4 col-lg-6 col-md-6">
-
-                                <div class="bank-account-card">
-
-                                    <div class="bank-account-card-top">
-
-                                        <div class="bank-account-header">
-
-                                            <div class="bank-account-name">
-
-                                                <div class="bank-logo-box">
-                                                    <i class="fas fa-university"></i>
-                                                </div>
-
-                                                <div>
-                                                    <h6>ECOBANK BIF</h6>
-
-                                                    <div class="bank-account-number">
-                                                        001458963247
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                            <span class="bank-account-status active">
-                                                Actif
-                                            </span>
-
-                                        </div>
-
-                                        <div class="bank-account-balance-label">
-                                            Solde disponible
-                                        </div>
-
-                                        <div class="bank-account-balance">
-                                            95 250 000 BIF
-                                        </div>
-
-                                        <div class="bank-account-meta">
-
-                                            <span>
-                                                <i class="fas fa-building"></i>
-                                                ECOBANK
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-money-bill"></i>
-                                                BIF
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-tag"></i>
-                                                Compte courant
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-footer">
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Entrées mois</span>
-                                            <strong>42,3 M</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Sorties mois</span>
-                                            <strong>31,8 M</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Opérations</span>
-                                            <strong>27</strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-actions">
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-list"></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <!-- BANCOBU -->
-                            <div class="col-xl-4 col-lg-6 col-md-6">
-
-                                <div class="bank-account-card">
-
-                                    <div class="bank-account-card-top">
-
-                                        <div class="bank-account-header">
-
-                                            <div class="bank-account-name">
-
-                                                <div class="bank-logo-box">
-                                                    <i class="fas fa-university"></i>
-                                                </div>
-
-                                                <div>
-                                                    <h6>BANCOBU BIF</h6>
-
-                                                    <div class="bank-account-number">
-                                                        202658710236
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                            <span class="bank-account-status active">
-                                                Actif
-                                            </span>
-
-                                        </div>
-
-                                        <div class="bank-account-balance-label">
-                                            Solde disponible
-                                        </div>
-
-                                        <div class="bank-account-balance">
-                                            125 000 000 BIF
-                                        </div>
-
-                                        <div class="bank-account-meta">
-
-                                            <span>
-                                                <i class="fas fa-building"></i>
-                                                BANCOBU
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-money-bill"></i>
-                                                BIF
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-tag"></i>
-                                                Compte courant
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-footer">
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Entrées mois</span>
-                                            <strong>62,5 M</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Sorties mois</span>
-                                            <strong>45,2 M</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Opérations</span>
-                                            <strong>32</strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-actions">
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-list"></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <!-- KCB -->
-                            <div class="col-xl-4 col-lg-6 col-md-6">
-
-                                <div class="bank-account-card">
-
-                                    <div class="bank-account-card-top">
-
-                                        <div class="bank-account-header">
-
-                                            <div class="bank-account-name">
-
-                                                <div class="bank-logo-box">
-                                                    <i class="fas fa-university"></i>
-                                                </div>
-
-                                                <div>
-                                                    <h6>KCB USD</h6>
-
-                                                    <div class="bank-account-number">
-                                                        321785469001
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                            <span class="bank-account-status active">
-                                                Actif
-                                            </span>
-
-                                        </div>
-
-                                        <div class="bank-account-balance-label">
-                                            Solde disponible
-                                        </div>
-
-                                        <div class="bank-account-balance">
-                                            17 600 USD
-                                        </div>
-
-                                        <div class="bank-account-meta">
-
-                                            <span>
-                                                <i class="fas fa-building"></i>
-                                                KCB Bank
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-dollar-sign"></i>
-                                                USD
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-tag"></i>
-                                                Compte courant
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-footer">
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Entrées mois</span>
-                                            <strong>24 000</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Sorties mois</span>
-                                            <strong>13 400</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Opérations</span>
-                                            <strong>21</strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-actions">
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-list"></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <!-- Compte bloqué -->
-                            <div class="col-xl-4 col-lg-6 col-md-6">
-
-                                <div class="bank-account-card">
-
-                                    <div class="bank-account-card-top">
-
-                                        <div class="bank-account-header">
-
-                                            <div class="bank-account-name">
-
-                                                <div class="bank-logo-box">
-                                                    <i class="fas fa-university"></i>
-                                                </div>
-
-                                                <div>
-                                                    <h6>CRDB Garantie</h6>
-
-                                                    <div class="bank-account-number">
-                                                        0151001009002
-                                                    </div>
-                                                </div>
-
-                                            </div>
-
-                                            <span class="bank-account-status blocked">
-                                                Bloqué
-                                            </span>
-
-                                        </div>
-
-                                        <div class="bank-account-balance-label">
-                                            Solde réservé
-                                        </div>
-
-                                        <div class="bank-account-balance">
-                                            25 000 000 BIF
-                                        </div>
-
-                                        <div class="bank-account-meta">
-
-                                            <span>
-                                                <i class="fas fa-building"></i>
-                                                CRDB Bank
-                                            </span>
-
-                                            <span>
-                                                <i class="fas fa-lock"></i>
-                                                Compte de garantie
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-footer">
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Entrées mois</span>
-                                            <strong>0</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Sorties mois</span>
-                                            <strong>0</strong>
-                                        </div>
-
-                                        <div class="bank-account-footer-item">
-                                            <span>Opérations</span>
-                                            <strong>0</strong>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="bank-account-actions">
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="bank-table-action">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
+                            <?php endforeach; ?>
 
                         </div>
+
+                        <?php else: ?>
+
+                        <div class="bank-empty-state">
+
+                            <div class="bank-empty-state-icon">
+
+                                <i class="fas fa-university"></i>
+
+                            </div>
+
+                            <h5>
+                                Aucun compte bancaire
+                            </h5>
+
+                            <p>
+                                Aucun compte bancaire n’a encore été enregistré.
+                            </p>
+
+                            <button type="button" class="btn btn-bank-primary" data-toggle="modal"
+                                data-target="#addBankAccountModal">
+
+                                <i class="fas fa-plus mr-1"></i>
+
+                                Créer un compte bancaire
+
+                            </button>
+
+                        </div>
+
+                        <?php endif; ?>
 
                     </div>
 
                 </div>
 
 
-                <!-- =====================================================
-         MOUVEMENTS RÉCENTS + ALERTES
-    ====================================================== -->
                 <div class="row">
-
+                    <!-- =====================================================
+                    MOUVEMENTS BANCAIRES RÉCENTS
+                ====================================================== -->
                     <div class="col-xl-8 col-lg-8">
 
                         <div class="bank-card">
@@ -2161,20 +2774,32 @@ $bankAccountOldInput =
                             <div class="bank-card-header">
 
                                 <div>
+
                                     <h5 class="bank-card-title">
+
                                         <i class="fas fa-exchange-alt"></i>
+
                                         Mouvements bancaires récents
+
                                     </h5>
 
                                     <span class="bank-card-subtitle">
-                                        Derniers virements, dépôts, retraits et transferts.
+
+                                        Derniers virements, dépôts, retraits et transferts enregistrés.
+
                                     </span>
+
                                 </div>
 
-                                <button class="btn btn-bank-outline">
+                                <a href="<?= base_url(
+                                                'finance/banques/journal'
+                                            ) ?>" class="btn btn-bank-outline">
+
                                     <i class="fas fa-list mr-1"></i>
+
                                     Voir tout le journal
-                                </button>
+
+                                </a>
 
                             </div>
 
@@ -2183,277 +2808,640 @@ $bankAccountOldInput =
                                 <table class="table bank-table">
 
                                     <thead>
+
                                         <tr>
+
                                             <th>#</th>
+
                                             <th>Date</th>
+
                                             <th>Référence</th>
+
                                             <th>Compte</th>
+
                                             <th>Type</th>
+
                                             <th>Libellé</th>
-                                            <th class="text-right">Débit</th>
-                                            <th class="text-right">Crédit</th>
+
+                                            <th class="text-right">
+                                                Débit
+                                            </th>
+
+                                            <th class="text-right">
+                                                Crédit
+                                            </th>
+
                                             <th>Statut</th>
-                                            <th class="text-center">Actions</th>
+
+                                            <th class="text-center">
+                                                Actions
+                                            </th>
+
                                         </tr>
+
                                     </thead>
 
                                     <tbody>
 
+                                        <?php if (
+                                            !empty($recentBankOperations)
+                                        ): ?>
+
+                                        <?php foreach (
+                                                $recentBankOperations
+                                                as $index => $operation
+                                            ): ?>
+
+                                        <?php
+
+                                                /*
+                                            * =====================================
+                                            * INFORMATIONS DU COMPTE À AFFICHER
+                                            * =====================================
+                                            */
+
+                                                $accountName =
+                                                    'Compte bancaire';
+
+                                                $accountNumber =
+                                                    '—';
+
+                                                $accountCode =
+                                                    '';
+
+                                                /*
+                                            * Encaissement :
+                                            * le compte destination reçoit l'argent.
+                                            */
+                                                if (
+                                                    $operation->operation_type
+                                                    === 'encaissement'
+                                                ) {
+                                                    $accountName =
+                                                        $operation
+                                                        ->destination_account_name
+                                                        ?: 'Compte destination';
+
+                                                    $accountNumber =
+                                                        $operation
+                                                        ->destination_account_number
+                                                        ?: '—';
+
+                                                    $accountCode =
+                                                        $operation
+                                                        ->destination_account_code
+                                                        ?: '';
+                                                }
+
+                                                /*
+                                            * Décaissement et transfert :
+                                            * le compte source fournit l'argent.
+                                            */
+                                                if (
+                                                    in_array(
+                                                        $operation->operation_type,
+                                                        [
+                                                            'decaissement',
+                                                            'transfert',
+                                                        ],
+                                                        true
+                                                    )
+                                                ) {
+                                                    $accountName =
+                                                        $operation
+                                                        ->source_account_name
+                                                        ?: 'Compte source';
+
+                                                    $accountNumber =
+                                                        $operation
+                                                        ->source_account_number
+                                                        ?: '—';
+
+                                                    $accountCode =
+                                                        $operation
+                                                        ->source_account_code
+                                                        ?: '';
+                                                }
+
+                                                /*
+                                            * =====================================
+                                            * TYPE D'OPÉRATION
+                                            * =====================================
+                                            */
+
+                                                $operationTypeLabel =
+                                                    'Opération';
+
+                                                $operationBadgeClass =
+                                                    'transfer';
+
+                                                $operationIcon =
+                                                    'fas fa-exchange-alt';
+
+                                                if (
+                                                    $operation->operation_type
+                                                    === 'encaissement'
+                                                ) {
+                                                    $operationTypeLabel =
+                                                        'Crédit';
+
+                                                    $operationBadgeClass =
+                                                        'credit';
+
+                                                    $operationIcon =
+                                                        'fas fa-arrow-down';
+                                                } elseif (
+                                                    $operation->operation_type
+                                                    === 'decaissement'
+                                                ) {
+                                                    $operationTypeLabel =
+                                                        'Débit';
+
+                                                    $operationBadgeClass =
+                                                        'debit';
+
+                                                    $operationIcon =
+                                                        'fas fa-arrow-up';
+                                                } elseif (
+                                                    $operation->operation_type
+                                                    === 'transfert'
+                                                ) {
+                                                    $operationTypeLabel =
+                                                        'Transfert';
+
+                                                    $operationBadgeClass =
+                                                        'transfer';
+
+                                                    $operationIcon =
+                                                        'fas fa-exchange-alt';
+                                                }
+
+                                                /*
+                                            * =====================================
+                                            * STATUT
+                                            * =====================================
+                                            */
+
+                                                $statusLabel =
+                                                    'En attente';
+
+                                                $statusClass =
+                                                    'badge-warning';
+
+                                                if (
+                                                    $operation->status
+                                                    === 'validated'
+                                                ) {
+                                                    $statusLabel =
+                                                        'Validé';
+
+                                                    $statusClass =
+                                                        'badge-success';
+                                                } elseif (
+                                                    $operation->status
+                                                    === 'cancelled'
+                                                ) {
+                                                    $statusLabel =
+                                                        'Annulé';
+
+                                                    $statusClass =
+                                                        'badge-danger';
+                                                } elseif (
+                                                    $operation->status
+                                                    === 'pending'
+                                                ) {
+                                                    $statusLabel =
+                                                        'En attente';
+
+                                                    $statusClass =
+                                                        'badge-warning';
+                                                }
+
+                                                /*
+                                            * =====================================
+                                            * DATE ET HEURE
+                                            * =====================================
+                                            */
+
+                                                $operationDate =
+                                                    !empty($operation->operation_date)
+                                                    ? date(
+                                                        'd/m/Y',
+                                                        strtotime(
+                                                            $operation
+                                                                ->operation_date
+                                                        )
+                                                    )
+                                                    : '—';
+
+                                                $operationTime =
+                                                    !empty($operation->created_at)
+                                                    ? date(
+                                                        'H:i',
+                                                        strtotime(
+                                                            $operation
+                                                                ->created_at
+                                                        )
+                                                    )
+                                                    : '';
+
+                                                /*
+                                            * =====================================
+                                            * SOUS-LIBELLÉ
+                                            * =====================================
+                                            */
+
+                                                $operationSubtitle = '';
+
+                                                if (
+                                                    $operation->operation_type
+                                                    === 'encaissement'
+                                                ) {
+                                                    $operationSubtitle =
+                                                        !empty($operation->third_party)
+                                                        ? 'Provenance : '
+                                                        . $operation
+                                                        ->third_party
+                                                        : 'Entrée bancaire';
+                                                } elseif (
+                                                    $operation->operation_type
+                                                    === 'decaissement'
+                                                ) {
+                                                    $operationSubtitle =
+                                                        !empty($operation->third_party)
+                                                        ? 'Bénéficiaire : '
+                                                        . $operation
+                                                        ->third_party
+                                                        : 'Sortie bancaire';
+                                                } elseif (
+                                                    $operation->operation_type
+                                                    === 'transfert'
+                                                ) {
+                                                    $operationSubtitle =
+                                                        'Destination : '
+                                                        . (
+                                                            $operation
+                                                            ->destination_account_name
+                                                            ?: 'Compte destination'
+                                                        );
+                                                }
+
+                                                ?>
+
                                         <tr>
-                                            <td>1</td>
 
                                             <td>
-                                                13/07/2026
-                                                <small class="d-block text-muted">
-                                                    10:42
+
+                                                <?= $index + 1 ?>
+
+                                            </td>
+
+                                            <td>
+
+                                                <?= html_escape(
+                                                            $operationDate
+                                                        ) ?>
+
+                                                <?php if (
+                                                            $operationTime !== ''
+                                                        ): ?>
+
+                                                <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+
+                                                    <?= html_escape(
+                                                                    $operationTime
+                                                                ) ?>
+
                                                 </small>
+
+                                                <?php endif; ?>
+
                                             </td>
 
                                             <td>
-                                                <span class="bank-operation-reference">
-                                                    BMV-2026-00048
+
+                                                <span class="
+                                            bank-operation-reference
+                                        ">
+
+                                                    <?= html_escape(
+                                                                $operation->reference
+                                                            ) ?>
+
                                                 </span>
+
                                             </td>
 
                                             <td>
-                                                <strong>CRDB BIF</strong>
-                                                <small class="d-block text-muted">
-                                                    0151001002456
+
+                                                <strong>
+
+                                                    <?= html_escape(
+                                                                $accountName
+                                                            ) ?>
+
+                                                </strong>
+
+                                                <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+
+                                                    <?= html_escape(
+                                                                $accountNumber
+                                                            ) ?>
+
                                                 </small>
-                                            </td>
 
-                                            <td>
-                                                <span class="bank-operation-badge credit">
-                                                    <i class="fas fa-arrow-down mr-1"></i>
-                                                    Crédit
-                                                </span>
-                                            </td>
+                                                <?php if (
+                                                            $accountCode !== ''
+                                                        ): ?>
 
-                                            <td>
-                                                Paiement client marché Gitega
-                                                <small class="d-block text-muted">
-                                                    Provenance : Ministère
+                                                <small class="
+                                                d-block
+                                                text-muted
+                                            " style="
+                                                color: #0f766e
+                                                    !important;
+                                            ">
+
+                                                    <?= html_escape(
+                                                                    $accountCode
+                                                                ) ?>
+
                                                 </small>
-                                            </td>
 
-                                            <td class="text-right text-muted">
-                                                —
-                                            </td>
+                                                <?php endif; ?>
 
-                                            <td class="text-right bank-amount-in">
-                                                + 25 000 000
                                             </td>
 
                                             <td>
-                                                <span class="badge badge-success">
-                                                    Validé
+
+                                                <span class="
+                                            bank-operation-badge
+                                            <?= html_escape(
+                                                    $operationBadgeClass
+                                                ) ?>
+                                        ">
+
+                                                    <i class="
+                                                <?= html_escape(
+                                                    $operationIcon
+                                                ) ?>
+                                                mr-1
+                                            "></i>
+
+                                                    <?= html_escape(
+                                                                $operationTypeLabel
+                                                            ) ?>
+
                                                 </span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <strong>
+
+                                                    <?= html_escape(
+                                                                $operation->label
+                                                            ) ?>
+
+                                                </strong>
+
+                                                <?php if (
+                                                            $operationSubtitle !== ''
+                                                        ): ?>
+
+                                                <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+
+                                                    <?= html_escape(
+                                                                    $operationSubtitle
+                                                                ) ?>
+
+                                                </small>
+
+                                                <?php endif; ?>
+
+                                                <?php if (
+                                                            !empty($operation
+                                                                ->document_number)
+                                                        ): ?>
+
+                                                <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+
+                                                    Pièce :
+
+                                                    <?= html_escape(
+                                                                    $operation
+                                                                        ->document_number
+                                                                ) ?>
+
+                                                </small>
+
+                                                <?php endif; ?>
+
+                                            </td>
+
+                                            <!-- DÉBIT -->
+                                            <td class="text-right">
+
+                                                <?php if (
+                                                            in_array(
+                                                                $operation
+                                                                    ->operation_type,
+                                                                [
+                                                                    'decaissement',
+                                                                    'transfert',
+                                                                ],
+                                                                true
+                                                            )
+                                                        ): ?>
+
+                                                <span class="
+                                                bank-amount-out
+                                            ">
+
+                                                    -
+
+                                                    <?= number_format(
+                                                                    (float)
+                                                                    $operation->amount,
+                                                                    0,
+                                                                    ',',
+                                                                    ' '
+                                                                ) ?>
+
+                                                    <?= html_escape(
+                                                                    $operation->currency
+                                                                ) ?>
+
+                                                </span>
+
+                                                <?php else: ?>
+
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+
+                                                <?php endif; ?>
+
+                                            </td>
+
+                                            <!-- CRÉDIT -->
+                                            <td class="text-right">
+
+                                                <?php if (
+                                                            $operation->operation_type
+                                                            === 'encaissement'
+                                                        ): ?>
+
+                                                <span class="
+                                                bank-amount-in
+                                            ">
+
+                                                    +
+
+                                                    <?= number_format(
+                                                                    (float)
+                                                                    $operation->amount,
+                                                                    0,
+                                                                    ',',
+                                                                    ' '
+                                                                ) ?>
+
+                                                    <?= html_escape(
+                                                                    $operation->currency
+                                                                ) ?>
+
+                                                </span>
+
+                                                <?php else: ?>
+
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+
+                                                <?php endif; ?>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="
+                                            badge
+                                            <?= html_escape(
+                                                    $statusClass
+                                                ) ?>
+                                        ">
+
+                                                    <?= html_escape(
+                                                                $statusLabel
+                                                            ) ?>
+
+                                                </span>
+
                                             </td>
 
                                             <td class="text-center">
 
-                                                <button class="bank-table-action">
+                                                <!-- Voir -->
+                                                <button type="button" class="
+                                                    bank-table-action
+                                                    btn-view-bank-operation
+                                                " title="Voir l’opération" onclick="viewBankOperation(
+                                                    <?= (int)
+                                                    $operation->id
+                                                    ?>
+                                                )">
+
                                                     <i class="fas fa-eye"></i>
+
                                                 </button>
 
-                                                <button class="bank-table-action">
+                                                <!-- Pièce jointe -->
+                                                <?php if (
+                                                            !empty($operation->attachment)
+                                                        ): ?>
+
+                                                <a href="<?= base_url(
+                                                                            'uploads/finance/'
+                                                                                . 'bank_operations/'
+                                                                                . rawurlencode(
+                                                                                    $operation
+                                                                                        ->attachment
+                                                                                )
+                                                                        ) ?>" class="
+                                                            bank-table-action
+                                                        " title="Voir la pièce justificative" target="_blank">
+
+                                                    <i class="
+                                                    fas
+                                                    fa-paperclip
+                                                "></i>
+
+                                                </a>
+
+                                                <?php endif; ?>
+
+                                                <!-- Imprimer -->
+                                                <a href="<?= base_url(
+                                                                        'finance/banques/'
+                                                                            . 'operation-print/'
+                                                                            . (int) $operation->id
+                                                                    ) ?>" class="
+                                                        bank-table-action
+                                                    " title="Imprimer" target="_blank">
+
                                                     <i class="fas fa-print"></i>
-                                                </button>
+
+                                                </a>
 
                                             </td>
+
                                         </tr>
+
+                                        <?php endforeach; ?>
+
+                                        <?php else: ?>
 
                                         <tr>
-                                            <td>2</td>
 
-                                            <td>
-                                                13/07/2026
-                                                <small class="d-block text-muted">
-                                                    09:25
-                                                </small>
-                                            </td>
+                                            <td colspan="10" class="text-center py-5">
 
-                                            <td>
-                                                <span class="bank-operation-reference">
-                                                    BMV-2026-00047
-                                                </span>
-                                            </td>
+                                                <i class="
+                                                fas
+                                                fa-exchange-alt
+                                                fa-2x
+                                                text-muted
+                                                mb-3
+                                            "></i>
 
-                                            <td>
-                                                <strong>BANCOBU BIF</strong>
-                                                <small class="d-block text-muted">
-                                                    202658710236
-                                                </small>
-                                            </td>
+                                                <h6>
+                                                    Aucun mouvement bancaire
+                                                </h6>
 
-                                            <td>
-                                                <span class="bank-operation-badge debit">
-                                                    <i class="fas fa-arrow-up mr-1"></i>
-                                                    Débit
-                                                </span>
-                                            </td>
+                                                <p class="text-muted mb-0">
 
-                                            <td>
-                                                Paiement fournisseur ciment
-                                                <small class="d-block text-muted">
-                                                    Bénéficiaire : BUCECO
-                                                </small>
-                                            </td>
+                                                    Aucune opération bancaire
+                                                    n’a encore été enregistrée.
 
-                                            <td class="text-right bank-amount-out">
-                                                - 8 500 000
-                                            </td>
-
-                                            <td class="text-right text-muted">
-                                                —
-                                            </td>
-
-                                            <td>
-                                                <span class="badge badge-success">
-                                                    Validé
-                                                </span>
-                                            </td>
-
-                                            <td class="text-center">
-
-                                                <button class="bank-table-action">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-
-                                                <button class="bank-table-action">
-                                                    <i class="fas fa-print"></i>
-                                                </button>
+                                                </p>
 
                                             </td>
+
                                         </tr>
 
-                                        <tr>
-                                            <td>3</td>
-
-                                            <td>
-                                                12/07/2026
-                                                <small class="d-block text-muted">
-                                                    16:35
-                                                </small>
-                                            </td>
-
-                                            <td>
-                                                <span class="bank-operation-reference">
-                                                    BMV-2026-00046
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <strong>CRDB BIF</strong>
-                                                <small class="d-block text-muted">
-                                                    0151001002456
-                                                </small>
-                                            </td>
-
-                                            <td>
-                                                <span class="bank-operation-badge transfer">
-                                                    <i class="fas fa-exchange-alt mr-1"></i>
-                                                    Transfert
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                Transfert vers ECOBANK
-                                                <small class="d-block text-muted">
-                                                    Destination : ECOBANK BIF
-                                                </small>
-                                            </td>
-
-                                            <td class="text-right bank-amount-out">
-                                                - 15 000 000
-                                            </td>
-
-                                            <td class="text-right text-muted">
-                                                —
-                                            </td>
-
-                                            <td>
-                                                <span class="badge badge-warning">
-                                                    En attente
-                                                </span>
-                                            </td>
-
-                                            <td class="text-center">
-
-                                                <button class="bank-table-action">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-
-                                                <button class="bank-table-action">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>4</td>
-
-                                            <td>
-                                                12/07/2026
-                                                <small class="d-block text-muted">
-                                                    11:05
-                                                </small>
-                                            </td>
-
-                                            <td>
-                                                <span class="bank-operation-reference">
-                                                    BMV-2026-00045
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                <strong>ECOBANK BIF</strong>
-                                                <small class="d-block text-muted">
-                                                    001458963247
-                                                </small>
-                                            </td>
-
-                                            <td>
-                                                <span class="bank-operation-badge debit">
-                                                    <i class="fas fa-arrow-up mr-1"></i>
-                                                    Débit
-                                                </span>
-                                            </td>
-
-                                            <td>
-                                                Paiement sous-traitant
-                                                <small class="d-block text-muted">
-                                                    Bénéficiaire : ABC Construction
-                                                </small>
-                                            </td>
-
-                                            <td class="text-right bank-amount-out">
-                                                - 6 700 000
-                                            </td>
-
-                                            <td class="text-right text-muted">
-                                                —
-                                            </td>
-
-                                            <td>
-                                                <span class="badge badge-danger">
-                                                    Justificatif
-                                                </span>
-                                            </td>
-
-                                            <td class="text-center">
-
-                                                <button class="bank-table-action">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-
-                                                <button class="bank-table-action">
-                                                    <i class="fas fa-paperclip"></i>
-                                                </button>
-
-                                            </td>
-                                        </tr>
+                                        <?php endif; ?>
 
                                     </tbody>
 
@@ -2461,10 +3449,73 @@ $bankAccountOldInput =
 
                             </div>
 
+                            <?php if (
+                                !empty($recentBankOperations)
+                            ): ?>
+
+                            <div class="
+                                p-3
+                                border-top
+                                d-flex
+                                justify-content-between
+                                align-items-center
+                            ">
+
+                                <small class="text-muted">
+
+                                    Affichage de 1 à
+
+                                    <?= count(
+                                            $recentBankOperations
+                                        ) ?>
+
+                                    sur
+
+                                    <?= (int) $bankOperationsCount ?>
+
+                                    opération<?= $bankOperationsCount > 1
+                                                        ? 's'
+                                                        : ''
+                                                    ?>
+
+                                </small>
+
+                                <?php if (
+                                        $bankOperationsCount
+                                        > count($recentBankOperations)
+                                    ): ?>
+
+                                <a href="<?= base_url(
+                                                        'finance/banques/journal'
+                                                    ) ?>" class="btn btn-bank-outline">
+
+                                    Voir les
+
+                                    <?= (int) $bankOperationsCount ?>
+
+                                    opérations
+
+                                    <i class="
+                                            fas
+                                            fa-arrow-right
+                                            ml-1
+                                        "></i>
+
+                                </a>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                            <?php endif; ?>
+
                         </div>
 
                     </div>
 
+                    <!-- =====================================================
+                    ALERTES BANCAIRES
+                ====================================================== -->
                     <div class="col-xl-4 col-lg-4">
 
                         <div class="bank-card">
@@ -2472,82 +3523,220 @@ $bankAccountOldInput =
                             <div class="bank-card-header">
 
                                 <div>
+
                                     <h5 class="bank-card-title">
+
                                         <i class="fas fa-exclamation-triangle"></i>
+
                                         Alertes bancaires
+
                                     </h5>
 
                                     <span class="bank-card-subtitle">
+
                                         Situations nécessitant une vérification.
+
                                     </span>
+
                                 </div>
 
-                                <span class="badge badge-danger">
-                                    3 alertes
+                                <span class="
+                                badge
+                                <?= $bankAlertsCount > 0
+                                    ? 'badge-danger'
+                                    : 'badge-success'
+                                ?>
+                            ">
+
+                                    <?= (int) $bankAlertsCount ?>
+
+                                    alerte<?= $bankAlertsCount > 1
+                                                ? 's'
+                                                : ''
+                                            ?>
+
                                 </span>
 
                             </div>
 
                             <div class="bank-card-body">
 
-                                <div class="bank-alert warning">
+                                <?php if (
+                                    !empty($bankAlerts)
+                                ): ?>
+
+                                <?php foreach (
+                                        $bankAlerts
+                                        as $alert
+                                    ): ?>
+
+                                <?php
+
+                                        $alertClass = 'info';
+
+                                        if (
+                                            $alert['type']
+                                            === 'warning'
+                                        ) {
+                                            $alertClass =
+                                                'warning';
+                                        } elseif (
+                                            $alert['type']
+                                            === 'danger'
+                                        ) {
+                                            $alertClass =
+                                                'danger';
+                                        }
+
+                                        ?>
+
+                                <div class="
+                            bank-alert
+                                <?= html_escape(
+                                            $alertClass
+                                        ) ?>
+                            ">
 
                                     <div class="bank-alert-icon">
-                                        <i class="fas fa-clock"></i>
+
+                                        <i class="<?= html_escape(
+                                                                $alert['icon']
+                                                            ) ?>"></i>
+
                                     </div>
 
-                                    <div>
-                                        <h6>Virement en attente</h6>
+                                    <div class="bank-alert-content">
+
+                                        <h6>
+
+                                            <?= html_escape(
+                                                        $alert['title']
+                                                    ) ?>
+
+                                        </h6>
 
                                         <p>
-                                            Le transfert de 15 000 000 BIF de CRDB
-                                            vers ECOBANK attend une validation.
+
+                                            <?= html_escape(
+                                                        $alert['description']
+                                                    ) ?>
+
                                         </p>
+
+                                        <div class="
+                                        bank-alert-actions
+                                        mt-2
+                                    ">
+
+                                            <?php if (
+                                                        !empty($alert['operation_id'])
+                                                    ): ?>
+
+                                            <button type="button" class="
+                                            btn
+                                            btn-sm
+                                            btn-bank-outline
+                                        " onclick="viewBankOperation(
+                                            <?= (int) $alert['operation_id'] ?>
+                                        )">
+
+                                                <i class="
+                                                fas
+                                                fa-eye
+                                                mr-1
+                                            "></i>
+
+                                                Voir l’opération
+
+                                            </button>
+
+                                            <?php endif; ?>
+
+                                            <?php if (
+                                                        !empty($alert['account_id'])
+                                                    ): ?>
+
+                                            <button type="button" class="
+                                            btn
+                                            btn-sm
+                                            btn-bank-outline
+                                        " onclick="viewBankAccount(
+                                            <?= (int) $alert['account_id'] ?>
+                                        )">
+
+                                                <i class="
+                                                fas
+                                                fa-university
+                                                mr-1
+                                            "></i>
+
+                                                Voir le compte
+
+                                            </button>
+
+                                            <?php endif; ?>
+
+                                        </div>
+
                                     </div>
 
                                 </div>
 
-                                <div class="bank-alert danger">
+                                <?php endforeach; ?>
 
-                                    <div class="bank-alert-icon">
-                                        <i class="fas fa-file-invoice"></i>
+                                <?php else: ?>
+
+                                <div class="
+                                text-center
+                                py-5
+                            ">
+
+                                    <div class="
+                                    bank-alert-empty-icon
+                                    mb-3
+                                ">
+
+                                        <i class="
+                                        fas
+                                        fa-check-circle
+                                    "></i>
+
                                     </div>
 
-                                    <div>
-                                        <h6>Justificatif manquant</h6>
+                                    <h6 style="
+                                    font-weight: 800;
+                                    color: #102033;
+                                ">
 
-                                        <p>
-                                            Une opération de 6 700 000 BIF ne possède
-                                            pas encore de pièce justificative.
-                                        </p>
-                                    </div>
+                                        Aucune alerte bancaire
+
+                                    </h6>
+
+                                    <p class="
+                                    text-muted
+                                    mb-0
+                                " style="
+                                    font-size: 9px;
+                                ">
+
+                                        Les comptes et opérations bancaires
+                                        ne présentent aucune anomalie.
+
+                                    </p>
 
                                 </div>
 
-                                <div class="bank-alert info">
-
-                                    <div class="bank-alert-icon">
-                                        <i class="fas fa-balance-scale"></i>
-                                    </div>
-
-                                    <div>
-                                        <h6>Rapprochement à effectuer</h6>
-
-                                        <p>
-                                            Le compte CRDB BIF n’a pas encore été
-                                            rapproché pour le mois de juillet.
-                                        </p>
-                                    </div>
-
-                                </div>
+                                <?php endif; ?>
 
                             </div>
 
                         </div>
 
                     </div>
-
                 </div>
+
+
+
 
             </div>
 
@@ -3228,15 +4417,45 @@ $bankAccountOldInput =
                 SCRIPTS
             ========================================================== -->
             <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener(
+                'DOMContentLoaded',
+                function() {
 
-                const bankChartElement =
-                    document.getElementById('bankFlowChart');
+                    const bankChartElement =
+                        document.getElementById(
+                            'bankFlowChart'
+                        );
 
-                if (
-                    bankChartElement &&
-                    typeof Chart !== 'undefined'
-                ) {
+                    if (
+                        !bankChartElement ||
+                        typeof Chart === 'undefined'
+                    ) {
+                        return;
+                    }
+
+                    const bankFlowLabels =
+                        <?= json_encode(
+                                $bankFlowEvolution['labels'],
+                                JSON_UNESCAPED_UNICODE
+                                    | JSON_UNESCAPED_SLASHES
+                            ) ?>;
+
+                    const bankFlowIncomes =
+                        <?= json_encode(
+                                array_map(
+                                    'floatval',
+                                    $bankFlowEvolution['incomes']
+                                )
+                            ) ?>;
+
+                    const bankFlowExpenses =
+                        <?= json_encode(
+                                array_map(
+                                    'floatval',
+                                    $bankFlowEvolution['expenses']
+                                )
+                            ) ?>;
+
                     const context =
                         bankChartElement.getContext('2d');
 
@@ -3281,28 +4500,12 @@ $bankAccountOldInput =
                             type: 'line',
 
                             data: {
-                                labels: [
-                                    '07 Juil.',
-                                    '08 Juil.',
-                                    '09 Juil.',
-                                    '10 Juil.',
-                                    '11 Juil.',
-                                    '12 Juil.',
-                                    '13 Juil.'
-                                ],
+                                labels: bankFlowLabels,
 
                                 datasets: [{
                                         label: 'Encaissements bancaires',
 
-                                        data: [
-                                            25000000,
-                                            34000000,
-                                            19000000,
-                                            42000000,
-                                            28500000,
-                                            38000000,
-                                            48500000
-                                        ],
+                                        data: bankFlowIncomes,
 
                                         borderColor: '#0f766e',
 
@@ -3327,15 +4530,7 @@ $bankAccountOldInput =
                                     {
                                         label: 'Décaissements bancaires',
 
-                                        data: [
-                                            18000000,
-                                            27000000,
-                                            15500000,
-                                            33500000,
-                                            22000000,
-                                            26500000,
-                                            31200000
-                                        ],
+                                        data: bankFlowExpenses,
 
                                         borderColor: '#dc2626',
 
@@ -3367,6 +4562,7 @@ $bankAccountOldInput =
 
                                 interaction: {
                                     intersect: false,
+
                                     mode: 'index'
                                 },
 
@@ -3376,7 +4572,9 @@ $bankAccountOldInput =
 
                                         labels: {
                                             usePointStyle: true,
+
                                             boxWidth: 8,
+
                                             padding: 20,
 
                                             font: {
@@ -3387,14 +4585,22 @@ $bankAccountOldInput =
 
                                     tooltip: {
                                         callbacks: {
-                                            label: function(context) {
+                                            label: function(
+                                                context
+                                            ) {
+                                                const amount =
+                                                    context.parsed.y ||
+                                                    0;
+
                                                 return (
                                                     context.dataset.label +
                                                     ' : ' +
                                                     new Intl
-                                                    .NumberFormat('fr-FR')
+                                                    .NumberFormat(
+                                                        'fr-FR'
+                                                    )
                                                     .format(
-                                                        context.parsed.y
+                                                        amount
                                                     ) +
                                                     ' BIF'
                                                 );
@@ -3410,6 +4616,12 @@ $bankAccountOldInput =
                                         },
 
                                         ticks: {
+                                            maxRotation: 0,
+
+                                            autoSkip: true,
+
+                                            maxTicksLimit: 15,
+
                                             font: {
                                                 size: 10
                                             }
@@ -3428,10 +4640,39 @@ $bankAccountOldInput =
                                                 size: 10
                                             },
 
-                                            callback: function(value) {
-                                                return (
-                                                    value / 1000000
-                                                ) + ' M';
+                                            callback: function(
+                                                value
+                                            ) {
+                                                if (
+                                                    value >=
+                                                    1000000000
+                                                ) {
+                                                    return (
+                                                        value /
+                                                        1000000000
+                                                    ) + ' Md';
+                                                }
+
+                                                if (
+                                                    value >=
+                                                    1000000
+                                                ) {
+                                                    return (
+                                                        value /
+                                                        1000000
+                                                    ) + ' M';
+                                                }
+
+                                                if (
+                                                    value >= 1000
+                                                ) {
+                                                    return (
+                                                        value /
+                                                        1000
+                                                    ) + ' K';
+                                                }
+
+                                                return value;
                                             }
                                         }
                                     }
@@ -3439,97 +4680,6 @@ $bankAccountOldInput =
                             }
                         }
                     );
-                }
-            });
-
-
-            // function prepareBankOperation(type) {
-
-            //     const title =
-            //         document.getElementById(
-            //             'bankOperationTitle'
-            //         );
-
-            //     const operationType =
-            //         document.getElementById(
-            //             'bankOperationType'
-            //         );
-
-            //     const destinationField =
-            //         document.getElementById(
-            //             'bankDestinationField'
-            //         );
-
-            //     const destinationSelect =
-            //         document.getElementById(
-            //             'bankDestinationAccount'
-            //         );
-
-            //     const sourceLabel =
-            //         document.getElementById(
-            //             'bankSourceLabel'
-            //         );
-
-            //     operationType.value = type;
-
-            //     destinationField.style.display = 'none';
-            //     destinationSelect.disabled = true;
-            //     destinationSelect.required = false;
-            //     destinationSelect.value = '';
-
-            //     if (type === 'encaissement') {
-
-            //         title.innerHTML =
-            //             'Enregistrer un encaissement bancaire';
-
-            //         sourceLabel.innerHTML =
-            //             'Compte à créditer ' +
-            //             '<span class="required-star">*</span>';
-            //     }
-
-            //     if (type === 'decaissement') {
-
-            //         title.innerHTML =
-            //             'Enregistrer un décaissement bancaire';
-
-            //         sourceLabel.innerHTML =
-            //             'Compte à débiter ' +
-            //             '<span class="required-star">*</span>';
-            //     }
-
-            //     if (type === 'transfert') {
-
-            //         title.innerHTML =
-            //             'Effectuer un transfert bancaire';
-
-            //         sourceLabel.innerHTML =
-            //             'Compte source ' +
-            //             '<span class="required-star">*</span>';
-
-            //         destinationField.style.display = 'block';
-            //         destinationSelect.disabled = false;
-            //         destinationSelect.required = true;
-            //     }
-            // }
-
-
-            $(document).on(
-                'change',
-                '.custom-file-input',
-                function() {
-
-                    const fileName =
-                        $(this)
-                        .val()
-                        .split('\\')
-                        .pop();
-
-                    $(this)
-                        .next('.custom-file-label')
-                        .html(
-                            fileName ||
-                            'Choisir un fichier'
-                        );
                 }
             );
             </script>
@@ -3706,6 +4856,26 @@ function prepareBankOperation(type) {
             .split('T')[0];
     }
 }
+
+$(document).on(
+    'change',
+    '.custom-file-input',
+    function() {
+
+        const fileName =
+            $(this)
+            .val()
+            .split('\\')
+            .pop();
+
+        $(this)
+            .next('.custom-file-label')
+            .html(
+                fileName ||
+                'Choisir un fichier'
+            );
+    }
+);
 
 
 /*

@@ -3276,4 +3276,4254 @@ class FinanceModel extends CI_Model
                 STR_PAD_LEFT
             );
     }
+
+    /**
+     * Retourne les statistiques principales des comptes bancaires.
+     *
+     * Montants affichés :
+     * - solde bancaire global en BIF ;
+     * - comptes actifs ;
+     * - établissements bancaires ;
+     * - encaissements bancaires du jour ;
+     * - décaissements bancaires du jour ;
+     * - variation du solde depuis le début du mois.
+     */
+    public function getBankMainStatistics(): array
+    {
+        $currency = 'BIF';
+        $today = date('Y-m-d');
+        $monthStart = date('Y-m-01');
+
+        /*
+     * =========================================================
+     * 1. SOLDE BANCAIRE GLOBAL
+     * =========================================================
+     */
+
+        $globalRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(current_balance),
+                0
+            ) AS global_balance,
+
+            COUNT(id) AS active_accounts,
+
+            COUNT(
+                DISTINCT bank_name
+            ) AS bank_count
+        ", false)
+            ->from('tbl_finance_bank_account')
+            ->where('status', 'active')
+            ->where('currency', $currency)
+            ->get()
+            ->row();
+
+        $globalBalance = $globalRow
+            ? (float) $globalRow->global_balance
+            : 0;
+
+        /*
+     * Ici, active_accounts compte uniquement
+     * les comptes actifs en BIF.
+     *
+     * Le nombre total des comptes actifs,
+     * toutes devises confondues, sera calculé
+     * séparément plus bas.
+     */
+
+        $activeBifAccounts = $globalRow
+            ? (int) $globalRow->active_accounts
+            : 0;
+
+        $bifBankCount = $globalRow
+            ? (int) $globalRow->bank_count
+            : 0;
+
+        /*
+     * =========================================================
+     * 2. NOMBRE TOTAL DE COMPTES ACTIFS
+     * =========================================================
+     */
+
+        $activeAccountsRow = $this->db
+            ->select("
+            COUNT(id) AS active_accounts,
+
+            COUNT(
+                DISTINCT bank_name
+            ) AS bank_count
+        ", false)
+            ->from('tbl_finance_bank_account')
+            ->where('status', 'active')
+            ->get()
+            ->row();
+
+        $activeAccounts = $activeAccountsRow
+            ? (int) $activeAccountsRow->active_accounts
+            : 0;
+
+        $bankCount = $activeAccountsRow
+            ? (int) $activeAccountsRow->bank_count
+            : 0;
+
+        /*
+     * =========================================================
+     * 3. ENCAISSEMENTS BANCAIRES DU JOUR
+     * =========================================================
+     *
+     * Un encaissement bancaire augmente la trésorerie globale.
+     *
+     * Le compte concerné est stocké dans :
+     * destination_bank_account_id.
+     */
+
+        $todayIncomeRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_bank_operation')
+            ->where(
+                'operation_type',
+                'encaissement'
+            )
+            ->where(
+                'operation_date',
+                $today
+            )
+            ->where(
+                'status',
+                'validated'
+            )
+            ->where(
+                'currency',
+                $currency
+            )
+            ->get()
+            ->row();
+
+        $todayIncomeAmount = $todayIncomeRow
+            ? (float) $todayIncomeRow->total_amount
+            : 0;
+
+        $todayIncomeCount = $todayIncomeRow
+            ? (int) $todayIncomeRow->total_operations
+            : 0;
+
+        /*
+     * =========================================================
+     * 4. DÉCAISSEMENTS BANCAIRES DU JOUR
+     * =========================================================
+     *
+     * Un décaissement bancaire diminue la trésorerie globale.
+     *
+     * Les transferts internes sont exclus.
+     */
+
+        $todayExpenseRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_bank_operation')
+            ->where(
+                'operation_type',
+                'decaissement'
+            )
+            ->where(
+                'operation_date',
+                $today
+            )
+            ->where(
+                'status',
+                'validated'
+            )
+            ->where(
+                'currency',
+                $currency
+            )
+            ->get()
+            ->row();
+
+        $todayExpenseAmount = $todayExpenseRow
+            ? (float) $todayExpenseRow->total_amount
+            : 0;
+
+        $todayExpenseCount = $todayExpenseRow
+            ? (int) $todayExpenseRow->total_operations
+            : 0;
+
+        /*
+     * =========================================================
+     * 5. FLUX DU MOIS
+     * =========================================================
+     *
+     * Cette partie sert à calculer la variation affichée
+     * sur la première carte.
+     */
+
+        $monthlyFlowRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'encaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS monthly_income,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'decaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS monthly_expense
+        ", false)
+            ->from('tbl_finance_bank_operation')
+            ->where('status', 'validated')
+            ->where('currency', $currency)
+            ->where('operation_date >=', $monthStart)
+            ->where('operation_date <=', $today)
+            ->where_in(
+                'operation_type',
+                [
+                    'encaissement',
+                    'decaissement',
+                ]
+            )
+            ->get()
+            ->row();
+
+        $monthlyIncome = $monthlyFlowRow
+            ? (float) $monthlyFlowRow->monthly_income
+            : 0;
+
+        $monthlyExpense = $monthlyFlowRow
+            ? (float) $monthlyFlowRow->monthly_expense
+            : 0;
+
+        $monthlyNetFlow =
+            $monthlyIncome
+            - $monthlyExpense;
+
+        /*
+     * Solde actuel =
+     * solde au début du mois + mouvement net du mois.
+     *
+     * Donc :
+     * solde début mois =
+     * solde actuel - mouvement net du mois.
+     */
+
+        $monthOpeningBalance =
+            $globalBalance
+            - $monthlyNetFlow;
+
+        $globalVariationPercentage = 0;
+
+        if ($monthOpeningBalance != 0) {
+            $globalVariationPercentage = (
+                (
+                    $globalBalance
+                    - $monthOpeningBalance
+                )
+                / abs($monthOpeningBalance)
+            ) * 100;
+        }
+
+        return [
+            'currency' => $currency,
+
+            'global_balance' =>
+            $globalBalance,
+
+            'active_accounts' =>
+            $activeAccounts,
+
+            'active_bif_accounts' =>
+            $activeBifAccounts,
+
+            'bank_count' =>
+            $bankCount,
+
+            'bif_bank_count' =>
+            $bifBankCount,
+
+            'today_income_amount' =>
+            $todayIncomeAmount,
+
+            'today_income_count' =>
+            $todayIncomeCount,
+
+            'today_expense_amount' =>
+            $todayExpenseAmount,
+
+            'today_expense_count' =>
+            $todayExpenseCount,
+
+            'monthly_income' =>
+            $monthlyIncome,
+
+            'monthly_expense' =>
+            $monthlyExpense,
+
+            'monthly_net_flow' =>
+            $monthlyNetFlow,
+
+            'month_opening_balance' =>
+            $monthOpeningBalance,
+
+            'global_variation_percentage' =>
+            $globalVariationPercentage,
+        ];
+    }
+
+    /**
+     * Retourne l'évolution des flux bancaires.
+     *
+     * Périodes acceptées :
+     * - 7days
+     * - 30days
+     * - month
+     * - year
+     *
+     * Les transferts internes sont exclus.
+     */
+    public function getBankFlowEvolution(string $period = '7days'): array
+    {
+        $today = date('Y-m-d');
+
+        switch ($period) {
+            case '30days':
+                $startDate = date(
+                    'Y-m-d',
+                    strtotime('-29 days')
+                );
+
+                $endDate = $today;
+                $groupFormat = '%Y-%m-%d';
+                break;
+
+            case 'month':
+                $startDate = date('Y-m-01');
+                $endDate = date('Y-m-t');
+                $groupFormat = '%Y-%m-%d';
+                break;
+
+            case 'year':
+                $startDate = date('Y-01-01');
+                $endDate = date('Y-12-31');
+                $groupFormat = '%Y-%m';
+                break;
+
+            case '7days':
+            default:
+                $period = '7days';
+
+                $startDate = date(
+                    'Y-m-d',
+                    strtotime('-6 days')
+                );
+
+                $endDate = $today;
+                $groupFormat = '%Y-%m-%d';
+                break;
+        }
+
+        /*
+     * =========================================================
+     * RÉCUPÉRER LES OPÉRATIONS AGRÉGÉES
+     * =========================================================
+     */
+
+        $sql = "
+        SELECT
+            DATE_FORMAT(
+                operation_date,
+                ?
+            ) AS period_key,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'encaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_income,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN operation_type = 'decaissement'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS total_expense
+
+        FROM tbl_finance_bank_operation
+
+        WHERE status = 'validated'
+
+        AND operation_type IN (
+            'encaissement',
+            'decaissement'
+        )
+
+        AND currency = 'BIF'
+
+        AND operation_date BETWEEN ? AND ?
+
+        GROUP BY
+            DATE_FORMAT(
+                operation_date,
+                ?
+            )
+
+        ORDER BY period_key ASC
+    ";
+
+        $rows = $this->db
+            ->query(
+                $sql,
+                [
+                    $groupFormat,
+                    $startDate,
+                    $endDate,
+                    $groupFormat,
+                ]
+            )
+            ->result();
+
+        /*
+     * Indexer les résultats.
+     */
+        $indexedResults = [];
+
+        foreach ($rows as $row) {
+            $indexedResults[$row->period_key] = [
+                'income' =>
+                (float) $row->total_income,
+
+                'expense' =>
+                (float) $row->total_expense,
+            ];
+        }
+
+        $labels = [];
+        $incomes = [];
+        $expenses = [];
+
+        $monthNames = [
+            1  => 'Janv.',
+            2  => 'Févr.',
+            3  => 'Mars',
+            4  => 'Avr.',
+            5  => 'Mai',
+            6  => 'Juin',
+            7  => 'Juil.',
+            8  => 'Août',
+            9  => 'Sept.',
+            10 => 'Oct.',
+            11 => 'Nov.',
+            12 => 'Déc.',
+        ];
+
+        /*
+     * =========================================================
+     * ANNÉE : UN POINT PAR MOIS
+     * =========================================================
+     */
+
+        if ($period === 'year') {
+            for ($month = 1; $month <= 12; $month++) {
+                $key = date('Y')
+                    . '-'
+                    . str_pad(
+                        (string) $month,
+                        2,
+                        '0',
+                        STR_PAD_LEFT
+                    );
+
+                $labels[] = $monthNames[$month];
+
+                $incomes[] = isset(
+                    $indexedResults[$key]
+                )
+                    ? $indexedResults[$key]['income']
+                    : 0;
+
+                $expenses[] = isset(
+                    $indexedResults[$key]
+                )
+                    ? $indexedResults[$key]['expense']
+                    : 0;
+            }
+        }
+
+        /*
+     * =========================================================
+     * AUTRES PÉRIODES : UN POINT PAR JOUR
+     * =========================================================
+     */ else {
+            $startTimestamp = strtotime($startDate);
+            $endTimestamp = strtotime($endDate);
+
+            for (
+                $timestamp = $startTimestamp;
+                $timestamp <= $endTimestamp;
+                $timestamp = strtotime(
+                    '+1 day',
+                    $timestamp
+                )
+            ) {
+                $key = date(
+                    'Y-m-d',
+                    $timestamp
+                );
+
+                $day = date(
+                    'd',
+                    $timestamp
+                );
+
+                $monthNumber = (int) date(
+                    'n',
+                    $timestamp
+                );
+
+                $labels[] = $day
+                    . ' '
+                    . $monthNames[$monthNumber];
+
+                $incomes[] = isset(
+                    $indexedResults[$key]
+                )
+                    ? $indexedResults[$key]['income']
+                    : 0;
+
+                $expenses[] = isset(
+                    $indexedResults[$key]
+                )
+                    ? $indexedResults[$key]['expense']
+                    : 0;
+            }
+        }
+
+        return [
+            'period' =>
+            $period,
+
+            'start_date' =>
+            $startDate,
+
+            'end_date' =>
+            $endDate,
+
+            'labels' =>
+            $labels,
+
+            'incomes' =>
+            $incomes,
+
+            'expenses' =>
+            $expenses,
+        ];
+    }
+
+    /**
+     * Retourne le solde disponible par banque.
+     *
+     * Seuls les comptes actifs en BIF sont additionnés.
+     */
+    public function getBankBalanceDistribution(): array
+    {
+        $rows = $this->db
+            ->select("
+            bank_name,
+
+            COUNT(id) AS account_count,
+
+            COALESCE(
+                SUM(current_balance),
+                0
+            ) AS total_balance
+        ", false)
+            ->from('tbl_finance_bank_account')
+            ->where('status', 'active')
+            ->where('currency', 'BIF')
+            ->group_by('bank_name')
+            ->order_by('total_balance', 'DESC')
+            ->get()
+            ->result();
+
+        $maxBalance = 0;
+
+        foreach ($rows as $row) {
+            $balance = (float) $row->total_balance;
+
+            if ($balance > $maxBalance) {
+                $maxBalance = $balance;
+            }
+        }
+
+        $bankLabels = [
+            'CRDB' =>
+            'CRDB Bank',
+
+            'BANCOBU' =>
+            'BANCOBU',
+
+            'ECOBANK' =>
+            'ECOBANK',
+
+            'KCB' =>
+            'KCB Bank',
+
+            'BCB' =>
+            'BCB',
+
+            'BHB' =>
+            'BHB',
+
+            'INTERBANK' =>
+            'Interbank Burundi',
+        ];
+
+        $distribution = [];
+
+        foreach ($rows as $row) {
+            $balance = (float) $row->total_balance;
+
+            $percentage = $maxBalance > 0
+                ? ($balance / $maxBalance) * 100
+                : 0;
+
+            $distribution[] = [
+                'bank_code' =>
+                $row->bank_name,
+
+                'bank_name' =>
+                $bankLabels[$row->bank_name]
+                    ?? $row->bank_name,
+
+                'account_count' =>
+                (int) $row->account_count,
+
+                'total_balance' =>
+                $balance,
+
+                'percentage' =>
+                min(
+                    100,
+                    max(
+                        0,
+                        $percentage
+                    )
+                ),
+            ];
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Retourne la situation détaillée des comptes bancaires.
+     *
+     * Pour chaque compte :
+     * - solde actuel ;
+     * - entrées du mois ;
+     * - sorties du mois ;
+     * - nombre d'opérations ;
+     * - informations générales du compte.
+     */
+    public function getBankAccountSituations(): array
+    {
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        $sql = "
+        SELECT
+            ba.id,
+            ba.code,
+            ba.name,
+            ba.bank_name,
+            ba.account_number,
+            ba.account_type,
+            ba.currency,
+            ba.opening_balance,
+            ba.current_balance,
+            ba.alert_threshold,
+            ba.branch_name,
+            ba.swift_code,
+            ba.observation,
+            ba.status,
+            ba.created_at,
+            ba.updated_at,
+
+            COALESCE(
+                movements.monthly_entries,
+                0
+            ) AS monthly_entries,
+
+            COALESCE(
+                movements.monthly_outputs,
+                0
+            ) AS monthly_outputs,
+
+            COALESCE(
+                movements.monthly_operations,
+                0
+            ) AS monthly_operations
+
+        FROM tbl_finance_bank_account ba
+
+        LEFT JOIN
+        (
+            SELECT
+                bank_movements.bank_account_id,
+
+                SUM(
+                    bank_movements.entry_amount
+                ) AS monthly_entries,
+
+                SUM(
+                    bank_movements.output_amount
+                ) AS monthly_outputs,
+
+                COUNT(
+                    DISTINCT bank_movements.operation_id
+                ) AS monthly_operations
+
+            FROM
+            (
+                /*
+                 * Entrées :
+                 * encaissements et destinations des transferts.
+                 */
+                SELECT
+                    op.id AS operation_id,
+                    op.destination_bank_account_id
+                        AS bank_account_id,
+                    op.amount AS entry_amount,
+                    0 AS output_amount
+
+                FROM tbl_finance_bank_operation op
+
+                WHERE op.destination_bank_account_id IS NOT NULL
+                AND op.status = 'validated'
+                AND op.operation_date BETWEEN ? AND ?
+
+                UNION ALL
+
+                /*
+                 * Sorties :
+                 * décaissements et sources des transferts.
+                 */
+                SELECT
+                    op.id AS operation_id,
+                    op.source_bank_account_id
+                        AS bank_account_id,
+                    0 AS entry_amount,
+                    op.amount AS output_amount
+
+                FROM tbl_finance_bank_operation op
+
+                WHERE op.source_bank_account_id IS NOT NULL
+                AND op.status = 'validated'
+                AND op.operation_date BETWEEN ? AND ?
+
+            ) bank_movements
+
+            GROUP BY bank_movements.bank_account_id
+
+        ) movements
+            ON movements.bank_account_id = ba.id
+
+        ORDER BY
+            CASE
+                WHEN ba.status = 'active'
+                    THEN 0
+                WHEN ba.status = 'blocked'
+                    THEN 1
+                ELSE 2
+            END ASC,
+
+            ba.bank_name ASC,
+            ba.currency ASC,
+            ba.name ASC
+    ";
+
+        return $this->db
+            ->query(
+                $sql,
+                [
+                    $monthStart,
+                    $monthEnd,
+                    $monthStart,
+                    $monthEnd,
+                ]
+            )
+            ->result();
+    }
+
+    /**
+     * Compte tous les comptes bancaires actifs.
+     */
+    public function countActiveBankAccounts(): int
+    {
+        return (int) $this->db
+            ->where('status', 'active')
+            ->count_all_results(
+                'tbl_finance_bank_account'
+            );
+    }
+
+    /**
+     * Retourne les mouvements bancaires les plus récents.
+     *
+     * @param int $limit Nombre maximum d'opérations à retourner.
+     *
+     * @return array
+     */
+    public function getRecentBankOperations(int $limit = 10): array
+    {
+        $limit = max(
+            1,
+            min(
+                100,
+                $limit
+            )
+        );
+
+        return $this->db
+            ->select([
+                /*
+             * Informations de l'opération.
+             */
+                'operation.id',
+                'operation.reference',
+                'operation.operation_type',
+                'operation.operation_date',
+                'operation.source_bank_account_id',
+                'operation.destination_bank_account_id',
+                'operation.amount',
+                'operation.currency',
+                'operation.category',
+                'operation.third_party',
+                'operation.payment_method',
+                'operation.document_number',
+                'operation.attachment',
+                'operation.label',
+                'operation.status',
+                'operation.created_by',
+                'operation.validated_by',
+                'operation.created_at',
+                'operation.updated_at',
+
+                /*
+             * Compte source.
+             */
+                'source_account.code AS source_account_code',
+                'source_account.name AS source_account_name',
+                'source_account.bank_name AS source_bank_name',
+                'source_account.account_number AS source_account_number',
+                'source_account.currency AS source_currency',
+
+                /*
+             * Compte destination.
+             */
+                'destination_account.code AS destination_account_code',
+                'destination_account.name AS destination_account_name',
+                'destination_account.bank_name AS destination_bank_name',
+                'destination_account.account_number AS destination_account_number',
+                'destination_account.currency AS destination_currency',
+            ])
+            ->from(
+                'tbl_finance_bank_operation AS operation'
+            )
+            ->join(
+                'tbl_finance_bank_account AS source_account',
+                'source_account.id = operation.source_bank_account_id',
+                'left'
+            )
+            ->join(
+                'tbl_finance_bank_account AS destination_account',
+                'destination_account.id = operation.destination_bank_account_id',
+                'left'
+            )
+            ->order_by(
+                'operation.operation_date',
+                'DESC'
+            )
+            ->order_by(
+                'operation.created_at',
+                'DESC'
+            )
+            ->order_by(
+                'operation.id',
+                'DESC'
+            )
+            ->limit($limit)
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Compte toutes les opérations bancaires enregistrées.
+     */
+    public function countBankOperations(): int
+    {
+        return (int) $this->db
+            ->count_all_results(
+                'tbl_finance_bank_operation'
+            );
+    }
+
+    /**
+     * Retourne les alertes bancaires à afficher.
+     *
+     * Alertes générées :
+     * - opérations en attente ;
+     * - opérations validées sans justificatif ;
+     * - comptes actifs sous leur seuil d'alerte.
+     *
+     * @param int $limit Nombre maximum d'alertes.
+     *
+     * @return array
+     */
+    public function getBankAlerts(int $limit = 10): array
+    {
+        $limit = max(
+            1,
+            min(
+                50,
+                $limit
+            )
+        );
+
+        $alerts = [];
+
+        /*
+     * =========================================================
+     * 1. OPÉRATIONS EN ATTENTE
+     * =========================================================
+     */
+
+        $pendingOperations = $this->db
+            ->select([
+                'operation.id',
+                'operation.reference',
+                'operation.operation_type',
+                'operation.amount',
+                'operation.currency',
+                'operation.label',
+                'operation.operation_date',
+                'operation.created_at',
+
+                'source_account.name AS source_account_name',
+                'destination_account.name AS destination_account_name',
+            ])
+            ->from(
+                'tbl_finance_bank_operation AS operation'
+            )
+            ->join(
+                'tbl_finance_bank_account AS source_account',
+                'source_account.id = operation.source_bank_account_id',
+                'left'
+            )
+            ->join(
+                'tbl_finance_bank_account AS destination_account',
+                'destination_account.id = operation.destination_bank_account_id',
+                'left'
+            )
+            ->where(
+                'operation.status',
+                'pending'
+            )
+            ->order_by(
+                'operation.operation_date',
+                'ASC'
+            )
+            ->order_by(
+                'operation.created_at',
+                'ASC'
+            )
+            ->limit($limit)
+            ->get()
+            ->result();
+
+        foreach ($pendingOperations as $operation) {
+            $title = 'Opération bancaire en attente';
+
+            $description =
+                'L’opération '
+                . $operation->reference
+                . ' d’un montant de '
+                . number_format(
+                    (float) $operation->amount,
+                    0,
+                    ',',
+                    ' '
+                )
+                . ' '
+                . $operation->currency
+                . ' attend une validation.';
+
+            if (
+                $operation->operation_type
+                === 'transfert'
+            ) {
+                $title =
+                    'Transfert bancaire en attente';
+
+                $description =
+                    'Le transfert de '
+                    . number_format(
+                        (float) $operation->amount,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $operation->currency
+                    . ' de '
+                    . (
+                        $operation->source_account_name
+                        ?: 'un compte source'
+                    )
+                    . ' vers '
+                    . (
+                        $operation
+                        ->destination_account_name
+                        ?: 'un compte destination'
+                    )
+                    . ' attend une validation.';
+            }
+
+            $alerts[] = [
+                'type' =>
+                'warning',
+
+                'icon' =>
+                'fas fa-clock',
+
+                'title' =>
+                $title,
+
+                'description' =>
+                $description,
+
+                'operation_id' =>
+                (int) $operation->id,
+
+                'priority' =>
+                2,
+
+                'created_at' =>
+                $operation->created_at,
+            ];
+        }
+
+        /*
+     * =========================================================
+     * 2. JUSTIFICATIFS MANQUANTS
+     * =========================================================
+     */
+
+        $missingAttachments = $this->db
+            ->select([
+                'operation.id',
+                'operation.reference',
+                'operation.amount',
+                'operation.currency',
+                'operation.operation_type',
+                'operation.label',
+                'operation.created_at',
+            ])
+            ->from(
+                'tbl_finance_bank_operation AS operation'
+            )
+            ->where(
+                'operation.status',
+                'validated'
+            )
+            ->group_start()
+            ->where(
+                'operation.attachment IS NULL',
+                null,
+                false
+            )
+            ->or_where(
+                'operation.attachment',
+                ''
+            )
+            ->group_end()
+            ->order_by(
+                'operation.created_at',
+                'DESC'
+            )
+            ->limit($limit)
+            ->get()
+            ->result();
+
+        foreach ($missingAttachments as $operation) {
+            $alerts[] = [
+                'type' =>
+                'danger',
+
+                'icon' =>
+                'fas fa-file-invoice',
+
+                'title' =>
+                'Justificatif manquant',
+
+                'description' =>
+                'L’opération '
+                    . $operation->reference
+                    . ' d’un montant de '
+                    . number_format(
+                        (float) $operation->amount,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $operation->currency
+                    . ' ne possède pas encore de pièce justificative.',
+
+                'operation_id' =>
+                (int) $operation->id,
+
+                'priority' =>
+                1,
+
+                'created_at' =>
+                $operation->created_at,
+            ];
+        }
+
+        /*
+     * =========================================================
+     * 3. COMPTES SOUS LE SEUIL D'ALERTE
+     * =========================================================
+     */
+
+        $lowBalanceAccounts = $this->db
+            ->select([
+                'id',
+                'code',
+                'name',
+                'current_balance',
+                'alert_threshold',
+                'currency',
+                'created_at',
+            ])
+            ->from(
+                'tbl_finance_bank_account'
+            )
+            ->where(
+                'status',
+                'active'
+            )
+            ->where(
+                'alert_threshold >',
+                0
+            )
+            ->where(
+                'current_balance <= alert_threshold',
+                null,
+                false
+            )
+            ->order_by(
+                'current_balance',
+                'ASC'
+            )
+            ->limit($limit)
+            ->get()
+            ->result();
+
+        foreach ($lowBalanceAccounts as $account) {
+            $alerts[] = [
+                'type' =>
+                'danger',
+
+                'icon' =>
+                'fas fa-university',
+
+                'title' =>
+                'Solde bancaire critique',
+
+                'description' =>
+                'Le compte '
+                    . $account->name
+                    . ' dispose de '
+                    . number_format(
+                        (float) $account
+                            ->current_balance,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $account->currency
+                    . ', pour un seuil fixé à '
+                    . number_format(
+                        (float) $account
+                            ->alert_threshold,
+                        0,
+                        ',',
+                        ' '
+                    )
+                    . ' '
+                    . $account->currency
+                    . '.',
+
+                'account_id' =>
+                (int) $account->id,
+
+                'priority' =>
+                0,
+
+                'created_at' =>
+                $account->created_at,
+            ];
+        }
+
+        /*
+     * Les alertes les plus importantes passent d'abord.
+     */
+        usort(
+            $alerts,
+            static function (
+                array $first,
+                array $second
+            ): int {
+                if (
+                    $first['priority']
+                    === $second['priority']
+                ) {
+                    return strcmp(
+                        (string) $second['created_at'],
+                        (string) $first['created_at']
+                    );
+                }
+
+                return $first['priority']
+                    <=> $second['priority'];
+            }
+        );
+
+        return array_slice(
+            $alerts,
+            0,
+            $limit
+        );
+    }
+
+    /**
+     * Retourne les statistiques principales de la page Encaissements.
+     *
+     * Données calculées depuis tbl_finance_cashbox_operation :
+     *
+     * - total encaissé pendant le mois courant ;
+     * - variation par rapport au mois précédent ;
+     * - encaissements validés aujourd'hui ;
+     * - encaissements en attente de validation ;
+     * - créances restant à encaisser.
+     */
+    public function getEncaissementMainStatistics(): array
+    {
+        /*
+     * =========================================================
+     * 1. DATES DE TRAVAIL
+     * =========================================================
+     */
+
+        $today = date('Y-m-d');
+
+        $currentMonthStart = date('Y-m-01');
+        $currentMonthEnd   = date('Y-m-t');
+
+        $previousMonthStart = date(
+            'Y-m-01',
+            strtotime('-1 month')
+        );
+
+        $previousMonthEnd = date(
+            'Y-m-t',
+            strtotime('-1 month')
+        );
+
+        /*
+     * =========================================================
+     * 2. TOTAL ENCAISSÉ CE MOIS
+     * =========================================================
+     */
+
+        $currentMonthRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where('operation_type', 'encaissement')
+            ->where('status', 'validated')
+            ->where('currency', 'BIF')
+            ->where('operation_date >=', $currentMonthStart)
+            ->where('operation_date <=', $currentMonthEnd)
+            ->get()
+            ->row();
+
+        $currentMonthAmount = $currentMonthRow
+            ? (float) $currentMonthRow->total_amount
+            : 0;
+
+        $currentMonthCount = $currentMonthRow
+            ? (int) $currentMonthRow->total_operations
+            : 0;
+
+        /*
+     * =========================================================
+     * 3. TOTAL ENCAISSÉ LE MOIS PRÉCÉDENT
+     * =========================================================
+     */
+
+        $previousMonthRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where('operation_type', 'encaissement')
+            ->where('status', 'validated')
+            ->where('currency', 'BIF')
+            ->where('operation_date >=', $previousMonthStart)
+            ->where('operation_date <=', $previousMonthEnd)
+            ->get()
+            ->row();
+
+        $previousMonthAmount = $previousMonthRow
+            ? (float) $previousMonthRow->total_amount
+            : 0;
+
+        /*
+     * =========================================================
+     * 4. CALCULER LA VARIATION MENSUELLE
+     * =========================================================
+     */
+
+        $monthlyVariation = 0;
+
+        if ($previousMonthAmount > 0) {
+            $monthlyVariation = (
+                (
+                    $currentMonthAmount
+                    - $previousMonthAmount
+                )
+                / $previousMonthAmount
+            ) * 100;
+        } elseif ($currentMonthAmount > 0) {
+            /*
+         * Le mois précédent était à zéro,
+         * mais le mois courant contient des encaissements.
+         */
+            $monthlyVariation = 100;
+        }
+
+        /*
+     * =========================================================
+     * 5. ENCAISSEMENTS DU JOUR
+     * =========================================================
+     */
+
+        $todayRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where('operation_type', 'encaissement')
+            ->where('status', 'validated')
+            ->where('currency', 'BIF')
+            ->where('operation_date', $today)
+            ->get()
+            ->row();
+
+        $todayAmount = $todayRow
+            ? (float) $todayRow->total_amount
+            : 0;
+
+        $todayCount = $todayRow
+            ? (int) $todayRow->total_operations
+            : 0;
+
+        /*
+     * =========================================================
+     * 6. ENCAISSEMENTS EN ATTENTE
+     * =========================================================
+     */
+
+        $pendingRow = $this->db
+            ->select("
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where('operation_type', 'encaissement')
+            ->where('status', 'pending')
+            ->where('currency', 'BIF')
+            ->get()
+            ->row();
+
+        $pendingAmount = $pendingRow
+            ? (float) $pendingRow->total_amount
+            : 0;
+
+        $pendingCount = $pendingRow
+            ? (int) $pendingRow->total_operations
+            : 0;
+
+        /*
+     * =========================================================
+     * 7. CRÉANCES À ENCAISSER
+     * =========================================================
+     *
+     * Cette statistique doit provenir de la facturation :
+     *
+     * montant total facturé
+     * - montant déjà encaissé
+     * = créance restante
+     *
+     * Nous la gardons temporairement à zéro jusqu'à ce que
+     * les noms exacts des tables et colonnes de facturation
+     * soient reliés à ce module.
+     */
+
+        $receivableAmount = 0;
+        $receivableClientsCount = 0;
+
+        /*
+     * =========================================================
+     * 8. RETOURNER LES STATISTIQUES
+     * =========================================================
+     */
+
+        return [
+            'currency' => 'BIF',
+
+            'current_month_amount' =>
+            $currentMonthAmount,
+
+            'current_month_count' =>
+            $currentMonthCount,
+
+            'previous_month_amount' =>
+            $previousMonthAmount,
+
+            'monthly_variation' =>
+            $monthlyVariation,
+
+            'today_amount' =>
+            $todayAmount,
+
+            'today_count' =>
+            $todayCount,
+
+            'pending_amount' =>
+            $pendingAmount,
+
+            'pending_count' =>
+            $pendingCount,
+
+            'receivable_amount' =>
+            $receivableAmount,
+
+            'receivable_clients_count' =>
+            $receivableClientsCount,
+        ];
+    }
+
+    /**
+     * Retourne toutes les caisses actives.
+     *
+     * Cette méthode est utilisée notamment dans :
+     * - la page Encaissements ;
+     * - la page Décaissements ;
+     * - les modales d'opérations de caisse.
+     *
+     * @return array
+     */
+    public function getAllActiveCashboxes(): array
+    {
+        return $this->db
+            ->select([
+                'id',
+                'code',
+                'name',
+                'type',
+                'chantier_id',
+                'responsable',
+                'devise',
+                'opening_balance',
+                'current_balance',
+                'alert_threshold',
+                'observation',
+                'status',
+                'created_by',
+                'created_at',
+                'updated_at',
+            ])
+            ->from('tbl_finance_cashbox')
+            ->where('status', 'active')
+            ->order_by(
+                "
+            CASE
+                WHEN type = 'siege' THEN 0
+                WHEN type = 'chantier' THEN 1
+                ELSE 2
+            END
+            ",
+                '',
+                false
+            )
+            ->order_by('name', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Retourne l'objectif mensuel d'encaissement.
+     *
+     * Cette méthode est temporaire.
+     * Plus tard, elle pourra lire les objectifs depuis une table
+     * de prévisions de trésorerie.
+     *
+     * @param string $monthKey Exemple : 2026-07
+     *
+     * @return float
+     */
+    private function getMonthlyEncaissementObjective(
+        string $monthKey
+    ): float {
+        /*
+     * Objectif par défaut.
+     */
+        $defaultObjective =
+            450000000;
+
+        /*
+     * Objectifs de test personnalisés.
+     */
+        $objectives = [
+            '2026-01' => 300000000,
+            '2026-02' => 320000000,
+            '2026-03' => 340000000,
+            '2026-04' => 350000000,
+            '2026-05' => 400000000,
+            '2026-06' => 430000000,
+            '2026-07' => 450000000,
+            '2026-08' => 460000000,
+            '2026-09' => 480000000,
+            '2026-10' => 500000000,
+            '2026-11' => 520000000,
+            '2026-12' => 550000000,
+        ];
+
+        return isset($objectives[$monthKey])
+            ? (float) $objectives[$monthKey]
+            : $defaultObjective;
+    }
+
+    /**
+     * Retourne l'évolution mensuelle des encaissements.
+     *
+     * Périodes acceptées :
+     * - 6months
+     * - 12months
+     * - current_year
+     * - previous_year
+     *
+     * @param string $period
+     *
+     * @return array
+     */
+    public function getEncaissementEvolution(
+        string $period = '6months'
+    ): array {
+        /*
+     * =========================================================
+     * 1. DÉTERMINER LA PÉRIODE
+     * =========================================================
+     */
+
+        $today = date('Y-m-d');
+
+        switch ($period) {
+            case '12months':
+                $startDate = date(
+                    'Y-m-01',
+                    strtotime('-11 months')
+                );
+
+                $endDate = date('Y-m-t');
+
+                $numberOfMonths = 12;
+                break;
+
+            case 'current_year':
+                $startDate = date('Y-01-01');
+                $endDate = date('Y-12-31');
+
+                $numberOfMonths = 12;
+                break;
+
+            case 'previous_year':
+                $previousYear = (int) date('Y') - 1;
+
+                $startDate =
+                    $previousYear . '-01-01';
+
+                $endDate =
+                    $previousYear . '-12-31';
+
+                $numberOfMonths = 12;
+                break;
+
+            case '6months':
+            default:
+                $period = '6months';
+
+                $startDate = date(
+                    'Y-m-01',
+                    strtotime('-5 months')
+                );
+
+                $endDate = date('Y-m-t');
+
+                $numberOfMonths = 6;
+                break;
+        }
+
+        /*
+     * =========================================================
+     * 2. RÉCUPÉRER LES ENCAISSEMENTS PAR MOIS
+     * =========================================================
+     */
+
+        $rows = $this->db
+            ->select("
+            DATE_FORMAT(
+                operation_date,
+                '%Y-%m'
+            ) AS month_key,
+
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where(
+                'operation_type',
+                'encaissement'
+            )
+            ->where(
+                'status',
+                'validated'
+            )
+            ->where(
+                'currency',
+                'BIF'
+            )
+            ->where(
+                'operation_date >=',
+                $startDate
+            )
+            ->where(
+                'operation_date <=',
+                $endDate
+            )
+            ->group_by("
+            DATE_FORMAT(
+                operation_date,
+                '%Y-%m'
+            )
+        ", false)
+            ->order_by(
+                'month_key',
+                'ASC'
+            )
+            ->get()
+            ->result();
+
+        /*
+     * Indexation des résultats.
+     */
+        $indexedRows = [];
+
+        foreach ($rows as $row) {
+            $indexedRows[$row->month_key] = [
+                'amount' =>
+                (float) $row->total_amount,
+
+                'count' =>
+                (int) $row->total_operations,
+            ];
+        }
+
+        /*
+     * =========================================================
+     * 3. NOMS DES MOIS
+     * =========================================================
+     */
+
+        $monthNames = [
+            1  => 'Janvier',
+            2  => 'Février',
+            3  => 'Mars',
+            4  => 'Avril',
+            5  => 'Mai',
+            6  => 'Juin',
+            7  => 'Juillet',
+            8  => 'Août',
+            9  => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre',
+        ];
+
+        $labels = [];
+        $amounts = [];
+        $operationCounts = [];
+        $objectives = [];
+
+        /*
+     * =========================================================
+     * 4. CONSTRUIRE TOUS LES MOIS, MÊME SANS OPÉRATION
+     * =========================================================
+     */
+
+        if (
+            in_array(
+                $period,
+                [
+                    'current_year',
+                    'previous_year',
+                ],
+                true
+            )
+        ) {
+            $year = $period === 'previous_year'
+                ? (int) date('Y') - 1
+                : (int) date('Y');
+
+            for ($month = 1; $month <= 12; $month++) {
+                $monthKey =
+                    $year
+                    . '-'
+                    . str_pad(
+                        (string) $month,
+                        2,
+                        '0',
+                        STR_PAD_LEFT
+                    );
+
+                $labels[] =
+                    $monthNames[$month];
+
+                $amounts[] =
+                    isset($indexedRows[$monthKey])
+                    ? $indexedRows[$monthKey]['amount']
+                    : 0;
+
+                $operationCounts[] =
+                    isset($indexedRows[$monthKey])
+                    ? $indexedRows[$monthKey]['count']
+                    : 0;
+
+                /*
+             * Objectif temporaire.
+             */
+                $objectives[] =
+                    $this->getMonthlyEncaissementObjective(
+                        $monthKey
+                    );
+            }
+        } else {
+            $startTimestamp =
+                strtotime($startDate);
+
+            for (
+                $index = 0;
+                $index < $numberOfMonths;
+                $index++
+            ) {
+                $timestamp = strtotime(
+                    '+' . $index . ' month',
+                    $startTimestamp
+                );
+
+                $monthKey =
+                    date(
+                        'Y-m',
+                        $timestamp
+                    );
+
+                $monthNumber =
+                    (int) date(
+                        'n',
+                        $timestamp
+                    );
+
+                $year =
+                    date(
+                        'Y',
+                        $timestamp
+                    );
+
+                $labels[] =
+                    $monthNames[$monthNumber]
+                    . ' '
+                    . $year;
+
+                $amounts[] =
+                    isset($indexedRows[$monthKey])
+                    ? $indexedRows[$monthKey]['amount']
+                    : 0;
+
+                $operationCounts[] =
+                    isset($indexedRows[$monthKey])
+                    ? $indexedRows[$monthKey]['count']
+                    : 0;
+
+                $objectives[] =
+                    $this->getMonthlyEncaissementObjective(
+                        $monthKey
+                    );
+            }
+        }
+
+        /*
+     * =========================================================
+     * 5. TOTAUX DE LA PÉRIODE
+     * =========================================================
+     */
+
+        $totalAmount = array_sum($amounts);
+
+        $totalOperations =
+            array_sum($operationCounts);
+
+        $averageAmount = count($amounts) > 0
+            ? $totalAmount / count($amounts)
+            : 0;
+
+        return [
+            'period' =>
+            $period,
+
+            'start_date' =>
+            $startDate,
+
+            'end_date' =>
+            $endDate,
+
+            'labels' =>
+            $labels,
+
+            'amounts' =>
+            $amounts,
+
+            'operation_counts' =>
+            $operationCounts,
+
+            'objectives' =>
+            $objectives,
+
+            'total_amount' =>
+            $totalAmount,
+
+            'total_operations' =>
+            $totalOperations,
+
+            'average_amount' =>
+            $averageAmount,
+        ];
+    }
+
+    /**
+     * Retourne la répartition des encaissements par catégorie.
+     *
+     * Les résultats sont calculés sur la période sélectionnée.
+     *
+     * @param string $startDate
+     * @param string $endDate
+     *
+     * @return array
+     */
+    public function getEncaissementSources(
+        string $startDate,
+        string $endDate
+    ): array {
+        $rows = $this->db
+            ->select("
+            CASE
+                WHEN category IS NULL
+                    OR TRIM(category) = ''
+                THEN 'Autre produit'
+                ELSE category
+            END AS source_name,
+
+            COALESCE(
+                SUM(amount),
+                0
+            ) AS total_amount,
+
+            COUNT(id) AS total_operations
+        ", false)
+            ->from('tbl_finance_cashbox_operation')
+            ->where(
+                'operation_type',
+                'encaissement'
+            )
+            ->where(
+                'status',
+                'validated'
+            )
+            ->where(
+                'currency',
+                'BIF'
+            )
+            ->where(
+                'operation_date >=',
+                $startDate
+            )
+            ->where(
+                'operation_date <=',
+                $endDate
+            )
+            ->group_by("
+            CASE
+                WHEN category IS NULL
+                    OR TRIM(category) = ''
+                THEN 'Autre produit'
+                ELSE category
+            END
+        ", false)
+            ->order_by(
+                'total_amount',
+                'DESC'
+            )
+            ->get()
+            ->result();
+
+        $totalSourcesAmount = 0;
+
+        foreach ($rows as $row) {
+            $totalSourcesAmount +=
+                (float) $row->total_amount;
+        }
+
+        /*
+     * Icônes selon la catégorie.
+     */
+        $icons = [
+            'Paiement client' =>
+            'fas fa-users',
+
+            'Paiements clients' =>
+            'fas fa-users',
+
+            'Avance sur marché' =>
+            'fas fa-file-contract',
+
+            'Avances sur marchés' =>
+            'fas fa-file-contract',
+
+            'Emprunt' =>
+            'fas fa-university',
+
+            'Emprunts' =>
+            'fas fa-university',
+
+            'Remboursement' =>
+            'fas fa-undo-alt',
+
+            'Remboursements' =>
+            'fas fa-undo-alt',
+
+            'Vente actif' =>
+            'fas fa-building',
+
+            'Autre produit' =>
+            'fas fa-ellipsis-h',
+
+            'Autres produits' =>
+            'fas fa-ellipsis-h',
+        ];
+
+        $sources = [];
+
+        foreach ($rows as $row) {
+            $amount =
+                (float) $row->total_amount;
+
+            $percentage =
+                $totalSourcesAmount > 0
+                ? (
+                    $amount
+                    / $totalSourcesAmount
+                ) * 100
+                : 0;
+
+            $sourceName =
+                trim(
+                    (string) $row->source_name
+                );
+
+            $sources[] = [
+                'name' =>
+                $sourceName,
+
+                'amount' =>
+                $amount,
+
+                'operation_count' =>
+                (int) $row->total_operations,
+
+                'percentage' =>
+                min(
+                    100,
+                    max(
+                        0,
+                        $percentage
+                    )
+                ),
+
+                'icon' =>
+                $icons[$sourceName]
+                    ?? 'fas fa-ellipsis-h',
+            ];
+        }
+
+        return [
+            'total_amount' =>
+            $totalSourcesAmount,
+
+            'sources' =>
+            $sources,
+        ];
+    }
+
+    /**
+     * Retourne l'historique paginé des encaissements.
+     *
+     * @param int $limit
+     * @param int $offset
+     *
+     * @return array
+     */
+    public function getEncaissementHistory(
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+        $limit = max(1, min(100, $limit));
+        $offset = max(0, $offset);
+
+        return $this->db
+            ->select([
+                'operation.id',
+                'operation.reference',
+                'operation.operation_date',
+                'operation.destination_cashbox_id',
+                'operation.amount',
+                'operation.currency',
+                'operation.category',
+                'operation.third_party',
+                'operation.payment_method',
+                'operation.document_number',
+                'operation.attachment',
+                'operation.label',
+                'operation.observation',
+                'operation.status',
+                'operation.created_by',
+                'operation.validated_by',
+                'operation.created_at',
+                'operation.updated_at',
+
+                'cashbox.code AS cashbox_code',
+                'cashbox.name AS cashbox_name',
+                'cashbox.type AS cashbox_type',
+                'cashbox.chantier_id AS cashbox_chantier_id',
+
+                'chantier.name AS chantier_name',
+                'chantier.ref_chantier AS chantier_reference',
+            ])
+            ->from(
+                'tbl_finance_cashbox_operation AS operation'
+            )
+            ->join(
+                'tbl_finance_cashbox AS cashbox',
+                'cashbox.id = operation.destination_cashbox_id',
+                'left'
+            )
+            ->join(
+                'chantiers AS chantier',
+                'chantier.id = cashbox.chantier_id',
+                'left'
+            )
+            ->where(
+                'operation.operation_type',
+                'encaissement'
+            )
+            ->order_by(
+                'operation.operation_date',
+                'DESC'
+            )
+            ->order_by(
+                'operation.created_at',
+                'DESC'
+            )
+            ->order_by(
+                'operation.id',
+                'DESC'
+            )
+            ->limit(
+                $limit,
+                $offset
+            )
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Compte tous les encaissements enregistrés.
+     */
+    public function countEncaissements(): int
+    {
+        return (int) $this->db
+            ->from('tbl_finance_cashbox_operation')
+            ->where(
+                'operation_type',
+                'encaissement'
+            )
+            ->count_all_results();
+    }
+
+    /**
+     * Retourne les prochains encaissements attendus.
+     *
+     * Pour le moment, un encaissement attendu correspond à une
+     * opération de type encaissement ayant le statut pending.
+     *
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function getExpectedEncaissements(
+        int $limit = 6
+    ): array {
+        $limit = max(
+            1,
+            min(
+                50,
+                $limit
+            )
+        );
+
+        return $this->db
+            ->select([
+                'operation.id',
+                'operation.reference',
+                'operation.operation_date',
+                'operation.amount',
+                'operation.currency',
+                'operation.category',
+                'operation.third_party',
+                'operation.payment_method',
+                'operation.document_number',
+                'operation.label',
+                'operation.observation',
+                'operation.status',
+                'operation.created_at',
+
+                'cashbox.id AS cashbox_id',
+                'cashbox.code AS cashbox_code',
+                'cashbox.name AS cashbox_name',
+                'cashbox.type AS cashbox_type',
+
+                'chantier.id AS chantier_id',
+                'chantier.name AS chantier_name',
+                'chantier.ref_chantier AS chantier_reference',
+            ])
+            ->from(
+                'tbl_finance_cashbox_operation AS operation'
+            )
+            ->join(
+                'tbl_finance_cashbox AS cashbox',
+                'cashbox.id = operation.destination_cashbox_id',
+                'left'
+            )
+            ->join(
+                'chantiers AS chantier',
+                'chantier.id = cashbox.chantier_id',
+                'left'
+            )
+            ->where(
+                'operation.operation_type',
+                'encaissement'
+            )
+            ->where(
+                'operation.status',
+                'pending'
+            )
+            ->order_by(
+                'operation.operation_date',
+                'ASC'
+            )
+            ->order_by(
+                'operation.created_at',
+                'ASC'
+            )
+            ->limit($limit)
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Compte les encaissements en attente.
+     */
+    public function countExpectedEncaissements(): int
+    {
+        return (int) $this->db
+            ->from(
+                'tbl_finance_cashbox_operation'
+            )
+            ->where(
+                'operation_type',
+                'encaissement'
+            )
+            ->where(
+                'status',
+                'pending'
+            )
+            ->count_all_results();
+    }
+
+    /**
+     * Retourne une synthèse des encaissements par payeur/client.
+     *
+     * Logique provisoire :
+     *
+     * - encaissé = opérations validées ;
+     * - reste = opérations en attente ;
+     * - total de référence = validé + en attente.
+     *
+     * La vraie valeur facturée devra ensuite provenir
+     * des tables du module Facturation.
+     *
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function getEncaissementClientSummary(
+        int $limit = 10
+    ): array {
+        $limit = max(
+            1,
+            min(
+                100,
+                $limit
+            )
+        );
+
+        $sql = "
+        SELECT
+            CASE
+                WHEN third_party IS NULL
+                    OR TRIM(third_party) = ''
+                THEN 'Provenance non renseignée'
+                ELSE TRIM(third_party)
+            END AS client_name,
+
+            COUNT(id) AS operation_count,
+
+            SUM(
+                CASE
+                    WHEN status = 'validated'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS validated_count,
+
+            SUM(
+                CASE
+                    WHEN status = 'pending'
+                    THEN 1
+                    ELSE 0
+                END
+            ) AS pending_count,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN status = 'validated'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS collected_amount,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN status = 'pending'
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS pending_amount,
+
+            COALESCE(
+                SUM(
+                    CASE
+                        WHEN status IN (
+                            'validated',
+                            'pending'
+                        )
+                        THEN amount
+                        ELSE 0
+                    END
+                ),
+                0
+            ) AS expected_total
+
+        FROM tbl_finance_cashbox_operation
+
+        WHERE operation_type = 'encaissement'
+        AND currency = 'BIF'
+        AND status IN (
+            'validated',
+            'pending'
+        )
+
+        GROUP BY
+            CASE
+                WHEN third_party IS NULL
+                    OR TRIM(third_party) = ''
+                THEN 'Provenance non renseignée'
+                ELSE TRIM(third_party)
+            END
+
+        ORDER BY expected_total DESC
+
+        LIMIT ?
+    ";
+
+        $rows = $this->db
+            ->query(
+                $sql,
+                [$limit]
+            )
+            ->result();
+
+        $results = [];
+
+        foreach ($rows as $row) {
+            $expectedTotal =
+                (float) $row->expected_total;
+
+            $collectedAmount =
+                (float) $row->collected_amount;
+
+            $pendingAmount =
+                (float) $row->pending_amount;
+
+            $recoveryPercentage =
+                $expectedTotal > 0
+                ? (
+                    $collectedAmount
+                    / $expectedTotal
+                ) * 100
+                : 0;
+
+            $results[] = [
+                'client_name' =>
+                $row->client_name,
+
+                'operation_count' =>
+                (int) $row->operation_count,
+
+                'validated_count' =>
+                (int) $row->validated_count,
+
+                'pending_count' =>
+                (int) $row->pending_count,
+
+                'expected_total' =>
+                $expectedTotal,
+
+                'collected_amount' =>
+                $collectedAmount,
+
+                'pending_amount' =>
+                $pendingAmount,
+
+                'recovery_percentage' =>
+                min(
+                    100,
+                    max(
+                        0,
+                        $recoveryPercentage
+                    )
+                ),
+            ];
+        }
+
+        return $results;
+    }
+
+    /**
+     * Retourne les prochaines échéances d'encaissement.
+     *
+     * @param int $limit
+     *
+     * @return array
+     */
+    public function getUpcomingExpectedReceipts(
+        int $limit = 4
+    ): array {
+        /*
+     * Sécuriser la limite.
+     */
+        $limit = max(
+            1,
+            min(
+                50,
+                $limit
+            )
+        );
+
+        return $this->db
+            ->select([
+                'expected.id',
+                'expected.reference',
+                'expected.client_name',
+                'expected.client_type',
+                'expected.document_type',
+                'expected.document_number',
+                'expected.label',
+                'expected.chantier_id',
+                'expected.expected_date',
+                'expected.expected_amount',
+                'expected.currency',
+                'expected.status',
+                'expected.observation',
+                'expected.created_by',
+                'expected.created_at',
+                'expected.updated_at',
+
+                'chantier.name AS chantier_name',
+                'chantier.ref_chantier AS chantier_reference',
+            ])
+            ->from(
+                'tbl_finance_expected_receipt AS expected'
+            )
+            ->join(
+                'chantiers AS chantier',
+                'chantier.id = expected.chantier_id',
+                'left'
+            )
+            ->where_in(
+                'expected.status',
+                [
+                    'pending',
+                    'partial',
+                    'overdue',
+                ]
+            )
+            ->where(
+                'expected.expected_amount >',
+                0
+            )
+            ->order_by(
+                "
+            CASE
+                WHEN expected.expected_date < CURDATE()
+                THEN 0
+                ELSE 1
+            END
+            ",
+                '',
+                false
+            )
+            ->order_by(
+                'expected.expected_date',
+                'ASC'
+            )
+            ->order_by(
+                'expected.id',
+                'ASC'
+            )
+            ->limit($limit)
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Compte toutes les échéances encore ouvertes.
+     *
+     * @return int
+     */
+    public function countOpenExpectedReceipts(): int
+    {
+        return (int) $this->db
+            ->from(
+                'tbl_finance_expected_receipt'
+            )
+            ->where_in(
+                'status',
+                [
+                    'pending',
+                    'partial',
+                    'overdue',
+                ]
+            )
+            ->count_all_results();
+    }
+
+    /**
+     * Retourne la liste distincte des établissements bancaires.
+     *
+     * @return array
+     */
+    public function getAvailableBankNames(): array
+    {
+        return $this->db
+            ->select('bank_name')
+            ->from('tbl_finance_bank_account')
+            ->where('bank_name IS NOT NULL', null, false)
+            ->where("TRIM(bank_name) <> ''", null, false)
+            ->group_by('bank_name')
+            ->order_by('bank_name', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Retourne la situation des comptes bancaires
+     * avec possibilité de filtrage.
+     *
+     * Filtres disponibles :
+     * - search
+     * - bank_name
+     * - currency
+     * - status
+     *
+     * @param array $filters
+     *
+     * @return array
+     */
+    public function getFilteredBankAccounts(
+        array $filters = []
+    ): array {
+        /*
+     * =========================================================
+     * 1. VALEURS DES FILTRES
+     * =========================================================
+     */
+
+        $search = trim(
+            (string) (
+                $filters['search']
+                ?? ''
+            )
+        );
+
+        $bankName = trim(
+            (string) (
+                $filters['bank_name']
+                ?? ''
+            )
+        );
+
+        $currency = trim(
+            (string) (
+                $filters['currency']
+                ?? ''
+            )
+        );
+
+        $status = trim(
+            (string) (
+                $filters['status']
+                ?? ''
+            )
+        );
+
+        /*
+     * =========================================================
+     * 2. REQUÊTE DE BASE
+     * =========================================================
+     */
+
+        $this->db
+            ->select([
+                'account.id',
+                'account.code',
+                'account.name',
+                'account.bank_name',
+                'account.account_number',
+                'account.account_type',
+                'account.currency',
+                'account.opening_balance',
+                'account.current_balance',
+                'account.alert_threshold',
+                'account.branch_name',
+                'account.swift_code',
+                'account.observation',
+                'account.status',
+                'account.created_by',
+                'account.updated_by',
+                'account.created_at',
+                'account.updated_at',
+            ])
+            ->from(
+                'tbl_finance_bank_account AS account'
+            );
+
+        /*
+     * =========================================================
+     * 3. FILTRE DE RECHERCHE
+     * =========================================================
+     *
+     * Recherche dans :
+     * - code
+     * - intitulé
+     * - banque
+     * - numéro de compte
+     * - agence
+     * - code SWIFT
+     */
+
+        if ($search !== '') {
+            $this->db
+                ->group_start()
+                ->like(
+                    'account.code',
+                    $search
+                )
+                ->or_like(
+                    'account.name',
+                    $search
+                )
+                ->or_like(
+                    'account.bank_name',
+                    $search
+                )
+                ->or_like(
+                    'account.account_number',
+                    $search
+                )
+                ->or_like(
+                    'account.branch_name',
+                    $search
+                )
+                ->or_like(
+                    'account.swift_code',
+                    $search
+                )
+                ->group_end();
+        }
+
+        /*
+     * =========================================================
+     * 4. FILTRE PAR BANQUE
+     * =========================================================
+     */
+
+        if ($bankName !== '') {
+            $this->db->where(
+                'account.bank_name',
+                $bankName
+            );
+        }
+
+        /*
+     * =========================================================
+     * 5. FILTRE PAR DEVISE
+     * =========================================================
+     */
+
+        if (
+            in_array(
+                $currency,
+                [
+                    'BIF',
+                    'USD',
+                    'EUR',
+                ],
+                true
+            )
+        ) {
+            $this->db->where(
+                'account.currency',
+                $currency
+            );
+        }
+
+        /*
+     * =========================================================
+     * 6. FILTRE PAR STATUT
+     * =========================================================
+     */
+
+        if (
+            in_array(
+                $status,
+                [
+                    'active',
+                    'inactive',
+                    'blocked',
+                ],
+                true
+            )
+        ) {
+            $this->db->where(
+                'account.status',
+                $status
+            );
+        }
+
+        /*
+     * =========================================================
+     * 7. TRI
+     * =========================================================
+     *
+     * On affiche :
+     * - les comptes actifs en premier ;
+     * - ensuite les comptes inactifs ;
+     * - enfin les comptes bloqués.
+     */
+
+        $this->db->order_by(
+            "
+        CASE
+            WHEN account.status = 'active' THEN 1
+            WHEN account.status = 'inactive' THEN 2
+            WHEN account.status = 'blocked' THEN 3
+            ELSE 4
+        END
+        ",
+            '',
+            false
+        );
+
+        $this->db
+            ->order_by(
+                'account.bank_name',
+                'ASC'
+            )
+            ->order_by(
+                'account.name',
+                'ASC'
+            )
+            ->order_by(
+                'account.id',
+                'DESC'
+            );
+
+        return $this->db
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Compte les comptes bancaires correspondant aux filtres.
+     *
+     * @param array $filters
+     *
+     * @return int
+     */
+    public function countFilteredBankAccounts(
+        array $filters = []
+    ): int {
+        $search = trim(
+            (string) (
+                $filters['search']
+                ?? ''
+            )
+        );
+
+        $bankName = trim(
+            (string) (
+                $filters['bank_name']
+                ?? ''
+            )
+        );
+
+        $currency = trim(
+            (string) (
+                $filters['currency']
+                ?? ''
+            )
+        );
+
+        $status = trim(
+            (string) (
+                $filters['status']
+                ?? ''
+            )
+        );
+
+        $this->db
+            ->from(
+                'tbl_finance_bank_account AS account'
+            );
+
+        if ($search !== '') {
+            $this->db
+                ->group_start()
+                ->like(
+                    'account.code',
+                    $search
+                )
+                ->or_like(
+                    'account.name',
+                    $search
+                )
+                ->or_like(
+                    'account.bank_name',
+                    $search
+                )
+                ->or_like(
+                    'account.account_number',
+                    $search
+                )
+                ->or_like(
+                    'account.branch_name',
+                    $search
+                )
+                ->or_like(
+                    'account.swift_code',
+                    $search
+                )
+                ->group_end();
+        }
+
+        if ($bankName !== '') {
+            $this->db->where(
+                'account.bank_name',
+                $bankName
+            );
+        }
+
+        if (
+            in_array(
+                $currency,
+                [
+                    'BIF',
+                    'USD',
+                    'EUR',
+                ],
+                true
+            )
+        ) {
+            $this->db->where(
+                'account.currency',
+                $currency
+            );
+        }
+
+        if (
+            in_array(
+                $status,
+                [
+                    'active',
+                    'inactive',
+                    'blocked',
+                ],
+                true
+            )
+        ) {
+            $this->db->where(
+                'account.status',
+                $status
+            );
+        }
+
+        return (int) $this->db
+            ->count_all_results();
+    }
+
+
+    /**
+     * Retourne les statistiques principales de la page Décaissements.
+     *
+     * Les montants affichés sont limités aux opérations en BIF.
+     *
+     * Statistiques retournées :
+     * - total décaissé durant le mois courant ;
+     * - variation par rapport au mois précédent ;
+     * - décaissements du jour ;
+     * - opérations en attente de paiement ;
+     * - trésorerie totale disponible.
+     *
+     * @return array
+     */
+    public function getDecaissementMainStatistics(): array
+    {
+        /*
+     * =========================================================
+     * 1. PÉRIODES
+     * =========================================================
+     */
+
+        $today = date('Y-m-d');
+
+        $currentMonthStart =
+            date('Y-m-01');
+
+        $currentMonthEnd =
+            date('Y-m-t');
+
+        $previousMonthStart =
+            date(
+                'Y-m-01',
+                strtotime('first day of previous month')
+            );
+
+        $previousMonthEnd =
+            date(
+                'Y-m-t',
+                strtotime('last day of previous month')
+            );
+
+        /*
+     * =========================================================
+     * 2. VALEURS PAR DÉFAUT
+     * =========================================================
+     */
+
+        $cashboxCurrentMonthAmount = 0;
+        $bankCurrentMonthAmount = 0;
+
+        $cashboxPreviousMonthAmount = 0;
+        $bankPreviousMonthAmount = 0;
+
+        $cashboxTodayAmount = 0;
+        $bankTodayAmount = 0;
+
+        $cashboxTodayCount = 0;
+        $bankTodayCount = 0;
+
+        $cashboxPendingAmount = 0;
+        $bankPendingAmount = 0;
+
+        $cashboxPendingCount = 0;
+        $bankPendingCount = 0;
+
+        $availableCashboxBalance = 0;
+        $availableBankBalance = 0;
+
+        /*
+     * =========================================================
+     * 3. DÉCAISSEMENTS DE CAISSE DU MOIS COURANT
+     * =========================================================
+     */
+
+        if (
+            $this->db->table_exists(
+                'tbl_finance_cashbox_operation'
+            )
+        ) {
+            $cashboxCurrentMonth = $this->db
+                ->select(
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    false
+                )
+                ->from(
+                    'tbl_finance_cashbox_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date >=',
+                    $currentMonthStart
+                )
+                ->where(
+                    'operation_date <=',
+                    $currentMonthEnd
+                )
+                ->get()
+                ->row();
+
+            $cashboxCurrentMonthAmount =
+                $cashboxCurrentMonth
+                ? (float) $cashboxCurrentMonth->total_amount
+                : 0;
+
+            /*
+         * Mois précédent.
+         */
+            $cashboxPreviousMonth = $this->db
+                ->select(
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    false
+                )
+                ->from(
+                    'tbl_finance_cashbox_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date >=',
+                    $previousMonthStart
+                )
+                ->where(
+                    'operation_date <=',
+                    $previousMonthEnd
+                )
+                ->get()
+                ->row();
+
+            $cashboxPreviousMonthAmount =
+                $cashboxPreviousMonth
+                ? (float) $cashboxPreviousMonth->total_amount
+                : 0;
+
+            /*
+         * Décaissements du jour.
+         */
+            $cashboxToday = $this->db
+                ->select([
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    'COUNT(id) AS total_operations',
+                ], false)
+                ->from(
+                    'tbl_finance_cashbox_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date',
+                    $today
+                )
+                ->get()
+                ->row();
+
+            if ($cashboxToday) {
+                $cashboxTodayAmount =
+                    (float) $cashboxToday->total_amount;
+
+                $cashboxTodayCount =
+                    (int) $cashboxToday->total_operations;
+            }
+
+            /*
+         * Décaissements en attente.
+         */
+            $cashboxPending = $this->db
+                ->select([
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    'COUNT(id) AS total_operations',
+                ], false)
+                ->from(
+                    'tbl_finance_cashbox_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'pending'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->get()
+                ->row();
+
+            if ($cashboxPending) {
+                $cashboxPendingAmount =
+                    (float) $cashboxPending->total_amount;
+
+                $cashboxPendingCount =
+                    (int) $cashboxPending->total_operations;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 4. DÉCAISSEMENTS BANCAIRES
+     * =========================================================
+     */
+
+        if (
+            $this->db->table_exists(
+                'tbl_finance_bank_operation'
+            )
+        ) {
+            /*
+         * Mois courant.
+         */
+            $bankCurrentMonth = $this->db
+                ->select(
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    false
+                )
+                ->from(
+                    'tbl_finance_bank_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date >=',
+                    $currentMonthStart
+                )
+                ->where(
+                    'operation_date <=',
+                    $currentMonthEnd
+                )
+                ->get()
+                ->row();
+
+            $bankCurrentMonthAmount =
+                $bankCurrentMonth
+                ? (float) $bankCurrentMonth->total_amount
+                : 0;
+
+            /*
+         * Mois précédent.
+         */
+            $bankPreviousMonth = $this->db
+                ->select(
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    false
+                )
+                ->from(
+                    'tbl_finance_bank_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date >=',
+                    $previousMonthStart
+                )
+                ->where(
+                    'operation_date <=',
+                    $previousMonthEnd
+                )
+                ->get()
+                ->row();
+
+            $bankPreviousMonthAmount =
+                $bankPreviousMonth
+                ? (float) $bankPreviousMonth->total_amount
+                : 0;
+
+            /*
+         * Décaissements bancaires du jour.
+         */
+            $bankToday = $this->db
+                ->select([
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    'COUNT(id) AS total_operations',
+                ], false)
+                ->from(
+                    'tbl_finance_bank_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date',
+                    $today
+                )
+                ->get()
+                ->row();
+
+            if ($bankToday) {
+                $bankTodayAmount =
+                    (float) $bankToday->total_amount;
+
+                $bankTodayCount =
+                    (int) $bankToday->total_operations;
+            }
+
+            /*
+         * Décaissements bancaires en attente.
+         */
+            $bankPending = $this->db
+                ->select([
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    'COUNT(id) AS total_operations',
+                ], false)
+                ->from(
+                    'tbl_finance_bank_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'pending'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->get()
+                ->row();
+
+            if ($bankPending) {
+                $bankPendingAmount =
+                    (float) $bankPending->total_amount;
+
+                $bankPendingCount =
+                    (int) $bankPending->total_operations;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 5. SOLDES DISPONIBLES DES CAISSES
+     * =========================================================
+     */
+
+        if (
+            $this->db->table_exists(
+                'tbl_finance_cashbox'
+            )
+        ) {
+            $cashboxAvailable = $this->db
+                ->select(
+                    'COALESCE(SUM(current_balance), 0) AS total_balance',
+                    false
+                )
+                ->from(
+                    'tbl_finance_cashbox'
+                )
+                ->where(
+                    'status',
+                    'active'
+                )
+                ->where(
+                    'devise',
+                    'BIF'
+                )
+                ->get()
+                ->row();
+
+            $availableCashboxBalance =
+                $cashboxAvailable
+                ? (float) $cashboxAvailable->total_balance
+                : 0;
+        }
+
+        /*
+     * =========================================================
+     * 6. SOLDES DISPONIBLES DES COMPTES BANCAIRES
+     * =========================================================
+     */
+
+        if (
+            $this->db->table_exists(
+                'tbl_finance_bank_account'
+            )
+        ) {
+            $bankAvailable = $this->db
+                ->select(
+                    'COALESCE(SUM(current_balance), 0) AS total_balance',
+                    false
+                )
+                ->from(
+                    'tbl_finance_bank_account'
+                )
+                ->where(
+                    'status',
+                    'active'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->get()
+                ->row();
+
+            $availableBankBalance =
+                $bankAvailable
+                ? (float) $bankAvailable->total_balance
+                : 0;
+        }
+
+        /*
+     * =========================================================
+     * 7. TOTAUX CONSOLIDÉS
+     * =========================================================
+     */
+
+        $currentMonthAmount =
+            $cashboxCurrentMonthAmount
+            + $bankCurrentMonthAmount;
+
+        $previousMonthAmount =
+            $cashboxPreviousMonthAmount
+            + $bankPreviousMonthAmount;
+
+        $todayAmount =
+            $cashboxTodayAmount
+            + $bankTodayAmount;
+
+        $todayCount =
+            $cashboxTodayCount
+            + $bankTodayCount;
+
+        $pendingAmount =
+            $cashboxPendingAmount
+            + $bankPendingAmount;
+
+        $pendingCount =
+            $cashboxPendingCount
+            + $bankPendingCount;
+
+        $availableTreasury =
+            $availableCashboxBalance
+            + $availableBankBalance;
+
+        /*
+     * =========================================================
+     * 8. VARIATION MENSUELLE
+     * =========================================================
+     */
+
+        $monthlyVariation = 0;
+
+        if ($previousMonthAmount > 0) {
+            $monthlyVariation =
+                (
+                    (
+                        $currentMonthAmount
+                        - $previousMonthAmount
+                    )
+                    / $previousMonthAmount
+                ) * 100;
+        } elseif ($currentMonthAmount > 0) {
+            $monthlyVariation = 100;
+        }
+
+        /*
+     * Limiter la valeur à deux décimales.
+     */
+        $monthlyVariation =
+            round(
+                $monthlyVariation,
+                2
+            );
+
+        /*
+     * =========================================================
+     * 9. RÉSULTAT
+     * =========================================================
+     */
+
+        return [
+            'current_month_amount' =>
+            $currentMonthAmount,
+
+            'previous_month_amount' =>
+            $previousMonthAmount,
+
+            'monthly_variation' =>
+            $monthlyVariation,
+
+            'today_amount' =>
+            $todayAmount,
+
+            'today_count' =>
+            $todayCount,
+
+            'pending_amount' =>
+            $pendingAmount,
+
+            'pending_count' =>
+            $pendingCount,
+
+            'available_treasury' =>
+            $availableTreasury,
+
+            /*
+         * Détails facultatifs.
+         */
+            'available_cashbox_balance' =>
+            $availableCashboxBalance,
+
+            'available_bank_balance' =>
+            $availableBankBalance,
+
+            'cashbox_current_month_amount' =>
+            $cashboxCurrentMonthAmount,
+
+            'bank_current_month_amount' =>
+            $bankCurrentMonthAmount,
+        ];
+    }
+
+    /**
+     * Retourne l'évolution mensuelle des décaissements de caisse.
+     *
+     * Source unique :
+     * tbl_finance_cashbox_operation
+     *
+     * Conditions :
+     * - operation_type = decaissement
+     * - status = validated
+     * - currency = BIF
+     *
+     * @param string $period
+     *
+     * @return array
+     */
+    public function getDecaissementEvolution(
+        string $period = '6months'
+    ): array {
+        /*
+     * =========================================================
+     * 1. SÉCURISER LA PÉRIODE
+     * =========================================================
+     */
+
+        $allowedPeriods = [
+            '6months',
+            '12months',
+            'current_year',
+            'previous_year',
+        ];
+
+        if (
+            !in_array(
+                $period,
+                $allowedPeriods,
+                true
+            )
+        ) {
+            $period = '6months';
+        }
+
+        /*
+     * =========================================================
+     * 2. DÉTERMINER LA PÉRIODE
+     * =========================================================
+     */
+
+        switch ($period) {
+            case '12months':
+
+                $startDate = date(
+                    'Y-m-01',
+                    strtotime('-11 months')
+                );
+
+                $endDate = date('Y-m-t');
+
+                break;
+
+            case 'current_year':
+
+                $startDate = date('Y-01-01');
+                $endDate = date('Y-12-31');
+
+                break;
+
+            case 'previous_year':
+
+                $previousYear =
+                    (int) date('Y') - 1;
+
+                $startDate =
+                    $previousYear . '-01-01';
+
+                $endDate =
+                    $previousYear . '-12-31';
+
+                break;
+
+            case '6months':
+            default:
+
+                $startDate = date(
+                    'Y-m-01',
+                    strtotime('-5 months')
+                );
+
+                $endDate = date('Y-m-t');
+
+                break;
+        }
+
+        /*
+     * =========================================================
+     * 3. MOIS EN FRANÇAIS
+     * =========================================================
+     */
+
+        $frenchMonths = [
+            1  => 'Janvier',
+            2  => 'Février',
+            3  => 'Mars',
+            4  => 'Avril',
+            5  => 'Mai',
+            6  => 'Juin',
+            7  => 'Juillet',
+            8  => 'Août',
+            9  => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre',
+        ];
+
+        /*
+     * =========================================================
+     * 4. PRÉPARER TOUS LES MOIS
+     * =========================================================
+     */
+
+        $startMonth = new DateTime($startDate);
+        $startMonth->modify('first day of this month');
+
+        $endMonth = new DateTime($endDate);
+        $endMonth->modify('first day of next month');
+
+        $dateInterval =
+            new DateInterval('P1M');
+
+        $datePeriod =
+            new DatePeriod(
+                $startMonth,
+                $dateInterval,
+                $endMonth
+            );
+
+        $months = [];
+
+        foreach ($datePeriod as $monthDate) {
+            $year =
+                (int) $monthDate->format('Y');
+
+            $month =
+                (int) $monthDate->format('n');
+
+            $monthKey =
+                $monthDate->format('Y-m');
+
+            $label =
+                $frenchMonths[$month];
+
+            /*
+         * Ajouter l’année lorsque la période
+         * peut traverser plusieurs exercices.
+         */
+            if (
+                $period === '12months'
+                || $period === 'previous_year'
+            ) {
+                $label .= ' ' . $year;
+            }
+
+            $months[$monthKey] = [
+                'year' =>
+                $year,
+
+                'month' =>
+                $month,
+
+                'label' =>
+                $label,
+
+                'realized_amount' =>
+                0,
+
+                'operation_count' =>
+                0,
+
+                'planned_amount' =>
+                0,
+            ];
+        }
+
+        /*
+     * =========================================================
+     * 5. DÉCAISSEMENTS RÉALISÉS
+     * =========================================================
+     */
+
+        if (
+            $this->db->table_exists(
+                'tbl_finance_cashbox_operation'
+            )
+        ) {
+            $rows = $this->db
+                ->select([
+                    'YEAR(operation_date) AS operation_year',
+                    'MONTH(operation_date) AS operation_month',
+                    'COALESCE(SUM(amount), 0) AS total_amount',
+                    'COUNT(id) AS total_operations',
+                ], false)
+                ->from(
+                    'tbl_finance_cashbox_operation'
+                )
+                ->where(
+                    'operation_type',
+                    'decaissement'
+                )
+                ->where(
+                    'status',
+                    'validated'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'operation_date >=',
+                    $startDate
+                )
+                ->where(
+                    'operation_date <=',
+                    $endDate
+                )
+                ->group_by([
+                    'YEAR(operation_date)',
+                    'MONTH(operation_date)',
+                ])
+                ->order_by(
+                    'YEAR(operation_date)',
+                    'ASC'
+                )
+                ->order_by(
+                    'MONTH(operation_date)',
+                    'ASC'
+                )
+                ->get()
+                ->result();
+
+            foreach ($rows as $row) {
+                $monthKey =
+                    sprintf(
+                        '%04d-%02d',
+                        (int) $row->operation_year,
+                        (int) $row->operation_month
+                    );
+
+                if (!isset($months[$monthKey])) {
+                    continue;
+                }
+
+                $months[$monthKey]['realized_amount'] =
+                    (float) $row->total_amount;
+
+                $months[$monthKey]['operation_count'] =
+                    (int) $row->total_operations;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 6. BUDGET PRÉVU
+     * =========================================================
+     *
+     * Facultatif : utilise la table budget si elle existe.
+     */
+
+        if (
+            $this->db->table_exists(
+                'tbl_finance_disbursement_budget'
+            )
+        ) {
+            $budgetRows = $this->db
+                ->select([
+                    'budget_year',
+                    'budget_month',
+                    'planned_amount',
+                ])
+                ->from(
+                    'tbl_finance_disbursement_budget'
+                )
+                ->where(
+                    'currency',
+                    'BIF'
+                )
+                ->where(
+                    'status',
+                    'active'
+                )
+                ->get()
+                ->result();
+
+            foreach ($budgetRows as $budgetRow) {
+                $monthKey =
+                    sprintf(
+                        '%04d-%02d',
+                        (int) $budgetRow->budget_year,
+                        (int) $budgetRow->budget_month
+                    );
+
+                if (!isset($months[$monthKey])) {
+                    continue;
+                }
+
+                $months[$monthKey]['planned_amount'] =
+                    (float) $budgetRow->planned_amount;
+            }
+        }
+
+        /*
+     * =========================================================
+     * 7. PRÉPARER LES TABLEAUX CHART.JS
+     * =========================================================
+     */
+
+        $labels = [];
+        $realizedAmounts = [];
+        $plannedAmounts = [];
+        $operationCounts = [];
+
+        $totalRealized = 0;
+        $totalPlanned = 0;
+        $totalOperations = 0;
+
+        foreach ($months as $monthData) {
+            $labels[] =
+                $monthData['label'];
+
+            $realizedAmounts[] =
+                round(
+                    (float) $monthData['realized_amount'],
+                    2
+                );
+
+            $plannedAmounts[] =
+                round(
+                    (float) $monthData['planned_amount'],
+                    2
+                );
+
+            $operationCounts[] =
+                (int) $monthData['operation_count'];
+
+            $totalRealized +=
+                (float) $monthData['realized_amount'];
+
+            $totalPlanned +=
+                (float) $monthData['planned_amount'];
+
+            $totalOperations +=
+                (int) $monthData['operation_count'];
+        }
+
+        /*
+     * =========================================================
+     * 8. TAUX D’EXÉCUTION
+     * =========================================================
+     */
+
+        $budgetExecutionRate =
+            $totalPlanned > 0
+            ? (
+                $totalRealized
+                / $totalPlanned
+            ) * 100
+            : 0;
+
+        return [
+            'period' =>
+            $period,
+
+            'start_date' =>
+            $startDate,
+
+            'end_date' =>
+            $endDate,
+
+            'labels' =>
+            $labels,
+
+            'realized_amounts' =>
+            $realizedAmounts,
+
+            'planned_amounts' =>
+            $plannedAmounts,
+
+            'operation_counts' =>
+            $operationCounts,
+
+            'months' =>
+            array_values($months),
+
+            'total_realized' =>
+            $totalRealized,
+
+            'total_planned' =>
+            $totalPlanned,
+
+            'total_operations' =>
+            $totalOperations,
+
+            'budget_difference' =>
+            $totalPlanned - $totalRealized,
+
+            'budget_execution_rate' =>
+            round(
+                $budgetExecutionRate,
+                2
+            ),
+        ];
+    }
+
+    /**
+     * Compte les décaissements enregistrés dans les caisses.
+     *
+     * @return int
+     */
+    public function countDecaissementHistory(): int
+    {
+        return (int) $this->db
+            ->from('tbl_finance_cashbox_operation')
+            ->where('operation_type', 'decaissement')
+            ->count_all_results();
+    }
+
+    /**
+     * Retourne l'historique paginé des décaissements.
+     *
+     * Source :
+     * tbl_finance_cashbox_operation
+     *
+     * @param int $limit
+     * @param int $offset
+     *
+     * @return array
+     */
+    public function getDecaissementHistory(
+        int $limit = 10,
+        int $offset = 0
+    ): array {
+        $limit = max(1, $limit);
+        $offset = max(0, $offset);
+
+        return $this->db
+            ->select([
+                'operation.id',
+                'operation.reference',
+                'operation.operation_date',
+                'operation.amount',
+                'operation.currency',
+                'operation.category',
+                'operation.third_party',
+                'operation.payment_method',
+                'operation.document_number',
+                'operation.attachment',
+                'operation.label',
+                'operation.observation',
+                'operation.status',
+                'operation.created_at',
+
+                'cashbox.id AS cashbox_id',
+                'cashbox.code AS cashbox_code',
+                'cashbox.name AS cashbox_name',
+                'cashbox.type AS cashbox_type',
+                'cashbox.chantier_id',
+
+                'chantier.ref_chantier',
+                'chantier.name AS chantier_name',
+            ])
+            ->from(
+                'tbl_finance_cashbox_operation AS operation'
+            )
+            ->join(
+                'tbl_finance_cashbox AS cashbox',
+                'cashbox.id = operation.source_cashbox_id',
+                'left'
+            )
+            ->join(
+                'chantiers AS chantier',
+                'chantier.id = cashbox.chantier_id',
+                'left'
+            )
+            ->where(
+                'operation.operation_type',
+                'decaissement'
+            )
+            ->order_by(
+                'operation.operation_date',
+                'DESC'
+            )
+            ->order_by(
+                'operation.created_at',
+                'DESC'
+            )
+            ->order_by(
+                'operation.id',
+                'DESC'
+            )
+            ->limit(
+                $limit,
+                $offset
+            )
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Retourne la synthèse des décaissements par chantier.
+     *
+     * Sources :
+     * - chantiers : budget du chantier ;
+     * - tbl_finance_cashbox : caisse associée au chantier ;
+     * - tbl_finance_cashbox_operation : décaissements enregistrés.
+     *
+     * @param string|null $startDate
+     * @param string|null $endDate
+     *
+     * @return array
+     */
+    public function getDecaissementChantierSummary(
+        ?string $startDate = null,
+        ?string $endDate = null
+    ): array {
+        /*
+     * =========================================================
+     * 1. NORMALISER LES DATES
+     * =========================================================
+     */
+
+        $startDate = !empty($startDate)
+            ? $startDate
+            : date('Y-m-01');
+
+        $endDate = !empty($endDate)
+            ? $endDate
+            : date('Y-m-t');
+
+        /*
+     * =========================================================
+     * 2. SOUS-REQUÊTE DES DÉCAISSEMENTS
+     * =========================================================
+     *
+     * On calcule le total décaissé par chantier à partir :
+     *
+     * opération.source_cashbox_id
+     *      -> cashbox.id
+     *      -> cashbox.chantier_id
+     */
+
+        $escapedStartDate =
+            $this->db->escape($startDate);
+
+        $escapedEndDate =
+            $this->db->escape($endDate);
+
+        $operationSubquery = "
+        SELECT
+            cb.chantier_id,
+
+            COALESCE(
+                SUM(op.amount),
+                0
+            ) AS total_disbursed,
+
+            COUNT(op.id) AS operation_count
+
+        FROM tbl_finance_cashbox_operation AS op
+
+        INNER JOIN tbl_finance_cashbox AS cb
+            ON cb.id = op.source_cashbox_id
+
+        WHERE op.operation_type = 'decaissement'
+
+          AND op.status = 'validated'
+
+          AND op.currency = 'BIF'
+
+          AND op.operation_date >= {$escapedStartDate}
+
+          AND op.operation_date <= {$escapedEndDate}
+
+          AND cb.chantier_id IS NOT NULL
+
+        GROUP BY cb.chantier_id
+    ";
+
+        /*
+     * =========================================================
+     * 3. RÉCUPÉRER LES CHANTIERS
+     * =========================================================
+     */
+
+        $rows = $this->db
+            ->select([
+                'chantier.id',
+                'chantier.ref_chantier',
+                'chantier.name',
+                'chantier.location',
+                'chantier.status',
+
+                'COALESCE(chantier.budget, 0) AS budget',
+
+                'COALESCE(disbursement.total_disbursed, 0) AS total_disbursed',
+
+                'COALESCE(disbursement.operation_count, 0) AS operation_count',
+            ], false)
+            ->from('chantiers AS chantier')
+            ->join(
+                "({$operationSubquery}) AS disbursement",
+                'disbursement.chantier_id = chantier.id',
+                'left',
+                false
+            )
+            ->where('chantier.status', 'Actif')
+            ->order_by(
+                'total_disbursed',
+                'DESC'
+            )
+            ->order_by(
+                'chantier.name',
+                'ASC'
+            )
+            ->get()
+            ->result();
+
+        /*
+     * =========================================================
+     * 4. CALCULER LES INDICATEURS
+     * =========================================================
+     */
+
+        $summary = [];
+
+        foreach ($rows as $row) {
+            $budget =
+                max(
+                    0,
+                    (float) $row->budget
+                );
+
+            $totalDisbursed =
+                max(
+                    0,
+                    (float) $row->total_disbursed
+                );
+
+            /*
+         * Le disponible peut devenir négatif
+         * en cas de dépassement budgétaire.
+         */
+            $available =
+                $budget - $totalDisbursed;
+
+            $consumptionPercentage =
+                $budget > 0
+                ? (
+                    $totalDisbursed
+                    / $budget
+                ) * 100
+                : 0;
+
+            /*
+         * Limite CSS de la barre à 100 %,
+         * même lorsque le budget est dépassé.
+         */
+            $progressPercentage =
+                min(
+                    100,
+                    max(
+                        0,
+                        $consumptionPercentage
+                    )
+                );
+
+            /*
+         * Couleur selon la consommation.
+         */
+            if ($consumptionPercentage >= 100) {
+                $progressClass =
+                    'bg-dark';
+
+                $situation =
+                    'depassement';
+            } elseif ($consumptionPercentage >= 90) {
+                $progressClass =
+                    'bg-danger';
+
+                $situation =
+                    'critique';
+            } elseif ($consumptionPercentage >= 75) {
+                $progressClass =
+                    'bg-warning';
+
+                $situation =
+                    'attention';
+            } elseif ($consumptionPercentage >= 50) {
+                $progressClass =
+                    'bg-info';
+
+                $situation =
+                    'normal';
+            } else {
+                $progressClass =
+                    'bg-success';
+
+                $situation =
+                    'faible';
+            }
+
+            $summary[] = (object) [
+                'id' =>
+                (int) $row->id,
+
+                'ref_chantier' =>
+                $row->ref_chantier,
+
+                'name' =>
+                $row->name,
+
+                'location' =>
+                $row->location,
+
+                'budget' =>
+                $budget,
+
+                'total_disbursed' =>
+                $totalDisbursed,
+
+                'available' =>
+                $available,
+
+                'operation_count' =>
+                (int) $row->operation_count,
+
+                'consumption_percentage' =>
+                round(
+                    $consumptionPercentage,
+                    2
+                ),
+
+                'progress_percentage' =>
+                round(
+                    $progressPercentage,
+                    2
+                ),
+
+                'progress_class' =>
+                $progressClass,
+
+                'situation' =>
+                $situation,
+            ];
+        }
+
+        return $summary;
+    }
 }

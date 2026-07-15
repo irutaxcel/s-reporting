@@ -838,6 +838,63 @@
                         height: 260px;
                     }
                 }
+
+                .dec-chart-summary-item {
+                    min-height: 68px;
+                    padding: 12px 14px;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 10px;
+                    background: #f8fafc;
+                }
+
+                .dec-chart-summary-item span {
+                    display: block;
+                    margin-bottom: 5px;
+                    color: #64748b;
+                    font-size: 11px;
+                    font-weight: 600;
+                }
+
+                .dec-chart-summary-item strong {
+                    color: #0f172a;
+                    font-size: 15px;
+                    font-weight: 800;
+                }
+
+                .dec-mode-cheque {
+                    background: #f3e8ff;
+                    color: #7e22ce;
+                }
+
+                .dec-mode-mobile {
+                    background: #fef3c7;
+                    color: #b45309;
+                }
+
+                .dec-status-cancelled {
+                    background: #fee2e2;
+                    color: #b91c1c;
+                }
+
+                .dec-action-attachment {
+                    color: #475569;
+                }
+
+                .dec-action-attachment:hover {
+                    border-color: #64748b;
+                    background: #f1f5f9;
+                    color: #0f172a;
+                    text-decoration: none;
+                }
+
+                .dec-empty-state {
+                    max-width: 450px;
+                    margin: 0 auto;
+                }
+
+                .dec-table td {
+                    vertical-align: middle;
+                }
             </style>
 
             <!-- =========================================================
@@ -892,11 +949,96 @@
 
             </div>
 
+
+            <?php
+
+            $decaissementStatistics =
+                isset($decaissementStatistics)
+                && is_array($decaissementStatistics)
+                ? $decaissementStatistics
+                : [];
+
+            $currentMonthAmount =
+                isset(
+                    $decaissementStatistics['current_month_amount']
+                )
+                ? (float) $decaissementStatistics['current_month_amount']
+                : 0;
+
+            $monthlyVariation =
+                isset(
+                    $decaissementStatistics['monthly_variation']
+                )
+                ? (float) $decaissementStatistics['monthly_variation']
+                : 0;
+
+            $todayAmount =
+                isset(
+                    $decaissementStatistics['today_amount']
+                )
+                ? (float) $decaissementStatistics['today_amount']
+                : 0;
+
+            $todayCount =
+                isset(
+                    $decaissementStatistics['today_count']
+                )
+                ? (int) $decaissementStatistics['today_count']
+                : 0;
+
+            $pendingAmount =
+                isset(
+                    $decaissementStatistics['pending_amount']
+                )
+                ? (float) $decaissementStatistics['pending_amount']
+                : 0;
+
+            $pendingCount =
+                isset(
+                    $decaissementStatistics['pending_count']
+                )
+                ? (int) $decaissementStatistics['pending_count']
+                : 0;
+
+            $availableTreasury =
+                isset(
+                    $decaissementStatistics['available_treasury']
+                )
+                ? (float) $decaissementStatistics['available_treasury']
+                : 0;
+
+            /*
+ * Déterminer l'icône de variation.
+ */
+            $variationIcon =
+                $monthlyVariation >= 0
+                ? 'fas fa-arrow-up'
+                : 'fas fa-arrow-down';
+
+            /*
+ * Une augmentation des dépenses reste affichée en rouge.
+ * Une diminution est favorable et peut être affichée en vert.
+ */
+            $variationBadgeClass =
+                $monthlyVariation > 0
+                ? 'dec-badge-danger'
+                : (
+                    $monthlyVariation < 0
+                    ? 'dec-badge-success'
+                    : 'dec-badge-info'
+                );
+
+            ?>
+
+
             <!-- =========================================================
-                 STATISTIQUES
-            ========================================================== -->
+     STATISTIQUES DES DÉCAISSEMENTS
+========================================================== -->
             <div class="row">
 
+                <!-- =====================================================
+         TOTAL DÉCAISSÉ CE MOIS
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="dec-stat-card">
@@ -907,9 +1049,25 @@
                                 <i class="fas fa-money-bill-wave"></i>
                             </div>
 
-                            <span class="dec-stat-badge dec-badge-danger">
-                                <i class="fas fa-arrow-up mr-1"></i>
-                                9,8 %
+                            <span class="
+                        dec-stat-badge
+                        <?= html_escape(
+                            $variationBadgeClass
+                        ) ?>
+                    ">
+                                <i class="
+                            <?= html_escape(
+                                $variationIcon
+                            ) ?>
+                            mr-1
+                        "></i>
+
+                                <?= number_format(
+                                    abs($monthlyVariation),
+                                    1,
+                                    ',',
+                                    ' '
+                                ) ?> %
                             </span>
 
                         </div>
@@ -919,7 +1077,16 @@
                         </div>
 
                         <div class="dec-stat-value">
-                            342 650 000 BIF
+
+                            <?= number_format(
+                                $currentMonthAmount,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            BIF
+
                         </div>
 
                         <div class="dec-stat-footer">
@@ -930,6 +1097,9 @@
 
                 </div>
 
+                <!-- =====================================================
+         DÉCAISSEMENTS DU JOUR
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="dec-stat-card">
@@ -941,7 +1111,14 @@
                             </div>
 
                             <span class="dec-stat-badge dec-badge-info">
-                                17 opérations
+
+                                <?= $todayCount ?>
+
+                                opération<?= $todayCount > 1
+                                                ? 's'
+                                                : ''
+                                            ?>
+
                             </span>
 
                         </div>
@@ -951,17 +1128,29 @@
                         </div>
 
                         <div class="dec-stat-value">
-                            24 750 000 BIF
+
+                            <?= number_format(
+                                $todayAmount,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            BIF
+
                         </div>
 
                         <div class="dec-stat-footer">
-                            Sorties enregistrées aujourd’hui
+                            Sorties validées aujourd’hui
                         </div>
 
                     </div>
 
                 </div>
 
+                <!-- =====================================================
+         EN ATTENTE DE PAIEMENT
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="dec-stat-card">
@@ -973,7 +1162,14 @@
                             </div>
 
                             <span class="dec-stat-badge dec-badge-warning">
-                                11 demandes
+
+                                <?= $pendingCount ?>
+
+                                demande<?= $pendingCount > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
                             </span>
 
                         </div>
@@ -983,17 +1179,29 @@
                         </div>
 
                         <div class="dec-stat-value">
-                            96 400 000 BIF
+
+                            <?= number_format(
+                                $pendingAmount,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            BIF
+
                         </div>
 
                         <div class="dec-stat-footer">
-                            Demandes approuvées non encore payées
+                            Décaissements non encore validés
                         </div>
 
                     </div>
 
                 </div>
 
+                <!-- =====================================================
+         TRÉSORERIE DISPONIBLE
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="dec-stat-card">
@@ -1004,8 +1212,19 @@
                                 <i class="fas fa-wallet"></i>
                             </div>
 
-                            <span class="dec-stat-badge dec-badge-success">
-                                Disponible
+                            <span class="
+                        dec-stat-badge
+                        <?= $availableTreasury > 0
+                            ? 'dec-badge-success'
+                            : 'dec-badge-danger'
+                        ?>
+                    ">
+
+                                <?= $availableTreasury > 0
+                                    ? 'Disponible'
+                                    : 'Indisponible'
+                                ?>
+
                             </span>
 
                         </div>
@@ -1015,7 +1234,16 @@
                         </div>
 
                         <div class="dec-stat-value">
-                            245 600 000 BIF
+
+                            <?= number_format(
+                                $availableTreasury,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            BIF
+
                         </div>
 
                         <div class="dec-stat-footer">
@@ -1195,6 +1423,71 @@
 
             </div>
 
+            <?php
+
+            $decaissementPeriod =
+                isset($decaissementPeriod)
+                ? (string) $decaissementPeriod
+                : '6months';
+
+            $decaissementEvolution =
+                isset($decaissementEvolution)
+                && is_array($decaissementEvolution)
+                ? $decaissementEvolution
+                : [];
+
+            $decaissementChartLabels =
+                isset(
+                    $decaissementEvolution['labels']
+                )
+                && is_array(
+                    $decaissementEvolution['labels']
+                )
+                ? $decaissementEvolution['labels']
+                : [];
+
+            $decaissementChartRealized =
+                isset(
+                    $decaissementEvolution['realized_amounts']
+                )
+                && is_array(
+                    $decaissementEvolution['realized_amounts']
+                )
+                ? $decaissementEvolution['realized_amounts']
+                : [];
+
+            $decaissementChartPlanned =
+                isset(
+                    $decaissementEvolution['planned_amounts']
+                )
+                && is_array(
+                    $decaissementEvolution['planned_amounts']
+                )
+                ? $decaissementEvolution['planned_amounts']
+                : [];
+
+            $decaissementChartCashbox =
+                isset(
+                    $decaissementEvolution['cashbox_amounts']
+                )
+                && is_array(
+                    $decaissementEvolution['cashbox_amounts']
+                )
+                ? $decaissementEvolution['cashbox_amounts']
+                : [];
+
+            $decaissementChartBank =
+                isset(
+                    $decaissementEvolution['bank_amounts']
+                )
+                && is_array(
+                    $decaissementEvolution['bank_amounts']
+                )
+                ? $decaissementEvolution['bank_amounts']
+                : [];
+
+            ?>
+
             <!-- =========================================================
                  GRAPHIQUE + CATÉGORIES
             ========================================================== -->
@@ -1214,25 +1507,83 @@
                                 </h5>
 
                                 <span class="dec-card-subtitle">
-                                    Analyse comparative des paiements réalisés et du budget prévu.
+                                    Analyse comparative des paiements réalisés
+                                    et du budget prévu.
                                 </span>
 
                             </div>
 
-                            <select class="form-control dec-period-select">
-                                <option>6 derniers mois</option>
-                                <option>12 derniers mois</option>
-                                <option>Cette année</option>
-                                <option>Année précédente</option>
-                            </select>
+                            <form action="<?= current_url() ?>" method="get" id="decaissementPeriodForm">
+
+                                <select name="decaissement_period" id="decaissementPeriodSelect"
+                                    class="form-control dec-period-select">
+
+                                    <option value="6months" <?= $decaissementPeriod === '6months'
+                                                                ? 'selected'
+                                                                : ''
+                                                            ?>>
+                                        6 derniers mois
+                                    </option>
+
+                                    <option value="12months" <?= $decaissementPeriod === '12months'
+                                                                    ? 'selected'
+                                                                    : ''
+                                                                ?>>
+                                        12 derniers mois
+                                    </option>
+
+                                    <option value="current_year" <?= $decaissementPeriod === 'current_year'
+                                                                        ? 'selected'
+                                                                        : ''
+                                                                    ?>>
+                                        Cette année
+                                    </option>
+
+                                    <option value="previous_year" <?= $decaissementPeriod === 'previous_year'
+                                                                        ? 'selected'
+                                                                        : ''
+                                                                    ?>>
+                                        Année précédente
+                                    </option>
+
+                                </select>
+
+                            </form>
 
                         </div>
 
                         <div class="dec-card-body">
 
-                            <div class="dec-chart-container">
-                                <canvas id="decaissementChart"></canvas>
-                            </div>
+                            <?php if (!empty($decaissementChartLabels)): ?>
+
+                                <div class="dec-chart-container">
+                                    <canvas id="decaissementChart"></canvas>
+                                </div>
+
+                            <?php else: ?>
+
+                                <div class="text-center py-5">
+
+                                    <i class="
+                            fas
+                            fa-chart-line
+                            fa-3x
+                            text-muted
+                            mb-3
+                        "></i>
+
+                                    <h6>
+                                        Aucune donnée disponible
+                                    </h6>
+
+                                    <p class="text-muted mb-0">
+                                        Aucun décaissement n’a été enregistré
+                                        durant cette période.
+                                    </p>
+
+                                </div>
+
+                            <?php endif; ?>
 
                         </div>
 
@@ -1240,131 +1591,111 @@
 
                 </div>
 
+                <?php
+
+                $totalRealized =
+                    (float) (
+                        $decaissementEvolution['total_realized']
+                        ?? 0
+                    );
+
+                $totalPlanned =
+                    (float) (
+                        $decaissementEvolution['total_planned']
+                        ?? 0
+                    );
+
+                $budgetDifference =
+                    (float) (
+                        $decaissementEvolution['budget_difference']
+                        ?? 0
+                    );
+
+                $executionRate =
+                    (float) (
+                        $decaissementEvolution['budget_execution_rate']
+                        ?? 0
+                    );
+
+                ?>
+
                 <div class="col-xl-4 col-lg-4">
 
-                    <div class="dec-card">
+                    <div class="row mt-3">
 
-                        <div class="dec-card-header">
+                        <div class="col-md-4">
 
-                            <div>
+                            <div class="dec-chart-summary-item">
 
-                                <h5 class="dec-card-title">
-                                    <i class="fas fa-chart-pie"></i>
-                                    Répartition des dépenses
-                                </h5>
-
-                                <span class="dec-card-subtitle">
-                                    Principales catégories de décaissements.
+                                <span>
+                                    Total réalisé
                                 </span>
+
+                                <strong class="text-danger">
+
+                                    <?= number_format(
+                                        $totalRealized,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) ?>
+
+                                    BIF
+
+                                </strong>
 
                             </div>
 
                         </div>
 
-                        <div class="dec-card-body">
+                        <div class="col-md-4">
 
-                            <div class="dec-category-item">
+                            <div class="dec-chart-summary-item">
 
-                                <div class="dec-category-header">
+                                <span>
+                                    Budget prévu
+                                </span>
 
-                                    <span class="dec-category-name">
-                                        <i class="fas fa-truck-loading"></i>
-                                        Fournisseurs
-                                    </span>
+                                <strong>
 
-                                    <span class="dec-category-value">
-                                        112,5 M
-                                    </span>
+                                    <?= number_format(
+                                        $totalPlanned,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) ?>
 
-                                </div>
+                                    BIF
 
-                                <div class="dec-category-progress">
-                                    <span style="width: 88%;"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="dec-category-item">
-
-                                <div class="dec-category-header">
-
-                                    <span class="dec-category-name">
-                                        <i class="fas fa-users"></i>
-                                        Salaires et main-d’œuvre
-                                    </span>
-
-                                    <span class="dec-category-value">
-                                        82,7 M
-                                    </span>
-
-                                </div>
-
-                                <div class="dec-category-progress">
-                                    <span style="width: 70%;"></span>
-                                </div>
+                                </strong>
 
                             </div>
 
-                            <div class="dec-category-item">
+                        </div>
 
-                                <div class="dec-category-header">
+                        <div class="col-md-4">
 
-                                    <span class="dec-category-name">
-                                        <i class="fas fa-user-tie"></i>
-                                        Sous-traitants
-                                    </span>
+                            <div class="dec-chart-summary-item">
 
-                                    <span class="dec-category-value">
-                                        68,4 M
-                                    </span>
+                                <span>
+                                    Taux d’exécution
+                                </span>
 
-                                </div>
+                                <strong class="<?= $executionRate > 100
+                                                    ? 'text-danger'
+                                                    : 'text-success'
+                                                ?>">
 
-                                <div class="dec-category-progress">
-                                    <span style="width: 58%;"></span>
-                                </div>
+                                    <?= number_format(
+                                        $executionRate,
+                                        1,
+                                        ',',
+                                        ' '
+                                    ) ?>
 
-                            </div>
+                                    %
 
-                            <div class="dec-category-item">
-
-                                <div class="dec-category-header">
-
-                                    <span class="dec-category-name">
-                                        <i class="fas fa-gas-pump"></i>
-                                        Carburant
-                                    </span>
-
-                                    <span class="dec-category-value">
-                                        45,5 M
-                                    </span>
-
-                                </div>
-
-                                <div class="dec-category-progress">
-                                    <span style="width: 42%;"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="dec-category-item">
-
-                                <div class="dec-category-header">
-
-                                    <span class="dec-category-name">
-                                        <i class="fas fa-landmark"></i>
-                                        Impôts et taxes
-                                    </span>
-
-                                    <span class="dec-category-value">
-                                        33,5 M
-                                    </span>
-
-                                </div>
-
-                                <div class="dec-category-progress">
-                                    <span style="width: 30%;"></span>
-                                </div>
+                                </strong>
 
                             </div>
 
@@ -1474,9 +1805,96 @@
 
             </div>
 
+            <?php
+
+            $decaissementHistory =
+                isset($decaissementHistory)
+                && is_array($decaissementHistory)
+                ? $decaissementHistory
+                : [];
+
+            $decaissementPagination =
+                isset($decaissementPagination)
+                && is_array($decaissementPagination)
+                ? $decaissementPagination
+                : [];
+
+            $currentPage =
+                isset(
+                    $decaissementPagination['current_page']
+                )
+                ? (int) $decaissementPagination['current_page']
+                : 1;
+
+            $perPage =
+                isset(
+                    $decaissementPagination['per_page']
+                )
+                ? (int) $decaissementPagination['per_page']
+                : 10;
+
+            $totalRows =
+                isset(
+                    $decaissementPagination['total_rows']
+                )
+                ? (int) $decaissementPagination['total_rows']
+                : 0;
+
+            $totalPages =
+                isset(
+                    $decaissementPagination['total_pages']
+                )
+                ? (int) $decaissementPagination['total_pages']
+                : 1;
+
+            $offset =
+                isset(
+                    $decaissementPagination['offset']
+                )
+                ? (int) $decaissementPagination['offset']
+                : 0;
+
+            /*
+ * Première ligne affichée.
+ */
+            $startRow =
+                $totalRows > 0
+                ? $offset + 1
+                : 0;
+
+            /*
+ * Dernière ligne affichée.
+ */
+            $endRow =
+                min(
+                    $offset + $perPage,
+                    $totalRows
+                );
+
+            /*
+ * Fonction locale pour générer une URL de pagination
+ * tout en conservant les autres paramètres GET.
+ */
+            if (!function_exists('buildDecaissementPageUrl')) {
+                function buildDecaissementPageUrl(
+                    int $page
+                ): string {
+                    $query = $_GET;
+
+                    $query['page'] =
+                        max(1, $page);
+
+                    return current_url()
+                        . '?'
+                        . http_build_query($query);
+                }
+            }
+
+            ?>
+
             <!-- =========================================================
-                 TABLEAU
-            ========================================================== -->
+     HISTORIQUE DES DÉCAISSEMENTS
+========================================================== -->
             <div class="dec-card">
 
                 <div class="dec-card-header">
@@ -1489,16 +1907,16 @@
                         </h5>
 
                         <span class="dec-card-subtitle">
-                            Liste des sorties de fonds enregistrées dans la trésorerie.
+                            Liste des sorties de fonds enregistrées
+                            dans la trésorerie.
                         </span>
 
                     </div>
 
-                    <button class="btn btn-dec-danger" data-toggle="modal" data-target="#addDecaissementModal">
-
+                    <button type="button" class="btn btn-dec-danger" data-toggle="modal"
+                        data-target="#addDecaissementModal">
                         <i class="fas fa-plus mr-1"></i>
                         Nouveau décaissement
-
                     </button>
 
                 </div>
@@ -1515,400 +1933,627 @@
                                 <th>Référence</th>
                                 <th>Bénéficiaire</th>
                                 <th>Objet / Catégorie</th>
-                                <th>Caisse / Compte</th>
+                                <th>Caisse</th>
                                 <th>Mode</th>
                                 <th>Pièce</th>
                                 <th>Chantier</th>
-                                <th class="text-right">Montant</th>
+                                <th class="text-right">
+                                    Montant
+                                </th>
                                 <th>Statut</th>
-                                <th class="text-center">Actions</th>
+                                <th class="text-center">
+                                    Actions
+                                </th>
                             </tr>
 
                         </thead>
 
                         <tbody>
 
-                            <tr>
-
-                                <td>1</td>
-
-                                <td>
-                                    12/07/2026
-                                    <small class="d-block text-muted">
-                                        11:30
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-reference">
-                                        DEC-2026-00058
-                                    </span>
-                                </td>
-
-                                <td class="dec-beneficiary">
-                                    <strong>TotalEnergies Burundi</strong>
-                                    <small>Fournisseur carburant</small>
-                                </td>
-
-                                <td class="dec-label">
-                                    <strong>Achat carburant engins</strong>
-                                    <small>Carburant et lubrifiants</small>
-                                </td>
-
-                                <td>
-                                    <strong>CRDB BIF</strong>
-                                    <small class="d-block text-muted">
-                                        Compte bancaire
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-mode-bank">
-                                        <i class="fas fa-university mr-1"></i>
-                                        Virement
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <strong>FAC-2026-085</strong>
-                                    <small class="d-block text-muted">
-                                        Facture jointe
-                                    </small>
-                                </td>
-
-                                <td>
-                                    Chantier Bujumbura
-                                </td>
-
-                                <td class="text-right dec-amount">
-                                    - 18 500 000
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-status-valid">
-                                        <i class="fas fa-check-circle mr-1"></i>
-                                        Payé
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="dec-action-btn dec-action-view" title="Voir">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="dec-action-btn dec-action-print" title="Imprimer">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>2</td>
-
-                                <td>
-                                    12/07/2026
-                                    <small class="d-block text-muted">
-                                        09:45
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-reference">
-                                        DEC-2026-00057
-                                    </span>
-                                </td>
-
-                                <td class="dec-beneficiary">
-                                    <strong>ABC Construction</strong>
-                                    <small>Sous-traitant</small>
-                                </td>
-
-                                <td class="dec-label">
-                                    <strong>Paiement situation n° 03</strong>
-                                    <small>Travaux de terrassement</small>
-                                </td>
-
-                                <td>
-                                    <strong>Interbank BIF</strong>
-                                    <small class="d-block text-muted">
-                                        Compte bancaire
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-mode-bank">
-                                        Virement
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <strong>SIT-2026-003</strong>
-                                    <small class="d-block text-muted">
-                                        Situation validée
-                                    </small>
-                                </td>
-
-                                <td>
-                                    Chantier Gitega
-                                </td>
-
-                                <td class="text-right dec-amount">
-                                    - 35 000 000
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-status-valid">
-                                        Payé
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="dec-action-btn dec-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="dec-action-btn dec-action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                    <button class="dec-action-btn dec-action-print">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>3</td>
-
-                                <td>
-                                    11/07/2026
-                                    <small class="d-block text-muted">
-                                        16:20
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-reference">
-                                        DEC-2026-00056
-                                    </span>
-                                </td>
-
-                                <td class="dec-beneficiary">
-                                    <strong>Personnel chantier Ngozi</strong>
-                                    <small>Main-d’œuvre journalière</small>
-                                </td>
-
-                                <td class="dec-label">
-                                    <strong>Paiement hebdomadaire</strong>
-                                    <small>Salaires et main-d’œuvre</small>
-                                </td>
-
-                                <td>
-                                    <strong>Caisse Ngozi</strong>
-                                    <small class="d-block text-muted">
-                                        Caisse chantier
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-mode-cash">
-                                        <i class="fas fa-money-bill-wave mr-1"></i>
-                                        Espèces
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <strong>PAY-2026-028</strong>
-                                    <small class="d-block text-muted">
-                                        Liste de paie
-                                    </small>
-                                </td>
-
-                                <td>
-                                    Chantier Ngozi
-                                </td>
-
-                                <td class="text-right dec-amount">
-                                    - 6 750 000
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-status-valid">
-                                        Payé
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="dec-action-btn dec-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="dec-action-btn dec-action-print">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>4</td>
-
-                                <td>
-                                    11/07/2026
-                                    <small class="d-block text-muted">
-                                        14:05
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-reference">
-                                        DEC-2026-00055
-                                    </span>
-                                </td>
-
-                                <td class="dec-beneficiary">
-                                    <strong>Office Burundais des Recettes</strong>
-                                    <small>Administration fiscale</small>
-                                </td>
-
-                                <td class="dec-label">
-                                    <strong>Paiement TVA du mois</strong>
-                                    <small>Impôts et taxes</small>
-                                </td>
-
-                                <td>
-                                    <strong>CRDB BIF</strong>
-                                    <small class="d-block text-muted">
-                                        Compte bancaire
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-mode-bank">
-                                        Virement
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <strong>DECL-TVA-07</strong>
-                                    <small class="d-block text-muted">
-                                        Déclaration fiscale
-                                    </small>
-                                </td>
-
-                                <td>
-                                    Siège
-                                </td>
-
-                                <td class="text-right dec-amount">
-                                    - 21 800 000
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-status-pending">
-                                        En validation
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="dec-action-btn dec-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="dec-action-btn dec-action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>5</td>
-
-                                <td>
-                                    10/07/2026
-                                    <small class="d-block text-muted">
-                                        10:40
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-reference">
-                                        DEC-2026-00054
-                                    </span>
-                                </td>
-
-                                <td class="dec-beneficiary">
-                                    <strong>Caisse chantier Muyinga</strong>
-                                    <small>Approvisionnement interne</small>
-                                </td>
-
-                                <td class="dec-label">
-                                    <strong>Alimentation caisse chantier</strong>
-                                    <small>Transfert de trésorerie</small>
-                                </td>
-
-                                <td>
-                                    <strong>Caisse siège</strong>
-                                    <small class="d-block text-muted">
-                                        Caisse source
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-mode-cash">
-                                        Espèces
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <strong>TRF-2026-019</strong>
-                                    <small class="d-block text-muted">
-                                        Bon de transfert
-                                    </small>
-                                </td>
-
-                                <td>
-                                    Chantier Muyinga
-                                </td>
-
-                                <td class="text-right dec-amount">
-                                    - 15 000 000
-                                </td>
-
-                                <td>
-                                    <span class="dec-badge dec-status-valid">
-                                        Payé
-                                    </span>
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="dec-action-btn dec-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="dec-action-btn dec-action-print">
-                                        <i class="fas fa-print"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
+                            <?php if (!empty($decaissementHistory)): ?>
+
+                                <?php foreach (
+                                    $decaissementHistory
+                                    as $index => $decaissement
+                                ): ?>
+
+                                    <?php
+
+                                    /*
+                         * =========================================
+                         * NUMÉRO DE LIGNE
+                         * =========================================
+                         */
+
+                                    $rowNumber =
+                                        $offset
+                                        + $index
+                                        + 1;
+
+                                    /*
+                         * =========================================
+                         * DATE ET HEURE
+                         * =========================================
+                         */
+
+                                    $operationDate =
+                                        !empty($decaissement
+                                            ->operation_date)
+                                        ? date(
+                                            'd/m/Y',
+                                            strtotime(
+                                                $decaissement
+                                                    ->operation_date
+                                            )
+                                        )
+                                        : '—';
+
+                                    $operationTime =
+                                        !empty($decaissement
+                                            ->created_at)
+                                        ? date(
+                                            'H:i',
+                                            strtotime(
+                                                $decaissement
+                                                    ->created_at
+                                            )
+                                        )
+                                        : null;
+
+                                    /*
+                         * =========================================
+                         * BÉNÉFICIAIRE
+                         * =========================================
+                         */
+
+                                    $beneficiary =
+                                        !empty($decaissement
+                                            ->third_party)
+                                        ? $decaissement
+                                        ->third_party
+                                        : 'Bénéficiaire non renseigné';
+
+                                    $beneficiaryDescription =
+                                        !empty($decaissement
+                                            ->category)
+                                        ? $decaissement
+                                        ->category
+                                        : 'Décaissement de caisse';
+
+                                    /*
+                         * =========================================
+                         * LIBELLÉ ET CATÉGORIE
+                         * =========================================
+                         */
+
+                                    $operationLabel =
+                                        !empty($decaissement
+                                            ->label)
+                                        ? $decaissement
+                                        ->label
+                                        : 'Décaissement';
+
+                                    $operationCategory =
+                                        !empty($decaissement
+                                            ->category)
+                                        ? $decaissement
+                                        ->category
+                                        : 'Non catégorisé';
+
+                                    /*
+                         * =========================================
+                         * CAISSE
+                         * =========================================
+                         */
+
+                                    $cashboxName =
+                                        !empty($decaissement
+                                            ->cashbox_name)
+                                        ? $decaissement
+                                        ->cashbox_name
+                                        : 'Caisse non disponible';
+
+                                    $cashboxCode =
+                                        !empty($decaissement
+                                            ->cashbox_code)
+                                        ? $decaissement
+                                        ->cashbox_code
+                                        : '—';
+
+                                    $cashboxTypeLabel =
+                                        isset(
+                                            $decaissement
+                                                ->cashbox_type
+                                        )
+                                        && $decaissement
+                                        ->cashbox_type
+                                        === 'chantier'
+                                        ? 'Caisse chantier'
+                                        : 'Caisse siège';
+
+                                    /*
+                         * =========================================
+                         * CHANTIER
+                         * =========================================
+                         */
+
+                                    $chantierName =
+                                        !empty($decaissement
+                                            ->chantier_name)
+                                        ? $decaissement
+                                        ->chantier_name
+                                        : 'Siège / Non affecté';
+
+                                    /*
+                         * =========================================
+                         * MODE DE RÈGLEMENT
+                         * =========================================
+                         */
+
+                                    $paymentMethod =
+                                        !empty($decaissement
+                                            ->payment_method)
+                                        ? $decaissement
+                                        ->payment_method
+                                        : 'cash';
+
+                                    $paymentMethodLabel =
+                                        'Espèces';
+
+                                    $paymentMethodIcon =
+                                        'fas fa-money-bill-wave';
+
+                                    $paymentMethodClass =
+                                        'dec-mode-cash';
+
+                                    switch ($paymentMethod) {
+                                        case 'bank':
+                                            $paymentMethodLabel =
+                                                'Virement';
+
+                                            $paymentMethodIcon =
+                                                'fas fa-university';
+
+                                            $paymentMethodClass =
+                                                'dec-mode-bank';
+                                            break;
+
+                                        case 'cheque':
+                                            $paymentMethodLabel =
+                                                'Chèque';
+
+                                            $paymentMethodIcon =
+                                                'fas fa-money-check-alt';
+
+                                            $paymentMethodClass =
+                                                'dec-mode-cheque';
+                                            break;
+
+                                        case 'mobile':
+                                            $paymentMethodLabel =
+                                                'Mobile Money';
+
+                                            $paymentMethodIcon =
+                                                'fas fa-mobile-alt';
+
+                                            $paymentMethodClass =
+                                                'dec-mode-mobile';
+                                            break;
+
+                                        case 'cash':
+                                        default:
+                                            $paymentMethodLabel =
+                                                'Espèces';
+
+                                            $paymentMethodIcon =
+                                                'fas fa-money-bill-wave';
+
+                                            $paymentMethodClass =
+                                                'dec-mode-cash';
+                                            break;
+                                    }
+
+                                    /*
+                         * =========================================
+                         * PIÈCE
+                         * =========================================
+                         */
+
+                                    $documentNumber =
+                                        !empty($decaissement
+                                            ->document_number)
+                                        ? $decaissement
+                                        ->document_number
+                                        : 'Sans numéro';
+
+                                    $hasAttachment =
+                                        !empty($decaissement
+                                            ->attachment);
+
+                                    /*
+                         * =========================================
+                         * STATUT
+                         * =========================================
+                         */
+
+                                    $status =
+                                        !empty($decaissement
+                                            ->status)
+                                        ? $decaissement
+                                        ->status
+                                        : 'pending';
+
+                                    $statusLabel =
+                                        'En attente';
+
+                                    $statusClass =
+                                        'dec-status-pending';
+
+                                    $statusIcon =
+                                        'fas fa-clock';
+
+                                    switch ($status) {
+                                        case 'validated':
+                                            $statusLabel =
+                                                'Payé';
+
+                                            $statusClass =
+                                                'dec-status-valid';
+
+                                            $statusIcon =
+                                                'fas fa-check-circle';
+                                            break;
+
+                                        case 'cancelled':
+                                        case 'rejected':
+                                            $statusLabel =
+                                                'Annulé';
+
+                                            $statusClass =
+                                                'dec-status-cancelled';
+
+                                            $statusIcon =
+                                                'fas fa-times-circle';
+                                            break;
+
+                                        case 'pending':
+                                        default:
+                                            $statusLabel =
+                                                'En validation';
+
+                                            $statusClass =
+                                                'dec-status-pending';
+
+                                            $statusIcon =
+                                                'fas fa-clock';
+                                            break;
+                                    }
+
+                                    ?>
+
+                                    <tr>
+
+                                        <td>
+                                            <?= $rowNumber ?>
+                                        </td>
+
+                                        <td>
+
+                                            <?= html_escape(
+                                                $operationDate
+                                            ) ?>
+
+                                            <?php if (
+                                                !empty($operationTime)
+                                            ): ?>
+
+                                                <small class="
+                                            d-block
+                                            text-muted
+                                        ">
+                                                    <?= html_escape(
+                                                        $operationTime
+                                                    ) ?>
+                                                </small>
+
+                                            <?php endif; ?>
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="dec-reference">
+
+                                                <?= html_escape(
+                                                    $decaissement
+                                                        ->reference
+                                                        ?? '—'
+                                                ) ?>
+
+                                            </span>
+
+                                        </td>
+
+                                        <td class="dec-beneficiary">
+
+                                            <strong>
+                                                <?= html_escape(
+                                                    $beneficiary
+                                                ) ?>
+                                            </strong>
+
+                                            <small>
+                                                <?= html_escape(
+                                                    $beneficiaryDescription
+                                                ) ?>
+                                            </small>
+
+                                        </td>
+
+                                        <td class="dec-label">
+
+                                            <strong>
+                                                <?= html_escape(
+                                                    $operationLabel
+                                                ) ?>
+                                            </strong>
+
+                                            <small>
+                                                <?= html_escape(
+                                                    $operationCategory
+                                                ) ?>
+                                            </small>
+
+                                        </td>
+
+                                        <td>
+
+                                            <strong>
+                                                <?= html_escape(
+                                                    $cashboxName
+                                                ) ?>
+                                            </strong>
+
+                                            <small class="
+                                        d-block
+                                        text-muted
+                                    ">
+                                                <?= html_escape(
+                                                    $cashboxTypeLabel
+                                                ) ?>
+
+                                                ·
+
+                                                <?= html_escape(
+                                                    $cashboxCode
+                                                ) ?>
+                                            </small>
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="
+                                        dec-badge
+                                        <?= html_escape(
+                                            $paymentMethodClass
+                                        ) ?>
+                                    ">
+
+                                                <i class="
+                                            <?= html_escape(
+                                                $paymentMethodIcon
+                                            ) ?>
+                                            mr-1
+                                        "></i>
+
+                                                <?= html_escape(
+                                                    $paymentMethodLabel
+                                                ) ?>
+
+                                            </span>
+
+                                        </td>
+
+                                        <td>
+
+                                            <strong>
+                                                <?= html_escape(
+                                                    $documentNumber
+                                                ) ?>
+                                            </strong>
+
+                                            <small class="
+                                        d-block
+                                        text-muted
+                                    ">
+
+                                                <?= $hasAttachment
+                                                    ? 'Pièce jointe'
+                                                    : 'Aucun justificatif'
+                                                ?>
+
+                                            </small>
+
+                                        </td>
+
+                                        <td>
+
+                                            <?= html_escape(
+                                                $chantierName
+                                            ) ?>
+
+                                            <?php if (
+                                                !empty($decaissement
+                                                    ->ref_chantier)
+                                            ): ?>
+
+                                                <small class="
+                                            d-block
+                                            text-muted
+                                        ">
+                                                    <?= html_escape(
+                                                        $decaissement
+                                                            ->ref_chantier
+                                                    ) ?>
+                                                </small>
+
+                                            <?php endif; ?>
+
+                                        </td>
+
+                                        <td class="
+                                    text-right
+                                    dec-amount
+                                ">
+                                            -
+
+                                            <?= number_format(
+                                                (float) (
+                                                    $decaissement
+                                                    ->amount
+                                                    ?? 0
+                                                ),
+                                                0,
+                                                ',',
+                                                ' '
+                                            ) ?>
+
+                                            <small class="
+                                        d-block
+                                        text-muted
+                                    ">
+                                                <?= html_escape(
+                                                    $decaissement
+                                                        ->currency
+                                                        ?? 'BIF'
+                                                ) ?>
+                                            </small>
+
+                                        </td>
+
+                                        <td>
+
+                                            <span class="
+                                        dec-badge
+                                        <?= html_escape(
+                                            $statusClass
+                                        ) ?>
+                                    ">
+
+                                                <i class="
+                                            <?= html_escape(
+                                                $statusIcon
+                                            ) ?>
+                                            mr-1
+                                        "></i>
+
+                                                <?= html_escape(
+                                                    $statusLabel
+                                                ) ?>
+
+                                            </span>
+
+                                        </td>
+
+                                        <td class="text-center">
+
+                                            <button type="button" class="
+                                        dec-action-btn
+                                        dec-action-view
+                                    " title="Voir" onclick="viewDecaissement(
+                                        <?= (int) $decaissement->id ?>
+                                    )">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+
+                                            <?php if (
+                                                $status !== 'validated'
+                                            ): ?>
+
+                                                <button type="button" class="
+                                            dec-action-btn
+                                            dec-action-edit
+                                        " title="Modifier" onclick="editDecaissement(
+                                            <?= (int) $decaissement->id ?>
+                                        )">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+
+                                            <?php endif; ?>
+
+                                            <?php if ($hasAttachment): ?>
+
+                                                <a href="<?=
+                                                            base_url(
+                                                                'uploads/finance/cashbox_operations/'
+                                                                    . rawurlencode(
+                                                                        $decaissement
+                                                                            ->attachment
+                                                                    )
+                                                            )
+                                                            ?>" target="_blank" class="
+                                            dec-action-btn
+                                            dec-action-attachment
+                                        " title="Voir le justificatif">
+                                                    <i class="fas fa-paperclip"></i>
+                                                </a>
+
+                                            <?php endif; ?>
+
+                                            <button type="button" class="
+                                        dec-action-btn
+                                        dec-action-print
+                                    " title="Imprimer" onclick="printDecaissement(
+                                        <?= (int) $decaissement->id ?>
+                                    )">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+
+                                        </td>
+
+                                    </tr>
+
+                                <?php endforeach; ?>
+
+                            <?php else: ?>
+
+                                <tr>
+
+                                    <td colspan="12" class="text-center py-5">
+
+                                        <div class="dec-empty-state">
+
+                                            <i class="
+                                        fas
+                                        fa-money-bill-wave
+                                        fa-3x
+                                        text-muted
+                                        mb-3
+                                    "></i>
+
+                                            <h6>
+                                                Aucun décaissement trouvé
+                                            </h6>
+
+                                            <p class="text-muted mb-3">
+                                                Aucun décaissement n’a encore
+                                                été enregistré dans la trésorerie.
+                                            </p>
+
+                                            <button type="button" class="btn btn-dec-danger" data-toggle="modal"
+                                                data-target="#addDecaissementModal">
+                                                <i class="fas fa-plus mr-1"></i>
+                                                Enregistrer un décaissement
+                                            </button>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            <?php endif; ?>
 
                         </tbody>
 
@@ -1916,151 +2561,234 @@
 
                 </div>
 
-                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                <!-- =====================================================
+         PAGINATION
+    ====================================================== -->
+                <div class="
+            p-3
+            border-top
+            d-flex
+            justify-content-between
+            align-items-center
+            flex-wrap
+        ">
 
                     <small class="text-muted">
-                        Affichage de 1 à 5 sur 114 décaissements
+
+                        Affichage de
+
+                        <?= $startRow ?>
+
+                        à
+
+                        <?= $endRow ?>
+
+                        sur
+
+                        <?= $totalRows ?>
+
+                        décaissement<?= $totalRows > 1
+                                        ? 's'
+                                        : ''
+                                    ?>
+
                     </small>
 
-                    <ul class="pagination pagination-sm mb-0">
+                    <?php if ($totalPages > 1): ?>
 
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">
-                                Précédent
-                            </a>
-                        </li>
+                        <ul class="pagination pagination-sm mb-0">
 
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
+                            <li class="
+                        page-item
+                        <?= $currentPage <= 1
+                            ? 'disabled'
+                            : ''
+                        ?>
+                    ">
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
+                                <a class="page-link" href="<?= $currentPage > 1
+                                                                ? html_escape(
+                                                                    buildDecaissementPageUrl(
+                                                                        $currentPage - 1
+                                                                    )
+                                                                )
+                                                                : '#'
+                                                            ?>">
+                                    Précédent
+                                </a>
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
+                            </li>
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">
-                                Suivant
-                            </a>
-                        </li>
+                            <?php
 
-                    </ul>
+                            $paginationStart =
+                                max(
+                                    1,
+                                    $currentPage - 2
+                                );
+
+                            $paginationEnd =
+                                min(
+                                    $totalPages,
+                                    $currentPage + 2
+                                );
+
+                            ?>
+
+                            <?php if (
+                                $paginationStart > 1
+                            ): ?>
+
+                                <li class="page-item">
+
+                                    <a class="page-link" href="<?= html_escape(
+                                                                    buildDecaissementPageUrl(1)
+                                                                ) ?>">
+                                        1
+                                    </a>
+
+                                </li>
+
+                                <?php if (
+                                    $paginationStart > 2
+                                ): ?>
+
+                                    <li class="
+                                page-item
+                                disabled
+                            ">
+                                        <span class="page-link">
+                                            …
+                                        </span>
+                                    </li>
+
+                                <?php endif; ?>
+
+                            <?php endif; ?>
+
+                            <?php for (
+                                $pageNumber =
+                                    $paginationStart;
+
+                                $pageNumber <=
+                                    $paginationEnd;
+
+                                $pageNumber++
+                            ): ?>
+
+                                <li class="
+                            page-item
+                            <?= $pageNumber
+                                    === $currentPage
+                                    ? 'active'
+                                    : ''
+                            ?>
+                        ">
+
+                                    <a class="page-link" href="<?= html_escape(
+                                                                    buildDecaissementPageUrl(
+                                                                        $pageNumber
+                                                                    )
+                                                                ) ?>">
+                                        <?= $pageNumber ?>
+                                    </a>
+
+                                </li>
+
+                            <?php endfor; ?>
+
+                            <?php if (
+                                $paginationEnd
+                                < $totalPages
+                            ): ?>
+
+                                <?php if (
+                                    $paginationEnd
+                                    < $totalPages - 1
+                                ): ?>
+
+                                    <li class="
+                                page-item
+                                disabled
+                            ">
+                                        <span class="page-link">
+                                            …
+                                        </span>
+                                    </li>
+
+                                <?php endif; ?>
+
+                                <li class="page-item">
+
+                                    <a class="page-link" href="<?= html_escape(
+                                                                    buildDecaissementPageUrl(
+                                                                        $totalPages
+                                                                    )
+                                                                ) ?>">
+                                        <?= $totalPages ?>
+                                    </a>
+
+                                </li>
+
+                            <?php endif; ?>
+
+                            <li class="
+                        page-item
+                        <?= $currentPage
+                            >= $totalPages
+                            ? 'disabled'
+                            : ''
+                        ?>
+                    ">
+
+                                <a class="page-link" href="<?= $currentPage
+                                                                < $totalPages
+                                                                ? html_escape(
+                                                                    buildDecaissementPageUrl(
+                                                                        $currentPage + 1
+                                                                    )
+                                                                )
+                                                                : '#'
+                                                            ?>">
+                                    Suivant
+                                </a>
+
+                            </li>
+
+                        </ul>
+
+                    <?php endif; ?>
 
                 </div>
 
             </div>
 
+            <?php
+
+            $decaissementChantierSummary =
+                isset($decaissementChantierSummary)
+                && is_array($decaissementChantierSummary)
+                ? $decaissementChantierSummary
+                : [];
+
+            $chantierSummaryStartDate =
+                isset($chantierSummaryStartDate)
+                ? $chantierSummaryStartDate
+                : date('Y-m-01');
+
+            $chantierSummaryEndDate =
+                isset($chantierSummaryEndDate)
+                ? $chantierSummaryEndDate
+                : date('Y-m-t');
+
+            ?>
+
             <!-- =========================================================
-                 PAIEMENTS ATTENDUS + SYNTHÈSE CHANTIERS
-            ========================================================== -->
+     SYNTHÈSE DES DÉCAISSEMENTS PAR CHANTIER
+========================================================== -->
             <div class="row">
 
-                <div class="col-xl-5 col-lg-5">
-
-                    <div class="dec-card">
-
-                        <div class="dec-card-header">
-
-                            <div>
-
-                                <h5 class="dec-card-title">
-                                    <i class="fas fa-clock"></i>
-                                    Paiements à effectuer
-                                </h5>
-
-                                <span class="dec-card-subtitle">
-                                    Demandes validées et prêtes pour paiement.
-                                </span>
-
-                            </div>
-
-                            <span class="badge badge-danger">
-                                4 urgences
-                            </span>
-
-                        </div>
-
-                        <div class="dec-card-body">
-
-                            <div class="dec-awaiting-item">
-
-                                <div class="dec-awaiting-icon">
-                                    <i class="fas fa-truck-loading"></i>
-                                </div>
-
-                                <div class="dec-awaiting-info">
-                                    <strong>BUCECO Burundi</strong>
-                                    <small>Facture ciment — échéance 13/07/2026</small>
-                                </div>
-
-                                <div class="dec-awaiting-amount">
-                                    28 500 000 BIF
-                                </div>
-
-                            </div>
-
-                            <div class="dec-awaiting-item">
-
-                                <div class="dec-awaiting-icon">
-                                    <i class="fas fa-user-tie"></i>
-                                </div>
-
-                                <div class="dec-awaiting-info">
-                                    <strong>Entreprise KAZE</strong>
-                                    <small>Situation travaux — échéance 14/07/2026</small>
-                                </div>
-
-                                <div class="dec-awaiting-amount">
-                                    32 000 000 BIF
-                                </div>
-
-                            </div>
-
-                            <div class="dec-awaiting-item">
-
-                                <div class="dec-awaiting-icon">
-                                    <i class="fas fa-users"></i>
-                                </div>
-
-                                <div class="dec-awaiting-info">
-                                    <strong>Personnel chantier Gitega</strong>
-                                    <small>Paie hebdomadaire — 15/07/2026</small>
-                                </div>
-
-                                <div class="dec-awaiting-amount">
-                                    12 400 000 BIF
-                                </div>
-
-                            </div>
-
-                            <div class="dec-awaiting-item">
-
-                                <div class="dec-awaiting-icon">
-                                    <i class="fas fa-gas-pump"></i>
-                                </div>
-
-                                <div class="dec-awaiting-info">
-                                    <strong>Engen Burundi</strong>
-                                    <small>Facture carburant — 16/07/2026</small>
-                                </div>
-
-                                <div class="dec-awaiting-amount">
-                                    23 500 000 BIF
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="col-xl-7 col-lg-7">
+                <div class="col-xl-12 col-lg-12">
 
                     <div class="dec-card">
 
@@ -2074,10 +2802,108 @@
                                 </h5>
 
                                 <span class="dec-card-subtitle">
-                                    Comparaison entre budget de dépenses et consommation réelle.
+
+                                    Comparaison entre le budget du chantier
+                                    et les décaissements validés du
+
+                                    <strong>
+                                        <?= date(
+                                            'd/m/Y',
+                                            strtotime(
+                                                $chantierSummaryStartDate
+                                            )
+                                        ) ?>
+                                    </strong>
+
+                                    au
+
+                                    <strong>
+                                        <?= date(
+                                            'd/m/Y',
+                                            strtotime(
+                                                $chantierSummaryEndDate
+                                            )
+                                        ) ?>
+                                    </strong>.
+
                                 </span>
 
                             </div>
+
+                            <form method="get" action="<?= current_url() ?>" class="
+                        d-flex
+                        align-items-end
+                        flex-wrap
+                    ">
+
+                                <?php foreach ($_GET as $key => $value): ?>
+
+                                    <?php if (
+                                        !in_array(
+                                            $key,
+                                            [
+                                                'chantier_start_date',
+                                                'chantier_end_date',
+                                                'page',
+                                            ],
+                                            true
+                                        )
+                                    ): ?>
+
+                                        <input type="hidden" name="<?= html_escape($key) ?>" value="<?= html_escape($value) ?>">
+
+                                    <?php endif; ?>
+
+                                <?php endforeach; ?>
+
+                                <div class="form-group mb-0 mr-2">
+
+                                    <label class="
+                                small
+                                text-muted
+                                mb-1
+                            ">
+                                        Du
+                                    </label>
+
+                                    <input type="date" name="chantier_start_date" class="
+                                form-control
+                                form-control-sm
+                            " value="<?= html_escape(
+                                            $chantierSummaryStartDate
+                                        ) ?>">
+
+                                </div>
+
+                                <div class="form-group mb-0 mr-2">
+
+                                    <label class="
+                                small
+                                text-muted
+                                mb-1
+                            ">
+                                        Au
+                                    </label>
+
+                                    <input type="date" name="chantier_end_date" class="
+                                form-control
+                                form-control-sm
+                            " value="<?= html_escape(
+                                            $chantierSummaryEndDate
+                                        ) ?>">
+
+                                </div>
+
+                                <button type="submit" class="
+                            btn
+                            btn-sm
+                            btn-dec-danger
+                        ">
+                                    <i class="fas fa-filter mr-1"></i>
+                                    Appliquer
+                                </button>
+
+                            </form>
 
                         </div>
 
@@ -2089,159 +2915,433 @@
 
                                     <tr>
                                         <th>Chantier</th>
-                                        <th class="text-right">Budget</th>
-                                        <th class="text-right">Décaissé</th>
-                                        <th class="text-right">Disponible</th>
-                                        <th>Consommation</th>
+
+                                        <th class="text-right">
+                                            Budget
+                                        </th>
+
+                                        <th class="text-right">
+                                            Décaissé
+                                        </th>
+
+                                        <th class="text-right">
+                                            Disponible
+                                        </th>
+
+                                        <th class="text-center">
+                                            Opérations
+                                        </th>
+
+                                        <th>
+                                            Consommation
+                                        </th>
                                     </tr>
 
                                 </thead>
 
                                 <tbody>
 
-                                    <tr>
+                                    <?php if (
+                                        !empty($decaissementChantierSummary)
+                                    ): ?>
 
-                                        <td>
-                                            <strong>Chantier Bujumbura</strong>
-                                            <small class="d-block text-muted">
-                                                CH-2026-001
-                                            </small>
-                                        </td>
+                                        <?php foreach (
+                                            $decaissementChantierSummary
+                                            as $chantierSummary
+                                        ): ?>
 
-                                        <td class="text-right">
-                                            180 000 000
-                                        </td>
+                                            <?php
 
-                                        <td class="text-right dec-amount">
-                                            128 500 000
-                                        </td>
+                                            $budget =
+                                                (float) (
+                                                    $chantierSummary
+                                                    ->budget
+                                                    ?? 0
+                                                );
 
-                                        <td class="text-right text-success font-weight-bold">
-                                            51 500 000
-                                        </td>
+                                            $totalDisbursed =
+                                                (float) (
+                                                    $chantierSummary
+                                                    ->total_disbursed
+                                                    ?? 0
+                                                );
 
-                                        <td style="min-width: 140px;">
+                                            $available =
+                                                (float) (
+                                                    $chantierSummary
+                                                    ->available
+                                                    ?? 0
+                                                );
 
-                                            <div class="progress progress-xs mb-1">
+                                            $consumptionPercentage =
+                                                (float) (
+                                                    $chantierSummary
+                                                    ->consumption_percentage
+                                                    ?? 0
+                                                );
 
-                                                <div class="progress-bar bg-success" style="width: 71.4%;">
-                                                </div>
+                                            $progressPercentage =
+                                                (float) (
+                                                    $chantierSummary
+                                                    ->progress_percentage
+                                                    ?? 0
+                                                );
 
-                                            </div>
+                                            $progressClass =
+                                                $chantierSummary
+                                                ->progress_class
+                                                ?? 'bg-success';
 
-                                            <small>71,4 %</small>
+                                            /*
+                                 * Couleur du montant disponible.
+                                 */
+                                            if ($available < 0) {
+                                                $availableClass =
+                                                    'text-danger';
 
-                                        </td>
+                                                $availableLabel =
+                                                    number_format(
+                                                        abs($available),
+                                                        0,
+                                                        ',',
+                                                        ' '
+                                                    )
+                                                    . ' dépassement';
+                                            } elseif (
+                                                $consumptionPercentage
+                                                >= 90
+                                            ) {
+                                                $availableClass =
+                                                    'text-danger';
 
-                                    </tr>
+                                                $availableLabel =
+                                                    number_format(
+                                                        $available,
+                                                        0,
+                                                        ',',
+                                                        ' '
+                                                    );
+                                            } elseif (
+                                                $consumptionPercentage
+                                                >= 75
+                                            ) {
+                                                $availableClass =
+                                                    'text-warning';
 
-                                    <tr>
+                                                $availableLabel =
+                                                    number_format(
+                                                        $available,
+                                                        0,
+                                                        ',',
+                                                        ' '
+                                                    );
+                                            } else {
+                                                $availableClass =
+                                                    'text-success';
 
-                                        <td>
-                                            <strong>Chantier Gitega</strong>
-                                            <small class="d-block text-muted">
-                                                CH-2026-002
-                                            </small>
-                                        </td>
+                                                $availableLabel =
+                                                    number_format(
+                                                        $available,
+                                                        0,
+                                                        ',',
+                                                        ' '
+                                                    );
+                                            }
 
-                                        <td class="text-right">
-                                            150 000 000
-                                        </td>
+                                            ?>
 
-                                        <td class="text-right dec-amount">
-                                            124 000 000
-                                        </td>
+                                            <tr>
 
-                                        <td class="text-right text-success font-weight-bold">
-                                            26 000 000
-                                        </td>
+                                                <td>
 
-                                        <td>
+                                                    <strong>
+                                                        <?= html_escape(
+                                                            $chantierSummary
+                                                                ->name
+                                                                ?? 'Chantier'
+                                                        ) ?>
+                                                    </strong>
 
-                                            <div class="progress progress-xs mb-1">
+                                                    <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+                                                        <?= html_escape(
+                                                            $chantierSummary
+                                                                ->ref_chantier
+                                                                ?? 'Sans référence'
+                                                        ) ?>
 
-                                                <div class="progress-bar bg-warning" style="width: 82.6%;">
-                                                </div>
+                                                        <?php if (
+                                                            !empty($chantierSummary
+                                                                ->location)
+                                                        ): ?>
 
-                                            </div>
+                                                            ·
 
-                                            <small>82,6 %</small>
+                                                            <?= html_escape(
+                                                                $chantierSummary
+                                                                    ->location
+                                                            ) ?>
 
-                                        </td>
+                                                        <?php endif; ?>
 
-                                    </tr>
+                                                    </small>
 
-                                    <tr>
+                                                </td>
 
-                                        <td>
-                                            <strong>Chantier Ngozi</strong>
-                                            <small class="d-block text-muted">
-                                                CH-2026-003
-                                            </small>
-                                        </td>
+                                                <td class="text-right">
 
-                                        <td class="text-right">
-                                            95 000 000
-                                        </td>
+                                                    <strong>
 
-                                        <td class="text-right dec-amount">
-                                            91 700 000
-                                        </td>
+                                                        <?= number_format(
+                                                            $budget,
+                                                            0,
+                                                            ',',
+                                                            ' '
+                                                        ) ?>
 
-                                        <td class="text-right text-danger font-weight-bold">
-                                            3 300 000
-                                        </td>
+                                                    </strong>
 
-                                        <td>
+                                                    <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+                                                        BIF
+                                                    </small>
 
-                                            <div class="progress progress-xs mb-1">
+                                                </td>
 
-                                                <div class="progress-bar bg-danger" style="width: 96.5%;">
-                                                </div>
+                                                <td class="
+                                            text-right
+                                            dec-amount
+                                        ">
 
-                                            </div>
+                                                    <strong>
 
-                                            <small>96,5 %</small>
+                                                        <?= number_format(
+                                                            $totalDisbursed,
+                                                            0,
+                                                            ',',
+                                                            ' '
+                                                        ) ?>
 
-                                        </td>
+                                                    </strong>
 
-                                    </tr>
+                                                    <small class="
+                                                d-block
+                                                text-muted
+                                            ">
+                                                        BIF
+                                                    </small>
 
-                                    <tr>
+                                                </td>
 
-                                        <td>
-                                            <strong>Chantier Muyinga</strong>
-                                            <small class="d-block text-muted">
-                                                CH-2026-004
-                                            </small>
-                                        </td>
+                                                <td class="
+                                            text-right
+                                            font-weight-bold
+                                            <?= html_escape(
+                                                $availableClass
+                                            ) ?>
+                                        ">
 
-                                        <td class="text-right">
-                                            125 000 000
-                                        </td>
+                                                    <?= html_escape(
+                                                        $availableLabel
+                                                    ) ?>
 
-                                        <td class="text-right dec-amount">
-                                            76 500 000
-                                        </td>
+                                                    <?php if (
+                                                        $available >= 0
+                                                    ): ?>
 
-                                        <td class="text-right text-success font-weight-bold">
-                                            48 500 000
-                                        </td>
+                                                        <small class="
+                                                    d-block
+                                                    text-muted
+                                                ">
+                                                            BIF
+                                                        </small>
 
-                                        <td>
+                                                    <?php endif; ?>
 
-                                            <div class="progress progress-xs mb-1">
+                                                </td>
 
-                                                <div class="progress-bar bg-info" style="width: 61.2%;">
-                                                </div>
+                                                <td class="text-center">
 
-                                            </div>
+                                                    <span class="
+                                                badge
+                                                badge-light
+                                                border
+                                                px-2
+                                                py-1
+                                            ">
+                                                        <?= (int) (
+                                                            $chantierSummary
+                                                            ->operation_count
+                                                            ?? 0
+                                                        ) ?>
+                                                    </span>
 
-                                            <small>61,2 %</small>
+                                                </td>
 
-                                        </td>
+                                                <td style="min-width: 180px;">
 
-                                    </tr>
+                                                    <?php if ($budget > 0): ?>
+
+                                                        <div class="
+                                                    progress
+                                                    progress-xs
+                                                    mb-1
+                                                ">
+
+                                                            <div class="
+                                                        progress-bar
+                                                        <?= html_escape(
+                                                            $progressClass
+                                                        ) ?>
+                                                    " role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                                                                aria-valuenow="<?=
+                                                                                number_format(
+                                                                                    $progressPercentage,
+                                                                                    2,
+                                                                                    '.',
+                                                                                    ''
+                                                                                )
+                                                                                ?>" style="width: <?=
+                                                                                                    number_format(
+                                                                                                        $progressPercentage,
+                                                                                                        2,
+                                                                                                        '.',
+                                                                                                        ''
+                                                                                                    )
+                                                                                                    ?>%;"></div>
+
+                                                        </div>
+
+                                                        <small class="
+                                                    d-flex
+                                                    justify-content-between
+                                                ">
+
+                                                            <span>
+
+                                                                <?= number_format(
+                                                                    $consumptionPercentage,
+                                                                    1,
+                                                                    ',',
+                                                                    ' '
+                                                                ) ?>
+
+                                                                %
+
+                                                            </span>
+
+                                                            <?php if (
+                                                                $consumptionPercentage
+                                                                > 100
+                                                            ): ?>
+
+                                                                <span class="
+                                                            text-danger
+                                                            font-weight-bold
+                                                        ">
+                                                                    Budget dépassé
+                                                                </span>
+
+                                                            <?php elseif (
+                                                                $consumptionPercentage
+                                                                >= 90
+                                                            ): ?>
+
+                                                                <span class="
+                                                            text-danger
+                                                            font-weight-bold
+                                                        ">
+                                                                    Critique
+                                                                </span>
+
+                                                            <?php elseif (
+                                                                $consumptionPercentage
+                                                                >= 75
+                                                            ): ?>
+
+                                                                <span class="
+                                                            text-warning
+                                                            font-weight-bold
+                                                        ">
+                                                                    Attention
+                                                                </span>
+
+                                                            <?php else: ?>
+
+                                                                <span class="text-muted">
+                                                                    Normal
+                                                                </span>
+
+                                                            <?php endif; ?>
+
+                                                        </small>
+
+                                                    <?php else: ?>
+
+                                                        <span class="
+                                                    badge
+                                                    badge-secondary
+                                                ">
+                                                            Budget non défini
+                                                        </span>
+
+                                                        <?php if (
+                                                            $totalDisbursed > 0
+                                                        ): ?>
+
+                                                            <small class="
+                                                        d-block
+                                                        text-danger
+                                                        mt-1
+                                                    ">
+                                                                Décaissements sans budget
+                                                            </small>
+
+                                                        <?php endif; ?>
+
+                                                    <?php endif; ?>
+
+                                                </td>
+
+                                            </tr>
+
+                                        <?php endforeach; ?>
+
+                                    <?php else: ?>
+
+                                        <tr>
+
+                                            <td colspan="6" class="
+                                        text-center
+                                        py-5
+                                    ">
+
+                                                <i class="
+                                            fas
+                                            fa-hard-hat
+                                            fa-3x
+                                            text-muted
+                                            mb-3
+                                        "></i>
+
+                                                <h6>
+                                                    Aucune synthèse disponible
+                                                </h6>
+
+                                                <p class="text-muted mb-0">
+                                                    Aucun chantier actif n’a été
+                                                    trouvé pour cette période.
+                                                </p>
+
+                                            </td>
+
+                                        </tr>
+
+                                    <?php endif; ?>
 
                                 </tbody>
 
@@ -2260,127 +3360,602 @@
 
 </div>
 
+<style>
+    /* =========================================================
+   MODAL DÉCAISSEMENT — STYLE BORDEAUX
+========================================================= */
+
+    :root {
+        --dec-primary: #7f1d1d;
+        --dec-primary-dark: #5f1515;
+        --dec-primary-soft: #fef2f2;
+        --dec-primary-soft-2: #fee2e2;
+        --dec-border: #fecaca;
+        --dec-text: #1f2937;
+        --dec-muted: #64748b;
+        --dec-white: #ffffff;
+        --dec-input-border: #cbd5e1;
+        --dec-balance-bg: #fff7f7;
+    }
+
+    /* Taille et position */
+    #addDecaissementModal .modal-dialog {
+        max-width: 1050px;
+        width: calc(100% - 30px);
+    }
+
+    #addDecaissementModal .modal-content {
+        border: 0;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 22px 55px rgba(15, 23, 42, 0.28);
+    }
+
+    /* =========================================================
+   HEADER
+========================================================= */
+
+    #addDecaissementModal .modal-header {
+        padding: 17px 20px;
+        border-bottom: 0;
+        background: linear-gradient(135deg,
+                var(--dec-primary) 0%,
+                var(--dec-primary-dark) 58%,
+                #2b1020 100%);
+        color: var(--dec-white);
+    }
+
+    #addDecaissementModal .modal-title {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        color: var(--dec-white);
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 0.1px;
+    }
+
+    #addDecaissementModal .modal-title i {
+        font-size: 15px;
+        color: #fecaca;
+    }
+
+    #addDecaissementModal .close {
+        padding: 0;
+        margin: 0;
+        color: var(--dec-white);
+        opacity: 1;
+        text-shadow: none;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    #addDecaissementModal .close:hover {
+        color: #fecaca;
+        opacity: 1;
+    }
+
+    /* =========================================================
+   BODY
+========================================================= */
+
+    #addDecaissementModal .modal-body {
+        padding: 22px 20px 10px;
+        background: #ffffff;
+    }
+
+    #addDecaissementModal .row {
+        margin-left: -7px;
+        margin-right: -7px;
+    }
+
+    #addDecaissementModal .row>[class*="col-"] {
+        padding-left: 7px;
+        padding-right: 7px;
+    }
+
+    #addDecaissementModal .form-group {
+        margin-bottom: 17px;
+    }
+
+    #addDecaissementModal label {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--dec-text);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    #addDecaissementModal .required-star {
+        color: #dc2626;
+    }
+
+    /* =========================================================
+   CHAMPS
+========================================================= */
+
+    #addDecaissementModal .form-control {
+        min-height: 42px;
+        border: 1px solid var(--dec-input-border);
+        border-radius: 8px;
+        background: #ffffff;
+        color: var(--dec-text);
+        font-size: 13px;
+        box-shadow: none;
+        transition: all 0.2s ease;
+    }
+
+    #addDecaissementModal textarea.form-control {
+        min-height: 95px;
+        resize: vertical;
+        padding-top: 11px;
+    }
+
+    #addDecaissementModal .form-control::placeholder {
+        color: #94a3b8;
+    }
+
+    #addDecaissementModal .form-control:focus {
+        border-color: var(--dec-primary);
+        box-shadow: 0 0 0 3px rgba(127, 29, 29, 0.12);
+    }
+
+    #addDecaissementModal select.form-control {
+        cursor: pointer;
+    }
+
+    #addDecaissementModal .input-group-text {
+        min-width: 48px;
+        justify-content: center;
+        border: 1px solid var(--dec-input-border);
+        border-left: 0;
+        border-radius: 0 8px 8px 0;
+        background: #eef2f7;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    /* =========================================================
+   SOLDE DISPONIBLE
+========================================================= */
+
+    #addDecaissementModal .dec-balance-box {
+        min-height: 91px;
+        margin-top: 25px;
+        padding: 13px 14px;
+        border: 1px solid var(--dec-border);
+        border-radius: 9px;
+        background: var(--dec-balance-bg);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #addDecaissementModal .dec-balance-box small {
+        margin-bottom: 5px;
+        color: var(--dec-muted);
+        font-size: 11px;
+    }
+
+    #addDecaissementModal .dec-balance-box strong {
+        color: var(--dec-primary);
+        font-size: 17px;
+        font-weight: 800;
+    }
+
+    #addDecaissementModal #decCashboxCode {
+        color: #7c2d2d;
+        font-size: 11px;
+    }
+
+    /* Solde insuffisant */
+    #addDecaissementModal .dec-balance-box.balance-danger {
+        border-color: #ef4444;
+        background: #fef2f2;
+    }
+
+    #addDecaissementModal .dec-balance-box.balance-danger strong {
+        color: #dc2626;
+    }
+
+    /* =========================================================
+   FILE INPUT
+========================================================= */
+
+    #addDecaissementModal .custom-file {
+        height: 42px;
+    }
+
+    #addDecaissementModal .custom-file-input {
+        height: 42px;
+    }
+
+    #addDecaissementModal .custom-file-label {
+        height: 42px;
+        padding: 10px 12px;
+        border: 1px solid var(--dec-input-border);
+        border-radius: 8px;
+        color: #475569;
+        font-size: 13px;
+        font-weight: 500;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    #addDecaissementModal .custom-file-label::after {
+        height: 40px;
+        padding: 10px 16px;
+        border-left: 1px solid var(--dec-input-border);
+        border-radius: 0 8px 8px 0;
+        background: #eef2f7;
+        color: #334155;
+        content: "Parcourir";
+    }
+
+    #addDecaissementModal .form-text {
+        margin-top: 5px;
+        color: var(--dec-muted);
+        font-size: 11px;
+    }
+
+    /* =========================================================
+   FOOTER
+========================================================= */
+
+    #addDecaissementModal .modal-footer {
+        padding: 14px 20px;
+        border-top: 1px solid #e5e7eb;
+        background: #ffffff;
+    }
+
+    #addDecaissementModal .btn {
+        min-height: 40px;
+        padding: 9px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    /* Bouton annuler */
+    #addDecaissementModal .btn-caisse-outline {
+        border: 1px solid #d1d5db;
+        background: #ffffff;
+        color: #475569;
+    }
+
+    #addDecaissementModal .btn-caisse-outline:hover {
+        border-color: var(--dec-primary);
+        background: var(--dec-primary-soft);
+        color: var(--dec-primary);
+    }
+
+    /* Bouton principal bordeaux */
+    #addDecaissementModal .btn-caisse-primary {
+        border: 1px solid var(--dec-primary);
+        background: var(--dec-primary);
+        color: #ffffff;
+        box-shadow: 0 7px 18px rgba(127, 29, 29, 0.18);
+    }
+
+    #addDecaissementModal .btn-caisse-primary:hover {
+        border-color: var(--dec-primary-dark);
+        background: var(--dec-primary-dark);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+
+    #addDecaissementModal .btn-caisse-primary:disabled {
+        opacity: 0.7;
+        transform: none;
+        cursor: not-allowed;
+    }
+
+    /* =========================================================
+   RESPONSIVE
+========================================================= */
+
+    @media (max-width: 991.98px) {
+        #addDecaissementModal .modal-dialog {
+            max-width: calc(100% - 20px);
+            margin: 10px auto;
+        }
+
+        #addDecaissementModal .modal-body {
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+
+        #addDecaissementModal .dec-balance-box {
+            margin-top: 0;
+        }
+    }
+
+    @media (max-width: 767.98px) {
+        #addDecaissementModal .modal-dialog {
+            width: calc(100% - 12px);
+            margin: 6px auto;
+        }
+
+        #addDecaissementModal .modal-header {
+            padding: 14px 15px;
+        }
+
+        #addDecaissementModal .modal-title {
+            font-size: 15px;
+        }
+
+        #addDecaissementModal .modal-body {
+            padding: 17px 15px 7px;
+        }
+
+        #addDecaissementModal .modal-footer {
+            padding: 12px 15px;
+            flex-direction: column-reverse;
+            align-items: stretch;
+        }
+
+        #addDecaissementModal .modal-footer .btn {
+            width: 100%;
+            margin: 4px 0;
+        }
+    }
+</style>
+
 <!-- =========================================================
      MODALE : NOUVEAU DÉCAISSEMENT
 ========================================================== -->
-<div class="modal fade dec-modal" id="addDecaissementModal" tabindex="-1" role="dialog">
+<div class="modal fade modal-caisse" id="addDecaissementModal" tabindex="-1" role="dialog"
+    aria-labelledby="addDecaissementModalLabel" aria-hidden="true">
 
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
 
-        <form action="<?= base_url('finance/decaissement-store') ?>" method="post" enctype="multipart/form-data"
-            style="width: 100%;">
+        <form action="<?= base_url('cashbox-operation-store') ?>" method="post" enctype="multipart/form-data"
+            id="decaissementForm" style="width: 100%;">
 
             <div class="modal-content">
 
+                <!-- =================================================
+                     ENTÊTE
+                ================================================== -->
                 <div class="modal-header">
 
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="addDecaissementModalLabel">
+                        <i class="fas fa-exchange-alt mr-2"></i>
 
-                        <i class="fas fa-arrow-circle-up mr-2"></i>
-
-                        <span id="decaissementModalTitle">
-                            Enregistrer un nouveau décaissement
-                        </span>
-
+                        Enregistrer un décaissement
                     </h5>
 
-                    <button type="button" class="close" data-dismiss="modal">
-
-                        <span>&times;</span>
-
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                        <span aria-hidden="true">
+                            &times;
+                        </span>
                     </button>
 
                 </div>
 
+                <!-- =================================================
+                     CONTENU
+                ================================================== -->
                 <div class="modal-body">
 
-                    <div class="dec-section-title">
-
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Informations générales
-
-                    </div>
+                    <!-- Type d'opération transmis au contrôleur -->
+                    <input type="hidden" name="operation_type" value="decaissement">
 
                     <div class="row">
 
+                        <!-- Date -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
-                                <label>
-                                    Référence
-                                    <span class="dec-required">*</span>
+                                <label for="decOperationDate">
+
+                                    Date de l’opération
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
                                 </label>
 
-                                <input type="text" name="reference" class="form-control"
-                                    value="DEC-<?= date('Y') ?>-00059" readonly>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Date de décaissement
-                                    <span class="dec-required">*</span>
-                                </label>
-
-                                <input type="date" name="decaissement_date" class="form-control"
+                                <input type="date" name="operation_date" id="decOperationDate" class="form-control"
                                     value="<?= date('Y-m-d') ?>" required>
 
                             </div>
 
                         </div>
 
+                        <!-- Caisse -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
-                                <label>
-                                    Type de décaissement
-                                    <span class="dec-required">*</span>
+                                <label for="decCashboxId">
+
+                                    Caisse concernée
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
                                 </label>
 
-                                <select name="expense_type" id="expenseType" class="form-control"
-                                    onchange="toggleDecaissementFields()" required>
+                                <select name="cashbox_id" id="decCashboxId" class="form-control"
+                                    onchange="updateDecaissementCashboxInfo()" required>
+
+                                    <option value="">
+                                        Sélectionner la caisse
+                                    </option>
+
+                                    <?php if (!empty($allCashboxes)): ?>
+
+                                        <?php foreach (
+                                            $allCashboxes
+                                            as $cashbox
+                                        ): ?>
+
+                                            <option value="<?= (int) $cashbox->id ?>"
+                                                data-balance="<?= (float) $cashbox->current_balance ?>"
+                                                data-currency="<?= html_escape($cashbox->devise) ?>"
+                                                data-code="<?= html_escape($cashbox->code) ?>"
+                                                data-type="<?= html_escape($cashbox->type) ?>">
+
+                                                <?= html_escape($cashbox->code) ?>
+
+                                                —
+
+                                                <?= html_escape($cashbox->name) ?>
+
+                                                —
+
+                                                <?= number_format(
+                                                    (float) $cashbox->current_balance,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                                <?= html_escape($cashbox->devise) ?>
+
+                                            </option>
+
+                                        <?php endforeach; ?>
+
+                                    <?php endif; ?>
+
+                                </select>
+
+                                <small class="form-text text-muted">
+
+                                    La caisse sélectionnée sera débitée.
+
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Montant -->
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+
+                                <label for="decAmount">
+
+                                    Montant
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
+                                </label>
+
+                                <div class="input-group">
+
+                                    <input type="number" name="amount" id="decAmount" class="form-control" min="0.01"
+                                        step="0.01" placeholder="0" required>
+
+                                    <div class="input-group-append">
+
+                                        <span class="input-group-text" id="decCurrencyLabel">
+                                            BIF
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                                <small class="form-text" id="decAmountHelp">
+                                    Le montant doit être supérieur à zéro.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Solde disponible -->
+                        <div class="col-md-4">
+
+                            <div class="dec-balance-box">
+
+                                <small>
+                                    Solde disponible
+                                </small>
+
+                                <strong id="decAvailableBalance">
+                                    0 BIF
+                                </strong>
+
+                                <span class="d-block mt-1" id="decCashboxCode">
+                                    Aucune caisse sélectionnée
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Catégorie -->
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+
+                                <label for="decCategory">
+                                    Catégorie
+                                </label>
+
+                                <select name="category" id="decCategory" class="form-control">
 
                                     <option value="">
                                         Sélectionner
                                     </option>
 
-                                    <option value="fournisseur">
-                                        Paiement fournisseur
+                                    <option value="Fournitures">
+                                        Fournitures
                                     </option>
 
-                                    <option value="sous_traitant">
-                                        Paiement sous-traitant
-                                    </option>
-
-                                    <option value="salaire">
-                                        Salaire / Main-d’œuvre
-                                    </option>
-
-                                    <option value="chantier">
-                                        Approvisionnement chantier
-                                    </option>
-
-                                    <option value="carburant">
+                                    <option value="Carburant">
                                         Carburant
                                     </option>
 
-                                    <option value="taxe">
-                                        Impôt et taxe
+                                    <option value="Main-d’œuvre">
+                                        Main-d’œuvre
                                     </option>
 
-                                    <option value="remboursement">
+                                    <option value="Salaire">
+                                        Salaire
+                                    </option>
+
+                                    <option value="Sous-traitance">
+                                        Sous-traitance
+                                    </option>
+
+                                    <option value="Maintenance engin">
+                                        Maintenance engin
+                                    </option>
+
+                                    <option value="Transport">
+                                        Transport
+                                    </option>
+
+                                    <option value="Impôts et taxes">
+                                        Impôts et taxes
+                                    </option>
+
+                                    <option value="Remboursement emprunt">
                                         Remboursement emprunt
                                     </option>
 
-                                    <option value="autre">
-                                        Autre charge
+                                    <option value="Achat de matériaux">
+                                        Achat de matériaux
+                                    </option>
+
+                                    <option value="Charges diverses">
+                                        Charges diverses
+                                    </option>
+
+                                    <option value="Autre">
+                                        Autre
                                     </option>
 
                                 </select>
@@ -2389,223 +3964,38 @@
 
                         </div>
 
-                    </div>
-
-                    <div class="dec-section-title mt-3">
-
-                        <i class="fas fa-user-tie mr-1"></i>
-                        Bénéficiaire et affectation
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-4" id="beneficiarySelectField">
+                        <!-- Bénéficiaire -->
+                        <div class="col-md-4">
 
                             <div class="form-group">
 
-                                <label>
+                                <label for="decThirdParty">
                                     Bénéficiaire
-                                    <span class="dec-required">*</span>
                                 </label>
 
-                                <select name="beneficiary_id" class="form-control">
-
-                                    <option value="">
-                                        Sélectionner le bénéficiaire
-                                    </option>
-
-                                    <option value="1">
-                                        TotalEnergies Burundi
-                                    </option>
-
-                                    <option value="2">
-                                        ABC Construction
-                                    </option>
-
-                                    <option value="3">
-                                        BUCECO Burundi
-                                    </option>
-
-                                    <option value="4">
-                                        Entreprise KAZE
-                                    </option>
-
-                                    <option value="5">
-                                        Office Burundais des Recettes
-                                    </option>
-
-                                </select>
+                                <input type="text" name="third_party" id="decThirdParty" class="form-control"
+                                    placeholder="Nom du fournisseur ou bénéficiaire">
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-4" id="beneficiaryTextField" style="display: none;">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Nom du bénéficiaire
-                                </label>
-
-                                <input type="text" name="beneficiary_name" class="form-control"
-                                    placeholder="Saisir le bénéficiaire">
-
-                            </div>
-
-                        </div>
-
+                        <!-- Mode de règlement -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
-                                <label>
-                                    Projet / Chantier
+                                <label for="decPaymentMethod">
+                                    Mode de règlement
                                 </label>
 
-                                <select name="chantier_id" class="form-control">
-
-                                    <option value="">
-                                        Siège / Non affecté
-                                    </option>
-
-                                    <option value="1">
-                                        Chantier Bujumbura
-                                    </option>
-
-                                    <option value="2">
-                                        Chantier Gitega
-                                    </option>
-
-                                    <option value="3">
-                                        Chantier Ngozi
-                                    </option>
-
-                                    <option value="4">
-                                        Chantier Muyinga
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Demande de paiement associée
-                                </label>
-
-                                <select name="payment_request_id" class="form-control">
-
-                                    <option value="">
-                                        Aucune demande associée
-                                    </option>
-
-                                    <option value="1">
-                                        DP-2026-0048 — BUCECO
-                                    </option>
-
-                                    <option value="2">
-                                        DP-2026-0047 — ABC Construction
-                                    </option>
-
-                                    <option value="3">
-                                        DP-2026-0046 — TotalEnergies
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Caisse ou compte débité
-                                    <span class="dec-required">*</span>
-                                </label>
-
-                                <select name="source_account_id" id="sourceAccount" class="form-control"
-                                    onchange="updateSourceBalance()" required>
-
-                                    <option value="">
-                                        Sélectionner
-                                    </option>
-
-                                    <optgroup label="Caisses">
-
-                                        <option value="cash-1" data-balance="35400000">
-                                            Caisse siège
-                                        </option>
-
-                                        <option value="cash-2" data-balance="18400000">
-                                            Caisse chantier Gitega
-                                        </option>
-
-                                        <option value="cash-3" data-balance="32500000">
-                                            Caisse chantier Bujumbura
-                                        </option>
-
-                                        <option value="cash-4" data-balance="1250000">
-                                            Caisse chantier Ngozi
-                                        </option>
-
-                                    </optgroup>
-
-                                    <optgroup label="Comptes bancaires">
-
-                                        <option value="bank-1" data-balance="320000000">
-                                            CRDB BIF
-                                        </option>
-
-                                        <option value="bank-2" data-balance="65000">
-                                            CRDB USD
-                                        </option>
-
-                                        <option value="bank-3" data-balance="185000000">
-                                            ECOBANK BIF
-                                        </option>
-
-                                        <option value="bank-4" data-balance="24000">
-                                            KCB USD
-                                        </option>
-
-                                    </optgroup>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Mode de paiement
-                                    <span class="dec-required">*</span>
-                                </label>
-
-                                <select name="payment_method" class="form-control" required>
-
-                                    <option value="">
-                                        Sélectionner
-                                    </option>
+                                <select name="payment_method" id="decPaymentMethod" class="form-control">
 
                                     <option value="cash">
                                         Espèces
                                     </option>
 
-                                    <option value="bank_transfer">
+                                    <option value="bank">
                                         Virement bancaire
                                     </option>
 
@@ -2613,167 +4003,95 @@
                                         Chèque
                                     </option>
 
-                                    <option value="mobile_money">
+                                    <option value="mobile">
                                         Mobile Money
                                     </option>
 
-                                    <option value="bank_debit">
-                                        Prélèvement bancaire
-                                    </option>
-
                                 </select>
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-4">
-
-                            <div class="dec-balance-box">
-
-                                <small>
-                                    Solde disponible du compte sélectionné
-                                </small>
-
-                                <strong id="sourceBalance">
-                                    0 BIF
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="dec-section-title mt-3">
-
-                        <i class="fas fa-money-bill-wave mr-1"></i>
-                        Montant et justificatifs
-
-                    </div>
-
-                    <div class="row">
-
+                        <!-- Numéro de pièce -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
-                                <label>
-                                    Montant à décaisser
-                                    <span class="dec-required">*</span>
-                                </label>
-
-                                <input type="number" name="amount" id="decAmount" class="form-control" min="0"
-                                    step="0.01" placeholder="0" required>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-2">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Devise
-                                    <span class="dec-required">*</span>
-                                </label>
-
-                                <select name="currency" class="form-control" required>
-
-                                    <option value="BIF">BIF</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-3">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Numéro de transaction
-                                </label>
-
-                                <input type="text" name="transaction_number" class="form-control"
-                                    placeholder="Virement, chèque, mobile...">
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-3">
-
-                            <div class="form-group">
-
-                                <label>
+                                <label for="decDocumentNumber">
                                     Numéro de pièce
                                 </label>
 
-                                <input type="text" name="document_number" class="form-control"
-                                    placeholder="Facture, bon, reçu...">
+                                <input type="text" name="document_number" id="decDocumentNumber" class="form-control"
+                                    placeholder="Facture, reçu, bon...">
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-6">
+                        <!-- Pièce justificative -->
+                        <div class="col-md-4">
 
                             <div class="form-group">
 
-                                <label>
+                                <label for="decAttachment">
                                     Pièce justificative
                                 </label>
 
                                 <div class="custom-file">
 
-                                    <input type="file" name="attachment" class="custom-file-input"
-                                        id="decaissementAttachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                    <input type="file" name="attachment" id="decAttachment" class="custom-file-input"
+                                        accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
 
-                                    <label class="custom-file-label" for="decaissementAttachment">
+                                    <label class="custom-file-label" for="decAttachment">
                                         Choisir un fichier
                                     </label>
 
                                 </div>
 
-                                <small class="text-muted">
-                                    Facture, reçu, bon de paiement ou autre justificatif.
+                                <small class="form-text text-muted">
+
+                                    PDF, image, Word ou Excel — maximum 5 Mo.
+
                                 </small>
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-6">
+                        <!-- Libellé -->
+                        <div class="col-md-12">
 
                             <div class="form-group">
 
-                                <label>
+                                <label for="decLabel">
+
                                     Libellé du décaissement
-                                    <span class="dec-required">*</span>
+
+                                    <span class="required-star">
+                                        *
+                                    </span>
+
                                 </label>
 
-                                <input type="text" name="label" class="form-control"
-                                    placeholder="Ex. Paiement facture carburant juillet" required>
+                                <input type="text" name="label" id="decLabel" class="form-control"
+                                    placeholder="Ex. Paiement facture carburant juillet" maxlength="255" required>
 
                             </div>
 
                         </div>
 
+                        <!-- Observation -->
                         <div class="col-md-12">
 
                             <div class="form-group mb-0">
 
-                                <label>
+                                <label for="decObservation">
                                     Observation
                                 </label>
 
-                                <textarea name="observation" class="form-control"
-                                    placeholder="Informations complémentaires sur ce paiement..."></textarea>
+                                <textarea name="observation" id="decObservation" class="form-control" rows="4"
+                                    placeholder="Informations complémentaires sur l’opération..."></textarea>
 
                             </div>
 
@@ -2783,20 +4101,19 @@
 
                 </div>
 
+                <!-- =================================================
+                     PIED DU MODAL
+                ================================================== -->
                 <div class="modal-footer">
 
-                    <button type="button" class="btn btn-dec-outline" data-dismiss="modal">
-
+                    <button type="button" class="btn btn-caisse-outline" data-dismiss="modal">
                         <i class="fas fa-times mr-1"></i>
                         Annuler
-
                     </button>
 
-                    <button type="submit" class="btn btn-dec-danger">
-
+                    <button type="submit" class="btn btn-caisse-primary" id="saveDecaissementButton">
                         <i class="fas fa-check-circle mr-1"></i>
-                        Enregistrer le décaissement
-
+                        Enregistrer l’opération
                     </button>
 
                 </div>
@@ -2813,242 +4130,769 @@
      SCRIPTS
 ========================================================== -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener(
+        'DOMContentLoaded',
+        function() {
 
-        const canvas = document.getElementById('decaissementChart');
+            /*
+             * =====================================================
+             * CHANGEMENT DE PÉRIODE
+             * =====================================================
+             */
 
-        if (canvas && typeof Chart !== 'undefined') {
+            const periodForm =
+                document.getElementById(
+                    'decaissementPeriodForm'
+                );
 
-            const ctx = canvas.getContext('2d');
+            const periodSelect =
+                document.getElementById(
+                    'decaissementPeriodSelect'
+                );
 
-            const gradientExpense = ctx.createLinearGradient(0, 0, 0, 300);
+            if (
+                periodForm &&
+                periodSelect
+            ) {
+                periodSelect.addEventListener(
+                    'change',
+                    function() {
+                        periodForm.submit();
+                    }
+                );
+            }
+
+            /*
+             * =====================================================
+             * DONNÉES PHP VERS JAVASCRIPT
+             * =====================================================
+             */
+
+            const chartLabels =
+                <?= json_encode(
+                    $decaissementChartLabels,
+                    JSON_UNESCAPED_UNICODE
+                        | JSON_UNESCAPED_SLASHES
+                ) ?>;
+
+            const realizedAmounts =
+                <?= json_encode(
+                    array_map(
+                        'floatval',
+                        $decaissementChartRealized
+                    )
+                ) ?>;
+
+            const plannedAmounts =
+                <?= json_encode(
+                    array_map(
+                        'floatval',
+                        $decaissementChartPlanned
+                    )
+                ) ?>;
+
+            const cashboxAmounts =
+                <?= json_encode(
+                    array_map(
+                        'floatval',
+                        $decaissementChartCashbox
+                    )
+                ) ?>;
+
+            const bankAmounts =
+                <?= json_encode(
+                    array_map(
+                        'floatval',
+                        $decaissementChartBank
+                    )
+                ) ?>;
+
+            /*
+             * =====================================================
+             * CRÉATION DU GRAPHIQUE
+             * =====================================================
+             */
+
+            const canvas =
+                document.getElementById(
+                    'decaissementChart'
+                );
+
+            if (
+                !canvas ||
+                typeof Chart === 'undefined'
+            ) {
+                return;
+            }
+
+            const ctx =
+                canvas.getContext('2d');
+
+            const gradientExpense =
+                ctx.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    300
+                );
 
             gradientExpense.addColorStop(
                 0,
-                'rgba(220, 38, 38, 0.28)'
+                'rgba(127, 29, 29, 0.30)'
             );
 
             gradientExpense.addColorStop(
                 1,
-                'rgba(220, 38, 38, 0.02)'
+                'rgba(127, 29, 29, 0.02)'
             );
 
-            new Chart(ctx, {
+            new Chart(
+                ctx, {
+                    type: 'line',
 
-                type: 'line',
+                    data: {
+                        labels: chartLabels,
 
-                data: {
+                        datasets: [{
+                                label: 'Décaissements réalisés',
 
-                    labels: [
-                        'Février',
-                        'Mars',
-                        'Avril',
-                        'Mai',
-                        'Juin',
-                        'Juillet'
-                    ],
+                                data: realizedAmounts,
 
-                    datasets: [{
-                            label: 'Décaissements réalisés',
+                                borderColor: '#991b1b',
 
-                            data: [
-                                245000000,
-                                278000000,
-                                265000000,
-                                315000000,
-                                298000000,
-                                342650000
-                            ],
+                                backgroundColor: gradientExpense,
 
-                            borderColor: '#dc2626',
-                            backgroundColor: gradientExpense,
-                            borderWidth: 2.5,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#dc2626',
-                            pointBorderWidth: 2,
-                            fill: true,
-                            tension: 0.35
-                        },
-                        {
-                            label: 'Budget prévu',
+                                borderWidth: 2.5,
 
-                            data: [
-                                260000000,
-                                290000000,
-                                300000000,
-                                320000000,
-                                330000000,
-                                350000000
-                            ],
+                                pointRadius: 4,
 
-                            borderColor: '#0f766e',
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            borderDash: [6, 6],
-                            pointRadius: 0,
-                            fill: false,
-                            tension: 0.25
-                        }
-                    ]
-                },
+                                pointHoverRadius: 6,
 
-                options: {
+                                pointBackgroundColor: '#ffffff',
 
-                    responsive: true,
-                    maintainAspectRatio: false,
+                                pointBorderColor: '#991b1b',
 
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
+                                pointBorderWidth: 2,
+
+                                fill: true,
+
+                                tension: 0.35
+                            },
+                            {
+                                label: 'Budget prévu',
+
+                                data: plannedAmounts,
+
+                                borderColor: '#0f766e',
+
+                                backgroundColor: 'transparent',
+
+                                borderWidth: 2,
+
+                                borderDash: [6, 6],
+
+                                pointRadius: 0,
+
+                                pointHoverRadius: 4,
+
+                                fill: false,
+
+                                tension: 0.25
+                            }
+                        ]
                     },
 
-                    plugins: {
+                    options: {
+                        responsive: true,
 
-                        legend: {
+                        maintainAspectRatio: false,
 
-                            position: 'bottom',
+                        interaction: {
+                            intersect: false,
 
-                            labels: {
-                                usePointStyle: true,
-                                boxWidth: 8,
-                                padding: 20,
+                            mode: 'index'
+                        },
 
-                                font: {
-                                    size: 11
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+
+                                labels: {
+                                    usePointStyle: true,
+
+                                    boxWidth: 8,
+
+                                    padding: 20,
+
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+
+                            tooltip: {
+                                callbacks: {
+                                    label: function(
+                                        context
+                                    ) {
+                                        return (
+                                            context.dataset.label +
+                                            ' : ' +
+                                            new Intl
+                                            .NumberFormat(
+                                                'fr-FR'
+                                            )
+                                            .format(
+                                                context.parsed.y
+                                            ) +
+                                            ' BIF'
+                                        );
+                                    },
+
+                                    afterBody: function(
+                                        tooltipItems
+                                    ) {
+                                        if (
+                                            !tooltipItems.length
+                                        ) {
+                                            return '';
+                                        }
+
+                                        const index =
+                                            tooltipItems[0]
+                                            .dataIndex;
+
+                                        const cashAmount =
+                                            cashboxAmounts[index] ||
+                                            0;
+
+                                        const bankAmount =
+                                            bankAmounts[index] ||
+                                            0;
+
+                                        return [
+                                            '',
+                                            'Caisses : ' +
+                                            new Intl
+                                            .NumberFormat(
+                                                'fr-FR'
+                                            )
+                                            .format(
+                                                cashAmount
+                                            ) +
+                                            ' BIF',
+
+                                            'Banques : ' +
+                                            new Intl
+                                            .NumberFormat(
+                                                'fr-FR'
+                                            )
+                                            .format(
+                                                bankAmount
+                                            ) +
+                                            ' BIF'
+                                        ];
+                                    }
                                 }
                             }
                         },
 
-                        tooltip: {
-
-                            callbacks: {
-
-                                label: function(context) {
-
-                                    return context.dataset.label +
-                                        ' : ' +
-                                        new Intl.NumberFormat('fr-FR').format(
-                                            context.parsed.y
-                                        ) +
-                                        ' BIF';
-                                }
-                            }
-                        }
-                    },
-
-                    scales: {
-
-                        x: {
-
-                            grid: {
-                                display: false
-                            },
-
-                            ticks: {
-
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        },
-
-                        y: {
-
-                            beginAtZero: true,
-
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.15)'
-                            },
-
-                            ticks: {
-
-                                font: {
-                                    size: 10
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
                                 },
 
-                                callback: function(value) {
-                                    return (value / 1000000) + ' M';
+                                ticks: {
+                                    font: {
+                                        size: 10
+                                    }
+                                }
+                            },
+
+                            y: {
+                                beginAtZero: true,
+
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.15)'
+                                },
+
+                                ticks: {
+                                    font: {
+                                        size: 10
+                                    },
+
+                                    callback: function(
+                                        value
+                                    ) {
+                                        if (
+                                            Math.abs(value) >=
+                                            1000000000
+                                        ) {
+                                            return (
+                                                    value /
+                                                    1000000000
+                                                ).toFixed(1) +
+                                                ' Md';
+                                        }
+
+                                        return (
+                                                value /
+                                                1000000
+                                            ).toFixed(0) +
+                                            ' M';
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            });
-        }
-    });
-
-    function prepareDecaissement(type) {
-
-        const typeField = document.getElementById('expenseType');
-        const title = document.getElementById('decaissementModalTitle');
-
-        typeField.value = type;
-
-        if (type === 'fournisseur') {
-            title.innerHTML = 'Enregistrer un paiement fournisseur';
-        }
-
-        if (type === 'sous_traitant') {
-            title.innerHTML = 'Enregistrer un paiement sous-traitant';
-        }
-
-        if (type === 'chantier') {
-            title.innerHTML = 'Approvisionner une caisse chantier';
-        }
-
-        toggleDecaissementFields();
-    }
-
-    function toggleDecaissementFields() {
-
-        const type = document.getElementById('expenseType').value;
-
-        const selectField = document.getElementById(
-            'beneficiarySelectField'
-        );
-
-        const textField = document.getElementById(
-            'beneficiaryTextField'
-        );
-
-        selectField.style.display = 'block';
-        textField.style.display = 'none';
-
-        if (
-            type === 'salaire' ||
-            type === 'autre' ||
-            type === 'remboursement'
-        ) {
-            selectField.style.display = 'none';
-            textField.style.display = 'block';
-        }
-    }
-
-    function updateSourceBalance() {
-
-        const select = document.getElementById('sourceAccount');
-        const selectedOption = select.options[select.selectedIndex];
-        const balance = selectedOption.getAttribute('data-balance') || 0;
-
-        document.getElementById('sourceBalance').innerHTML =
-            new Intl.NumberFormat('fr-FR').format(balance) + ' BIF';
-    }
-
-    $(document).on(
-        'change',
-        '.custom-file-input',
-        function() {
-
-            const fileName = $(this)
-                .val()
-                .split('\\')
-                .pop();
-
-            $(this)
-                .next('.custom-file-label')
-                .html(fileName || 'Choisir un fichier');
+            );
         }
     );
 </script>
+
+<script>
+    function checkDecaissementBalance() {
+
+        const cashboxSelect =
+            document.getElementById('decCashboxId');
+
+        const amountInput =
+            document.getElementById('decAmount');
+
+        const balanceBox =
+            document.querySelector(
+                '#addDecaissementModal .dec-balance-box'
+            );
+
+        const amountHelp =
+            document.getElementById('decAmountHelp');
+
+        if (
+            !cashboxSelect ||
+            !amountInput ||
+            !balanceBox
+        ) {
+            return;
+        }
+
+        const selectedOption =
+            cashboxSelect.options[
+                cashboxSelect.selectedIndex
+            ];
+
+        const availableBalance =
+            selectedOption && selectedOption.value ?
+            parseFloat(
+                selectedOption.dataset.balance || 0
+            ) :
+            0;
+
+        const amount =
+            parseFloat(
+                amountInput.value || 0
+            );
+
+        balanceBox.classList.remove(
+            'balance-danger'
+        );
+
+        amountInput.classList.remove(
+            'is-invalid'
+        );
+
+        if (
+            selectedOption &&
+            selectedOption.value &&
+            amount > availableBalance
+        ) {
+            balanceBox.classList.add(
+                'balance-danger'
+            );
+
+            amountInput.classList.add(
+                'is-invalid'
+            );
+
+            if (amountHelp) {
+                amountHelp.textContent =
+                    'Le montant dépasse le solde disponible.';
+
+                amountHelp.style.color =
+                    '#dc2626';
+            }
+
+            return;
+        }
+
+        if (amountHelp) {
+            amountHelp.textContent =
+                'Le montant doit être supérieur à zéro.';
+
+            amountHelp.style.color =
+                '';
+        }
+    }
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function() {
+
+            const cashboxSelect =
+                document.getElementById(
+                    'decCashboxId'
+                );
+
+            const amountInput =
+                document.getElementById(
+                    'decAmount'
+                );
+
+            if (cashboxSelect) {
+                cashboxSelect.addEventListener(
+                    'change',
+                    function() {
+                        updateDecaissementCashboxInfo();
+                        checkDecaissementBalance();
+                    }
+                );
+            }
+
+            if (amountInput) {
+                amountInput.addEventListener(
+                    'input',
+                    checkDecaissementBalance
+                );
+            }
+
+        }
+    );
+</script>
+
+<script>
+    function updateDecaissementCashboxInfo() {
+
+        const cashboxSelect =
+            document.getElementById('decCashboxId');
+
+        const balanceElement =
+            document.getElementById('decAvailableBalance');
+
+        const codeElement =
+            document.getElementById('decCashboxCode');
+
+        const currencyElement =
+            document.getElementById('decCurrencyLabel');
+
+        const amountInput =
+            document.getElementById('decAmount');
+
+        if (
+            !cashboxSelect ||
+            !balanceElement ||
+            !codeElement ||
+            !currencyElement
+        ) {
+            return;
+        }
+
+        const selectedOption =
+            cashboxSelect.options[
+                cashboxSelect.selectedIndex
+            ];
+
+        if (
+            !selectedOption ||
+            !selectedOption.value
+        ) {
+            balanceElement.textContent =
+                '0 BIF';
+
+            codeElement.textContent =
+                'Aucune caisse sélectionnée';
+
+            currencyElement.textContent =
+                'BIF';
+
+            if (amountInput) {
+                amountInput.removeAttribute('max');
+            }
+
+            return;
+        }
+
+        const balance = parseFloat(
+            selectedOption.dataset.balance || 0
+        );
+
+        const currency =
+            selectedOption.dataset.currency || 'BIF';
+
+        const code =
+            selectedOption.dataset.code || '';
+
+        balanceElement.textContent =
+            new Intl.NumberFormat('fr-FR').format(
+                balance
+            ) +
+            ' ' +
+            currency;
+
+        codeElement.textContent =
+            code;
+
+        currencyElement.textContent =
+            currency;
+
+        /*
+         * Empêcher l’utilisateur de saisir un montant
+         * supérieur au solde disponible.
+         */
+        if (amountInput) {
+            amountInput.max = balance;
+        }
+    }
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function() {
+
+            const decaissementForm =
+                document.getElementById(
+                    'decaissementForm'
+                );
+
+            const amountInput =
+                document.getElementById(
+                    'decAmount'
+                );
+
+            const cashboxSelect =
+                document.getElementById(
+                    'decCashboxId'
+                );
+
+            const submitButton =
+                document.getElementById(
+                    'saveDecaissementButton'
+                );
+
+            if (decaissementForm) {
+
+                decaissementForm.addEventListener(
+                    'submit',
+                    function(event) {
+
+                        const selectedOption =
+                            cashboxSelect ?
+                            cashboxSelect.options[
+                                cashboxSelect.selectedIndex
+                            ] :
+                            null;
+
+                        const balance =
+                            selectedOption ?
+                            parseFloat(
+                                selectedOption.dataset.balance ||
+                                0
+                            ) :
+                            0;
+
+                        const amount =
+                            amountInput ?
+                            parseFloat(
+                                amountInput.value ||
+                                0
+                            ) :
+                            0;
+
+                        if (amount <= 0) {
+                            event.preventDefault();
+
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Montant invalide',
+                                text: 'Le montant doit être supérieur à zéro.',
+                                confirmButtonText: 'Corriger'
+                            });
+
+                            return;
+                        }
+
+                        if (amount > balance) {
+                            event.preventDefault();
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Solde insuffisant',
+                                text: 'Le montant demandé dépasse le solde disponible de la caisse.',
+                                confirmButtonText: 'Corriger'
+                            });
+
+                            return;
+                        }
+
+                        if (submitButton) {
+                            submitButton.disabled = true;
+
+                            submitButton.innerHTML =
+                                '<i class="fas fa-spinner fa-spin mr-1"></i>' +
+                                ' Enregistrement...';
+                        }
+                    }
+                );
+            }
+
+            /*
+             * Affichage du nom de la pièce jointe.
+             */
+            $(document).on(
+                'change',
+                '#decAttachment',
+                function() {
+
+                    const fileName =
+                        $(this)
+                        .val()
+                        .split('\\')
+                        .pop();
+
+                    $(this)
+                        .next('.custom-file-label')
+                        .html(
+                            fileName ||
+                            'Choisir un fichier'
+                        );
+                }
+            );
+
+            /*
+             * Réinitialiser le modal à sa fermeture.
+             */
+            $('#addDecaissementModal').on(
+                'hidden.bs.modal',
+                function() {
+
+                    const form =
+                        document.getElementById(
+                            'decaissementForm'
+                        );
+
+                    if (form) {
+                        form.reset();
+                    }
+
+                    const balanceElement =
+                        document.getElementById(
+                            'decAvailableBalance'
+                        );
+
+                    const codeElement =
+                        document.getElementById(
+                            'decCashboxCode'
+                        );
+
+                    const currencyElement =
+                        document.getElementById(
+                            'decCurrencyLabel'
+                        );
+
+                    const fileLabel =
+                        document.querySelector(
+                            'label[for="decAttachment"]'
+                        );
+
+                    if (balanceElement) {
+                        balanceElement.textContent =
+                            '0 BIF';
+                    }
+
+                    if (codeElement) {
+                        codeElement.textContent =
+                            'Aucune caisse sélectionnée';
+                    }
+
+                    if (currencyElement) {
+                        currencyElement.textContent =
+                            'BIF';
+                    }
+
+                    if (fileLabel) {
+                        fileLabel.textContent =
+                            'Choisir un fichier';
+                    }
+
+                    if (submitButton) {
+                        submitButton.disabled = false;
+
+                        submitButton.innerHTML =
+                            '<i class="fas fa-check-circle mr-1"></i>' +
+                            ' Enregistrer l’opération';
+                    }
+                }
+            );
+
+        }
+    );
+</script>
+
+<script>
+    function viewDecaissement(id) {
+        console.log(
+            'Voir le décaissement :',
+            id
+        );
+    }
+
+    function editDecaissement(id) {
+        console.log(
+            'Modifier le décaissement :',
+            id
+        );
+    }
+
+    function printDecaissement(id) {
+        window.location.href =
+            '<?= base_url('finance/decaissement-print/') ?>' +
+            id;
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php if ($this->session->flashdata('success')): ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Caisse créée',
+                html: <?= json_encode(
+                            $this->session->flashdata('success')
+                        ) ?>,
+                confirmButtonText: 'D’accord',
+                confirmButtonColor: '#0f766e'
+            });
+        });
+    </script>
+
+<?php endif; ?>
+
+
+<?php if ($this->session->flashdata('error')): ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Enregistrement impossible',
+                html: <?= json_encode(
+                            $this->session->flashdata('error')
+                        ) ?>,
+                confirmButtonText: 'Corriger',
+                confirmButtonColor: '#dc2626'
+            });
+        });
+    </script>
+
+<?php endif; ?>

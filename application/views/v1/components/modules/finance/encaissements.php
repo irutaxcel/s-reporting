@@ -813,6 +813,216 @@
                         height: 260px;
                     }
                 }
+
+                /* =========================================================
+   MODALE CAISSE COMMUNE
+========================================================= */
+
+                .modal-caisse .modal-content {
+                    border: 0;
+                    border-radius: 14px;
+                    overflow: hidden;
+                    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+                }
+
+                .modal-caisse .modal-header {
+                    display: flex;
+                    align-items: center;
+                    min-height: 56px;
+                    padding: 14px 18px;
+                    color: #ffffff;
+                    border-bottom: 0;
+                    background: linear-gradient(135deg,
+                            #177f75 0%,
+                            #124f5b 55%,
+                            #102033 100%);
+                }
+
+                .modal-caisse .modal-title {
+                    margin: 0;
+                    color: #ffffff;
+                    font-size: 14px;
+                    font-weight: 800;
+                }
+
+                .modal-caisse .modal-header .close {
+                    margin: -5px -5px -5px auto;
+                    padding: 8px;
+                    color: #ffffff;
+                    text-shadow: none;
+                    opacity: 1;
+                    outline: none;
+                }
+
+                .modal-caisse .modal-header .close:hover {
+                    color: #d1fae5;
+                    opacity: 1;
+                }
+
+                .modal-caisse .modal-body {
+                    padding: 22px 18px 12px;
+                    background: #ffffff;
+                }
+
+                .modal-caisse .modal-footer {
+                    padding: 13px 18px;
+                    border-top: 1px solid #e2e8f0;
+                    background: #ffffff;
+                }
+
+                .modal-caisse label {
+                    margin-bottom: 7px;
+                    color: #334155;
+                    font-size: 10px;
+                    font-weight: 800;
+                }
+
+                .modal-caisse .form-control,
+                .modal-caisse .custom-file-label,
+                .modal-caisse .input-group-text {
+                    min-height: 42px;
+                    border-color: #cbd5e1;
+                    border-radius: 8px;
+                    color: #334155;
+                    font-size: 11px;
+                    box-shadow: none;
+                }
+
+                .modal-caisse textarea.form-control {
+                    min-height: 88px;
+                    resize: vertical;
+                }
+
+                .modal-caisse .form-control:focus {
+                    border-color: #0f766e;
+                    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.10);
+                }
+
+                .modal-caisse .input-group .form-control {
+                    border-radius: 8px 0 0 8px;
+                }
+
+                .modal-caisse .input-group-append .input-group-text {
+                    display: flex;
+                    align-items: center;
+                    min-width: 54px;
+                    justify-content: center;
+                    border-left: 0;
+                    border-radius: 0 8px 8px 0;
+                    background: #e2e8f0;
+                    font-weight: 700;
+                }
+
+                .modal-caisse .custom-file-label {
+                    display: flex;
+                    align-items: center;
+                    padding-top: 0;
+                    padding-bottom: 0;
+                }
+
+                .modal-caisse .custom-file-label::after {
+                    display: flex;
+                    align-items: center;
+                    height: 100%;
+                    content: "Browse";
+                    border-left: 1px solid #cbd5e1;
+                    background: #e2e8f0;
+                    font-weight: 700;
+                }
+
+                .modal-caisse .form-text {
+                    margin-top: 5px;
+                    color: #64748b !important;
+                    font-size: 9px;
+                }
+
+                .required-star {
+                    color: #dc2626;
+                    font-weight: 900;
+                }
+
+                .btn-caisse-primary {
+                    padding: 9px 15px;
+                    color: #ffffff;
+                    border: 1px solid #0f766e;
+                    border-radius: 8px;
+                    background: #0f766e;
+                    font-size: 10px;
+                    font-weight: 800;
+                }
+
+                .btn-caisse-primary:hover,
+                .btn-caisse-primary:focus {
+                    color: #ffffff;
+                    border-color: #115e59;
+                    background: #115e59;
+                    box-shadow: none;
+                }
+
+                .btn-caisse-outline {
+                    padding: 9px 15px;
+                    color: #0f766e;
+                    border: 1px solid #99d5cf;
+                    border-radius: 8px;
+                    background: #ffffff;
+                    font-size: 10px;
+                    font-weight: 800;
+                }
+
+                .btn-caisse-outline:hover,
+                .btn-caisse-outline:focus {
+                    color: #0f766e;
+                    border-color: #0f766e;
+                    background: #f0fdfa;
+                    box-shadow: none;
+                }
+
+                /* =========================================================
+   RÉSUMÉ DE L’ÉVOLUTION DES ENCAISSEMENTS
+========================================================= */
+
+                .enc-flow-summary {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 10px;
+                    margin-bottom: 16px;
+                }
+
+                .enc-flow-summary-item {
+                    padding: 10px 12px;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 10px;
+                    background: #f8fafc;
+                }
+
+                .enc-flow-summary-item span {
+                    display: block;
+                    margin-bottom: 4px;
+                    color: #64748b;
+                    font-size: 8px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                }
+
+                .enc-flow-summary-item strong {
+                    color: #102033;
+                    font-size: 12px;
+                    font-weight: 900;
+                }
+
+                .enc-source-percentage {
+                    margin-top: 4px;
+                    color: #64748b;
+                    font-size: 8px;
+                    font-weight: 700;
+                    text-align: right;
+                }
+
+                @media (max-width: 767px) {
+                    .enc-flow-summary {
+                        grid-template-columns: 1fr;
+                    }
+                }
             </style>
 
             <!-- =========================================================
@@ -867,11 +1077,96 @@
 
             </div>
 
+            <?php
+
+            $encStats = isset($encaissementStatistics)
+                && is_array($encaissementStatistics)
+                ? $encaissementStatistics
+                : [];
+
+            $encCurrency = $encStats['currency']
+                ?? 'BIF';
+
+            $currentMonthIncome = isset(
+                $encStats['current_month_amount']
+            )
+                ? (float) $encStats['current_month_amount']
+                : 0;
+
+            $currentMonthIncomeCount = isset(
+                $encStats['current_month_count']
+            )
+                ? (int) $encStats['current_month_count']
+                : 0;
+
+            $monthlyVariation = isset(
+                $encStats['monthly_variation']
+            )
+                ? (float) $encStats['monthly_variation']
+                : 0;
+
+            $todayIncome = isset(
+                $encStats['today_amount']
+            )
+                ? (float) $encStats['today_amount']
+                : 0;
+
+            $todayIncomeCount = isset(
+                $encStats['today_count']
+            )
+                ? (int) $encStats['today_count']
+                : 0;
+
+            $pendingIncome = isset(
+                $encStats['pending_amount']
+            )
+                ? (float) $encStats['pending_amount']
+                : 0;
+
+            $pendingIncomeCount = isset(
+                $encStats['pending_count']
+            )
+                ? (int) $encStats['pending_count']
+                : 0;
+
+            $receivableAmount = isset(
+                $encStats['receivable_amount']
+            )
+                ? (float) $encStats['receivable_amount']
+                : 0;
+
+            $receivableClientsCount = isset(
+                $encStats['receivable_clients_count']
+            )
+                ? (int) $encStats['receivable_clients_count']
+                : 0;
+
+            /*
+            * Apparence du badge de variation.
+            */
+            $variationClass = 'enc-badge-info';
+            $variationIcon  = 'fas fa-minus';
+            $variationPrefix = '';
+
+            if ($monthlyVariation > 0) {
+                $variationClass = 'enc-badge-success';
+                $variationIcon  = 'fas fa-arrow-up';
+                $variationPrefix = '+';
+            } elseif ($monthlyVariation < 0) {
+                $variationClass = 'enc-badge-danger';
+                $variationIcon  = 'fas fa-arrow-down';
+            }
+
+            ?>
+
             <!-- =========================================================
-                 STATISTIQUES
-            ========================================================== -->
+     STATISTIQUES DYNAMIQUES DES ENCAISSEMENTS
+========================================================== -->
             <div class="row">
 
+                <!-- =====================================================
+         TOTAL ENCAISSÉ CE MOIS
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="enc-stat-card">
@@ -879,32 +1174,84 @@
                         <div class="enc-stat-top">
 
                             <div class="enc-stat-icon enc-icon-green">
+
                                 <i class="fas fa-coins"></i>
+
                             </div>
 
-                            <span class="enc-stat-badge enc-badge-success">
-                                <i class="fas fa-arrow-up mr-1"></i>
-                                12,6 %
+                            <span class="
+                        enc-stat-badge
+                        <?= html_escape(
+                            $variationClass
+                        ) ?>
+                    " title="Variation par rapport au mois précédent">
+
+                                <i class="
+                            <?= html_escape(
+                                $variationIcon
+                            ) ?>
+                            mr-1
+                        "></i>
+
+                                <?= $variationPrefix ?>
+
+                                <?= number_format(
+                                    abs($monthlyVariation),
+                                    1,
+                                    ',',
+                                    ' '
+                                ) ?>
+
+                                %
+
                             </span>
 
                         </div>
 
                         <div class="enc-stat-label">
+
                             Total encaissé ce mois
+
                         </div>
 
                         <div class="enc-stat-value">
-                            485 700 000 BIF
+
+                            <?= number_format(
+                                $currentMonthIncome,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            <?= html_escape($encCurrency) ?>
+
                         </div>
 
                         <div class="enc-stat-footer">
-                            Tous les encaissements validés du mois
+
+                            <?= $currentMonthIncomeCount ?>
+
+                            encaissement<?= $currentMonthIncomeCount > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
+                            validé<?= $currentMonthIncomeCount > 1
+                                        ? 's'
+                                        : ''
+                                    ?>
+
+                            ce mois
+
                         </div>
 
                     </div>
 
                 </div>
 
+                <!-- =====================================================
+         ENCAISSEMENTS DU JOUR
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="enc-stat-card">
@@ -912,31 +1259,67 @@
                         <div class="enc-stat-top">
 
                             <div class="enc-stat-icon enc-icon-blue">
+
                                 <i class="fas fa-calendar-day"></i>
+
                             </div>
 
-                            <span class="enc-stat-badge enc-badge-info">
-                                8 opérations
+                            <span class="
+                        enc-stat-badge
+                        enc-badge-info
+                    ">
+
+                                <?= $todayIncomeCount ?>
+
+                                opération<?= $todayIncomeCount > 1
+                                                ? 's'
+                                                : ''
+                                            ?>
+
                             </span>
 
                         </div>
 
                         <div class="enc-stat-label">
+
                             Encaissements du jour
+
                         </div>
 
                         <div class="enc-stat-value">
-                            38 500 000 BIF
+
+                            <?= number_format(
+                                $todayIncome,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            <?= html_escape($encCurrency) ?>
+
                         </div>
 
                         <div class="enc-stat-footer">
-                            Entrées enregistrées aujourd’hui
+
+                            <?php if ($todayIncomeCount > 0): ?>
+
+                                Entrées validées aujourd’hui
+
+                            <?php else: ?>
+
+                                Aucun encaissement validé aujourd’hui
+
+                            <?php endif; ?>
+
                         </div>
 
                     </div>
 
                 </div>
 
+                <!-- =====================================================
+         EN ATTENTE DE VALIDATION
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="enc-stat-card">
@@ -944,31 +1327,70 @@
                         <div class="enc-stat-top">
 
                             <div class="enc-stat-icon enc-icon-orange">
+
                                 <i class="fas fa-clock"></i>
+
                             </div>
 
-                            <span class="enc-stat-badge enc-badge-warning">
-                                6 dossiers
+                            <span class="
+                        enc-stat-badge
+                        <?= $pendingIncomeCount > 0
+                            ? 'enc-badge-warning'
+                            : 'enc-badge-info'
+                        ?>
+                    ">
+
+                                <?= $pendingIncomeCount ?>
+
+                                dossier<?= $pendingIncomeCount > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
                             </span>
 
                         </div>
 
                         <div class="enc-stat-label">
+
                             En attente de validation
+
                         </div>
 
                         <div class="enc-stat-value">
-                            72 800 000 BIF
+
+                            <?= number_format(
+                                $pendingIncome,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            <?= html_escape($encCurrency) ?>
+
                         </div>
 
                         <div class="enc-stat-footer">
-                            Encaissements non encore comptabilisés
+
+                            <?php if ($pendingIncomeCount > 0): ?>
+
+                                Encaissements non encore validés
+
+                            <?php else: ?>
+
+                                Aucun encaissement en attente
+
+                            <?php endif; ?>
+
                         </div>
 
                     </div>
 
                 </div>
 
+                <!-- =====================================================
+         CRÉANCES À ENCAISSER
+    ====================================================== -->
                 <div class="col-xl-3 col-lg-6 col-md-6">
 
                     <div class="enc-stat-card">
@@ -976,25 +1398,50 @@
                         <div class="enc-stat-top">
 
                             <div class="enc-stat-icon enc-icon-purple">
+
                                 <i class="fas fa-file-invoice-dollar"></i>
+
                             </div>
 
-                            <span class="enc-stat-badge enc-badge-info">
-                                12 clients
+                            <span class="
+                        enc-stat-badge
+                        enc-badge-info
+                    ">
+
+                                <?= $receivableClientsCount ?>
+
+                                client<?= $receivableClientsCount > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
+
                             </span>
 
                         </div>
 
                         <div class="enc-stat-label">
+
                             Créances à encaisser
+
                         </div>
 
                         <div class="enc-stat-value">
-                            310 250 000 BIF
+
+                            <?= number_format(
+                                $receivableAmount,
+                                0,
+                                ',',
+                                ' '
+                            ) ?>
+
+                            <?= html_escape($encCurrency) ?>
+
                         </div>
 
                         <div class="enc-stat-footer">
+
                             Montants attendus sur factures et décomptes
+
                         </div>
 
                     </div>
@@ -1179,11 +1626,70 @@
 
             </div>
 
+            <?php
+
+            if (
+                !function_exists(
+                    'formatEncaissementCompactAmount'
+                )
+            ) {
+                function formatEncaissementCompactAmount(
+                    $amount
+                ): string {
+                    $amount = (float) $amount;
+
+                    if (
+                        abs($amount) >= 1000000000
+                    ) {
+                        return number_format(
+                            $amount / 1000000000,
+                            1,
+                            ',',
+                            ' '
+                        ) . ' Md';
+                    }
+
+                    if (
+                        abs($amount) >= 1000000
+                    ) {
+                        return number_format(
+                            $amount / 1000000,
+                            1,
+                            ',',
+                            ' '
+                        ) . ' M';
+                    }
+
+                    if (
+                        abs($amount) >= 1000
+                    ) {
+                        return number_format(
+                            $amount / 1000,
+                            1,
+                            ',',
+                            ' '
+                        ) . ' K';
+                    }
+
+                    return number_format(
+                        $amount,
+                        0,
+                        ',',
+                        ' '
+                    );
+                }
+            }
+
+            ?>
+
             <!-- =========================================================
-                 GRAPHIQUE + RÉPARTITION
-            ========================================================== -->
+     GRAPHIQUE + RÉPARTITION DYNAMIQUES
+========================================================== -->
             <div class="row">
 
+                <!-- =====================================================
+         ÉVOLUTION DES ENCAISSEMENTS
+    ====================================================== -->
                 <div class="col-xl-8 col-lg-8">
 
                     <div class="enc-card">
@@ -1193,29 +1699,133 @@
                             <div>
 
                                 <h5 class="enc-card-title">
+
                                     <i class="fas fa-chart-line"></i>
+
                                     Évolution des encaissements
+
                                 </h5>
 
                                 <span class="enc-card-subtitle">
-                                    Analyse des entrées de fonds sur les derniers mois.
+
+                                    Analyse des entrées de fonds sur la période sélectionnée.
+
                                 </span>
 
                             </div>
 
-                            <select class="form-control enc-period-select">
-                                <option>6 derniers mois</option>
-                                <option>12 derniers mois</option>
-                                <option>Cette année</option>
-                                <option>Année précédente</option>
-                            </select>
+                            <form action="<?= current_url() ?>" method="get" id="encaissementPeriodForm">
+
+                                <select name="encaissement_period" id="encaissementPeriod"
+                                    class="form-control enc-period-select" onchange="
+                            document
+                                .getElementById(
+                                    'encaissementPeriodForm'
+                                )
+                                .submit();
+                        ">
+
+                                    <option value="6months" <?= $encaissementPeriod === '6months'
+                                                                ? 'selected'
+                                                                : ''
+                                                            ?>>
+                                        6 derniers mois
+                                    </option>
+
+                                    <option value="12months" <?= $encaissementPeriod === '12months'
+                                                                    ? 'selected'
+                                                                    : ''
+                                                                ?>>
+                                        12 derniers mois
+                                    </option>
+
+                                    <option value="current_year" <?= $encaissementPeriod === 'current_year'
+                                                                        ? 'selected'
+                                                                        : ''
+                                                                    ?>>
+                                        Cette année
+                                    </option>
+
+                                    <option value="previous_year" <?= $encaissementPeriod === 'previous_year'
+                                                                        ? 'selected'
+                                                                        : ''
+                                                                    ?>>
+                                        Année précédente
+                                    </option>
+
+                                </select>
+
+                            </form>
 
                         </div>
 
                         <div class="enc-card-body">
 
+                            <!-- Résumé de la période -->
+                            <div class="enc-flow-summary">
+
+                                <div class="enc-flow-summary-item">
+
+                                    <span>
+                                        Total période
+                                    </span>
+
+                                    <strong class="text-success">
+
+                                        <?= number_format(
+                                            (float) $encaissementEvolution['total_amount'],
+                                            0,
+                                            ',',
+                                            ' '
+                                        ) ?>
+
+                                        BIF
+
+                                    </strong>
+
+                                </div>
+
+                                <div class="enc-flow-summary-item">
+
+                                    <span>
+                                        Moyenne mensuelle
+                                    </span>
+
+                                    <strong>
+
+                                        <?= number_format(
+                                            (float) $encaissementEvolution['average_amount'],
+                                            0,
+                                            ',',
+                                            ' '
+                                        ) ?>
+
+                                        BIF
+
+                                    </strong>
+
+                                </div>
+
+                                <div class="enc-flow-summary-item">
+
+                                    <span>
+                                        Nombre d’opérations
+                                    </span>
+
+                                    <strong>
+
+                                        <?= (int) $encaissementEvolution['total_operations'] ?>
+
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
                             <div class="enc-chart-container">
+
                                 <canvas id="encaissementChart"></canvas>
+
                             </div>
 
                         </div>
@@ -1224,6 +1834,9 @@
 
                 </div>
 
+                <!-- =====================================================
+         SOURCES DES ENCAISSEMENTS
+    ====================================================== -->
                 <div class="col-xl-4 col-lg-4">
 
                     <div class="enc-card">
@@ -1233,12 +1846,17 @@
                             <div>
 
                                 <h5 class="enc-card-title">
+
                                     <i class="fas fa-chart-pie"></i>
+
                                     Sources des encaissements
+
                                 </h5>
 
                                 <span class="enc-card-subtitle">
+
                                     Répartition des entrées par origine.
+
                                 </span>
 
                             </div>
@@ -1247,110 +1865,127 @@
 
                         <div class="enc-card-body">
 
-                            <div class="enc-source-item">
+                            <?php if (
+                                !empty($encaissementSources['sources'])
+                            ): ?>
 
-                                <div class="enc-source-header">
+                                <?php foreach (
+                                    $encaissementSources['sources']
+                                    as $source
+                                ): ?>
 
-                                    <span class="enc-source-name">
-                                        <i class="fas fa-users"></i>
-                                        Paiements clients
-                                    </span>
+                                    <?php
 
-                                    <span class="enc-source-value">
-                                        285,4 M
-                                    </span>
+                                    $sourcePercentage = isset(
+                                        $source['percentage']
+                                    )
+                                        ? (float) $source['percentage']
+                                        : 0;
+
+                                    $sourcePercentage = min(
+                                        100,
+                                        max(
+                                            0,
+                                            $sourcePercentage
+                                        )
+                                    );
+
+                                    $sourcePercentageCss =
+                                        number_format(
+                                            $sourcePercentage,
+                                            2,
+                                            '.',
+                                            ''
+                                        );
+
+                                    ?>
+
+                                    <div class="enc-source-item">
+
+                                        <div class="enc-source-header">
+
+                                            <span class="enc-source-name">
+
+                                                <i class="<?= html_escape(
+                                                                $source['icon']
+                                                            ) ?>"></i>
+
+                                                <?= html_escape(
+                                                    $source['name']
+                                                ) ?>
+
+                                                <small class="d-block text-muted" style="font-size: 8px;">
+
+                                                    <?= (int) $source['operation_count'] ?>
+
+                                                    opération<?= $source['operation_count'] > 1
+                                                                    ? 's'
+                                                                    : ''
+                                                                ?>
+
+                                                </small>
+
+                                            </span>
+
+                                            <span class="enc-source-value">
+
+                                                <?= formatEncaissementCompactAmount(
+                                                    $source['amount']
+                                                ) ?>
+
+                                            </span>
+
+                                        </div>
+
+                                        <div class="enc-source-progress">
+
+                                            <span style="width: <?= $sourcePercentageCss ?>%;"></span>
+
+                                        </div>
+
+                                        <div class="enc-source-percentage">
+
+                                            <?= number_format(
+                                                $sourcePercentage,
+                                                1,
+                                                ',',
+                                                ' '
+                                            ) ?>
+
+                                            %
+
+                                        </div>
+
+                                    </div>
+
+                                <?php endforeach; ?>
+
+                            <?php else: ?>
+
+                                <div class="text-center py-5">
+
+                                    <i class="
+                                fas
+                                fa-chart-pie
+                                fa-2x
+                                text-muted
+                                mb-3
+                            "></i>
+
+                                    <h6>
+                                        Aucune source disponible
+                                    </h6>
+
+                                    <p class="text-muted mb-0">
+
+                                        Aucun encaissement validé n’a été trouvé
+                                        pour cette période.
+
+                                    </p>
 
                                 </div>
 
-                                <div class="enc-source-progress">
-                                    <span style="width: 82%;"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="enc-source-item">
-
-                                <div class="enc-source-header">
-
-                                    <span class="enc-source-name">
-                                        <i class="fas fa-file-contract"></i>
-                                        Avances sur marchés
-                                    </span>
-
-                                    <span class="enc-source-value">
-                                        120,5 M
-                                    </span>
-
-                                </div>
-
-                                <div class="enc-source-progress">
-                                    <span style="width: 58%;"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="enc-source-item">
-
-                                <div class="enc-source-header">
-
-                                    <span class="enc-source-name">
-                                        <i class="fas fa-university"></i>
-                                        Emprunts
-                                    </span>
-
-                                    <span class="enc-source-value">
-                                        45,0 M
-                                    </span>
-
-                                </div>
-
-                                <div class="enc-source-progress">
-                                    <span style="width: 32%;"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="enc-source-item">
-
-                                <div class="enc-source-header">
-
-                                    <span class="enc-source-name">
-                                        <i class="fas fa-undo-alt"></i>
-                                        Remboursements
-                                    </span>
-
-                                    <span class="enc-source-value">
-                                        18,8 M
-                                    </span>
-
-                                </div>
-
-                                <div class="enc-source-progress">
-                                    <span style="width: 20%;"></span>
-                                </div>
-
-                            </div>
-
-                            <div class="enc-source-item">
-
-                                <div class="enc-source-header">
-
-                                    <span class="enc-source-name">
-                                        <i class="fas fa-ellipsis-h"></i>
-                                        Autres produits
-                                    </span>
-
-                                    <span class="enc-source-value">
-                                        16,0 M
-                                    </span>
-
-                                </div>
-
-                                <div class="enc-source-progress">
-                                    <span style="width: 16%;"></span>
-                                </div>
-
-                            </div>
+                            <?php endif; ?>
 
                         </div>
 
@@ -1461,8 +2096,8 @@
             </div>
 
             <!-- =========================================================
-                 TABLEAU DES ENCAISSEMENTS
-            ========================================================== -->
+     HISTORIQUE DYNAMIQUE DES ENCAISSEMENTS
+========================================================== -->
             <div class="enc-card">
 
                 <div class="enc-card-header">
@@ -1480,11 +2115,10 @@
 
                     </div>
 
-                    <button class="btn btn-enc-primary" data-toggle="modal" data-target="#addEncaissementModal">
-
+                    <button type="button" class="btn btn-enc-primary" data-toggle="modal"
+                        data-target="#addEncaissementModal">
                         <i class="fas fa-plus mr-1"></i>
                         Nouvel encaissement
-
                     </button>
 
                 </div>
@@ -1494,9 +2128,7 @@
                     <table class="table enc-table">
 
                         <thead>
-
                             <tr>
-
                                 <th>#</th>
                                 <th>Date</th>
                                 <th>Référence</th>
@@ -1509,524 +2141,553 @@
                                 <th>Devise</th>
                                 <th>Statut</th>
                                 <th class="text-center">Actions</th>
-
                             </tr>
-
                         </thead>
 
                         <tbody>
 
-                            <tr>
+                            <?php if (!empty($encaissementHistory)): ?>
+
+                                <?php foreach (
+                                    $encaissementHistory
+                                    as $index => $encaissement
+                                ): ?>
+
+                                    <?php
+
+                                    /*
+                         * =========================================
+                         * DATE ET HEURE
+                         * =========================================
+                         */
+
+                                    $displayDate =
+                                        !empty($encaissement->operation_date)
+                                        ? date(
+                                            'd/m/Y',
+                                            strtotime(
+                                                $encaissement
+                                                    ->operation_date
+                                            )
+                                        )
+                                        : '—';
+
+                                    $displayTime =
+                                        !empty($encaissement->created_at)
+                                        ? date(
+                                            'H:i',
+                                            strtotime(
+                                                $encaissement
+                                                    ->created_at
+                                            )
+                                        )
+                                        : '';
+
+                                    /*
+                         * =========================================
+                         * PROVENANCE
+                         * =========================================
+                         */
+
+                                    $thirdParty =
+                                        !empty($encaissement->third_party)
+                                        ? $encaissement->third_party
+                                        : 'Provenance non renseignée';
+
+                                    /*
+                         * =========================================
+                         * CATÉGORIE
+                         * =========================================
+                         */
+
+                                    $category =
+                                        !empty($encaissement->category)
+                                        ? $encaissement->category
+                                        : 'Encaissement';
+
+                                    /*
+                         * =========================================
+                         * CAISSE
+                         * =========================================
+                         */
+
+                                    $cashboxName =
+                                        !empty($encaissement->cashbox_name)
+                                        ? $encaissement->cashbox_name
+                                        : 'Caisse non renseignée';
+
+                                    $cashboxSubtitle =
+                                        'Caisse de trésorerie';
+
+                                    if (
+                                        $encaissement->cashbox_type
+                                        === 'siege'
+                                    ) {
+                                        $cashboxSubtitle =
+                                            'Caisse siège';
+                                    } elseif (
+                                        $encaissement->cashbox_type
+                                        === 'chantier'
+                                    ) {
+                                        $cashboxSubtitle =
+                                            !empty($encaissement
+                                                ->chantier_name)
+                                            ? 'Chantier : '
+                                            . $encaissement
+                                            ->chantier_name
+                                            : 'Caisse chantier';
+                                    }
+
+                                    /*
+                         * =========================================
+                         * MODE DE RÈGLEMENT
+                         * =========================================
+                         */
+
+                                    $paymentModeLabel =
+                                        'Autre';
+
+                                    $paymentModeIcon =
+                                        'fas fa-exchange-alt';
+
+                                    $paymentModeClass =
+                                        'enc-mode-bank';
+
+                                    switch ($encaissement
+                                        ->payment_method) {
+                                        case 'cash':
+                                            $paymentModeLabel =
+                                                'Espèces';
+
+                                            $paymentModeIcon =
+                                                'fas fa-money-bill-wave';
+
+                                            $paymentModeClass =
+                                                'enc-mode-cash';
+                                            break;
+
+                                        case 'bank':
+                                            $paymentModeLabel =
+                                                'Virement';
+
+                                            $paymentModeIcon =
+                                                'fas fa-university';
+
+                                            $paymentModeClass =
+                                                'enc-mode-bank';
+                                            break;
+
+                                        case 'cheque':
+                                            $paymentModeLabel =
+                                                'Chèque';
+
+                                            $paymentModeIcon =
+                                                'fas fa-money-check';
+
+                                            $paymentModeClass =
+                                                'enc-mode-cheque';
+                                            break;
+
+                                        case 'mobile':
+                                            $paymentModeLabel =
+                                                'Mobile Money';
+
+                                            $paymentModeIcon =
+                                                'fas fa-mobile-alt';
 
-                                <td>1</td>
+                                            $paymentModeClass =
+                                                'enc-mode-mobile';
+                                            break;
+                                    }
 
-                                <td>
-                                    12/07/2026
-                                    <small class="d-block text-muted">
-                                        10:42
-                                    </small>
-                                </td>
+                                    /*
+                         * =========================================
+                         * STATUT
+                         * =========================================
+                         */
 
-                                <td>
-                                    <span class="enc-reference">
-                                        ENC-2026-00048
-                                    </span>
-                                </td>
+                                    $statusLabel =
+                                        'En attente';
 
-                                <td class="enc-client">
+                                    $statusClass =
+                                        'enc-status-pending';
 
-                                    <strong>
-                                        Ministère des Infrastructures
-                                    </strong>
+                                    $statusIcon =
+                                        'fas fa-clock';
 
-                                    <small>
-                                        Client institutionnel
-                                    </small>
+                                    if (
+                                        $encaissement->status
+                                        === 'validated'
+                                    ) {
+                                        $statusLabel =
+                                            'Validé';
 
-                                </td>
+                                        $statusClass =
+                                            'enc-status-valid';
 
-                                <td class="enc-label">
+                                        $statusIcon =
+                                            'fas fa-check-circle';
+                                    } elseif (
+                                        $encaissement->status
+                                        === 'cancelled'
+                                    ) {
+                                        $statusLabel =
+                                            'Annulé';
 
-                                    <strong>
-                                        Paiement décompte n° 04
-                                    </strong>
+                                        $statusClass =
+                                            'enc-status-cancelled';
 
-                                    <small>
-                                        Projet route nationale RN3
-                                    </small>
+                                        $statusIcon =
+                                            'fas fa-times-circle';
+                                    }
 
-                                </td>
+                                    /*
+                         * =========================================
+                         * PIÈCE
+                         * =========================================
+                         */
 
-                                <td>
+                                    $documentNumber =
+                                        !empty($encaissement
+                                            ->document_number)
+                                        ? $encaissement
+                                        ->document_number
+                                        : '—';
 
-                                    <strong>CRDB BIF</strong>
+                                    $hasAttachment =
+                                        !empty($encaissement->attachment);
 
-                                    <small class="d-block text-muted">
-                                        Compte bancaire
-                                    </small>
+                                    $rowNumber =
+                                        (
+                                            (int) $encaissementPagination['offset']
+                                        )
+                                        + $index
+                                        + 1;
 
-                                </td>
+                                    ?>
 
-                                <td>
+                                    <tr>
 
-                                    <span class="enc-badge enc-mode-bank">
+                                        <td>
+                                            <?= $rowNumber ?>
+                                        </td>
 
-                                        <i class="fas fa-university mr-1"></i>
-                                        Virement
+                                        <td>
 
-                                    </span>
+                                            <?= html_escape(
+                                                $displayDate
+                                            ) ?>
 
-                                </td>
+                                            <?php if (
+                                                $displayTime !== ''
+                                            ): ?>
 
-                                <td>
+                                                <small class="d-block text-muted">
+                                                    <?= html_escape(
+                                                        $displayTime
+                                                    ) ?>
+                                                </small>
 
-                                    <strong>FAC-2026-0045</strong>
+                                            <?php endif; ?>
 
-                                    <small class="d-block text-muted">
-                                        Reçu joint
-                                    </small>
+                                        </td>
 
-                                </td>
+                                        <td>
 
-                                <td class="text-right enc-amount">
-                                    + 85 000 000
-                                </td>
+                                            <span class="enc-reference">
 
-                                <td>BIF</td>
+                                                <?= html_escape(
+                                                    $encaissement
+                                                        ->reference
+                                                ) ?>
 
-                                <td>
+                                            </span>
 
-                                    <span class="enc-badge enc-status-valid">
+                                        </td>
 
-                                        <i class="fas fa-check-circle mr-1"></i>
-                                        Validé
+                                        <td class="enc-client">
 
-                                    </span>
+                                            <strong>
 
-                                </td>
+                                                <?= html_escape(
+                                                    $thirdParty
+                                                ) ?>
 
-                                <td class="text-center">
+                                            </strong>
 
-                                    <button class="enc-action-btn enc-action-view" title="Voir">
+                                            <small>
 
-                                        <i class="fas fa-eye"></i>
+                                                <?= html_escape(
+                                                    $category
+                                                ) ?>
 
-                                    </button>
+                                            </small>
 
-                                    <button class="enc-action-btn enc-action-print" title="Imprimer">
+                                        </td>
 
-                                        <i class="fas fa-print"></i>
+                                        <td class="enc-label">
 
-                                    </button>
+                                            <strong>
 
-                                </td>
+                                                <?= html_escape(
+                                                    $encaissement->label
+                                                ) ?>
 
-                            </tr>
+                                            </strong>
 
-                            <tr>
+                                            <small>
 
-                                <td>2</td>
+                                                <?= !empty($encaissement
+                                                    ->observation)
+                                                    ? html_escape(
+                                                        $encaissement
+                                                            ->observation
+                                                    )
+                                                    : 'Aucune observation'
+                                                ?>
 
-                                <td>
-                                    12/07/2026
-                                    <small class="d-block text-muted">
-                                        09:15
-                                    </small>
-                                </td>
+                                            </small>
 
-                                <td>
-                                    <span class="enc-reference">
-                                        ENC-2026-00047
-                                    </span>
-                                </td>
+                                        </td>
 
-                                <td class="enc-client">
+                                        <td>
 
-                                    <strong>
-                                        Commune de Gitega
-                                    </strong>
+                                            <strong>
 
-                                    <small>
-                                        Maître d’ouvrage
-                                    </small>
+                                                <?= html_escape(
+                                                    $cashboxName
+                                                ) ?>
 
-                                </td>
+                                            </strong>
 
-                                <td class="enc-label">
+                                            <small class="d-block text-muted">
 
-                                    <strong>
-                                        Avance de démarrage
-                                    </strong>
+                                                <?= html_escape(
+                                                    $cashboxSubtitle
+                                                ) ?>
 
-                                    <small>
-                                        Construction bâtiment administratif
-                                    </small>
+                                            </small>
 
-                                </td>
+                                            <?php if (
+                                                !empty($encaissement
+                                                    ->cashbox_code)
+                                            ): ?>
 
-                                <td>
+                                                <small class="d-block text-muted">
 
-                                    <strong>Interbank BIF</strong>
+                                                    <?= html_escape(
+                                                        $encaissement
+                                                            ->cashbox_code
+                                                    ) ?>
 
-                                    <small class="d-block text-muted">
-                                        Compte bancaire
-                                    </small>
+                                                </small>
 
-                                </td>
+                                            <?php endif; ?>
 
-                                <td>
+                                        </td>
 
-                                    <span class="enc-badge enc-mode-cheque">
+                                        <td>
 
-                                        <i class="fas fa-money-check mr-1"></i>
-                                        Chèque
+                                            <span class="
+                                        enc-badge
+                                        <?= html_escape(
+                                            $paymentModeClass
+                                        ) ?>
+                                    ">
 
-                                    </span>
+                                                <i class="
+                                            <?= html_escape(
+                                                $paymentModeIcon
+                                            ) ?>
+                                            mr-1
+                                        "></i>
 
-                                </td>
+                                                <?= html_escape(
+                                                    $paymentModeLabel
+                                                ) ?>
 
-                                <td>
+                                            </span>
 
-                                    <strong>CHQ-789541</strong>
+                                        </td>
 
-                                    <small class="d-block text-muted">
-                                        Chèque encaissé
-                                    </small>
+                                        <td>
 
-                                </td>
+                                            <strong>
 
-                                <td class="text-right enc-amount">
-                                    + 120 000 000
-                                </td>
+                                                <?= html_escape(
+                                                    $documentNumber
+                                                ) ?>
 
-                                <td>BIF</td>
+                                            </strong>
 
-                                <td>
+                                            <small class="d-block text-muted">
 
-                                    <span class="enc-badge enc-status-valid">
-                                        Validé
-                                    </span>
+                                                <?= $hasAttachment
+                                                    ? 'Justificatif joint'
+                                                    : 'Aucun justificatif'
+                                                ?>
 
-                                </td>
+                                            </small>
 
-                                <td class="text-center">
+                                        </td>
 
-                                    <button class="enc-action-btn enc-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                        <td class="
+                                    text-right
+                                    enc-amount
+                                ">
 
-                                    <button class="enc-action-btn enc-action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
+                                            +
 
-                                    <button class="enc-action-btn enc-action-print">
-                                        <i class="fas fa-print"></i>
-                                    </button>
+                                            <?= number_format(
+                                                (float)
+                                                $encaissement->amount,
+                                                0,
+                                                ',',
+                                                ' '
+                                            ) ?>
 
-                                </td>
+                                        </td>
 
-                            </tr>
+                                        <td>
 
-                            <tr>
+                                            <?= html_escape(
+                                                $encaissement->currency
+                                            ) ?>
 
-                                <td>3</td>
+                                        </td>
 
-                                <td>
-                                    11/07/2026
-                                    <small class="d-block text-muted">
-                                        15:35
-                                    </small>
-                                </td>
+                                        <td>
 
-                                <td>
-                                    <span class="enc-reference">
-                                        ENC-2026-00046
-                                    </span>
-                                </td>
+                                            <span class="
+                                        enc-badge
+                                        <?= html_escape(
+                                            $statusClass
+                                        ) ?>
+                                    ">
 
-                                <td class="enc-client">
+                                                <i class="
+                                            <?= html_escape(
+                                                $statusIcon
+                                            ) ?>
+                                            mr-1
+                                        "></i>
 
-                                    <strong>
-                                        ABC Construction
-                                    </strong>
+                                                <?= html_escape(
+                                                    $statusLabel
+                                                ) ?>
 
-                                    <small>
-                                        Sous-traitant
-                                    </small>
+                                            </span>
 
-                                </td>
+                                        </td>
 
-                                <td class="enc-label">
+                                        <td class="text-center">
 
-                                    <strong>
-                                        Remboursement avance
-                                    </strong>
+                                            <!-- Voir -->
+                                            <button type="button" class="
+                                        enc-action-btn
+                                        enc-action-view
+                                    " title="Voir l’encaissement" onclick="viewEncaissement(
+                                        <?= (int)
+                                        $encaissement->id
+                                        ?>
+                                    )">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
 
-                                    <small>
-                                        Trop-perçu sur situation précédente
-                                    </small>
+                                            <!-- Modifier -->
+                                            <?php if (
+                                                $encaissement->status
+                                                !== 'cancelled'
+                                            ): ?>
 
-                                </td>
+                                                <button type="button" class="
+                                            enc-action-btn
+                                            enc-action-edit
+                                        " title="Modifier" onclick="editEncaissement(
+                                            <?= (int)
+                                                $encaissement->id
+                                            ?>
+                                        )">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
 
-                                <td>
+                                            <?php endif; ?>
 
-                                    <strong>Caisse siège</strong>
+                                            <!-- Pièce justificative -->
+                                            <?php if ($hasAttachment): ?>
 
-                                    <small class="d-block text-muted">
-                                        Caisse principale
-                                    </small>
+                                                <a href="<?= base_url(
+                                                                'uploads/finance/'
+                                                                    . 'cashbox_operations/'
+                                                                    . rawurlencode(
+                                                                        $encaissement
+                                                                            ->attachment
+                                                                    )
+                                                            ) ?>" class="
+                                            enc-action-btn
+                                            enc-action-print
+                                        " title="Ouvrir le justificatif" target="_blank">
+                                                    <i class="fas fa-paperclip"></i>
+                                                </a>
 
-                                </td>
+                                            <?php endif; ?>
 
-                                <td>
+                                            <!-- Imprimer -->
+                                            <a href="<?= base_url(
+                                                            'finance/encaissement-print/'
+                                                                . (int)
+                                                                $encaissement->id
+                                                        ) ?>" class="
+                                        enc-action-btn
+                                        enc-action-print
+                                    " title="Imprimer" target="_blank">
+                                                <i class="fas fa-print"></i>
+                                            </a>
 
-                                    <span class="enc-badge enc-mode-cash">
+                                        </td>
 
-                                        <i class="fas fa-money-bill-wave mr-1"></i>
-                                        Espèces
+                                    </tr>
 
-                                    </span>
+                                <?php endforeach; ?>
 
-                                </td>
+                            <?php else: ?>
 
-                                <td>
+                                <tr>
 
-                                    <strong>REC-2026-0032</strong>
+                                    <td colspan="12" class="text-center py-5">
 
-                                    <small class="d-block text-muted">
-                                        Reçu de caisse
-                                    </small>
+                                        <div class="mb-3">
 
-                                </td>
+                                            <i class="
+                                        fas
+                                        fa-coins
+                                        fa-3x
+                                        text-muted
+                                    "></i>
 
-                                <td class="text-right enc-amount">
-                                    + 5 500 000
-                                </td>
+                                        </div>
 
-                                <td>BIF</td>
+                                        <h6>
+                                            Aucun encaissement enregistré
+                                        </h6>
 
-                                <td>
+                                        <p class="text-muted mb-3">
 
-                                    <span class="enc-badge enc-status-valid">
-                                        Validé
-                                    </span>
+                                            Les encaissements ajoutés apparaîtront ici.
 
-                                </td>
+                                        </p>
 
-                                <td class="text-center">
+                                        <button type="button" class="btn btn-enc-primary" data-toggle="modal"
+                                            data-target="#addEncaissementModal">
+                                            <i class="fas fa-plus mr-1"></i>
+                                            Nouvel encaissement
+                                        </button>
 
-                                    <button class="enc-action-btn enc-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    </td>
 
-                                    <button class="enc-action-btn enc-action-print">
-                                        <i class="fas fa-print"></i>
-                                    </button>
+                                </tr>
 
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>4</td>
-
-                                <td>
-                                    11/07/2026
-                                    <small class="d-block text-muted">
-                                        11:20
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="enc-reference">
-                                        ENC-2026-00045
-                                    </span>
-                                </td>
-
-                                <td class="enc-client">
-
-                                    <strong>
-                                        Banque CRDB
-                                    </strong>
-
-                                    <small>
-                                        Institution financière
-                                    </small>
-
-                                </td>
-
-                                <td class="enc-label">
-
-                                    <strong>
-                                        Décaissement crédit de trésorerie
-                                    </strong>
-
-                                    <small>
-                                        Financement court terme
-                                    </small>
-
-                                </td>
-
-                                <td>
-
-                                    <strong>CRDB BIF</strong>
-
-                                    <small class="d-block text-muted">
-                                        Compte bancaire
-                                    </small>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="enc-badge enc-mode-bank">
-                                        Virement
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <strong>CRD-2026-0011</strong>
-
-                                    <small class="d-block text-muted">
-                                        Contrat de crédit
-                                    </small>
-
-                                </td>
-
-                                <td class="text-right enc-amount">
-                                    + 75 000 000
-                                </td>
-
-                                <td>BIF</td>
-
-                                <td>
-
-                                    <span class="enc-badge enc-status-pending">
-                                        En attente
-                                    </span>
-
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="enc-action-btn enc-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="enc-action-btn enc-action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                            <tr>
-
-                                <td>5</td>
-
-                                <td>
-                                    10/07/2026
-                                    <small class="d-block text-muted">
-                                        16:08
-                                    </small>
-                                </td>
-
-                                <td>
-                                    <span class="enc-reference">
-                                        ENC-2026-00044
-                                    </span>
-                                </td>
-
-                                <td class="enc-client">
-
-                                    <strong>
-                                        Client particulier
-                                    </strong>
-
-                                    <small>
-                                        Vente de matériaux
-                                    </small>
-
-                                </td>
-
-                                <td class="enc-label">
-
-                                    <strong>
-                                        Vente de matériaux récupérés
-                                    </strong>
-
-                                    <small>
-                                        Ciment et ferraille non utilisés
-                                    </small>
-
-                                </td>
-
-                                <td>
-
-                                    <strong>Caisse siège</strong>
-
-                                    <small class="d-block text-muted">
-                                        Caisse principale
-                                    </small>
-
-                                </td>
-
-                                <td>
-
-                                    <span class="enc-badge enc-mode-mobile">
-
-                                        <i class="fas fa-mobile-alt mr-1"></i>
-                                        Mobile Money
-
-                                    </span>
-
-                                </td>
-
-                                <td>
-
-                                    <strong>MOB-554788</strong>
-
-                                    <small class="d-block text-muted">
-                                        Transaction mobile
-                                    </small>
-
-                                </td>
-
-                                <td class="text-right enc-amount">
-                                    + 2 800 000
-                                </td>
-
-                                <td>BIF</td>
-
-                                <td>
-
-                                    <span class="enc-badge enc-status-valid">
-                                        Validé
-                                    </span>
-
-                                </td>
-
-                                <td class="text-center">
-
-                                    <button class="enc-action-btn enc-action-view">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-
-                                    <button class="enc-action-btn enc-action-edit">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-
-                                    <button class="enc-action-btn enc-action-delete">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-
-                                </td>
-
-                            </tr>
+                            <?php endif; ?>
 
                         </tbody>
 
@@ -2034,392 +2695,218 @@
 
                 </div>
 
-                <div class="p-3 border-top d-flex justify-content-between align-items-center">
+                <?php if (
+                    !empty($encaissementHistory)
+                ): ?>
 
-                    <small class="text-muted">
-                        Affichage de 1 à 5 sur 86 encaissements
-                    </small>
+                    <?php
 
-                    <ul class="pagination pagination-sm mb-0">
+                    $currentPage =
+                        (int) $encaissementPagination['current_page'];
 
-                        <li class="page-item disabled">
-                            <a class="page-link" href="#">
-                                Précédent
-                            </a>
-                        </li>
+                    $totalPages =
+                        (int) $encaissementPagination['total_pages'];
 
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
+                    $totalRows =
+                        (int) $encaissementPagination['total_rows'];
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
+                    $firstDisplayed =
+                        (int) $encaissementPagination['offset'] + 1;
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
+                    $lastDisplayed = min(
+                        $totalRows,
+                        $encaissementPagination['offset']
+                            + count($encaissementHistory)
+                    );
 
-                        <li class="page-item">
-                            <a class="page-link" href="#">
-                                Suivant
-                            </a>
-                        </li>
+                    /*
+         * Conserver la période du graphique
+         * pendant la pagination.
+         */
+                    $paginationBaseParams = [];
 
-                    </ul>
+                    if (
+                        !empty($encaissementPeriod)
+                    ) {
+                        $paginationBaseParams['encaissement_period'] = $encaissementPeriod;
+                    }
 
-                </div>
+                    ?>
 
-            </div>
+                    <div class="
+                p-3
+                border-top
+                d-flex
+                justify-content-between
+                align-items-center
+                flex-wrap
+            ">
 
-            <!-- =========================================================
-                 ENCAISSEMENTS ATTENDUS + SYNTHÈSE CLIENTS
-            ========================================================== -->
-            <div class="row">
+                        <small class="text-muted">
 
-                <div class="col-xl-5 col-lg-5">
+                            Affichage de
 
-                    <div class="enc-card">
+                            <?= $firstDisplayed ?>
 
-                        <div class="enc-card-header">
+                            à
 
-                            <div>
+                            <?= $lastDisplayed ?>
 
-                                <h5 class="enc-card-title">
-                                    <i class="fas fa-hourglass-half"></i>
-                                    Encaissements attendus
-                                </h5>
+                            sur
 
-                                <span class="enc-card-subtitle">
-                                    Montants prévus dans les prochains jours.
-                                </span>
+                            <?= $totalRows ?>
 
-                            </div>
+                            encaissement<?= $totalRows > 1
+                                            ? 's'
+                                            : ''
+                                        ?>
 
-                            <span class="badge badge-warning">
-                                4 échéances
-                            </span>
+                        </small>
 
-                        </div>
+                        <?php if ($totalPages > 1): ?>
 
-                        <div class="enc-card-body">
+                            <ul class="
+                        pagination
+                        pagination-sm
+                        mb-0
+                    ">
 
-                            <div class="enc-awaiting-item">
+                                <!-- Précédent -->
+                                <?php
 
-                                <div class="enc-awaiting-icon">
-                                    <i class="fas fa-file-invoice-dollar"></i>
-                                </div>
+                                $previousParams =
+                                    $paginationBaseParams;
 
-                                <div class="enc-awaiting-info">
+                                $previousParams['page'] =
+                                    max(
+                                        1,
+                                        $currentPage - 1
+                                    );
 
-                                    <strong>
-                                        Ministère des Travaux Publics
-                                    </strong>
+                                ?>
 
-                                    <small>
-                                        Décompte n° 05 — Échéance 15/07/2026
-                                    </small>
+                                <li class="
+                            page-item
+                            <?= $currentPage <= 1
+                                ? 'disabled'
+                                : ''
+                            ?>
+                        ">
 
-                                </div>
+                                    <a class="page-link" href="<?= $currentPage <= 1
+                                                                    ? '#'
+                                                                    : current_url()
+                                                                    . '?'
+                                                                    . http_build_query(
+                                                                        $previousParams
+                                                                    )
+                                                                ?>">
+                                        Précédent
+                                    </a>
 
-                                <div class="enc-awaiting-amount">
-                                    95 000 000 BIF
-                                </div>
+                                </li>
 
-                            </div>
+                                <!-- Numéros de pages -->
+                                <?php
 
-                            <div class="enc-awaiting-item">
+                                $startPage = max(
+                                    1,
+                                    $currentPage - 2
+                                );
 
-                                <div class="enc-awaiting-icon">
-                                    <i class="fas fa-file-contract"></i>
-                                </div>
+                                $endPage = min(
+                                    $totalPages,
+                                    $currentPage + 2
+                                );
 
-                                <div class="enc-awaiting-info">
+                                ?>
 
-                                    <strong>
-                                        Commune de Ngozi
-                                    </strong>
+                                <?php for (
+                                    $pageNumber = $startPage;
+                                    $pageNumber <= $endPage;
+                                    $pageNumber++
+                                ): ?>
 
-                                    <small>
-                                        Avance de démarrage — 18/07/2026
-                                    </small>
+                                    <?php
 
-                                </div>
+                                    $pageParams =
+                                        $paginationBaseParams;
 
-                                <div class="enc-awaiting-amount">
-                                    60 000 000 BIF
-                                </div>
+                                    $pageParams['page'] =
+                                        $pageNumber;
 
-                            </div>
+                                    ?>
 
-                            <div class="enc-awaiting-item">
+                                    <li class="
+                                page-item
+                                <?= $pageNumber
+                                        === $currentPage
+                                        ? 'active'
+                                        : ''
+                                ?>
+                            ">
 
-                                <div class="enc-awaiting-icon">
-                                    <i class="fas fa-user-tie"></i>
-                                </div>
+                                        <a class="page-link" href="<?= current_url()
+                                                                        . '?'
+                                                                        . http_build_query(
+                                                                            $pageParams
+                                                                        )
+                                                                    ?>">
+                                            <?= $pageNumber ?>
+                                        </a>
 
-                                <div class="enc-awaiting-info">
+                                    </li>
 
-                                    <strong>
-                                        Société BCB
-                                    </strong>
+                                <?php endfor; ?>
 
-                                    <small>
-                                        Paiement facture — 22/07/2026
-                                    </small>
+                                <!-- Suivant -->
+                                <?php
 
-                                </div>
+                                $nextParams =
+                                    $paginationBaseParams;
 
-                                <div class="enc-awaiting-amount">
-                                    35 500 000 BIF
-                                </div>
+                                $nextParams['page'] =
+                                    min(
+                                        $totalPages,
+                                        $currentPage + 1
+                                    );
 
-                            </div>
+                                ?>
 
-                            <div class="enc-awaiting-item">
+                                <li class="
+                            page-item
+                            <?= $currentPage
+                                >= $totalPages
+                                ? 'disabled'
+                                : ''
+                            ?>
+                        ">
 
-                                <div class="enc-awaiting-icon">
-                                    <i class="fas fa-university"></i>
-                                </div>
+                                    <a class="page-link" href="<?= $currentPage
+                                                                    >= $totalPages
+                                                                    ? '#'
+                                                                    : current_url()
+                                                                    . '?'
+                                                                    . http_build_query(
+                                                                        $nextParams
+                                                                    )
+                                                                ?>">
+                                        Suivant
+                                    </a>
 
-                                <div class="enc-awaiting-info">
+                                </li>
 
-                                    <strong>
-                                        Banque KCB
-                                    </strong>
+                            </ul>
 
-                                    <small>
-                                        Mise à disposition crédit — 25/07/2026
-                                    </small>
-
-                                </div>
-
-                                <div class="enc-awaiting-amount">
-                                    120 000 000 BIF
-                                </div>
-
-                            </div>
-
-                        </div>
+                        <?php endif; ?>
 
                     </div>
 
-                </div>
-
-                <div class="col-xl-7 col-lg-7">
-
-                    <div class="enc-card">
-
-                        <div class="enc-card-header">
-
-                            <div>
-
-                                <h5 class="enc-card-title">
-                                    <i class="fas fa-users"></i>
-                                    Synthèse par client
-                                </h5>
-
-                                <span class="enc-card-subtitle">
-                                    Montants facturés, encaissés et restant à recouvrer.
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <div class="table-responsive">
-
-                            <table class="table enc-table">
-
-                                <thead>
-
-                                    <tr>
-                                        <th>Client</th>
-                                        <th class="text-right">Facturé</th>
-                                        <th class="text-right">Encaissé</th>
-                                        <th class="text-right">Reste</th>
-                                        <th>Recouvrement</th>
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-
-                                    <tr>
-
-                                        <td>
-
-                                            <strong>
-                                                Ministère des Infrastructures
-                                            </strong>
-
-                                            <small class="d-block text-muted">
-                                                6 factures
-                                            </small>
-
-                                        </td>
-
-                                        <td class="text-right">
-                                            420 000 000
-                                        </td>
-
-                                        <td class="text-right enc-amount">
-                                            325 000 000
-                                        </td>
-
-                                        <td class="text-right text-danger font-weight-bold">
-                                            95 000 000
-                                        </td>
-
-                                        <td style="min-width: 140px;">
-
-                                            <div class="progress progress-xs mb-1">
-
-                                                <div class="progress-bar bg-success" style="width: 77.4%;">
-                                                </div>
-
-                                            </div>
-
-                                            <small>77,4 %</small>
-
-                                        </td>
-
-                                    </tr>
-
-                                    <tr>
-
-                                        <td>
-
-                                            <strong>
-                                                Commune de Gitega
-                                            </strong>
-
-                                            <small class="d-block text-muted">
-                                                3 factures
-                                            </small>
-
-                                        </td>
-
-                                        <td class="text-right">
-                                            280 000 000
-                                        </td>
-
-                                        <td class="text-right enc-amount">
-                                            220 000 000
-                                        </td>
-
-                                        <td class="text-right text-danger font-weight-bold">
-                                            60 000 000
-                                        </td>
-
-                                        <td>
-
-                                            <div class="progress progress-xs mb-1">
-
-                                                <div class="progress-bar bg-info" style="width: 78.5%;">
-                                                </div>
-
-                                            </div>
-
-                                            <small>78,5 %</small>
-
-                                        </td>
-
-                                    </tr>
-
-                                    <tr>
-
-                                        <td>
-
-                                            <strong>
-                                                Société BCB
-                                            </strong>
-
-                                            <small class="d-block text-muted">
-                                                2 factures
-                                            </small>
-
-                                        </td>
-
-                                        <td class="text-right">
-                                            125 000 000
-                                        </td>
-
-                                        <td class="text-right enc-amount">
-                                            89 500 000
-                                        </td>
-
-                                        <td class="text-right text-danger font-weight-bold">
-                                            35 500 000
-                                        </td>
-
-                                        <td>
-
-                                            <div class="progress progress-xs mb-1">
-
-                                                <div class="progress-bar bg-warning" style="width: 71.6%;">
-                                                </div>
-
-                                            </div>
-
-                                            <small>71,6 %</small>
-
-                                        </td>
-
-                                    </tr>
-
-                                    <tr>
-
-                                        <td>
-
-                                            <strong>
-                                                Province de Muyinga
-                                            </strong>
-
-                                            <small class="d-block text-muted">
-                                                4 factures
-                                            </small>
-
-                                        </td>
-
-                                        <td class="text-right">
-                                            310 000 000
-                                        </td>
-
-                                        <td class="text-right enc-amount">
-                                            280 250 000
-                                        </td>
-
-                                        <td class="text-right text-danger font-weight-bold">
-                                            29 750 000
-                                        </td>
-
-                                        <td>
-
-                                            <div class="progress progress-xs mb-1">
-
-                                                <div class="progress-bar bg-success" style="width: 90.4%;">
-                                                </div>
-
-                                            </div>
-
-                                            <small>90,4 %</small>
-
-                                        </td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    </div>
-
-                </div>
+                <?php endif; ?>
 
             </div>
+
+
 
         </div>
     </section>
@@ -2428,113 +2915,193 @@
 
 <!-- =========================================================
      MODALE : NOUVEL ENCAISSEMENT
+     Styles identiques à la modale de la page Caisse
 ========================================================== -->
-<div class="modal fade enc-modal" id="addEncaissementModal" tabindex="-1" role="dialog">
+<div class="modal fade modal-caisse" id="addEncaissementModal" tabindex="-1" role="dialog" aria-hidden="true">
 
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
 
-        <form action="<?= base_url('finance/encaissement-store') ?>" method="post" enctype="multipart/form-data"
-            style="width: 100%;">
+        <form action="<?= base_url('cashbox-operation-store') ?>" method="post" enctype="multipart/form-data"
+            id="encaissementForm" style="width: 100%;">
 
             <div class="modal-content">
 
+                <!-- =================================================
+                     HEADER
+                ================================================== -->
                 <div class="modal-header">
 
                     <h5 class="modal-title">
 
                         <i class="fas fa-arrow-circle-down mr-2"></i>
-                        Enregistrer un nouvel encaissement
+
+                        Enregistrer un encaissement
 
                     </h5>
 
-                    <button type="button" class="close" data-dismiss="modal">
-
-                        <span>&times;</span>
-
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
+                        <span aria-hidden="true">
+                            &times;
+                        </span>
                     </button>
 
                 </div>
 
+                <!-- =================================================
+                     BODY
+                ================================================== -->
                 <div class="modal-body">
 
-                    <div class="enc-section-title">
-
-                        <i class="fas fa-info-circle mr-1"></i>
-                        Informations générales
-
-                    </div>
+                    <input type="hidden" name="operation_type" value="encaissement">
 
                     <div class="row">
 
+                        <!-- Date -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
                                 <label>
-                                    Référence
-                                    <span class="enc-required">*</span>
+                                    Date de l’opération
+                                    <span class="required-star">*</span>
                                 </label>
 
-                                <input type="text" name="reference" class="form-control"
-                                    value="ENC-<?= date('Y') ?>-00049" readonly>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Date d’encaissement
-                                    <span class="enc-required">*</span>
-                                </label>
-
-                                <input type="date" name="encaissement_date" class="form-control"
+                                <input type="date" name="operation_date" class="form-control"
                                     value="<?= date('Y-m-d') ?>" required>
 
                             </div>
 
                         </div>
 
+                        <!-- Caisse -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
                                 <label>
-                                    Source de l’encaissement
-                                    <span class="enc-required">*</span>
+                                    Caisse concernée
+                                    <span class="required-star">*</span>
                                 </label>
 
-                                <select name="source_type" id="sourceType" class="form-control"
-                                    onchange="toggleEncaissementSource()" required>
+                                <select name="cashbox_id" id="encaissementCashbox" class="form-control" required>
+
+                                    <option value="">
+                                        Sélectionner la caisse
+                                    </option>
+
+                                    <?php if (!empty($allCashboxes)): ?>
+
+                                        <?php foreach ($allCashboxes as $cashbox): ?>
+
+                                            <?php
+                                            $currentBalance = isset(
+                                                $cashbox->current_balance
+                                            )
+                                                ? (float) $cashbox->current_balance
+                                                : 0;
+                                            ?>
+
+                                            <option value="<?= (int) $cashbox->id ?>" data-currency="<?= html_escape(
+                                                                                                            $cashbox->devise
+                                                                                                        ) ?>"
+                                                data-balance="<?= $currentBalance ?>">
+                                                <?= html_escape($cashbox->code) ?>
+
+                                                —
+
+                                                <?= html_escape($cashbox->name) ?>
+
+                                                —
+
+                                                <?= number_format(
+                                                    $currentBalance,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                                <?= html_escape($cashbox->devise) ?>
+                                            </option>
+
+                                        <?php endforeach; ?>
+
+                                    <?php endif; ?>
+
+                                </select>
+
+                                <small id="encaissementCashboxInfo" class="form-text text-muted">
+                                    La caisse sélectionnée recevra le montant.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Montant -->
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+
+                                <label>
+                                    Montant
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <div class="input-group">
+
+                                    <input type="number" name="amount" id="encaissementAmount" class="form-control"
+                                        min="0.01" step="0.01" placeholder="0" required>
+
+                                    <div class="input-group-append">
+
+                                        <span class="input-group-text" id="encaissementCurrency">
+                                            BIF
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Catégorie -->
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+
+                                <label>
+                                    Catégorie
+                                </label>
+
+                                <select name="category" class="form-control">
 
                                     <option value="">
                                         Sélectionner
                                     </option>
 
-                                    <option value="client">
+                                    <option value="Paiement client">
                                         Paiement client
                                     </option>
 
-                                    <option value="avance_marche">
+                                    <option value="Avance sur marché">
                                         Avance sur marché
                                     </option>
 
-                                    <option value="emprunt">
-                                        Emprunt bancaire
-                                    </option>
-
-                                    <option value="remboursement">
+                                    <option value="Remboursement">
                                         Remboursement
                                     </option>
 
-                                    <option value="vente_actif">
+                                    <option value="Emprunt">
+                                        Emprunt
+                                    </option>
+
+                                    <option value="Vente actif">
                                         Vente d’actif
                                     </option>
 
-                                    <option value="autre">
+                                    <option value="Autre produit">
                                         Autre produit
                                     </option>
 
@@ -2544,209 +3111,38 @@
 
                         </div>
 
-                    </div>
-
-                    <div class="enc-section-title mt-3">
-
-                        <i class="fas fa-user-tie mr-1"></i>
-                        Provenance et affectation
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-4" id="clientField">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Client / Payeur
-                                </label>
-
-                                <select name="client_id" class="form-control">
-
-                                    <option value="">
-                                        Sélectionner le client
-                                    </option>
-
-                                    <option value="1">
-                                        Ministère des Infrastructures
-                                    </option>
-
-                                    <option value="2">
-                                        Commune de Gitega
-                                    </option>
-
-                                    <option value="3">
-                                        Province de Muyinga
-                                    </option>
-
-                                    <option value="4">
-                                        Société BCB
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4" id="bankSourceField" style="display: none;">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Institution financière
-                                </label>
-
-                                <input type="text" name="financial_institution" class="form-control"
-                                    placeholder="Ex. Banque CRDB">
-
-                            </div>
-
-                        </div>
-
+                        <!-- Provenance -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
                                 <label>
-                                    Projet / Chantier concerné
+                                    Bénéficiaire / Provenance
                                 </label>
 
-                                <select name="chantier_id" class="form-control">
-
-                                    <option value="">
-                                        Non affecté à un chantier
-                                    </option>
-
-                                    <option value="1">
-                                        Chantier Bujumbura
-                                    </option>
-
-                                    <option value="2">
-                                        Chantier Gitega
-                                    </option>
-
-                                    <option value="3">
-                                        Chantier Ngozi
-                                    </option>
-
-                                    <option value="4">
-                                        Chantier Muyinga
-                                    </option>
-
-                                </select>
+                                <input type="text" name="third_party" class="form-control"
+                                    placeholder="Nom du bénéficiaire ou de la source">
 
                             </div>
 
                         </div>
 
+                        <!-- Mode -->
                         <div class="col-md-4">
 
                             <div class="form-group">
 
                                 <label>
-                                    Facture / Décompte associé
+                                    Mode de règlement
                                 </label>
 
-                                <select name="invoice_id" class="form-control">
-
-                                    <option value="">
-                                        Aucun document associé
-                                    </option>
-
-                                    <option value="1">
-                                        FAC-2026-0045 — 85 000 000 BIF
-                                    </option>
-
-                                    <option value="2">
-                                        DEC-2026-0004 — 95 000 000 BIF
-                                    </option>
-
-                                    <option value="3">
-                                        FAC-2026-0038 — 35 500 000 BIF
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Caisse ou compte destinataire
-                                    <span class="enc-required">*</span>
-                                </label>
-
-                                <select name="destination_account_id" class="form-control" required>
-
-                                    <option value="">
-                                        Sélectionner
-                                    </option>
-
-                                    <optgroup label="Caisses">
-
-                                        <option value="cash-1">
-                                            Caisse siège
-                                        </option>
-
-                                        <option value="cash-2">
-                                            Caisse chantier Gitega
-                                        </option>
-
-                                    </optgroup>
-
-                                    <optgroup label="Comptes bancaires">
-
-                                        <option value="bank-1">
-                                            CRDB BIF
-                                        </option>
-
-                                        <option value="bank-2">
-                                            CRDB USD
-                                        </option>
-
-                                        <option value="bank-3">
-                                            ECOBANK BIF
-                                        </option>
-
-                                        <option value="bank-4">
-                                            KCB USD
-                                        </option>
-
-                                    </optgroup>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Mode d’encaissement
-                                    <span class="enc-required">*</span>
-                                </label>
-
-                                <select name="payment_method" class="form-control" required>
-
-                                    <option value="">
-                                        Sélectionner
-                                    </option>
+                                <select name="payment_method" class="form-control">
 
                                     <option value="cash">
                                         Espèces
                                     </option>
 
-                                    <option value="bank_transfer">
+                                    <option value="bank">
                                         Virement bancaire
                                     </option>
 
@@ -2754,84 +3150,18 @@
                                         Chèque
                                     </option>
 
-                                    <option value="mobile_money">
+                                    <option value="mobile">
                                         Mobile Money
                                     </option>
 
-                                    <option value="bank_deposit">
-                                        Versement bancaire
-                                    </option>
-
                                 </select>
 
                             </div>
 
                         </div>
 
-                    </div>
-
-                    <div class="enc-section-title mt-3">
-
-                        <i class="fas fa-money-bill-wave mr-1"></i>
-                        Montant et justificatifs
-
-                    </div>
-
-                    <div class="row">
-
+                        <!-- Numéro pièce -->
                         <div class="col-md-4">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Montant encaissé
-                                    <span class="enc-required">*</span>
-                                </label>
-
-                                <input type="number" name="amount" id="encAmount" class="form-control" min="0"
-                                    step="0.01" placeholder="0" required>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-2">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Devise
-                                    <span class="enc-required">*</span>
-                                </label>
-
-                                <select name="currency" class="form-control" required>
-
-                                    <option value="BIF">BIF</option>
-                                    <option value="USD">USD</option>
-                                    <option value="EUR">EUR</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-3">
-
-                            <div class="form-group">
-
-                                <label>
-                                    Numéro de transaction
-                                </label>
-
-                                <input type="text" name="transaction_number" class="form-control"
-                                    placeholder="Virement, chèque, mobile...">
-
-                            </div>
-
-                        </div>
-
-                        <div class="col-md-3">
 
                             <div class="form-group">
 
@@ -2840,13 +3170,14 @@
                                 </label>
 
                                 <input type="text" name="document_number" class="form-control"
-                                    placeholder="Reçu, bordereau, avis crédit...">
+                                    placeholder="Facture, reçu, bon...">
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-6">
+                        <!-- Fichier -->
+                        <div class="col-md-8">
 
                             <div class="form-group">
 
@@ -2857,40 +3188,40 @@
                                 <div class="custom-file">
 
                                     <input type="file" name="attachment" class="custom-file-input"
-                                        id="encaissementAttachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                                        id="encaissementAttachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
 
                                     <label class="custom-file-label" for="encaissementAttachment">
-
                                         Choisir un fichier
-
                                     </label>
 
                                 </div>
 
-                                <small class="text-muted">
-                                    PDF, image ou document — maximum 5 Mo.
+                                <small class="form-text text-muted">
+                                    PDF, image, Word ou Excel — maximum 5 Mo.
                                 </small>
 
                             </div>
 
                         </div>
 
-                        <div class="col-md-6">
+                        <!-- Libellé -->
+                        <div class="col-md-12">
 
                             <div class="form-group">
 
                                 <label>
                                     Libellé de l’encaissement
-                                    <span class="enc-required">*</span>
+                                    <span class="required-star">*</span>
                                 </label>
 
                                 <input type="text" name="label" class="form-control"
-                                    placeholder="Ex. Paiement du décompte n° 04" required>
+                                    placeholder="Ex. Paiement de la facture FAC-2026-0045" required>
 
                             </div>
 
                         </div>
 
+                        <!-- Observation -->
                         <div class="col-md-12">
 
                             <div class="form-group mb-0">
@@ -2899,8 +3230,8 @@
                                     Observation
                                 </label>
 
-                                <textarea name="observation" class="form-control"
-                                    placeholder="Informations complémentaires sur cet encaissement..."></textarea>
+                                <textarea name="observation" class="form-control" rows="3"
+                                    placeholder="Informations complémentaires sur l’opération..."></textarea>
 
                             </div>
 
@@ -2910,19 +3241,24 @@
 
                 </div>
 
+                <!-- =================================================
+                     FOOTER
+                ================================================== -->
                 <div class="modal-footer">
 
-                    <button type="button" class="btn btn-enc-outline" data-dismiss="modal">
+                    <button type="button" class="btn btn-caisse-outline" data-dismiss="modal">
 
                         <i class="fas fa-times mr-1"></i>
+
                         Annuler
 
                     </button>
 
-                    <button type="submit" class="btn btn-enc-primary">
+                    <button type="submit" class="btn btn-caisse-primary">
 
-                        <i class="fas fa-save mr-1"></i>
-                        Enregistrer l’encaissement
+                        <i class="fas fa-check-circle mr-1"></i>
+
+                        Enregistrer l’opération
 
                     </button>
 
@@ -2940,15 +3276,66 @@
      SCRIPTS
 ========================================================== -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener(
+        'DOMContentLoaded',
+        function() {
 
-        const canvas = document.getElementById('encaissementChart');
+            const canvas =
+                document.getElementById(
+                    'encaissementChart'
+                );
 
-        if (canvas && typeof Chart !== 'undefined') {
+            if (
+                !canvas ||
+                typeof Chart === 'undefined'
+            ) {
+                return;
+            }
 
-            const ctx = canvas.getContext('2d');
+            /*
+             * Données PHP converties en JavaScript.
+             */
+            const encaissementLabels =
+                <?= json_encode(
+                    $encaissementEvolution['labels'],
+                    JSON_UNESCAPED_UNICODE
+                        | JSON_UNESCAPED_SLASHES
+                ) ?>;
 
-            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            const encaissementAmounts =
+                <?= json_encode(
+                    array_map(
+                        'floatval',
+                        $encaissementEvolution['amounts']
+                    )
+                ) ?>;
+
+            const encaissementObjectives =
+                <?= json_encode(
+                    array_map(
+                        'floatval',
+                        $encaissementEvolution['objectives']
+                    )
+                ) ?>;
+
+            const operationCounts =
+                <?= json_encode(
+                    array_map(
+                        'intval',
+                        $encaissementEvolution['operation_counts']
+                    )
+                ) ?>;
+
+            const context =
+                canvas.getContext('2d');
+
+            const gradient =
+                context.createLinearGradient(
+                    0,
+                    0,
+                    0,
+                    300
+                );
 
             gradient.addColorStop(
                 0,
@@ -2960,152 +3347,222 @@
                 'rgba(15, 118, 110, 0.02)'
             );
 
-            new Chart(ctx, {
+            new Chart(
+                context, {
+                    type: 'line',
 
-                type: 'line',
+                    data: {
+                        labels: encaissementLabels,
 
-                data: {
+                        datasets: [{
+                                label: 'Encaissements réalisés',
 
-                    labels: [
-                        'Février',
-                        'Mars',
-                        'Avril',
-                        'Mai',
-                        'Juin',
-                        'Juillet'
-                    ],
+                                data: encaissementAmounts,
 
-                    datasets: [{
-                            label: 'Encaissements réalisés',
+                                borderColor: '#0f766e',
 
-                            data: [
-                                280000000,
-                                325000000,
-                                295000000,
-                                420000000,
-                                390000000,
-                                485700000
-                            ],
+                                backgroundColor: gradient,
 
-                            borderColor: '#0f766e',
-                            backgroundColor: gradient,
-                            borderWidth: 2.5,
-                            pointRadius: 4,
-                            pointHoverRadius: 6,
-                            pointBackgroundColor: '#ffffff',
-                            pointBorderColor: '#0f766e',
-                            pointBorderWidth: 2,
-                            fill: true,
-                            tension: 0.35
-                        },
-                        {
-                            label: 'Objectif mensuel',
+                                borderWidth: 2.5,
 
-                            data: [
-                                300000000,
-                                340000000,
-                                350000000,
-                                400000000,
-                                430000000,
-                                450000000
-                            ],
+                                pointRadius: 4,
 
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            borderDash: [6, 6],
-                            pointRadius: 0,
-                            fill: false,
-                            tension: 0.25
-                        }
-                    ]
-                },
+                                pointHoverRadius: 6,
 
-                options: {
+                                pointBackgroundColor: '#ffffff',
 
-                    responsive: true,
-                    maintainAspectRatio: false,
+                                pointBorderColor: '#0f766e',
 
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
+                                pointBorderWidth: 2,
+
+                                fill: true,
+
+                                tension: 0.35
+                            },
+                            {
+                                label: 'Objectif mensuel',
+
+                                data: encaissementObjectives,
+
+                                borderColor: '#f59e0b',
+
+                                backgroundColor: 'transparent',
+
+                                borderWidth: 2,
+
+                                borderDash: [6, 6],
+
+                                pointRadius: 0,
+
+                                fill: false,
+
+                                tension: 0.25
+                            }
+                        ]
                     },
 
-                    plugins: {
+                    options: {
+                        responsive: true,
 
-                        legend: {
+                        maintainAspectRatio: false,
 
-                            position: 'bottom',
+                        interaction: {
+                            intersect: false,
 
-                            labels: {
-                                usePointStyle: true,
-                                boxWidth: 8,
-                                padding: 20,
+                            mode: 'index'
+                        },
 
-                                font: {
-                                    size: 11
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+
+                                labels: {
+                                    usePointStyle: true,
+
+                                    boxWidth: 8,
+
+                                    padding: 20,
+
+                                    font: {
+                                        size: 11
+                                    }
+                                }
+                            },
+
+                            tooltip: {
+                                callbacks: {
+                                    title: function(
+                                        tooltipItems
+                                    ) {
+                                        return tooltipItems[
+                                            0
+                                        ].label;
+                                    },
+
+                                    label: function(
+                                        context
+                                    ) {
+                                        const amount =
+                                            context.parsed.y ||
+                                            0;
+
+                                        let label =
+                                            context.dataset.label +
+                                            ' : ' +
+                                            new Intl
+                                            .NumberFormat(
+                                                'fr-FR'
+                                            )
+                                            .format(
+                                                amount
+                                            ) +
+                                            ' BIF';
+
+                                        /*
+                                         * Afficher le nombre d'opérations
+                                         * uniquement pour les encaissements.
+                                         */
+                                        if (
+                                            context.datasetIndex ===
+                                            0
+                                        ) {
+                                            const operationCount =
+                                                operationCounts[
+                                                    context.dataIndex
+                                                ] || 0;
+
+                                            label +=
+                                                ' — ' +
+                                                operationCount +
+                                                ' opération';
+
+                                            if (
+                                                operationCount > 1
+                                            ) {
+                                                label += 's';
+                                            }
+                                        }
+
+                                        return label;
+                                    }
                                 }
                             }
                         },
 
-                        tooltip: {
-
-                            callbacks: {
-
-                                label: function(context) {
-
-                                    return context.dataset.label +
-                                        ' : ' +
-                                        new Intl.NumberFormat('fr-FR').format(
-                                            context.parsed.y
-                                        ) +
-                                        ' BIF';
-                                }
-                            }
-                        }
-                    },
-
-                    scales: {
-
-                        x: {
-
-                            grid: {
-                                display: false
-                            },
-
-                            ticks: {
-
-                                font: {
-                                    size: 10
-                                }
-                            }
-                        },
-
-                        y: {
-
-                            beginAtZero: true,
-
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.15)'
-                            },
-
-                            ticks: {
-
-                                font: {
-                                    size: 10
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
                                 },
 
-                                callback: function(value) {
-                                    return (value / 1000000) + ' M';
+                                ticks: {
+                                    maxRotation: 0,
+
+                                    autoSkip: true,
+
+                                    font: {
+                                        size: 10
+                                    }
+                                }
+                            },
+
+                            y: {
+                                beginAtZero: true,
+
+                                grid: {
+                                    color: 'rgba(148, 163, 184, 0.15)'
+                                },
+
+                                ticks: {
+                                    font: {
+                                        size: 10
+                                    },
+
+                                    callback: function(
+                                        value
+                                    ) {
+                                        if (
+                                            value >=
+                                            1000000000
+                                        ) {
+                                            return (
+                                                value /
+                                                1000000000
+                                            ) + ' Md';
+                                        }
+
+                                        if (
+                                            value >=
+                                            1000000
+                                        ) {
+                                            return (
+                                                value /
+                                                1000000
+                                            ) + ' M';
+                                        }
+
+                                        if (
+                                            value >= 1000
+                                        ) {
+                                            return (
+                                                value /
+                                                1000
+                                            ) + ' K';
+                                        }
+
+                                        return value;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            });
+            );
         }
-    });
+    );
+</script>
 
+<script>
     function toggleEncaissementSource() {
 
         const sourceType = document.getElementById('sourceType').value;
@@ -3148,3 +3605,42 @@
         }
     );
 </script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<?php if ($this->session->flashdata('success')): ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Caisse créée',
+                html: <?= json_encode(
+                            $this->session->flashdata('success')
+                        ) ?>,
+                confirmButtonText: 'D’accord',
+                confirmButtonColor: '#0f766e'
+            });
+        });
+    </script>
+
+<?php endif; ?>
+
+
+<?php if ($this->session->flashdata('error')): ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Enregistrement impossible',
+                html: <?= json_encode(
+                            $this->session->flashdata('error')
+                        ) ?>,
+                confirmButtonText: 'Corriger',
+                confirmButtonColor: '#dc2626'
+            });
+        });
+    </script>
+
+<?php endif; ?>

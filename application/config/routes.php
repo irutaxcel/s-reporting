@@ -173,6 +173,8 @@ $route['finance/caisse-store'] = 'FinanceController/caisseStore';
 $route['finance/cashbox-operation-store']
     = 'FinanceController/cashboxOperationStore';
 
+$route['cashbox-operation-store'] = 'FinanceController/cashboxOperationStore';
+
 $route['compte-banques'] = 'FinanceController/banques';
 $route['bank-account-store']
     = 'FinanceController/bankAccountStore';
@@ -182,3 +184,7 @@ $route['bank-operation-store']
 $route['encaissements'] = 'FinanceController/encaissements';
 
 $route['decaissements'] = 'FinanceController/decaissements';
+
+$route['rapprochement'] = 'FinanceController/rapprochement';
+
+$route['prevision'] = 'FinanceController/prevision';

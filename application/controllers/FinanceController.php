@@ -1163,7 +1163,7 @@ class FinanceController extends CI_Controller
                 $this->input->post(NULL, true)
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
@@ -1184,7 +1184,7 @@ class FinanceController extends CI_Controller
                     'Ce chantier possède déjà une caisse active.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
         }
@@ -1253,7 +1253,7 @@ class FinanceController extends CI_Controller
                     ?? 'Une erreur est survenue pendant la création de la caisse.'
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
@@ -1264,7 +1264,7 @@ class FinanceController extends CI_Controller
                 . ' a été créée avec succès.'
         );
 
-        redirect('caisse');
+        redirect($_SERVER['HTTP_REFERER']);
     }
 
     public function cashboxOperationStore()
@@ -1390,8 +1390,8 @@ class FinanceController extends CI_Controller
         );
 
         /*
-     * Arrêter si la validation échoue.
-     */
+        * Arrêter si la validation échoue.
+        */
         if ($this->form_validation->run() === FALSE) {
             $this->session->set_flashdata(
                 'error',
@@ -1399,23 +1399,23 @@ class FinanceController extends CI_Controller
             );
 
             /*
-         * Conserver les valeurs pour éventuellement
-         * rouvrir la modale avec les anciennes données.
-         */
+            * Conserver les valeurs pour éventuellement
+            * rouvrir la modale avec les anciennes données.
+            */
             $this->session->set_flashdata(
                 'operation_old_input',
                 $this->input->post(NULL, TRUE)
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
         /*
-     * =========================================================
-     * 2. RÉCUPÉRATION ET NORMALISATION DES DONNÉES
-     * =========================================================
-     */
+        * =========================================================
+        * 2. RÉCUPÉRATION ET NORMALISATION DES DONNÉES
+        * =========================================================
+        */
 
         $operationDate = trim(
             (string) $this->input->post(
@@ -1486,7 +1486,7 @@ class FinanceController extends CI_Controller
                 'La date de l’opération est invalide.'
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
@@ -1499,39 +1499,39 @@ class FinanceController extends CI_Controller
                 'Le montant doit être supérieur à zéro.'
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
         /*
-     * =========================================================
-     * 3. DÉTERMINER LA CAISSE SOURCE ET LA DESTINATION
-     * =========================================================
-     */
+        * =========================================================
+        * 3. DÉTERMINER LA CAISSE SOURCE ET LA DESTINATION
+        * =========================================================
+        */
 
         $sourceCashboxId = NULL;
         $destinationCashboxId = NULL;
 
         /*
-     * Encaissement :
-     * la caisse concernée reçoit l’argent.
-     */
+        * Encaissement :
+        * la caisse concernée reçoit l’argent.
+        */
         if ($operationType === 'encaissement') {
             $destinationCashboxId = $cashboxId;
         }
 
         /*
-     * Décaissement :
-     * la caisse concernée envoie ou dépense l’argent.
-     */ elseif ($operationType === 'decaissement') {
+        * Décaissement :
+        * la caisse concernée envoie ou dépense l’argent.
+        */ elseif ($operationType === 'decaissement') {
             $sourceCashboxId = $cashboxId;
         }
 
         /*
-     * Approvisionnement :
-     * la caisse concernée est la source ;
-     * la deuxième caisse est la destination.
-     */ elseif ($operationType === 'approvisionnement') {
+        * Approvisionnement :
+        * la caisse concernée est la source ;
+        * la deuxième caisse est la destination.
+        */ elseif ($operationType === 'approvisionnement') {
             $sourceCashboxId = $cashboxId;
 
             $destinationCashboxId = (int) $this->input->post(
@@ -1545,7 +1545,7 @@ class FinanceController extends CI_Controller
                     'La caisse destination est obligatoire.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
 
@@ -1555,7 +1555,7 @@ class FinanceController extends CI_Controller
                     'La caisse source et la caisse destination doivent être différentes.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
         }
@@ -1581,7 +1581,7 @@ class FinanceController extends CI_Controller
                     'La caisse source sélectionnée est introuvable.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
 
@@ -1591,7 +1591,7 @@ class FinanceController extends CI_Controller
                     'La caisse source sélectionnée n’est pas active.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
         }
@@ -1608,7 +1608,7 @@ class FinanceController extends CI_Controller
                     'La caisse destination sélectionnée est introuvable.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
 
@@ -1618,15 +1618,15 @@ class FinanceController extends CI_Controller
                     'La caisse destination sélectionnée n’est pas active.'
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
         }
 
         /*
-     * Pour un approvisionnement, les deux caisses doivent
-     * utiliser la même devise.
-     */
+        * Pour un approvisionnement, les deux caisses doivent
+        * utiliser la même devise.
+        */
         if (
             $operationType === 'approvisionnement'
             && $sourceCashbox
@@ -1638,14 +1638,14 @@ class FinanceController extends CI_Controller
                 'Le transfert est impossible entre deux caisses de devises différentes.'
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
         /*
-     * Vérification informative avant l’appel du modèle.
-     * Le modèle devra refaire la vérification dans la transaction.
-     */
+        * Vérification informative avant l’appel du modèle.
+        * Le modèle devra refaire la vérification dans la transaction.
+        */
         if (
             in_array(
                 $operationType,
@@ -1660,15 +1660,15 @@ class FinanceController extends CI_Controller
                 'Le solde disponible dans la caisse source est insuffisant.'
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
         /*
-     * =========================================================
-     * 5. UPLOAD DE LA PIÈCE JUSTIFICATIVE
-     * =========================================================
-     */
+        * =========================================================
+        * 5. UPLOAD DE LA PIÈCE JUSTIFICATIVE
+        * =========================================================
+        */
 
         $attachmentName = NULL;
 
@@ -1696,7 +1696,7 @@ class FinanceController extends CI_Controller
                         'Impossible de créer le dossier des pièces justificatives.'
                     );
 
-                    redirect('caisse');
+                    redirect($_SERVER['HTTP_REFERER']);
                     return;
                 }
             }
@@ -1726,7 +1726,7 @@ class FinanceController extends CI_Controller
                     )
                 );
 
-                redirect('caisse');
+                redirect($_SERVER['HTTP_REFERER']);
                 return;
             }
 
@@ -1736,10 +1736,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 6. GÉNÉRATION AUTOMATIQUE DU LIBELLÉ
-     * =========================================================
-     */
+        * =========================================================
+        * 6. GÉNÉRATION AUTOMATIQUE DU LIBELLÉ
+        * =========================================================
+        */
 
         $automaticLabel = '';
 
@@ -1805,16 +1805,16 @@ class FinanceController extends CI_Controller
                     . $destinationName;
 
                 /*
-             * Pour un transfert interne, la provenance peut
-             * être générée automatiquement.
-             */
+                * Pour un transfert interne, la provenance peut
+                * être générée automatiquement.
+                */
                 if ($thirdParty === '') {
                     $thirdParty = $sourceName;
                 }
 
                 /*
-             * Forcer la catégorie si elle n’a pas été envoyée.
-             */
+                * Forcer la catégorie si elle n’a pas été envoyée.
+                */
                 if ($category === '') {
                     $category = 'Approvisionnement';
                 }
@@ -1829,8 +1829,8 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * Sécurité pour la taille maximale de la colonne VARCHAR(255).
-     */
+        * Sécurité pour la taille maximale de la colonne VARCHAR(255).
+        */
         $automaticLabel = mb_substr(
             $automaticLabel,
             0,
@@ -1839,10 +1839,10 @@ class FinanceController extends CI_Controller
         );
 
         /*
-     * =========================================================
-     * 7. DÉTERMINER LA DEVISE
-     * =========================================================
-     */
+        * =========================================================
+        * 7. DÉTERMINER LA DEVISE
+        * =========================================================
+        */
 
         $currency = 'BIF';
 
@@ -1853,18 +1853,18 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 8. PRÉPARER LES DONNÉES POUR LE MODÈLE
-     * =========================================================
-     */
+        * =========================================================
+        * 8. PRÉPARER LES DONNÉES POUR LE MODÈLE
+        * =========================================================
+        */
 
         $currentUserId = $this->session->userdata('user_id')
             ?: NULL;
 
         $operationData = [
             /*
-         * La référence sera générée dans le modèle.
-         */
+            * La référence sera générée dans le modèle.
+            */
             'operation_type' => $operationType,
 
             'operation_date' => $operationDate,
@@ -1894,8 +1894,8 @@ class FinanceController extends CI_Controller
             'attachment' => $attachmentName,
 
             /*
-         * Le libellé est généré automatiquement.
-         */
+            * Le libellé est généré automatiquement.
+            */
             'label' => $automaticLabel,
 
             'observation' => $observation !== ''
@@ -1912,28 +1912,28 @@ class FinanceController extends CI_Controller
         ];
 
         /*
-     * =========================================================
-     * 9. APPEL DU MODÈLE
-     * =========================================================
-     */
+        * =========================================================
+        * 9. APPEL DU MODÈLE
+        * =========================================================
+        */
 
         $result = $this->finance->createCashboxOperation(
             $operationData
         );
 
         /*
-     * =========================================================
-     * 10. GESTION DE L’ÉCHEC
-     * =========================================================
-     */
+        * =========================================================
+        * 10. GESTION DE L’ÉCHEC
+        * =========================================================
+        */
 
         if (
             !is_array($result)
             || empty($result['status'])
         ) {
             /*
-         * Supprimer le fichier si la base n’a pas été mise à jour.
-         */
+            * Supprimer le fichier si la base n’a pas été mise à jour.
+            */
             if ($attachmentName) {
                 $filePath = FCPATH
                     . 'uploads/finance/cashbox_operations/'
@@ -1955,15 +1955,15 @@ class FinanceController extends CI_Controller
                 $errorMessage
             );
 
-            redirect('caisse');
+            redirect($_SERVER['HTTP_REFERER']);
             return;
         }
 
         /*
-     * =========================================================
-     * 11. MESSAGE DE SUCCÈS
-     * =========================================================
-     */
+        * =========================================================
+        * 11. MESSAGE DE SUCCÈS
+        * =========================================================
+        */
 
         $operationLabels = [
             'encaissement' => 'L’encaissement',
@@ -1991,35 +1991,164 @@ class FinanceController extends CI_Controller
             )
         );
 
-        redirect('caisse');
+        redirect($_SERVER['HTTP_REFERER']);
     }
+
+    // public function banques()
+    // {
+    //     if (!$this->session->userdata('user_id')) {
+    //         redirect('sign-in');
+    //         return;
+    //     }
+
+    //     $data['title'] = 'Comptes bancaires';
+
+    //     // $data['allChantiers'] = $this->tech->getAllChantier();
+
+    //     // $data['encaissementsData'] = $this->tech->getEncaissementsData();
+
+    //     $data['nextBankAccountCode'] =
+    //         $this->finance->getNextBankAccountCode();
+
+    //     $data['allBankAccounts'] =
+    //         $this->finance->getAllActiveBankAccounts();
+
+    //     $data['nextBankOperationReference'] =
+    //         $this->finance->getNextBankOperationReference();
+
+    //     $this->load->view('v1/components/layout/header', $data);
+    //     $this->load->view('v1/components/layout/sidebar', $data);
+    //     $this->load->view('v1/components/modules/finance/banques', $data);
+    //     $this->load->view('v1/components/layout/footer', $data);
+    // }
 
     public function banques()
     {
+
         if (!$this->session->userdata('user_id')) {
             redirect('sign-in');
             return;
         }
 
-        $data['title'] = 'Comptes bancaires';
+        $data = [];
 
-        // $data['allChantiers'] = $this->tech->getAllChantier();
+        $data['title'] =
+            'Comptes bancaires';
 
-        // $data['encaissementsData'] = $this->tech->getEncaissementsData();
+        /*
+     * Statistiques principales.
+     */
+        $data['bankMainStatistics'] =
+            $this->finance
+            ->getBankMainStatistics();
 
-        $data['nextBankAccountCode'] =
-            $this->finance->getNextBankAccountCode();
-
+        /*
+     * Comptes bancaires.
+     */
         $data['allBankAccounts'] =
-            $this->finance->getAllActiveBankAccounts();
+            $this->finance
+            ->getAllActiveBankAccounts();
+
+        /*
+     * Situation des comptes.
+     */
+        $data['bankAccountSituations'] =
+            $this->finance
+            ->getBankAccountSituations();
+
+        $data['activeBankAccountsCount'] =
+            $this->finance
+            ->countActiveBankAccounts();
+
+        /*
+     * Mouvements bancaires récents.
+     */
+        $data['recentBankOperations'] =
+            $this->finance
+            ->getRecentBankOperations(10);
+
+        $data['bankOperationsCount'] =
+            $this->finance
+            ->countBankOperations();
+
+        /*
+     * Évolution des flux.
+     */
+        $bankFlowPeriod = trim(
+            (string) $this->input->get(
+                'bankflow_period',
+                true
+            )
+        );
+
+        $allowedPeriods = [
+            '7days',
+            '30days',
+            'month',
+            'year',
+        ];
+
+        if (
+            !in_array(
+                $bankFlowPeriod,
+                $allowedPeriods,
+                true
+            )
+        ) {
+            $bankFlowPeriod = '7days';
+        }
+
+        $data['bankFlowPeriod'] =
+            $bankFlowPeriod;
+
+        $data['bankFlowEvolution'] =
+            $this->finance
+            ->getBankFlowEvolution(
+                $bankFlowPeriod
+            );
+
+        $data['bankBalanceDistribution'] =
+            $this->finance
+            ->getBankBalanceDistribution();
+
+        /*
+     * Références automatiques.
+     */
+        $data['nextBankAccountCode'] =
+            $this->finance
+            ->getNextBankAccountCode();
 
         $data['nextBankOperationReference'] =
-            $this->finance->getNextBankOperationReference();
+            $this->finance
+            ->getNextBankOperationReference();
 
-        $this->load->view('v1/components/layout/header', $data);
-        $this->load->view('v1/components/layout/sidebar', $data);
-        $this->load->view('v1/components/modules/finance/banques', $data);
-        $this->load->view('v1/components/layout/footer', $data);
+        $data['bankAlerts'] =
+            $this->finance
+            ->getBankAlerts(6);
+
+        $data['bankAlertsCount'] =
+            count(
+                $data['bankAlerts']
+            );
+
+        $this->load->view(
+            'v1/components/layout/header',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/sidebar',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/modules/finance/banques',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer'
+        );
     }
 
     /**
@@ -2028,10 +2157,10 @@ class FinanceController extends CI_Controller
     public function bankAccountStore()
     {
         /*
-     * =========================================================
-     * 1. AUTORISER UNIQUEMENT LES REQUÊTES POST
-     * =========================================================
-     */
+        * =========================================================
+        * 1. AUTORISER UNIQUEMENT LES REQUÊTES POST
+        * =========================================================
+        */
 
         if ($this->input->method(TRUE) !== 'POST') {
             show_404();
@@ -2039,15 +2168,15 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * Charger la bibliothèque de validation.
-     */
+        * Charger la bibliothèque de validation.
+        */
         $this->load->library('form_validation');
 
         /*
-     * =========================================================
-     * 2. RÈGLES DE VALIDATION
-     * =========================================================
-     */
+        * =========================================================
+        * 2. RÈGLES DE VALIDATION
+        * =========================================================
+        */
 
         $this->form_validation->set_rules(
             'name',
@@ -2696,10 +2825,10 @@ class FinanceController extends CI_Controller
     public function bankOperationStore()
     {
         /*
-     * =========================================================
-     * 1. AUTORISER UNIQUEMENT POST
-     * =========================================================
-     */
+        * =========================================================
+        * 1. AUTORISER UNIQUEMENT POST
+        * =========================================================
+        */
 
         if ($this->input->method(TRUE) !== 'POST') {
             show_404();
@@ -2709,10 +2838,10 @@ class FinanceController extends CI_Controller
         $this->load->library('form_validation');
 
         /*
-     * =========================================================
-     * 2. RÈGLES DE VALIDATION
-     * =========================================================
-     */
+        * =========================================================
+        * 2. RÈGLES DE VALIDATION
+        * =========================================================
+        */
 
         $this->form_validation->set_rules(
             'operation_type',
@@ -2769,9 +2898,9 @@ class FinanceController extends CI_Controller
         );
 
         /*
-     * Le compte destination est obligatoire
-     * uniquement pour un transfert.
-     */
+        * Le compte destination est obligatoire
+        * uniquement pour un transfert.
+        */
         $operationType = trim(
             (string) $this->input->post(
                 'operation_type',
@@ -2788,10 +2917,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 3. MESSAGES DE VALIDATION
-     * =========================================================
-     */
+        * =========================================================
+        * 3. MESSAGES DE VALIDATION
+        * =========================================================
+        */
 
         $this->form_validation->set_message(
             'required',
@@ -2824,10 +2953,10 @@ class FinanceController extends CI_Controller
         );
 
         /*
-     * =========================================================
-     * 4. ARRÊTER EN CAS D’ERREUR
-     * =========================================================
-     */
+        * =========================================================
+        * 4. ARRÊTER EN CAS D’ERREUR
+        * =========================================================
+        */
 
         if ($this->form_validation->run() === FALSE) {
             $this->session->set_flashdata(
@@ -2850,10 +2979,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 5. RÉCUPÉRATION DES DONNÉES
-     * =========================================================
-     */
+        * =========================================================
+        * 5. RÉCUPÉRATION DES DONNÉES
+        * =========================================================
+        */
 
         $operationDate = trim(
             (string) $this->input->post(
@@ -2914,36 +3043,36 @@ class FinanceController extends CI_Controller
         );
 
         /*
-     * =========================================================
-     * 6. DÉTERMINER SOURCE ET DESTINATION
-     * =========================================================
-     */
+        * =========================================================
+        * 6. DÉTERMINER SOURCE ET DESTINATION
+        * =========================================================
+        */
 
         $sourceBankAccountId = NULL;
         $finalDestinationBankAccountId = NULL;
 
         /*
-     * Encaissement :
-     * le compte sélectionné reçoit l’argent.
-     */
+        * Encaissement :
+        * le compte sélectionné reçoit l’argent.
+        */
         if ($operationType === 'encaissement') {
             $finalDestinationBankAccountId =
                 $bankAccountId;
         }
 
         /*
-     * Décaissement :
-     * le compte sélectionné fournit l’argent.
-     */ elseif ($operationType === 'decaissement') {
+        * Décaissement :
+        * le compte sélectionné fournit l’argent.
+        */ elseif ($operationType === 'decaissement') {
             $sourceBankAccountId =
                 $bankAccountId;
         }
 
         /*
-     * Transfert :
-     * le compte sélectionné est la source,
-     * et destination_bank_account_id est la destination.
-     */ elseif ($operationType === 'transfert') {
+        * Transfert :
+        * le compte sélectionné est la source,
+        * et destination_bank_account_id est la destination.
+        */ elseif ($operationType === 'transfert') {
             $sourceBankAccountId =
                 $bankAccountId;
 
@@ -2970,10 +3099,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 7. VÉRIFIER LE COMPTE PRINCIPAL
-     * =========================================================
-     */
+        * =========================================================
+        * 7. VÉRIFIER LE COMPTE PRINCIPAL
+        * =========================================================
+        */
 
         $referenceAccountId =
             $sourceBankAccountId
@@ -3015,10 +3144,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 8. VÉRIFIER LE COMPTE DESTINATION DU TRANSFERT
-     * =========================================================
-     */
+        * =========================================================
+        * 8. VÉRIFIER LE COMPTE DESTINATION DU TRANSFERT
+        * =========================================================
+        */
 
         if ($operationType === 'transfert') {
             $destinationAccount = $this->db
@@ -3060,9 +3189,9 @@ class FinanceController extends CI_Controller
             }
 
             /*
-         * Sans gestion de taux de change,
-         * un transfert doit utiliser la même devise.
-         */
+            * Sans gestion de taux de change,
+            * un transfert doit utiliser la même devise.
+            */
             if (
                 $referenceAccount->currency
                 !== $destinationAccount->currency
@@ -3083,10 +3212,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 9. VÉRIFIER LE SOLDE DISPONIBLE
-     * =========================================================
-     */
+        * =========================================================
+        * 9. VÉRIFIER LE SOLDE DISPONIBLE
+        * =========================================================
+        */
 
         if (
             in_array(
@@ -3124,10 +3253,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 10. UPLOAD FACULTATIF
-     * =========================================================
-     */
+        * =========================================================
+        * 10. UPLOAD FACULTATIF
+        * =========================================================
+        */
 
         $attachmentName = NULL;
 
@@ -3199,10 +3328,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 11. IDENTIFIANT UTILISATEUR
-     * =========================================================
-     */
+        * =========================================================
+        * 11. IDENTIFIANT UTILISATEUR
+        * =========================================================
+        */
 
         $currentUserId =
             $this->session->userdata(
@@ -3217,10 +3346,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 12. PRÉPARER LES DONNÉES
-     * =========================================================
-     */
+        * =========================================================
+        * 12. PRÉPARER LES DONNÉES
+        * =========================================================
+        */
 
         $operationData = [
             /*
@@ -3282,10 +3411,10 @@ class FinanceController extends CI_Controller
         ];
 
         /*
-     * =========================================================
-     * 13. ENREGISTRER VIA LE MODÈLE
-     * =========================================================
-     */
+        * =========================================================
+        * 13. ENREGISTRER VIA LE MODÈLE
+        * =========================================================
+        */
 
         $result =
             $this->finance
@@ -3320,10 +3449,10 @@ class FinanceController extends CI_Controller
         }
 
         /*
-     * =========================================================
-     * 14. MESSAGE DE SUCCÈS
-     * =========================================================
-     */
+        * =========================================================
+        * 14. MESSAGE DE SUCCÈS
+        * =========================================================
+        */
 
         $operationLabels = [
             'encaissement' =>
@@ -3347,25 +3476,395 @@ class FinanceController extends CI_Controller
         redirect('compte-banques');
     }
 
+    /**
+     * Affiche la page de gestion des encaissements.
+     *
+     * Cette méthode prépare :
+     * - les caisses actives ;
+     * - les statistiques principales ;
+     * - l'évolution mensuelle des encaissements ;
+     * - la répartition des encaissements par source ;
+     * - l'historique paginé ;
+     * - les encaissements attendus ;
+     * - la synthèse de recouvrement par client.
+     *
+     * @return void
+     */
     public function encaissements()
     {
+        /*
+        * =========================================================
+        * 1. SÉCURITÉ DE LA PAGE
+        * =========================================================
+        *
+        * Active cette partie si toutes les pages privées
+        * exigent un utilisateur connecté.
+        */
+
         if (!$this->session->userdata('user_id')) {
             redirect('sign-in');
             return;
         }
 
+        /*
+        * =========================================================
+        * 2. INITIALISATION DES DONNÉES
+        * =========================================================
+        */
+
+        $data = [];
+
         $data['title'] = 'Encaissements';
 
-        $data['allChantiers'] = $this->tech->getAllChantier();
+        /*
+        * Valeurs par défaut.
+        *
+        * Elles empêchent les erreurs "Undefined variable"
+        * dans la vue si une requête ne retourne aucun résultat.
+        */
+        $data['allCashboxes'] = [];
+        $data['encaissementStatistics'] = [];
+        $data['encaissementEvolution'] = [
+            'start_date'       => date('Y-m-01'),
+            'end_date'         => date('Y-m-t'),
+            'labels'           => [],
+            'amounts'          => [],
+            'objectives'       => [],
+            'operation_counts' => [],
+            'total_amount'     => 0,
+            'total_operations' => 0,
+            'average_amount'   => 0,
+        ];
 
-        // $data['encaissementsData'] = $this->tech->getEncaissementsData();
+        $data['encaissementSources'] = [
+            'total_amount' => 0,
+            'sources'      => [],
+        ];
 
-        $this->load->view('v1/components/layout/header', $data);
-        $this->load->view('v1/components/layout/sidebar', $data);
-        $this->load->view('v1/components/modules/finance/encaissements', $data);
-        $this->load->view('v1/components/layout/footer', $data);
+        $data['encaissementHistory'] = [];
+
+        $data['encaissementPagination'] = [
+            'current_page' => 1,
+            'per_page'     => 10,
+            'total_rows'   => 0,
+            'total_pages'  => 1,
+            'offset'       => 0,
+        ];
+
+        $data['upcomingExpectedReceipts'] = [];
+        $data['openExpectedReceiptsCount'] = 0;
+        $data['encaissementClientSummary'] = [];
+
+        /*
+     * =========================================================
+     * 3. RÉCUPÉRER LES CAISSES ACTIVES
+     * =========================================================
+     *
+     * Ces caisses alimentent la liste déroulante de la modale
+     * "Enregistrer un encaissement".
+     */
+
+        $data['allCashboxes'] =
+            $this->finance
+            ->getAllActiveCashboxes();
+
+        /*
+     * =========================================================
+     * 4. STATISTIQUES PRINCIPALES
+     * =========================================================
+     *
+     * Cette méthode doit retourner notamment :
+     *
+     * - current_month_amount
+     * - current_month_count
+     * - monthly_variation
+     * - today_amount
+     * - today_count
+     * - pending_amount
+     * - pending_count
+     * - receivable_amount
+     * - receivable_clients_count
+     */
+
+        $data['encaissementStatistics'] =
+            $this->finance
+            ->getEncaissementMainStatistics();
+
+        /*
+     * =========================================================
+     * 5. PÉRIODE DU GRAPHIQUE
+     * =========================================================
+     *
+     * Paramètre attendu dans l'URL :
+     *
+     * encaissements?encaissement_period=6months
+     */
+
+        $allowedPeriods = [
+            '6months',
+            '12months',
+            'current_year',
+            'previous_year',
+        ];
+
+        $encaissementPeriod = trim(
+            (string) $this->input->get(
+                'encaissement_period',
+                true
+            )
+        );
+
+        /*
+     * Lorsque la valeur est absente ou incorrecte,
+     * nous utilisons les six derniers mois.
+     */
+        if (
+            !in_array(
+                $encaissementPeriod,
+                $allowedPeriods,
+                true
+            )
+        ) {
+            $encaissementPeriod = '6months';
+        }
+
+        $data['encaissementPeriod'] =
+            $encaissementPeriod;
+
+        /*
+     * =========================================================
+     * 6. ÉVOLUTION DES ENCAISSEMENTS
+     * =========================================================
+     */
+
+        $encaissementEvolution =
+            $this->finance
+            ->getEncaissementEvolution(
+                $encaissementPeriod
+            );
+
+        /*
+     * Vérification supplémentaire pour éviter les erreurs
+     * si la méthode du modèle ne retourne pas un tableau.
+     */
+        if (is_array($encaissementEvolution)) {
+            $data['encaissementEvolution'] =
+                array_merge(
+                    $data['encaissementEvolution'],
+                    $encaissementEvolution
+                );
+        }
+
+        /*
+     * =========================================================
+     * 7. SOURCES DES ENCAISSEMENTS
+     * =========================================================
+     *
+     * La période utilisée est la même que celle du graphique.
+     */
+
+        $evolutionStartDate =
+            $data['encaissementEvolution']['start_date']
+            ?? date('Y-m-01');
+
+        $evolutionEndDate =
+            $data['encaissementEvolution']['end_date']
+            ?? date('Y-m-t');
+
+        $encaissementSources =
+            $this->finance
+            ->getEncaissementSources(
+                $evolutionStartDate,
+                $evolutionEndDate
+            );
+
+        if (is_array($encaissementSources)) {
+            $data['encaissementSources'] =
+                array_merge(
+                    $data['encaissementSources'],
+                    $encaissementSources
+                );
+        }
+
+        /*
+     * =========================================================
+     * 8. PAGINATION DE L'HISTORIQUE
+     * =========================================================
+     */
+
+        $encaissementsPerPage = 10;
+
+        /*
+     * Le numéro de page est récupéré dans l'URL :
+     *
+     * encaissements?page=2
+     */
+        $encaissementPage = (int) $this->input->get(
+            'page',
+            true
+        );
+
+        if ($encaissementPage < 1) {
+            $encaissementPage = 1;
+        }
+
+        /*
+     * Nombre total d'encaissements dans la base.
+     */
+        $totalEncaissements =
+            (int) $this->finance
+                ->countEncaissements();
+
+        /*
+     * Calcul du nombre total de pages.
+     */
+        $totalEncaissementPages =
+            $totalEncaissements > 0
+            ? (int) ceil(
+                $totalEncaissements
+                    / $encaissementsPerPage
+            )
+            : 1;
+
+        /*
+     * Empêcher une page supérieure au nombre de pages existantes.
+     */
+        if (
+            $encaissementPage
+            > $totalEncaissementPages
+        ) {
+            $encaissementPage =
+                $totalEncaissementPages;
+        }
+
+        /*
+     * Calcul de l'offset SQL.
+     *
+     * Page 1 : offset 0
+     * Page 2 : offset 10
+     * Page 3 : offset 20
+     */
+        $encaissementOffset =
+            ($encaissementPage - 1)
+            * $encaissementsPerPage;
+
+        /*
+     * Récupération de l'historique paginé.
+     */
+        $encaissementHistory =
+            $this->finance
+            ->getEncaissementHistory(
+                $encaissementsPerPage,
+                $encaissementOffset
+            );
+
+        $data['encaissementHistory'] =
+            is_array($encaissementHistory)
+            ? $encaissementHistory
+            : [];
+
+        /*
+     * Informations utilisées dans le pied du tableau.
+     */
+        $data['encaissementPagination'] = [
+            'current_page' =>
+            $encaissementPage,
+
+            'per_page' =>
+            $encaissementsPerPage,
+
+            'total_rows' =>
+            $totalEncaissements,
+
+            'total_pages' =>
+            $totalEncaissementPages,
+
+            'offset' =>
+            $encaissementOffset,
+        ];
+
+        /*
+     * =========================================================
+     * 9. ENCAISSEMENTS ATTENDUS
+     * =========================================================
+     *
+     * La partie gauche du dernier bloc affiche les quatre
+     * prochaines échéances ouvertes.
+     */
+
+        $upcomingExpectedReceipts =
+            $this->finance
+            ->getUpcomingExpectedReceipts(4);
+
+        $data['upcomingExpectedReceipts'] =
+            is_array($upcomingExpectedReceipts)
+            ? $upcomingExpectedReceipts
+            : [];
+
+        /*
+     * Nombre total d'échéances ouvertes.
+     *
+     * Le badge peut afficher un nombre supérieur à quatre,
+     * même si la liste ne présente que quatre éléments.
+     */
+        $data['openExpectedReceiptsCount'] =
+            (int) $this->finance
+                ->countOpenExpectedReceipts();
+
+        /*
+     * =========================================================
+     * 10. SYNTHÈSE PAR CLIENT
+     * =========================================================
+     *
+     * La partie droite du dernier bloc présente :
+     *
+     * - total facturé ;
+     * - total encaissé ;
+     * - reste à recouvrer ;
+     * - pourcentage de recouvrement.
+     */
+
+        $encaissementClientSummary =
+            $this->finance
+            ->getEncaissementClientSummary(10);
+
+        $data['encaissementClientSummary'] =
+            is_array($encaissementClientSummary)
+            ? $encaissementClientSummary
+            : [];
+
+        /*
+     * =========================================================
+     * 11. CHARGEMENT DES VUES
+     * =========================================================
+     */
+
+        $this->load->view(
+            'v1/components/layout/header',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/sidebar',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/modules/finance/encaissements',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer',
+            $data
+        );
     }
 
+    /**
+     * Affiche la page des décaissements.
+     *
+     * @return void
+     */
     public function decaissements()
     {
         if (!$this->session->userdata('user_id')) {
@@ -3373,15 +3872,287 @@ class FinanceController extends CI_Controller
             return;
         }
 
-        $data['title'] = 'Décaissements';
+        $data = [];
 
-        $data['allChantiers'] = $this->tech->getAllChantier();
+        $data['title'] =
+            'Décaissements';
 
-        // $data['decaissementsData'] = $this->tech->getDecaissementsData();
+        /*
+     * Caisses pour la modale.
+     */
+        $data['allCashboxes'] =
+            $this->finance
+            ->getAllActiveCashboxes();
 
-        $this->load->view('v1/components/layout/header', $data);
-        $this->load->view('v1/components/layout/sidebar', $data);
-        $this->load->view('v1/components/modules/finance/decaissements', $data);
-        $this->load->view('v1/components/layout/footer', $data);
+        /*
+     * Statistiques principales.
+     */
+        $data['decaissementStatistics'] =
+            $this->finance
+            ->getDecaissementMainStatistics();
+
+        /*
+     * Période du graphique.
+     */
+        $allowedDecaissementPeriods = [
+            '6months',
+            '12months',
+            'current_year',
+            'previous_year',
+        ];
+
+        $decaissementPeriod = trim(
+            (string) $this->input->get(
+                'decaissement_period',
+                true
+            )
+        );
+
+        if (
+            !in_array(
+                $decaissementPeriod,
+                $allowedDecaissementPeriods,
+                true
+            )
+        ) {
+            $decaissementPeriod = '6months';
+        }
+
+        $data['decaissementPeriod'] =
+            $decaissementPeriod;
+
+        /*
+     * Données dynamiques du graphique.
+     */
+        $data['decaissementEvolution'] =
+            $this->finance
+            ->getDecaissementEvolution(
+                $decaissementPeriod
+            );
+
+        /*
+ * =========================================================
+ * HISTORIQUE DES DÉCAISSEMENTS
+ * =========================================================
+ */
+
+        $decaissementsPerPage = 10;
+
+        $currentDecaissementPage = (int) $this->input->get(
+            'page',
+            true
+        );
+
+        if ($currentDecaissementPage < 1) {
+            $currentDecaissementPage = 1;
+        }
+
+        /*
+ * Nombre total de décaissements.
+ */
+        $totalDecaissements =
+            $this->finance
+            ->countDecaissementHistory();
+
+        /*
+ * Nombre total de pages.
+ */
+        $totalDecaissementPages =
+            $totalDecaissements > 0
+            ? (int) ceil(
+                $totalDecaissements
+                    / $decaissementsPerPage
+            )
+            : 1;
+
+        /*
+ * Empêcher une page supérieure au nombre disponible.
+ */
+        if (
+            $currentDecaissementPage
+            > $totalDecaissementPages
+        ) {
+            $currentDecaissementPage =
+                $totalDecaissementPages;
+        }
+
+        /*
+ * Offset SQL.
+ */
+        $decaissementOffset =
+            (
+                $currentDecaissementPage - 1
+            )
+            * $decaissementsPerPage;
+
+        /*
+ * Données du tableau.
+ */
+        $data['decaissementHistory'] =
+            $this->finance
+            ->getDecaissementHistory(
+                $decaissementsPerPage,
+                $decaissementOffset
+            );
+
+        /*
+ * Informations de pagination.
+ */
+        $data['decaissementPagination'] = [
+            'current_page' =>
+            $currentDecaissementPage,
+
+            'per_page' =>
+            $decaissementsPerPage,
+
+            'total_rows' =>
+            $totalDecaissements,
+
+            'total_pages' =>
+            $totalDecaissementPages,
+
+            'offset' =>
+            $decaissementOffset,
+        ];
+
+        /*
+ * =========================================================
+ * SYNTHÈSE DES DÉCAISSEMENTS PAR CHANTIER
+ * =========================================================
+ */
+
+        /*
+ * Par défaut, la synthèse porte sur le mois en cours.
+ */
+        $chantierSummaryStartDate =
+            date('Y-m-01');
+
+        $chantierSummaryEndDate =
+            date('Y-m-t');
+
+        /*
+ * Dates éventuellement envoyées par les filtres.
+ */
+        $requestedStartDate = trim(
+            (string) $this->input->get(
+                'chantier_start_date',
+                true
+            )
+        );
+
+        $requestedEndDate = trim(
+            (string) $this->input->get(
+                'chantier_end_date',
+                true
+            )
+        );
+
+        /*
+ * Vérifier le format YYYY-MM-DD.
+ */
+        if (
+            !empty($requestedStartDate)
+            && preg_match(
+                '/^\d{4}-\d{2}-\d{2}$/',
+                $requestedStartDate
+            )
+        ) {
+            $chantierSummaryStartDate =
+                $requestedStartDate;
+        }
+
+        if (
+            !empty($requestedEndDate)
+            && preg_match(
+                '/^\d{4}-\d{2}-\d{2}$/',
+                $requestedEndDate
+            )
+        ) {
+            $chantierSummaryEndDate =
+                $requestedEndDate;
+        }
+
+        /*
+ * Éviter une période inversée.
+ */
+        if (
+            strtotime($chantierSummaryStartDate)
+            > strtotime($chantierSummaryEndDate)
+        ) {
+            $temporaryDate =
+                $chantierSummaryStartDate;
+
+            $chantierSummaryStartDate =
+                $chantierSummaryEndDate;
+
+            $chantierSummaryEndDate =
+                $temporaryDate;
+        }
+
+        $data['chantierSummaryStartDate'] =
+            $chantierSummaryStartDate;
+
+        $data['chantierSummaryEndDate'] =
+            $chantierSummaryEndDate;
+
+        $data['decaissementChantierSummary'] =
+            $this->finance
+            ->getDecaissementChantierSummary(
+                $chantierSummaryStartDate,
+                $chantierSummaryEndDate
+            );
+
+        /*
+     * Chargement des vues.
+     */
+        $this->load->view(
+            'v1/components/layout/header',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/sidebar',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/modules/finance/decaissements',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer',
+            $data
+        );
+    }
+
+    public function rapprochement()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Rapprochement bancaire';
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/rapprochement');
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function prevision()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Prévisions de trésorerie';
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/prevision');
+        $this->load->view('v1/components/layout/footer');
     }
 }
