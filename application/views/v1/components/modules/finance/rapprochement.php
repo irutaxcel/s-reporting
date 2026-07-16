@@ -28,921 +28,921 @@
      STYLES : RAPPROCHEMENT BANCAIRE
 ========================================================== -->
             <style>
-                :root {
-                    --reco-primary: #0f766e;
-                    --reco-primary-dark: #0b4f4a;
-                    --reco-secondary: #164e63;
-                    --reco-dark: #0f172a;
-                    --reco-muted: #64748b;
-                    --reco-border: #dbe5ec;
-                    --reco-bg: #f5f8fa;
-                    --reco-white: #ffffff;
-                    --reco-success: #16a34a;
-                    --reco-warning: #d97706;
-                    --reco-danger: #dc2626;
-                    --reco-info: #0284c7;
-                    --reco-purple: #7c3aed;
-                }
+            :root {
+                --reco-primary: #0f766e;
+                --reco-primary-dark: #0b4f4a;
+                --reco-secondary: #164e63;
+                --reco-dark: #0f172a;
+                --reco-muted: #64748b;
+                --reco-border: #dbe5ec;
+                --reco-bg: #f5f8fa;
+                --reco-white: #ffffff;
+                --reco-success: #16a34a;
+                --reco-warning: #d97706;
+                --reco-danger: #dc2626;
+                --reco-info: #0284c7;
+                --reco-purple: #7c3aed;
+            }
 
-                .reco-page {
-                    padding-bottom: 35px;
-                }
+            .reco-page {
+                padding-bottom: 35px;
+            }
 
-                /* =====================================================
+            /* =====================================================
        BANNIÈRE
     ====================================================== */
 
-                .reco-hero {
-                    position: relative;
-                    overflow: hidden;
-                    margin-bottom: 22px;
-                    padding: 26px 28px;
-                    color: #fff;
-                    border-radius: 16px;
-                    background:
-                        linear-gradient(120deg,
-                            #0f766e 0%,
-                            #155e75 52%,
-                            #0f172a 100%);
-                    box-shadow: 0 10px 30px rgba(15, 118, 110, 0.14);
-                }
+            .reco-hero {
+                position: relative;
+                overflow: hidden;
+                margin-bottom: 22px;
+                padding: 26px 28px;
+                color: #fff;
+                border-radius: 16px;
+                background:
+                    linear-gradient(120deg,
+                        #0f766e 0%,
+                        #155e75 52%,
+                        #0f172a 100%);
+                box-shadow: 0 10px 30px rgba(15, 118, 110, 0.14);
+            }
 
-                .reco-hero::before,
-                .reco-hero::after {
-                    position: absolute;
-                    content: "";
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.06);
-                }
+            .reco-hero::before,
+            .reco-hero::after {
+                position: absolute;
+                content: "";
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.06);
+            }
 
-                .reco-hero::before {
-                    width: 230px;
-                    height: 230px;
-                    right: 70px;
-                    bottom: -145px;
-                }
+            .reco-hero::before {
+                width: 230px;
+                height: 230px;
+                right: 70px;
+                bottom: -145px;
+            }
 
-                .reco-hero::after {
-                    width: 180px;
-                    height: 180px;
-                    right: -55px;
-                    top: -80px;
-                }
+            .reco-hero::after {
+                width: 180px;
+                height: 180px;
+                right: -55px;
+                top: -80px;
+            }
 
-                .reco-hero-content {
-                    position: relative;
-                    z-index: 2;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 20px;
-                }
+            .reco-hero-content {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+            }
 
-                .reco-hero-left {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 16px;
-                }
+            .reco-hero-left {
+                display: flex;
+                align-items: flex-start;
+                gap: 16px;
+            }
 
-                .reco-hero-icon {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 0 0 52px;
-                    width: 52px;
-                    height: 52px;
-                    font-size: 22px;
-                    border-radius: 14px;
-                    background: rgba(255, 255, 255, 0.14);
-                    border: 1px solid rgba(255, 255, 255, 0.12);
-                }
+            .reco-hero-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 52px;
+                width: 52px;
+                height: 52px;
+                font-size: 22px;
+                border-radius: 14px;
+                background: rgba(255, 255, 255, 0.14);
+                border: 1px solid rgba(255, 255, 255, 0.12);
+            }
 
-                .reco-hero h2 {
-                    margin: 0 0 6px;
-                    font-size: 25px;
-                    font-weight: 800;
-                    color: #fff;
-                }
+            .reco-hero h2 {
+                margin: 0 0 6px;
+                font-size: 25px;
+                font-weight: 800;
+                color: #fff;
+            }
 
-                .reco-hero p {
-                    max-width: 780px;
-                    margin: 0;
-                    line-height: 1.65;
-                    font-size: 13px;
-                    color: rgba(255, 255, 255, 0.88);
-                }
+            .reco-hero p {
+                max-width: 780px;
+                margin: 0;
+                line-height: 1.65;
+                font-size: 13px;
+                color: rgba(255, 255, 255, 0.88);
+            }
 
-                .reco-date-box {
-                    position: relative;
-                    z-index: 2;
-                    min-width: 165px;
-                    padding: 12px 16px;
-                    text-align: center;
-                    border-radius: 12px;
-                    background: rgba(255, 255, 255, 0.10);
-                    border: 1px solid rgba(255, 255, 255, 0.20);
-                    backdrop-filter: blur(8px);
-                }
+            .reco-date-box {
+                position: relative;
+                z-index: 2;
+                min-width: 165px;
+                padding: 12px 16px;
+                text-align: center;
+                border-radius: 12px;
+                background: rgba(255, 255, 255, 0.10);
+                border: 1px solid rgba(255, 255, 255, 0.20);
+                backdrop-filter: blur(8px);
+            }
 
-                .reco-date-box span {
-                    display: block;
-                    margin-bottom: 4px;
-                    font-size: 11px;
-                    color: rgba(255, 255, 255, 0.78);
-                }
+            .reco-date-box span {
+                display: block;
+                margin-bottom: 4px;
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.78);
+            }
 
-                .reco-date-box strong {
-                    font-size: 14px;
-                    color: #fff;
-                }
+            .reco-date-box strong {
+                font-size: 14px;
+                color: #fff;
+            }
 
-                /* =====================================================
+            /* =====================================================
        CARTES STATISTIQUES
     ====================================================== */
 
-                .reco-stat-card {
-                    position: relative;
-                    overflow: hidden;
-                    min-height: 165px;
-                    margin-bottom: 20px;
-                    padding: 20px;
-                    border: 1px solid var(--reco-border);
-                    border-radius: 14px;
-                    background: #fff;
-                    box-shadow: 0 7px 22px rgba(15, 23, 42, 0.045);
-                }
+            .reco-stat-card {
+                position: relative;
+                overflow: hidden;
+                min-height: 165px;
+                margin-bottom: 20px;
+                padding: 20px;
+                border: 1px solid var(--reco-border);
+                border-radius: 14px;
+                background: #fff;
+                box-shadow: 0 7px 22px rgba(15, 23, 42, 0.045);
+            }
 
-                .reco-stat-card::after {
-                    position: absolute;
-                    width: 100px;
-                    height: 100px;
-                    content: "";
-                    right: -25px;
-                    bottom: -40px;
-                    border-radius: 50%;
-                    background: #f1f6f8;
-                }
+            .reco-stat-card::after {
+                position: absolute;
+                width: 100px;
+                height: 100px;
+                content: "";
+                right: -25px;
+                bottom: -40px;
+                border-radius: 50%;
+                background: #f1f6f8;
+            }
 
-                .reco-stat-top {
-                    position: relative;
-                    z-index: 2;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    margin-bottom: 20px;
-                }
+            .reco-stat-top {
+                position: relative;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
 
-                .reco-stat-icon {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 46px;
-                    height: 46px;
-                    font-size: 18px;
-                    border-radius: 12px;
-                }
+            .reco-stat-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 46px;
+                height: 46px;
+                font-size: 18px;
+                border-radius: 12px;
+            }
 
-                .reco-icon-green {
-                    color: #15803d;
-                    background: #dcfce7;
-                }
+            .reco-icon-green {
+                color: #15803d;
+                background: #dcfce7;
+            }
 
-                .reco-icon-blue {
-                    color: #0369a1;
-                    background: #e0f2fe;
-                }
+            .reco-icon-blue {
+                color: #0369a1;
+                background: #e0f2fe;
+            }
 
-                .reco-icon-orange {
-                    color: #b45309;
-                    background: #fef3c7;
-                }
+            .reco-icon-orange {
+                color: #b45309;
+                background: #fef3c7;
+            }
 
-                .reco-icon-red {
-                    color: #b91c1c;
-                    background: #fee2e2;
-                }
+            .reco-icon-red {
+                color: #b91c1c;
+                background: #fee2e2;
+            }
 
-                .reco-stat-badge {
-                    padding: 6px 9px;
-                    font-size: 10px;
-                    font-weight: 700;
-                    border-radius: 30px;
-                }
+            .reco-stat-badge {
+                padding: 6px 9px;
+                font-size: 10px;
+                font-weight: 700;
+                border-radius: 30px;
+            }
 
-                .reco-badge-success {
-                    color: #15803d;
-                    background: #dcfce7;
-                }
+            .reco-badge-success {
+                color: #15803d;
+                background: #dcfce7;
+            }
 
-                .reco-badge-info {
-                    color: #0369a1;
-                    background: #e0f2fe;
-                }
+            .reco-badge-info {
+                color: #0369a1;
+                background: #e0f2fe;
+            }
 
-                .reco-badge-warning {
-                    color: #b45309;
-                    background: #fef3c7;
-                }
+            .reco-badge-warning {
+                color: #b45309;
+                background: #fef3c7;
+            }
 
-                .reco-badge-danger {
-                    color: #b91c1c;
-                    background: #fee2e2;
-                }
+            .reco-badge-danger {
+                color: #b91c1c;
+                background: #fee2e2;
+            }
 
-                .reco-stat-label {
-                    position: relative;
-                    z-index: 2;
-                    margin-bottom: 7px;
-                    font-size: 11px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    color: #64748b;
-                }
+            .reco-stat-label {
+                position: relative;
+                z-index: 2;
+                margin-bottom: 7px;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #64748b;
+            }
 
-                .reco-stat-value {
-                    position: relative;
-                    z-index: 2;
-                    margin-bottom: 6px;
-                    font-size: 22px;
-                    line-height: 1.2;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
+            .reco-stat-value {
+                position: relative;
+                z-index: 2;
+                margin-bottom: 6px;
+                font-size: 22px;
+                line-height: 1.2;
+                font-weight: 800;
+                color: #0f172a;
+            }
 
-                .reco-stat-footer {
-                    position: relative;
-                    z-index: 2;
-                    font-size: 10px;
-                    color: #64748b;
-                }
+            .reco-stat-footer {
+                position: relative;
+                z-index: 2;
+                font-size: 10px;
+                color: #64748b;
+            }
 
-                /* =====================================================
+            /* =====================================================
        CARTES GÉNÉRALES
     ====================================================== */
 
-                .reco-card {
-                    margin-bottom: 20px;
-                    border: 1px solid var(--reco-border);
-                    border-radius: 14px;
-                    background: #fff;
-                    box-shadow: 0 7px 22px rgba(15, 23, 42, 0.04);
-                }
+            .reco-card {
+                margin-bottom: 20px;
+                border: 1px solid var(--reco-border);
+                border-radius: 14px;
+                background: #fff;
+                box-shadow: 0 7px 22px rgba(15, 23, 42, 0.04);
+            }
 
-                .reco-card-header {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 15px;
-                    padding: 16px 18px;
-                    border-bottom: 1px solid #e7edf2;
-                }
+            .reco-card-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 15px;
+                padding: 16px 18px;
+                border-bottom: 1px solid #e7edf2;
+            }
 
-                .reco-card-title {
-                    margin: 0 0 3px;
-                    font-size: 15px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
+            .reco-card-title {
+                margin: 0 0 3px;
+                font-size: 15px;
+                font-weight: 800;
+                color: #0f172a;
+            }
 
-                .reco-card-title i {
-                    margin-right: 7px;
-                    color: var(--reco-primary);
-                }
+            .reco-card-title i {
+                margin-right: 7px;
+                color: var(--reco-primary);
+            }
 
-                .reco-card-subtitle {
-                    display: block;
-                    font-size: 10px;
-                    color: #64748b;
-                }
+            .reco-card-subtitle {
+                display: block;
+                font-size: 10px;
+                color: #64748b;
+            }
 
-                .reco-card-body {
-                    padding: 18px;
-                }
+            .reco-card-body {
+                padding: 18px;
+            }
 
-                /* =====================================================
+            /* =====================================================
        ACTIONS RAPIDES
     ====================================================== */
 
-                .reco-quick-action {
-                    display: flex;
-                    align-items: center;
-                    min-height: 88px;
-                    padding: 13px;
-                    border: 1px solid #dce6ec;
-                    border-radius: 12px;
-                    background: #fff;
-                    transition: all 0.2s ease;
-                    cursor: pointer;
-                }
+            .reco-quick-action {
+                display: flex;
+                align-items: center;
+                min-height: 88px;
+                padding: 13px;
+                border: 1px solid #dce6ec;
+                border-radius: 12px;
+                background: #fff;
+                transition: all 0.2s ease;
+                cursor: pointer;
+            }
 
-                .reco-quick-action:hover {
-                    transform: translateY(-2px);
-                    border-color: #8bc8c2;
-                    box-shadow: 0 8px 20px rgba(15, 118, 110, 0.10);
-                }
+            .reco-quick-action:hover {
+                transform: translateY(-2px);
+                border-color: #8bc8c2;
+                box-shadow: 0 8px 20px rgba(15, 118, 110, 0.10);
+            }
 
-                .reco-quick-action-icon {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 0 0 42px;
-                    width: 42px;
-                    height: 42px;
-                    margin-right: 12px;
-                    border-radius: 11px;
-                    font-size: 17px;
-                }
+            .reco-quick-action-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 42px;
+                width: 42px;
+                height: 42px;
+                margin-right: 12px;
+                border-radius: 11px;
+                font-size: 17px;
+            }
 
-                .reco-action-green {
-                    color: #15803d;
-                    background: #dcfce7;
-                }
+            .reco-action-green {
+                color: #15803d;
+                background: #dcfce7;
+            }
 
-                .reco-action-blue {
-                    color: #0369a1;
-                    background: #e0f2fe;
-                }
+            .reco-action-blue {
+                color: #0369a1;
+                background: #e0f2fe;
+            }
 
-                .reco-action-orange {
-                    color: #b45309;
-                    background: #fef3c7;
-                }
+            .reco-action-orange {
+                color: #b45309;
+                background: #fef3c7;
+            }
 
-                .reco-action-purple {
-                    color: #6d28d9;
-                    background: #ede9fe;
-                }
+            .reco-action-purple {
+                color: #6d28d9;
+                background: #ede9fe;
+            }
 
-                .reco-quick-action strong {
-                    display: block;
-                    margin-bottom: 3px;
-                    font-size: 12px;
-                    color: #0f172a;
-                }
+            .reco-quick-action strong {
+                display: block;
+                margin-bottom: 3px;
+                font-size: 12px;
+                color: #0f172a;
+            }
 
-                .reco-quick-action small {
-                    display: block;
-                    line-height: 1.5;
-                    font-size: 9px;
-                    color: #64748b;
-                }
+            .reco-quick-action small {
+                display: block;
+                line-height: 1.5;
+                font-size: 9px;
+                color: #64748b;
+            }
 
-                /* =====================================================
+            /* =====================================================
        FILTRES
     ====================================================== */
 
-                .reco-filter-box {
-                    margin-bottom: 20px;
-                    padding: 17px;
-                    border: 1px solid var(--reco-border);
-                    border-radius: 14px;
-                    background: #fff;
-                    box-shadow: 0 7px 22px rgba(15, 23, 42, 0.035);
-                }
+            .reco-filter-box {
+                margin-bottom: 20px;
+                padding: 17px;
+                border: 1px solid var(--reco-border);
+                border-radius: 14px;
+                background: #fff;
+                box-shadow: 0 7px 22px rgba(15, 23, 42, 0.035);
+            }
 
-                .reco-filter-box label {
-                    margin-bottom: 7px;
-                    font-size: 10px;
-                    font-weight: 800;
-                    text-transform: uppercase;
-                    color: #334155;
-                }
+            .reco-filter-box label {
+                margin-bottom: 7px;
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                color: #334155;
+            }
 
-                .reco-filter-box .form-control {
-                    height: 40px;
-                    font-size: 11px;
-                    border-radius: 8px;
-                    border-color: #d7e1e8;
-                }
+            .reco-filter-box .form-control {
+                height: 40px;
+                font-size: 11px;
+                border-radius: 8px;
+                border-color: #d7e1e8;
+            }
 
-                .btn-reco-primary {
-                    min-height: 40px;
-                    padding: 9px 16px;
-                    border: 1px solid var(--reco-primary);
-                    border-radius: 8px;
-                    color: #fff;
-                    background: var(--reco-primary);
-                    font-size: 11px;
-                    font-weight: 700;
-                }
+            .btn-reco-primary {
+                min-height: 40px;
+                padding: 9px 16px;
+                border: 1px solid var(--reco-primary);
+                border-radius: 8px;
+                color: #fff;
+                background: var(--reco-primary);
+                font-size: 11px;
+                font-weight: 700;
+            }
 
-                .btn-reco-primary:hover,
-                .btn-reco-primary:focus {
-                    color: #fff;
-                    background: var(--reco-primary-dark);
-                    border-color: var(--reco-primary-dark);
-                }
+            .btn-reco-primary:hover,
+            .btn-reco-primary:focus {
+                color: #fff;
+                background: var(--reco-primary-dark);
+                border-color: var(--reco-primary-dark);
+            }
 
-                .btn-reco-outline {
-                    min-height: 40px;
-                    padding: 9px 16px;
-                    border: 1px solid #9bc9c5;
-                    border-radius: 8px;
-                    color: var(--reco-primary);
-                    background: #fff;
-                    font-size: 11px;
-                    font-weight: 700;
-                }
+            .btn-reco-outline {
+                min-height: 40px;
+                padding: 9px 16px;
+                border: 1px solid #9bc9c5;
+                border-radius: 8px;
+                color: var(--reco-primary);
+                background: #fff;
+                font-size: 11px;
+                font-weight: 700;
+            }
 
-                .btn-reco-outline:hover {
-                    color: #fff;
-                    background: var(--reco-primary);
-                }
+            .btn-reco-outline:hover {
+                color: #fff;
+                background: var(--reco-primary);
+            }
 
-                /* =====================================================
+            /* =====================================================
        COMPTE À RAPPROCHER
     ====================================================== */
 
-                .reco-account-head {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 16px;
-                    margin-bottom: 18px;
-                    padding: 15px;
-                    border-radius: 12px;
-                    background: linear-gradient(135deg, #f0fdfa, #eff6ff);
-                    border: 1px solid #cce7e4;
-                }
+            .reco-account-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+                margin-bottom: 18px;
+                padding: 15px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #f0fdfa, #eff6ff);
+                border: 1px solid #cce7e4;
+            }
 
-                .reco-account-identity {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                }
+            .reco-account-identity {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
 
-                .reco-account-icon {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 0 0 48px;
-                    width: 48px;
-                    height: 48px;
-                    color: #0369a1;
-                    border-radius: 12px;
-                    background: #dff2ff;
-                    font-size: 20px;
-                }
+            .reco-account-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 48px;
+                width: 48px;
+                height: 48px;
+                color: #0369a1;
+                border-radius: 12px;
+                background: #dff2ff;
+                font-size: 20px;
+            }
 
-                .reco-account-identity h6 {
-                    margin: 0 0 4px;
-                    font-size: 14px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
+            .reco-account-identity h6 {
+                margin: 0 0 4px;
+                font-size: 14px;
+                font-weight: 800;
+                color: #0f172a;
+            }
 
-                .reco-account-identity p {
-                    margin: 0;
-                    font-size: 10px;
-                    color: #64748b;
-                }
+            .reco-account-identity p {
+                margin: 0;
+                font-size: 10px;
+                color: #64748b;
+            }
 
-                .reco-account-status {
-                    padding: 7px 10px;
-                    font-size: 10px;
-                    font-weight: 800;
-                    text-transform: uppercase;
-                    border-radius: 30px;
-                    color: #b45309;
-                    background: #fef3c7;
-                }
+            .reco-account-status {
+                padding: 7px 10px;
+                font-size: 10px;
+                font-weight: 800;
+                text-transform: uppercase;
+                border-radius: 30px;
+                color: #b45309;
+                background: #fef3c7;
+            }
 
-                /* =====================================================
+            /* =====================================================
        BLOC DES SOLDES
     ====================================================== */
 
-                .reco-balance-box {
-                    height: 100%;
-                    padding: 15px;
-                    border: 1px solid #dfe8ee;
-                    border-radius: 12px;
-                    background: #fbfdfe;
-                }
+            .reco-balance-box {
+                height: 100%;
+                padding: 15px;
+                border: 1px solid #dfe8ee;
+                border-radius: 12px;
+                background: #fbfdfe;
+            }
 
-                .reco-balance-label {
-                    margin-bottom: 6px;
-                    font-size: 10px;
-                    font-weight: 700;
-                    text-transform: uppercase;
-                    color: #64748b;
-                }
+            .reco-balance-label {
+                margin-bottom: 6px;
+                font-size: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #64748b;
+            }
 
-                .reco-balance-value {
-                    margin-bottom: 5px;
-                    font-size: 20px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
+            .reco-balance-value {
+                margin-bottom: 5px;
+                font-size: 20px;
+                font-weight: 800;
+                color: #0f172a;
+            }
 
-                .reco-balance-info {
-                    font-size: 9px;
-                    color: #64748b;
-                }
+            .reco-balance-info {
+                font-size: 9px;
+                color: #64748b;
+            }
 
-                .reco-balance-difference {
-                    border-color: #fed7aa;
-                    background: #fff7ed;
-                }
+            .reco-balance-difference {
+                border-color: #fed7aa;
+                background: #fff7ed;
+            }
 
-                .reco-balance-difference .reco-balance-value {
-                    color: #c2410c;
-                }
+            .reco-balance-difference .reco-balance-value {
+                color: #c2410c;
+            }
 
-                .reco-balance-success {
-                    border-color: #bbf7d0;
-                    background: #f0fdf4;
-                }
+            .reco-balance-success {
+                border-color: #bbf7d0;
+                background: #f0fdf4;
+            }
 
-                .reco-balance-success .reco-balance-value {
-                    color: #15803d;
-                }
+            .reco-balance-success .reco-balance-value {
+                color: #15803d;
+            }
 
-                /* =====================================================
+            /* =====================================================
        PROGRESSION
     ====================================================== */
 
-                .reco-progress-zone {
-                    margin-top: 18px;
-                    padding: 15px;
-                    border-radius: 12px;
-                    background: #f8fafc;
-                    border: 1px solid #e2e8f0;
-                }
+            .reco-progress-zone {
+                margin-top: 18px;
+                padding: 15px;
+                border-radius: 12px;
+                background: #f8fafc;
+                border: 1px solid #e2e8f0;
+            }
 
-                .reco-progress-top {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    margin-bottom: 8px;
-                }
+            .reco-progress-top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 8px;
+            }
 
-                .reco-progress-top strong {
-                    font-size: 11px;
-                    color: #334155;
-                }
+            .reco-progress-top strong {
+                font-size: 11px;
+                color: #334155;
+            }
 
-                .reco-progress-top span {
-                    font-size: 11px;
-                    font-weight: 800;
-                    color: var(--reco-primary);
-                }
+            .reco-progress-top span {
+                font-size: 11px;
+                font-weight: 800;
+                color: var(--reco-primary);
+            }
 
-                .reco-progress {
-                    height: 8px;
-                    overflow: hidden;
-                    border-radius: 20px;
-                    background: #e2e8f0;
-                }
+            .reco-progress {
+                height: 8px;
+                overflow: hidden;
+                border-radius: 20px;
+                background: #e2e8f0;
+            }
 
-                .reco-progress-bar {
-                    height: 100%;
-                    border-radius: 20px;
-                    background: linear-gradient(90deg, #14b8a6, #0f766e);
-                }
+            .reco-progress-bar {
+                height: 100%;
+                border-radius: 20px;
+                background: linear-gradient(90deg, #14b8a6, #0f766e);
+            }
 
-                /* =====================================================
+            /* =====================================================
        TABLEAUX
     ====================================================== */
 
-                .reco-table {
-                    margin-bottom: 0;
-                    font-size: 10px;
-                }
+            .reco-table {
+                margin-bottom: 0;
+                font-size: 10px;
+            }
 
-                .reco-table thead th {
-                    padding: 12px 10px;
-                    vertical-align: middle;
-                    text-transform: uppercase;
-                    white-space: nowrap;
-                    font-size: 9px;
-                    color: #475569;
-                    background: #f6f9fb;
-                    border-bottom: 1px solid #dce5eb;
-                }
+            .reco-table thead th {
+                padding: 12px 10px;
+                vertical-align: middle;
+                text-transform: uppercase;
+                white-space: nowrap;
+                font-size: 9px;
+                color: #475569;
+                background: #f6f9fb;
+                border-bottom: 1px solid #dce5eb;
+            }
 
-                .reco-table tbody td {
-                    padding: 11px 10px;
-                    vertical-align: middle;
-                    border-top: 1px solid #e7edf2;
-                    color: #334155;
-                }
+            .reco-table tbody td {
+                padding: 11px 10px;
+                vertical-align: middle;
+                border-top: 1px solid #e7edf2;
+                color: #334155;
+            }
 
-                .reco-table tbody tr:hover {
-                    background: #fbfefe;
-                }
+            .reco-table tbody tr:hover {
+                background: #fbfefe;
+            }
 
-                .reco-reference {
-                    font-weight: 800;
-                    color: #0f172a;
-                }
+            .reco-reference {
+                font-weight: 800;
+                color: #0f172a;
+            }
 
-                .reco-table strong {
-                    color: #0f172a;
-                }
+            .reco-table strong {
+                color: #0f172a;
+            }
 
-                .reco-table small {
-                    font-size: 8px;
-                    color: #64748b;
-                }
+            .reco-table small {
+                font-size: 8px;
+                color: #64748b;
+            }
 
-                .reco-amount-debit {
-                    font-weight: 800;
-                    color: #dc2626;
-                }
+            .reco-amount-debit {
+                font-weight: 800;
+                color: #dc2626;
+            }
 
-                .reco-amount-credit {
-                    font-weight: 800;
-                    color: #16a34a;
-                }
+            .reco-amount-credit {
+                font-weight: 800;
+                color: #16a34a;
+            }
 
-                .reco-match-badge {
-                    display: inline-flex;
-                    align-items: center;
-                    padding: 5px 8px;
-                    font-size: 9px;
-                    font-weight: 700;
-                    border-radius: 30px;
-                    white-space: nowrap;
-                }
+            .reco-match-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 5px 8px;
+                font-size: 9px;
+                font-weight: 700;
+                border-radius: 30px;
+                white-space: nowrap;
+            }
 
-                .reco-match-ok {
-                    color: #15803d;
-                    background: #dcfce7;
-                }
+            .reco-match-ok {
+                color: #15803d;
+                background: #dcfce7;
+            }
 
-                .reco-match-partial {
-                    color: #b45309;
-                    background: #fef3c7;
-                }
+            .reco-match-partial {
+                color: #b45309;
+                background: #fef3c7;
+            }
 
-                .reco-match-missing {
-                    color: #b91c1c;
-                    background: #fee2e2;
-                }
+            .reco-match-missing {
+                color: #b91c1c;
+                background: #fee2e2;
+            }
 
-                .reco-match-pending {
-                    color: #0369a1;
-                    background: #e0f2fe;
-                }
+            .reco-match-pending {
+                color: #0369a1;
+                background: #e0f2fe;
+            }
 
-                .reco-action-btn {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 30px;
-                    height: 30px;
-                    margin: 1px;
-                    padding: 0;
-                    border: 1px solid #d6e1e8;
-                    border-radius: 8px;
-                    color: #334155;
-                    background: #fff;
-                    transition: all 0.2s ease;
-                }
+            .reco-action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 30px;
+                height: 30px;
+                margin: 1px;
+                padding: 0;
+                border: 1px solid #d6e1e8;
+                border-radius: 8px;
+                color: #334155;
+                background: #fff;
+                transition: all 0.2s ease;
+            }
 
-                .reco-action-btn:hover {
-                    color: #fff;
-                    background: var(--reco-primary);
-                    border-color: var(--reco-primary);
-                }
+            .reco-action-btn:hover {
+                color: #fff;
+                background: var(--reco-primary);
+                border-color: var(--reco-primary);
+            }
 
-                .reco-action-match {
-                    color: #15803d;
-                }
+            .reco-action-match {
+                color: #15803d;
+            }
 
-                .reco-action-warning {
-                    color: #d97706;
-                }
+            .reco-action-warning {
+                color: #d97706;
+            }
 
-                .reco-action-danger {
-                    color: #dc2626;
-                }
+            .reco-action-danger {
+                color: #dc2626;
+            }
 
-                /* =====================================================
+            /* =====================================================
        ANOMALIES
     ====================================================== */
 
-                .reco-alert-item {
-                    display: flex;
-                    align-items: flex-start;
-                    gap: 12px;
-                    margin-bottom: 12px;
-                    padding: 13px;
-                    border-radius: 11px;
-                    border: 1px solid;
-                }
+            .reco-alert-item {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-bottom: 12px;
+                padding: 13px;
+                border-radius: 11px;
+                border: 1px solid;
+            }
 
-                .reco-alert-item:last-child {
-                    margin-bottom: 0;
-                }
+            .reco-alert-item:last-child {
+                margin-bottom: 0;
+            }
 
-                .reco-alert-danger {
-                    border-color: #fecaca;
-                    background: #fff5f5;
-                }
+            .reco-alert-danger {
+                border-color: #fecaca;
+                background: #fff5f5;
+            }
 
-                .reco-alert-warning {
-                    border-color: #fde68a;
-                    background: #fffbeb;
-                }
+            .reco-alert-warning {
+                border-color: #fde68a;
+                background: #fffbeb;
+            }
 
-                .reco-alert-info {
-                    border-color: #bae6fd;
-                    background: #f0f9ff;
-                }
+            .reco-alert-info {
+                border-color: #bae6fd;
+                background: #f0f9ff;
+            }
 
-                .reco-alert-icon {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 0 0 38px;
-                    width: 38px;
-                    height: 38px;
-                    border-radius: 10px;
-                }
+            .reco-alert-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 38px;
+                width: 38px;
+                height: 38px;
+                border-radius: 10px;
+            }
 
-                .reco-alert-danger .reco-alert-icon {
-                    color: #b91c1c;
-                    background: #fee2e2;
-                }
+            .reco-alert-danger .reco-alert-icon {
+                color: #b91c1c;
+                background: #fee2e2;
+            }
 
-                .reco-alert-warning .reco-alert-icon {
-                    color: #b45309;
-                    background: #fef3c7;
-                }
+            .reco-alert-warning .reco-alert-icon {
+                color: #b45309;
+                background: #fef3c7;
+            }
 
-                .reco-alert-info .reco-alert-icon {
-                    color: #0369a1;
-                    background: #e0f2fe;
-                }
+            .reco-alert-info .reco-alert-icon {
+                color: #0369a1;
+                background: #e0f2fe;
+            }
 
-                .reco-alert-item h6 {
-                    margin: 0 0 4px;
-                    font-size: 11px;
-                    font-weight: 800;
-                    color: #0f172a;
-                }
+            .reco-alert-item h6 {
+                margin: 0 0 4px;
+                font-size: 11px;
+                font-weight: 800;
+                color: #0f172a;
+            }
 
-                .reco-alert-item p {
-                    margin: 0;
-                    font-size: 9px;
-                    line-height: 1.55;
-                    color: #64748b;
-                }
+            .reco-alert-item p {
+                margin: 0;
+                font-size: 9px;
+                line-height: 1.55;
+                color: #64748b;
+            }
 
-                /* =====================================================
+            /* =====================================================
        HISTORIQUE DES SESSIONS
     ====================================================== */
 
-                .reco-session-item {
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    gap: 12px;
-                    padding: 12px 0;
-                    border-bottom: 1px solid #e8eef2;
-                }
+            .reco-session-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                padding: 12px 0;
+                border-bottom: 1px solid #e8eef2;
+            }
 
-                .reco-session-item:last-child {
-                    border-bottom: 0;
-                }
+            .reco-session-item:last-child {
+                border-bottom: 0;
+            }
 
-                .reco-session-left {
-                    display: flex;
-                    align-items: center;
-                    gap: 11px;
-                }
+            .reco-session-left {
+                display: flex;
+                align-items: center;
+                gap: 11px;
+            }
 
-                .reco-session-icon {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    flex: 0 0 38px;
-                    width: 38px;
-                    height: 38px;
-                    color: var(--reco-primary);
-                    border-radius: 10px;
-                    background: #e6fffb;
-                }
+            .reco-session-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 38px;
+                width: 38px;
+                height: 38px;
+                color: var(--reco-primary);
+                border-radius: 10px;
+                background: #e6fffb;
+            }
 
-                .reco-session-left strong {
-                    display: block;
-                    margin-bottom: 2px;
-                    font-size: 11px;
-                    color: #0f172a;
-                }
+            .reco-session-left strong {
+                display: block;
+                margin-bottom: 2px;
+                font-size: 11px;
+                color: #0f172a;
+            }
 
-                .reco-session-left small {
-                    display: block;
-                    font-size: 8px;
-                    color: #64748b;
-                }
+            .reco-session-left small {
+                display: block;
+                font-size: 8px;
+                color: #64748b;
+            }
 
-                .reco-session-amount {
-                    text-align: right;
-                }
+            .reco-session-amount {
+                text-align: right;
+            }
 
-                .reco-session-amount strong {
-                    display: block;
-                    margin-bottom: 3px;
-                    font-size: 11px;
-                    color: #0f172a;
-                }
+            .reco-session-amount strong {
+                display: block;
+                margin-bottom: 3px;
+                font-size: 11px;
+                color: #0f172a;
+            }
 
-                /* =====================================================
+            /* =====================================================
        MODALE
     ====================================================== */
 
-                .modal-reco .modal-content {
-                    overflow: hidden;
-                    border: 0;
-                    border-radius: 14px;
-                    box-shadow: 0 25px 70px rgba(15, 23, 42, 0.28);
-                }
+            .modal-reco .modal-content {
+                overflow: hidden;
+                border: 0;
+                border-radius: 14px;
+                box-shadow: 0 25px 70px rgba(15, 23, 42, 0.28);
+            }
 
-                .modal-reco .modal-header {
-                    color: #fff;
-                    border-bottom: 0;
-                    background:
-                        linear-gradient(115deg,
-                            #0f766e,
-                            #164e63,
-                            #0f172a);
-                }
+            .modal-reco .modal-header {
+                color: #fff;
+                border-bottom: 0;
+                background:
+                    linear-gradient(115deg,
+                        #0f766e,
+                        #164e63,
+                        #0f172a);
+            }
 
-                .modal-reco .modal-title {
-                    font-size: 14px;
-                    font-weight: 800;
-                }
+            .modal-reco .modal-title {
+                font-size: 14px;
+                font-weight: 800;
+            }
 
-                .modal-reco .close {
-                    color: #fff;
-                    opacity: 1;
-                }
+            .modal-reco .close {
+                color: #fff;
+                opacity: 1;
+            }
 
-                .modal-reco .modal-body {
-                    padding: 22px;
-                }
+            .modal-reco .modal-body {
+                padding: 22px;
+            }
 
-                .modal-reco label {
-                    margin-bottom: 7px;
-                    font-size: 10px;
-                    font-weight: 800;
-                    color: #334155;
-                }
+            .modal-reco label {
+                margin-bottom: 7px;
+                font-size: 10px;
+                font-weight: 800;
+                color: #334155;
+            }
 
-                .modal-reco .form-control {
-                    height: 41px;
-                    font-size: 11px;
-                    border-radius: 8px;
-                    border-color: #d7e2e9;
-                }
+            .modal-reco .form-control {
+                height: 41px;
+                font-size: 11px;
+                border-radius: 8px;
+                border-color: #d7e2e9;
+            }
 
-                .modal-reco textarea.form-control {
-                    height: auto;
-                    min-height: 90px;
-                }
+            .modal-reco textarea.form-control {
+                height: auto;
+                min-height: 90px;
+            }
 
-                .required-star {
-                    color: #dc2626;
-                }
+            .required-star {
+                color: #dc2626;
+            }
 
-                /* =====================================================
+            /* =====================================================
        RESPONSIVE
     ====================================================== */
 
-                @media (max-width: 991px) {
+            @media (max-width: 991px) {
 
-                    .reco-hero-content,
-                    .reco-account-head {
-                        align-items: flex-start;
-                        flex-direction: column;
-                    }
-
-                    .reco-date-box {
-                        width: 100%;
-                    }
-
-                    .reco-card-header {
-                        align-items: flex-start;
-                        flex-direction: column;
-                    }
+                .reco-hero-content,
+                .reco-account-head {
+                    align-items: flex-start;
+                    flex-direction: column;
                 }
 
-                @media (max-width: 767px) {
-                    .reco-hero {
-                        padding: 20px;
-                    }
-
-                    .reco-hero-left {
-                        flex-direction: column;
-                    }
-
-                    .reco-filter-box .btn {
-                        width: 100%;
-                        margin-top: 8px;
-                    }
+                .reco-date-box {
+                    width: 100%;
                 }
+
+                .reco-card-header {
+                    align-items: flex-start;
+                    flex-direction: column;
+                }
+            }
+
+            @media (max-width: 767px) {
+                .reco-hero {
+                    padding: 20px;
+                }
+
+                .reco-hero-left {
+                    flex-direction: column;
+                }
+
+                .reco-filter-box .btn {
+                    width: 100%;
+                    margin-top: 8px;
+                }
+            }
             </style>
 
 
@@ -2347,13 +2347,15 @@
 
 
             <!-- =========================================================
-     MODALE : NOUVEAU RAPPROCHEMENT
-========================================================== -->
-            <div class="modal fade modal-reco" id="newReconciliationModal" tabindex="-1" role="dialog">
+                MODALE : NOUVEAU RAPPROCHEMENT
+            ========================================================== -->
+            <div class="modal fade modal-reco" id="newReconciliationModal" tabindex="-1" role="dialog"
+                aria-hidden="true">
 
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
 
-                    <form action="#" method="post" style="width: 100%;">
+                    <form action="<?= base_url('finance/rapprochement/store'); ?>" method="post" style="width: 100%;"
+                        id="newReconciliationForm">
 
                         <div class="modal-content">
 
@@ -2364,7 +2366,7 @@
                                     Démarrer un rapprochement bancaire
                                 </h5>
 
-                                <button type="button" class="close" data-dismiss="modal">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                                     <span>&times;</span>
                                 </button>
 
@@ -2374,6 +2376,7 @@
 
                                 <div class="row">
 
+                                    <!-- Compte bancaire -->
                                     <div class="col-md-6">
 
                                         <div class="form-group">
@@ -2383,71 +2386,95 @@
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <select name="bank_account_id" class="form-control" required>
+                                            <select name="bank_account_id" id="reconciliationBankAccount"
+                                                class="form-control" required>
+
                                                 <option value="">
                                                     Sélectionner le compte
                                                 </option>
 
-                                                <option value="1">
-                                                    CRDB BIF — 110000000001
+                                                <?php if (!empty($allBankAccounts)): ?>
+
+                                                <?php foreach ($allBankAccounts as $account): ?>
+
+                                                <option value="<?= (int) $account->id ?>"
+                                                    data-currency="<?= html_escape($account->currency) ?>"
+                                                    data-balance="<?= (float) $account->current_balance ?>"
+                                                    data-bank="<?= html_escape($account->bank_name) ?>"
+                                                    data-account-number="<?= html_escape($account->account_number) ?>">
+                                                    <?= html_escape($account->bank_name) ?>
+                                                    —
+                                                    <?= html_escape($account->name) ?>
+                                                    —
+                                                    <?= html_escape($account->account_number) ?>
+                                                    —
+                                                    <?= number_format(
+                                                                (float) $account->current_balance,
+                                                                0,
+                                                                ',',
+                                                                ' '
+                                                            ) ?>
+                                                    <?= html_escape($account->currency) ?>
                                                 </option>
 
-                                                <option value="2">
-                                                    BANCOBU BIF — 220000000001
+                                                <?php endforeach; ?>
+
+                                                <?php else: ?>
+
+                                                <option value="" disabled>
+                                                    Aucun compte bancaire actif disponible
                                                 </option>
 
-                                                <option value="3">
-                                                    ECOBANK BIF — 330000000001
-                                                </option>
+                                                <?php endif; ?>
+
                                             </select>
+
+                                            <small class="form-text text-muted">
+                                                Le rapprochement sera effectué uniquement sur ce compte.
+                                            </small>
 
                                         </div>
 
                                     </div>
 
+                                    <!-- Devise -->
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+
+                                            <label>Devise</label>
+
+                                            <input type="text" id="reconciliationCurrency" class="form-control"
+                                                placeholder="Devise du compte" readonly>
+
+                                            <input type="hidden" name="currency" id="reconciliationCurrencyValue">
+
+                                            <small class="form-text text-muted">
+                                                La devise est récupérée automatiquement depuis le compte.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Date début -->
                                     <div class="col-md-6">
 
                                         <div class="form-group">
 
                                             <label>
-                                                Relevé bancaire
+                                                Date de début
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <select name="statement_id" class="form-control" required>
-                                                <option value="">
-                                                    Sélectionner le relevé importé
-                                                </option>
-
-                                                <option value="1">
-                                                    CRDB — Juillet 2026
-                                                </option>
-
-                                                <option value="2">
-                                                    BANCOBU — Juillet 2026
-                                                </option>
-                                            </select>
+                                            <input type="date" name="period_start" id="reconciliationPeriodStart"
+                                                class="form-control" value="<?= date('Y-m-01'); ?>" required>
 
                                         </div>
 
                                     </div>
 
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-
-                                            <label>
-                                                Date du début
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="date" name="period_start" class="form-control"
-                                                value="<?= date('Y-m-01') ?>" required>
-
-                                        </div>
-
-                                    </div>
-
+                                    <!-- Date fin -->
                                     <div class="col-md-6">
 
                                         <div class="form-group">
@@ -2457,13 +2484,101 @@
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <input type="date" name="period_end" class="form-control"
-                                                value="<?= date('Y-m-d') ?>" required>
+                                            <input type="date" name="period_end" id="reconciliationPeriodEnd"
+                                                class="form-control" value="<?= date('Y-m-d'); ?>" required>
 
                                         </div>
 
                                     </div>
 
+                                    <!-- Solde initial relevé -->
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+
+                                            <label>
+                                                Solde initial du relevé
+                                                <span class="required-star">*</span>
+                                            </label>
+
+                                            <div class="input-group">
+
+                                                <input type="number" name="statement_opening_balance"
+                                                    id="statementOpeningBalance" class="form-control" min="0"
+                                                    step="0.01" value="0" required>
+
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text reconciliation-currency-label">
+                                                        —
+                                                    </span>
+                                                </div>
+
+                                            </div>
+
+                                            <small class="form-text text-muted">
+                                                Solde communiqué par la banque au début de la période.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Solde final relevé -->
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+
+                                            <label>
+                                                Solde final du relevé
+                                                <span class="required-star">*</span>
+                                            </label>
+
+                                            <div class="input-group">
+
+                                                <input type="number" name="statement_closing_balance"
+                                                    id="statementClosingBalance" class="form-control" min="0"
+                                                    step="0.01" placeholder="0" required>
+
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text reconciliation-currency-label">
+                                                        —
+                                                    </span>
+                                                </div>
+
+                                            </div>
+
+                                            <small class="form-text text-muted">
+                                                Solde communiqué par la banque à la fin de la période.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Solde système -->
+                                    <div class="col-md-6">
+
+                                        <div class="form-group">
+
+                                            <label>
+                                                Solde actuel dans le système
+                                            </label>
+
+                                            <input type="text" id="reconciliationSystemBalance" class="form-control"
+                                                value="0" readonly>
+
+                                            <input type="hidden" name="system_balance"
+                                                id="reconciliationSystemBalanceValue" value="0">
+
+                                            <small class="form-text text-muted">
+                                                Solde actuellement enregistré dans l’application.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Responsable -->
                                     <div class="col-md-6">
 
                                         <div class="form-group">
@@ -2472,39 +2587,30 @@
                                                 Responsable du rapprochement
                                             </label>
 
-                                            <input type="text" name="responsible" class="form-control"
-                                                placeholder="Nom du responsable">
+                                            <input type="text" class="form-control" value="<?= html_escape(
+                                                                                                $this->session->userdata('last_name') . " " . $this->session->userdata('first_name')
+                                                                                                    ?: $this->session->userdata('username')
+                                                                                                    ?: ''
+                                                                                            ); ?>" readonly>
+
+                                            <input type="hidden" name="responsible_user_id"
+                                                value="<?= (int) $this->session->userdata('user_id'); ?>">
 
                                         </div>
 
                                     </div>
 
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-
-                                            <label>
-                                                Devise
-                                            </label>
-
-                                            <select name="currency" class="form-control">
-                                                <option value="BIF">BIF</option>
-                                                <option value="USD">USD</option>
-                                                <option value="EUR">EUR</option>
-                                            </select>
-
-                                        </div>
-
-                                    </div>
-
+                                    <!-- Observation -->
                                     <div class="col-md-12">
 
                                         <div class="form-group mb-0">
 
-                                            <label>Observation</label>
+                                            <label>
+                                                Observation
+                                            </label>
 
-                                            <textarea name="observation" class="form-control"
-                                                placeholder="Précisions relatives à cette session..."></textarea>
+                                            <textarea name="observation" class="form-control" rows="4" maxlength="1000"
+                                                placeholder="Précisions relatives à cette session de rapprochement..."></textarea>
 
                                         </div>
 
@@ -2536,53 +2642,218 @@
 
             </div>
 
+            <script>
+            $(document).ready(function() {
+
+                /**
+                 * Met à jour automatiquement :
+                 * - la devise ;
+                 * - le solde actuel du système ;
+                 * - la devise affichée à côté des soldes du relevé.
+                 */
+                function updateReconciliationAccountData() {
+
+                    const accountSelect =
+                        $('#reconciliationBankAccount');
+
+                    const selectedOption =
+                        accountSelect.find('option:selected');
+
+                    const accountId =
+                        accountSelect.val();
+
+                    /*
+                     * Aucun compte sélectionné.
+                     */
+                    if (!accountId) {
+
+                        $('#reconciliationCurrency').val('');
+
+                        $('#reconciliationCurrencyValue').val('');
+
+                        $('#reconciliationSystemBalance').val('0');
+
+                        $('#reconciliationSystemBalanceValue').val('0');
+
+                        $('#statementOpeningBalance').val('');
+
+                        $('.reconciliation-currency-label').text('—');
+
+                        return;
+                    }
+
+                    /*
+                     * Récupération des données de l'option sélectionnée.
+                     */
+                    const currency =
+                        selectedOption.attr('data-currency') || '';
+
+                    const balanceRaw =
+                        selectedOption.attr('data-balance') || '0';
+
+                    const balance =
+                        parseFloat(balanceRaw) || 0;
+
+                    /*
+                     * Formatage uniquement pour l'affichage.
+                     */
+                    const formattedBalance =
+                        new Intl.NumberFormat(
+                            'fr-FR', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            }
+                        ).format(balance);
+
+                    /*
+                     * Devise visible.
+                     */
+                    $('#reconciliationCurrency').val(currency);
+
+                    /*
+                     * Devise envoyée au contrôleur.
+                     */
+                    $('#reconciliationCurrencyValue').val(currency);
+
+                    /*
+                     * Solde actuel visible.
+                     */
+                    $('#reconciliationSystemBalance').val(
+                        formattedBalance + ' ' + currency
+                    );
+
+                    /*
+                     * Solde actuel brut envoyé au contrôleur.
+                     */
+                    $('#reconciliationSystemBalanceValue').val(balance);
+
+                    /*
+                     * Mettre automatiquement le solde initial.
+                     *
+                     * Ici, le solde initial du relevé prend le solde actuel
+                     * du compte sélectionné.
+                     */
+                    $('#statementOpeningBalance').val(balance);
+
+                    /*
+                     * Devise à droite des champs montant.
+                     */
+                    $('.reconciliation-currency-label').text(currency);
+                }
+
+                /*
+                 * Lors du changement de compte.
+                 */
+                $(document).on(
+                    'change',
+                    '#reconciliationBankAccount',
+                    function() {
+                        updateReconciliationAccountData();
+                    }
+                );
+
+                /*
+                 * Lors de l'ouverture du modal.
+                 *
+                 * Utile si un compte est déjà sélectionné.
+                 */
+                $('#newReconciliationModal').on(
+                    'shown.bs.modal',
+                    function() {
+                        updateReconciliationAccountData();
+                    }
+                );
+
+            });
+            </script>
+
+
+            <script>
+            $(document).on(
+                'change',
+                '#reconciliationBankAccount',
+                function() {
+
+                    const selectedOption = $(this).find('option:selected');
+
+                    const currency =
+                        selectedOption.data('currency') || '';
+
+                    const balance =
+                        parseFloat(
+                            selectedOption.data('balance') || 0
+                        );
+
+                    $('#reconciliationCurrency').val(currency);
+
+                    $('#reconciliationCurrencyValue').val(currency);
+
+                    $('.reconciliation-currency-label').text(
+                        currency || '—'
+                    );
+
+                    const formattedBalance =
+                        new Intl.NumberFormat('fr-FR', {
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 2
+                        }).format(balance);
+
+                    $('#reconciliationSystemBalance').val(
+                        currency ?
+                        formattedBalance + ' ' + currency :
+                        formattedBalance
+                    );
+                }
+            );
+            </script>
+
 
             <!-- =========================================================
      SCRIPTS
 ========================================================== -->
             <script>
-                $(document).on(
-                    'change',
-                    '.custom-file-input',
-                    function() {
-                        const fileName = $(this)
-                            .val()
-                            .split('\\')
-                            .pop();
+            $(document).on(
+                'change',
+                '.custom-file-input',
+                function() {
+                    const fileName = $(this)
+                        .val()
+                        .split('\\')
+                        .pop();
 
-                        $(this)
-                            .next('.custom-file-label')
-                            .html(
-                                fileName || 'Choisir un fichier'
-                            );
-                    }
-                );
-
-                function confirmReconciliation() {
-                    if (typeof Swal === 'undefined') {
-                        return;
-                    }
-
-                    Swal.fire({
-                        title: 'Valider le rapprochement ?',
-                        text: 'Cette action clôturera la session de rapprochement bancaire en cours.',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#0f766e',
-                        cancelButtonColor: '#64748b',
-                        confirmButtonText: 'Oui, valider',
-                        cancelButtonText: 'Annuler'
-                    }).then(function(result) {
-                        if (result.isConfirmed) {
-                            Swal.fire({
-                                title: 'Rapprochement validé',
-                                text: 'La session a été clôturée avec succès.',
-                                icon: 'success',
-                                confirmButtonColor: '#0f766e'
-                            });
-                        }
-                    });
+                    $(this)
+                        .next('.custom-file-label')
+                        .html(
+                            fileName || 'Choisir un fichier'
+                        );
                 }
+            );
+
+            function confirmReconciliation() {
+                if (typeof Swal === 'undefined') {
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Valider le rapprochement ?',
+                    text: 'Cette action clôturera la session de rapprochement bancaire en cours.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0f766e',
+                    cancelButtonColor: '#64748b',
+                    confirmButtonText: 'Oui, valider',
+                    cancelButtonText: 'Annuler'
+                }).then(function(result) {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Rapprochement validé',
+                            text: 'La session a été clôturée avec succès.',
+                            icon: 'success',
+                            confirmButtonColor: '#0f766e'
+                        });
+                    }
+                });
+            }
             </script>
 
         </div><!-- /.container-fluid -->

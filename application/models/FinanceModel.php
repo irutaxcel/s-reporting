@@ -7526,4 +7526,35 @@ class FinanceModel extends CI_Model
 
         return $summary;
     }
+
+    /**
+     * Récupère tous les comptes bancaires actifs
+     * avec leur solde disponible.
+     *
+     * @return array
+     */
+    public function getActiveBankAccountsForReconciliation()
+    {
+        $this->db->select(
+            'id,
+         code,
+         name,
+         bank_name,
+         account_number,
+         account_type,
+         currency,
+         current_balance,
+         branch_name'
+        );
+
+        $this->db->from('tbl_finance_bank_account');
+
+        $this->db->where('status', 'active');
+
+        $this->db->order_by('bank_name', 'ASC');
+
+        $this->db->order_by('name', 'ASC');
+
+        return $this->db->get()->result();
+    }
 }

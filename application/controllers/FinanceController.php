@@ -4128,17 +4128,50 @@ class FinanceController extends CI_Controller
 
     public function rapprochement()
     {
+        /*
+     * Vérification de la connexion.
+     */
         if (!$this->session->userdata('user_id')) {
             redirect('sign-in');
             return;
         }
 
-        $title = 'Rapprochement bancaire';
+        /*
+     * Tableau principal envoyé aux vues.
+     */
+        $data = [];
 
-        $this->load->view('v1/components/layout/header', ['title' => $title]);
-        $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/finance/rapprochement');
-        $this->load->view('v1/components/layout/footer');
+        $data['title'] = 'Rapprochement bancaire';
+
+        /*
+     * Récupération des comptes bancaires actifs.
+     */
+        $data['allBankAccounts'] =
+            $this->finance
+            ->getActiveBankAccountsForReconciliation();
+
+        /*
+     * Chargement des vues.
+     */
+        $this->load->view(
+            'v1/components/layout/header',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/sidebar',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/modules/finance/rapprochement',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer',
+            $data
+        );
     }
 
     public function prevision()
