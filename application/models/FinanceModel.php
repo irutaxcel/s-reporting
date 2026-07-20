@@ -7557,4 +7557,1067 @@ class FinanceModel extends CI_Model
 
         return $this->db->get()->result();
     }
+
+    /**
+     * Récupère un compte bancaire actif par son identifiant.
+     *
+     * @param int $bankAccountId
+     * @return object|null
+     */
+    public function getActiveBankAccountById($bankAccountId)
+    {
+        $bankAccountId = (int) $bankAccountId;
+
+        if ($bankAccountId <= 0) {
+            return null;
+        }
+
+        return $this->db
+            ->select([
+                'id',
+                'code',
+                'name',
+                'bank_name',
+                'account_number',
+                'account_type',
+                'currency',
+                'opening_balance',
+                'current_balance',
+                'status',
+            ])
+            ->from('tbl_finance_bank_account')
+            ->where('id', $bankAccountId)
+            ->where('status', 'active')
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    /**
+     * Génère la prochaine référence de rapprochement bancaire.
+     *
+     * Exemple :
+     * RAP-2026-00001
+     *
+     * @return string
+     */
+    public function generateBankReconciliationReference()
+    {
+        $year = date('Y');
+
+        $prefix = 'RAP-' . $year . '-';
+
+        $lastReconciliation = $this->db
+            ->select('reference')
+            ->from('tbl_finance_bank_reconciliation')
+            ->like('reference', $prefix, 'after')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
+
+        $nextNumber = 1;
+
+        if (
+            $lastReconciliation
+            && !empty($lastReconciliation->reference)
+        ) {
+            $parts = explode(
+                '-',
+                $lastReconciliation->reference
+            );
+
+            $lastNumber = (int) end($parts);
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return $prefix
+            . str_pad(
+                $nextNumber,
+                5,
+                '0',
+                STR_PAD_LEFT
+            );
+    }
+
+    /**
+     * Vérifie si une session active existe déjà
+     * pour le même compte et la même période.
+     *
+     * @param int $bankAccountId
+     * @param string $periodStart
+     * @param string $periodEnd
+     * @return bool
+     */
+    public function bankReconciliationAlreadyExists(
+        $bankAccountId,
+        $periodStart,
+        $periodEnd
+    ) {
+        return $this->db
+            ->from('tbl_finance_bank_reconciliation')
+            ->where('bank_account_id', (int) $bankAccountId)
+            ->where('period_start', $periodStart)
+            ->where('period_end', $periodEnd)
+            ->where_in(
+                'status',
+                [
+                    'draft',
+                    'in_progress',
+                    'completed',
+                ]
+            )
+            ->count_all_results() > 0;
+    }
+
+    /**
+     * Calcule le solde système d'un compte à une date donnée.
+     *
+     * Solde =
+     * solde d'ouverture
+     * + encaissements
+     * - décaissements
+     * - transferts sortants
+     * + transferts entrants
+     *
+     * @param int $bankAccountId
+     * @param string $date
+     * @return float
+     */
+    public function getBankAccountSystemBalanceAtDate(
+        $bankAccountId,
+        $date
+    ) {
+        $bankAccount = $this->db
+            ->select('opening_balance')
+            ->from('tbl_finance_bank_account')
+            ->where('id', (int) $bankAccountId)
+            ->limit(1)
+            ->get()
+            ->row();
+
+        if (!$bankAccount) {
+            return 0;
+        }
+
+        $balance = (float) $bankAccount->opening_balance;
+
+        /*
+     * Entrées sur le compte.
+     */
+        $incoming = $this->db
+            ->select_sum('amount', 'total')
+            ->from('tbl_finance_bank_operation')
+            ->where('destination_bank_account_id', (int) $bankAccountId)
+            ->where('operation_date <', $date)
+            ->where('status', 'validated')
+            ->get()
+            ->row();
+
+        /*
+     * Sorties depuis le compte.
+     */
+        $outgoing = $this->db
+            ->select_sum('amount', 'total')
+            ->from('tbl_finance_bank_operation')
+            ->where('source_bank_account_id', (int) $bankAccountId)
+            ->where('operation_date <', $date)
+            ->where('status', 'validated')
+            ->get()
+            ->row();
+
+        $incomingAmount = $incoming
+            ? (float) $incoming->total
+            : 0;
+
+        $outgoingAmount = $outgoing
+            ? (float) $outgoing->total
+            : 0;
+
+        return $balance
+            + $incomingAmount
+            - $outgoingAmount;
+    }
+
+    /**
+     * Calcule le solde système jusqu'à la fin d'une date.
+     *
+     * @param int $bankAccountId
+     * @param string $date
+     * @return float
+     */
+    public function getBankAccountSystemClosingBalance(
+        $bankAccountId,
+        $date
+    ) {
+        $bankAccount = $this->db
+            ->select('opening_balance')
+            ->from('tbl_finance_bank_account')
+            ->where('id', (int) $bankAccountId)
+            ->limit(1)
+            ->get()
+            ->row();
+
+        if (!$bankAccount) {
+            return 0;
+        }
+
+        $balance = (float) $bankAccount->opening_balance;
+
+        $incoming = $this->db
+            ->select_sum('amount', 'total')
+            ->from('tbl_finance_bank_operation')
+            ->where('destination_bank_account_id', (int) $bankAccountId)
+            ->where('operation_date <=', $date)
+            ->where('status', 'validated')
+            ->get()
+            ->row();
+
+        $outgoing = $this->db
+            ->select_sum('amount', 'total')
+            ->from('tbl_finance_bank_operation')
+            ->where('source_bank_account_id', (int) $bankAccountId)
+            ->where('operation_date <=', $date)
+            ->where('status', 'validated')
+            ->get()
+            ->row();
+
+        $incomingAmount = $incoming
+            ? (float) $incoming->total
+            : 0;
+
+        $outgoingAmount = $outgoing
+            ? (float) $outgoing->total
+            : 0;
+
+        return $balance
+            + $incomingAmount
+            - $outgoingAmount;
+    }
+
+    /**
+     * Enregistre une nouvelle session de rapprochement.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function createBankReconciliation(array $data)
+    {
+        $this->db->trans_begin();
+
+        try {
+            /*
+         * Génération de la référence dans la transaction.
+         */
+            $data['reference'] =
+                $this->generateBankReconciliationReference();
+
+            $inserted = $this->db->insert(
+                'tbl_finance_bank_reconciliation',
+                $data
+            );
+
+            if (!$inserted) {
+                throw new Exception(
+                    'Impossible d’enregistrer le rapprochement bancaire.'
+                );
+            }
+
+            $reconciliationId =
+                (int) $this->db->insert_id();
+
+            if ($this->db->trans_status() === false) {
+                throw new Exception(
+                    'Une erreur est survenue pendant la transaction.'
+                );
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status' => true,
+                'id' => $reconciliationId,
+                'reference' => $data['reference'],
+                'message' =>
+                'Le rapprochement bancaire a été démarré.',
+            ];
+        } catch (Throwable $exception) {
+            $this->db->trans_rollback();
+
+            log_message(
+                'error',
+                'Erreur création rapprochement bancaire : '
+                    . $exception->getMessage()
+            );
+
+            return [
+                'status' => false,
+                'id' => null,
+                'reference' => null,
+                'message' => $exception->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Génère la prochaine référence du relevé bancaire.
+     *
+     * @return string
+     */
+    public function generateBankStatementReference()
+    {
+        $year = date('Y');
+
+        $prefix = 'REL-' . $year . '-';
+
+        $lastStatement = $this->db
+            ->select('reference')
+            ->from('tbl_finance_bank_statement')
+            ->like('reference', $prefix, 'after')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row();
+
+        $nextNumber = 1;
+
+        if (
+            $lastStatement
+            && !empty($lastStatement->reference)
+        ) {
+            $referenceParts = explode(
+                '-',
+                $lastStatement->reference
+            );
+
+            $lastNumber = (int) end($referenceParts);
+
+            $nextNumber = $lastNumber + 1;
+        }
+
+        return $prefix
+            . str_pad(
+                $nextNumber,
+                5,
+                '0',
+                STR_PAD_LEFT
+            );
+    }
+
+    /**
+     * Vérifie si un relevé existe déjà pour le compte
+     * et la période sélectionnés.
+     *
+     * @param int $bankAccountId
+     * @param string $periodStart
+     * @param string $periodEnd
+     * @return bool
+     */
+    public function bankStatementAlreadyExists(
+        $bankAccountId,
+        $periodStart,
+        $periodEnd
+    ) {
+        return $this->db
+            ->from('tbl_finance_bank_statement')
+            ->where('bank_account_id', (int) $bankAccountId)
+            ->where('period_start', $periodStart)
+            ->where('period_end', $periodEnd)
+            ->where_not_in(
+                'status',
+                [
+                    'cancelled',
+                    'failed',
+                ]
+            )
+            ->count_all_results() > 0;
+    }
+
+    /**
+     * Enregistre les informations d'un relevé bancaire.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function createBankStatement(array $data)
+    {
+        $this->db->trans_begin();
+
+        try {
+            $data['reference'] =
+                $this->generateBankStatementReference();
+
+            $inserted = $this->db->insert(
+                'tbl_finance_bank_statement',
+                $data
+            );
+
+            if (!$inserted) {
+                $databaseError = $this->db->error();
+
+                throw new Exception(
+                    !empty($databaseError['message'])
+                        ? $databaseError['message']
+                        : 'Le relevé bancaire n’a pas pu être enregistré.'
+                );
+            }
+
+            $statementId =
+                (int) $this->db->insert_id();
+
+            if ($this->db->trans_status() === false) {
+                throw new Exception(
+                    'La transaction d’importation a échoué.'
+                );
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status' => true,
+                'id' => $statementId,
+                'reference' => $data['reference'],
+                'message' =>
+                'Le relevé bancaire a été importé avec succès.',
+            ];
+        } catch (Throwable $exception) {
+            $this->db->trans_rollback();
+
+            log_message(
+                'error',
+                'Erreur import relevé bancaire : '
+                    . $exception->getMessage()
+            );
+
+            return [
+                'status' => false,
+                'id' => null,
+                'reference' => null,
+                'message' => $exception->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Statistiques principales du rapprochement bancaire.
+     *
+     * @return array
+     */
+    public function getBankReconciliationMainStatistics()
+    {
+        $startDate = date('Y-m-01');
+        $endDate   = date('Y-m-t');
+
+        /*
+     * Valeurs par défaut.
+     */
+        $statistics = [
+            'total_bank_operations'       => 0,
+            'matched_operations'          => 0,
+            'matched_percentage'          => 0,
+
+            'statement_accounts_count'    => 0,
+            'statement_closing_balance'   => 0,
+
+            'pending_operations_count'    => 0,
+            'pending_operations_amount'   => 0,
+
+            'anomalies_count'             => 0,
+            'unjustified_difference'      => 0,
+        ];
+
+        /*
+     * =====================================================
+     * 1. Nombre total d'opérations bancaires du mois
+     * =====================================================
+     */
+        $totalOperations = $this->db
+            ->select('COUNT(bo.id) AS total_operations', false)
+            ->from('tbl_finance_bank_operation bo')
+            ->where('bo.operation_date >=', $startDate)
+            ->where('bo.operation_date <=', $endDate)
+            ->get()
+            ->row();
+
+        $statistics['total_bank_operations'] =
+            $totalOperations
+            ? (int) $totalOperations->total_operations
+            : 0;
+
+        /*
+     * =====================================================
+     * 2. Soldes des relevés bancaires importés
+     * =====================================================
+     *
+     * On prend le dernier relevé de chaque compte bancaire.
+     */
+        $latestStatementsSubquery = "
+        SELECT
+            MAX(bs2.id)
+        FROM tbl_finance_bank_statement bs2
+        WHERE bs2.bank_account_id = bs.bank_account_id
+    ";
+
+        $statementSummary = $this->db
+            ->select([
+                'COUNT(DISTINCT bs.bank_account_id) AS accounts_count',
+                'COALESCE(SUM(bs.closing_balance), 0) AS total_closing_balance',
+            ], false)
+            ->from('tbl_finance_bank_statement bs')
+            ->where(
+                "bs.id IN ($latestStatementsSubquery)",
+                null,
+                false
+            )
+            ->get()
+            ->row();
+
+        if ($statementSummary) {
+            $statistics['statement_accounts_count'] =
+                (int) $statementSummary->accounts_count;
+
+            $statistics['statement_closing_balance'] =
+                (float) $statementSummary->total_closing_balance;
+        }
+
+        /*
+     * =====================================================
+     * 3. Statistiques détaillées de rapprochement
+     * =====================================================
+     */
+        if (
+            !$this->db->table_exists(
+                'tbl_finance_bank_reconciliation_item'
+            )
+        ) {
+            return $statistics;
+        }
+
+        /*
+     * Opérations rapprochées.
+     */
+        $matchedResult = $this->db
+            ->select('COUNT(ri.id) AS matched_count', false)
+            ->from('tbl_finance_bank_reconciliation_item ri')
+            ->join(
+                'tbl_finance_bank_reconciliation br',
+                'br.id = ri.reconciliation_id',
+                'inner'
+            )
+            ->where('br.period_start <=', $endDate)
+            ->where('br.period_end >=', $startDate)
+            ->where('ri.matching_status', 'matched')
+            ->get()
+            ->row();
+
+        $statistics['matched_operations'] =
+            $matchedResult
+            ? (int) $matchedResult->matched_count
+            : 0;
+
+        /*
+     * Pourcentage rapproché.
+     */
+        if ($statistics['total_bank_operations'] > 0) {
+            $statistics['matched_percentage'] = round(
+                (
+                    $statistics['matched_operations']
+                    / $statistics['total_bank_operations']
+                ) * 100,
+                1
+            );
+        }
+
+        /*
+     * Opérations en attente de rapprochement.
+     */
+        $pendingResult = $this->db
+            ->select([
+                'COUNT(ri.id) AS pending_count',
+                '
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN ri.statement_amount IS NOT NULL
+                            THEN ri.statement_amount
+                            ELSE ri.system_amount
+                        END
+                    ),
+                    0
+                ) AS pending_amount
+            ',
+            ], false)
+            ->from('tbl_finance_bank_reconciliation_item ri')
+            ->join(
+                'tbl_finance_bank_reconciliation br',
+                'br.id = ri.reconciliation_id',
+                'inner'
+            )
+            ->where('br.period_start <=', $endDate)
+            ->where('br.period_end >=', $startDate)
+            ->where_in(
+                'ri.matching_status',
+                [
+                    'unmatched',
+                    'pending',
+                ]
+            )
+            ->get()
+            ->row();
+
+        if ($pendingResult) {
+            $statistics['pending_operations_count'] =
+                (int) $pendingResult->pending_count;
+
+            $statistics['pending_operations_amount'] =
+                (float) $pendingResult->pending_amount;
+        }
+
+        /*
+     * Anomalies et écart global non justifié.
+     */
+        $anomalyResult = $this->db
+            ->select([
+                'COUNT(ri.id) AS anomalies_count',
+                '
+                COALESCE(
+                    SUM(ABS(ri.difference_amount)),
+                    0
+                ) AS total_difference
+            ',
+            ], false)
+            ->from('tbl_finance_bank_reconciliation_item ri')
+            ->join(
+                'tbl_finance_bank_reconciliation br',
+                'br.id = ri.reconciliation_id',
+                'inner'
+            )
+            ->where('br.period_start <=', $endDate)
+            ->where('br.period_end >=', $startDate)
+            ->where_in(
+                'ri.matching_status',
+                [
+                    'amount_difference',
+                    'date_difference',
+                    'missing_system_entry',
+                    'missing_statement_entry',
+                ]
+            )
+            ->get()
+            ->row();
+
+        if ($anomalyResult) {
+            $statistics['anomalies_count'] =
+                (int) $anomalyResult->anomalies_count;
+
+            $statistics['unjustified_difference'] =
+                (float) $anomalyResult->total_difference;
+        }
+
+        return $statistics;
+    }
+
+    /**
+     * Retourne les sessions de rapprochement pouvant être analysées.
+     *
+     * @return array
+     */
+    public function getReconciliationsAvailableForAnalysis()
+    {
+        return $this->db
+            ->select([
+                'br.id',
+                'br.reference',
+                'br.bank_account_id',
+                'br.period_start',
+                'br.period_end',
+                'br.currency',
+                'br.status',
+
+                'ba.name AS account_name',
+                'ba.bank_name',
+                'ba.account_number',
+            ])
+            ->from('tbl_finance_bank_reconciliation br')
+            ->join(
+                'tbl_finance_bank_account ba',
+                'ba.id = br.bank_account_id',
+                'inner'
+            )
+            ->where_in(
+                'br.status',
+                [
+                    'draft',
+                    'in_progress',
+                ]
+            )
+            ->order_by('br.created_at', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Récupère une session de rapprochement par ID.
+     *
+     * @param int $reconciliationId
+     * @return object|null
+     */
+    public function getBankReconciliationById($reconciliationId)
+    {
+        return $this->db
+            ->select([
+                'br.*',
+
+                'ba.name AS account_name',
+                'ba.bank_name',
+                'ba.account_number',
+                'ba.current_balance AS account_current_balance',
+                'ba.currency AS account_currency',
+            ])
+            ->from('tbl_finance_bank_reconciliation br')
+            ->join(
+                'tbl_finance_bank_account ba',
+                'ba.id = br.bank_account_id',
+                'inner'
+            )
+            ->where('br.id', (int) $reconciliationId)
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    /**
+     * Recherche un relevé bancaire compatible avec une session.
+     */
+    public function getStatementForReconciliation(
+        $bankAccountId,
+        $periodStart,
+        $periodEnd
+    ) {
+        $bankAccountId = (int) $bankAccountId;
+
+        if (
+            $bankAccountId <= 0
+            || empty($periodStart)
+            || empty($periodEnd)
+        ) {
+            return null;
+        }
+
+        return $this->db
+            ->select('bs.*')
+            ->from('tbl_finance_bank_statement bs')
+            ->where(
+                'bs.bank_account_id',
+                $bankAccountId
+            )
+
+            /*
+         * Les deux périodes doivent se chevaucher.
+         */
+            ->where(
+                'bs.period_start <=',
+                $periodEnd
+            )
+            ->where(
+                'bs.period_end >=',
+                $periodStart
+            )
+
+            /*
+         * Privilégier un relevé couvrant complètement
+         * la période de la session.
+         */
+            ->order_by(
+                '
+            CASE
+                WHEN bs.period_start <= '
+                    . $this->db->escape($periodStart)
+                    . '
+                AND bs.period_end >= '
+                    . $this->db->escape($periodEnd)
+                    . '
+                THEN 0
+                ELSE 1
+            END
+            ',
+                'ASC',
+                false
+            )
+            ->order_by(
+                'bs.statement_date',
+                'DESC'
+            )
+            ->order_by(
+                'bs.id',
+                'DESC'
+            )
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    /**
+     * Récupère toutes les lignes analysables d'un relevé.
+     */
+    public function getStatementLinesForAnalysis(
+        $statementId,
+        $periodStart,
+        $periodEnd
+    ) {
+        return $this->db
+            ->select('bsl.*')
+            ->from('tbl_finance_bank_statement_line bsl')
+            ->where(
+                'bsl.statement_id',
+                (int) $statementId
+            )
+            ->where(
+                'bsl.operation_date >=',
+                $periodStart
+            )
+            ->where(
+                'bsl.operation_date <=',
+                $periodEnd
+            )
+            ->where(
+                'bsl.matching_status !=',
+                'ignored'
+            )
+            ->order_by(
+                'bsl.operation_date',
+                'ASC'
+            )
+            ->order_by(
+                'bsl.id',
+                'ASC'
+            )
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Cherche une opération système correspondant à une ligne bancaire.
+     *
+     * @param int $bankAccountId
+     * @param object $statementLine
+     * @param int $dateTolerance
+     * @param float $amountTolerance
+     * @return object|null
+     */
+    public function findMatchingBankOperation(
+        $bankAccountId,
+        $statementLine,
+        $dateTolerance,
+        $amountTolerance
+    ) {
+        $operationDate =
+            $statementLine->operation_date;
+
+        $minimumDate = date(
+            'Y-m-d',
+            strtotime(
+                $operationDate
+                    . ' -'
+                    . (int) $dateTolerance
+                    . ' days'
+            )
+        );
+
+        $maximumDate = date(
+            'Y-m-d',
+            strtotime(
+                $operationDate
+                    . ' +'
+                    . (int) $dateTolerance
+                    . ' days'
+            )
+        );
+
+        $minimumAmount =
+            max(
+                0,
+                (float) $statementLine->amount
+                    - (float) $amountTolerance
+            );
+
+        $maximumAmount =
+            (float) $statementLine->amount
+            + (float) $amountTolerance;
+
+        $this->db
+            ->select('bo.*')
+            ->from('tbl_finance_bank_operation bo')
+            ->where('bo.operation_date >=', $minimumDate)
+            ->where('bo.operation_date <=', $maximumDate)
+            ->where('bo.amount >=', $minimumAmount)
+            ->where('bo.amount <=', $maximumAmount)
+            ->where_not_in(
+                'bo.status',
+                [
+                    'cancelled',
+                    'rejected',
+                ]
+            );
+
+        /*
+     * Débit sur le relevé :
+     * argent sorti du compte.
+     */
+        if (
+            $statementLine->operation_direction
+            === 'debit'
+        ) {
+            $this->db
+                ->where(
+                    'bo.source_bank_account_id',
+                    (int) $bankAccountId
+                )
+                ->where_in(
+                    'bo.operation_type',
+                    [
+                        'decaissement',
+                        'transfert',
+                    ]
+                );
+        }
+
+        /*
+     * Crédit sur le relevé :
+     * argent entré dans le compte.
+     */
+        if (
+            $statementLine->operation_direction
+            === 'credit'
+        ) {
+            $this->db
+                ->where(
+                    'bo.destination_bank_account_id',
+                    (int) $bankAccountId
+                )
+                ->where_in(
+                    'bo.operation_type',
+                    [
+                        'encaissement',
+                        'transfert',
+                    ]
+                );
+        }
+
+        /*
+     * Exclure les opérations déjà rapprochées.
+     */
+        $this->db->where(
+            "
+        NOT EXISTS (
+            SELECT 1
+            FROM tbl_finance_bank_reconciliation_item bri
+            WHERE bri.bank_operation_id = bo.id
+            AND bri.matching_status = 'matched'
+        )
+        ",
+            null,
+            false
+        );
+
+        return $this->db
+            ->order_by(
+                'ABS(DATEDIFF(bo.operation_date, '
+                    . $this->db->escape($operationDate)
+                    . '))',
+                'ASC',
+                false
+            )
+            ->order_by(
+                'ABS(bo.amount - '
+                    . $this->db->escape(
+                        (float) $statementLine->amount
+                    )
+                    . ')',
+                'ASC',
+                false
+            )
+            ->limit(1)
+            ->get()
+            ->row();
+    }
+
+    /**
+     * Insère une ligne de résultat du rapprochement.
+     *
+     * @param array $data
+     * @return int
+     */
+    public function insertReconciliationItem(array $data)
+    {
+        $this->db->insert(
+            'tbl_finance_bank_reconciliation_item',
+            $data
+        );
+
+        return (int) $this->db->insert_id();
+    }
+
+    /**
+     * Supprime les résultats automatiques non validés d'une session.
+     *
+     * @param int $reconciliationId
+     * @return bool
+     */
+    public function deletePreviousAutomaticAnalysis(
+        $reconciliationId
+    ) {
+        return $this->db
+            ->where(
+                'reconciliation_id',
+                (int) $reconciliationId
+            )
+            ->where('matching_method', 'automatic')
+            ->where('validated_at IS NULL', null, false)
+            ->delete(
+                'tbl_finance_bank_reconciliation_item'
+            );
+    }
+
+    /**
+     * Change le statut de correspondance d'une ligne bancaire.
+     *
+     * @param int $statementLineId
+     * @param string $status
+     * @return bool
+     */
+    public function updateStatementLineMatchingStatus(
+        $statementLineId,
+        $status
+    ) {
+        return $this->db
+            ->where('id', (int) $statementLineId)
+            ->update(
+                'tbl_finance_bank_statement_line',
+                [
+                    'matching_status' => $status,
+                    'updated_at'      => date('Y-m-d H:i:s'),
+                ]
+            );
+    }
+
+    /**
+     * Met à jour une session de rapprochement.
+     *
+     * @param int $reconciliationId
+     * @param array $data
+     * @return bool
+     */
+    public function updateBankReconciliation(
+        $reconciliationId,
+        array $data
+    ) {
+        return $this->db
+            ->where('id', (int) $reconciliationId)
+            ->update(
+                'tbl_finance_bank_reconciliation',
+                $data
+            );
+    }
 }

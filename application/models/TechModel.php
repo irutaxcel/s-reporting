@@ -88,7 +88,7 @@ class TechModel extends CI_Model
         return $result && $result->unit_rate ? $result->unit_rate : 0;
     }
 
-    public function insert_achat_materiel_form($data_form, $articles, $quantites, $prix_unitaires, $totaux_lignes)
+    public function insert_achat_materiel_form($data_form, $articles, $quantites, $prix_unitaires, $observation_line, $totaux_lignes)
     {
         $this->db->trans_start();
 
@@ -109,7 +109,7 @@ class TechModel extends CI_Model
                     'quantity'        => $quantites[$key],
                     'unit_price'      => $prix_unitaires[$key],
                     'total_price'     => $totaux_lignes[$key],
-                    'observations'    => null
+                    'observations'    => $observation_line[$key],
                 ];
 
                 $this->db->insert('purchase_request_items', $data_item);
@@ -191,7 +191,7 @@ class TechModel extends CI_Model
             ->result();
     }
 
-    public function updateAchatMateriel($id, $data_form, $articles, $quantites, $prix_unitaires, $totaux_lignes)
+    public function updateAchatMateriel($id, $data_form, $articles, $quantites, $prix_unitaires, $totaux_lignes, $observation)
     {
         $this->db->trans_start();
 
@@ -214,7 +214,7 @@ class TechModel extends CI_Model
                     'quantity'        => $quantites[$key],
                     'unit_price'      => $prix_unitaires[$key],
                     'total_price'     => $totaux_lignes[$key],
-                    'observations'    => null
+                    'observations'    => $observation[$key]
                 ]);
             }
         }

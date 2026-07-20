@@ -193,6 +193,7 @@
                                                     <th width="140">Quantité</th>
                                                     <th width="170">Prix unitaire</th>
                                                     <th width="180">Total</th>
+                                                    <th width="170">Observation</th>
                                                     <th width="60">Action</th>
                                                 </tr>
                                             </thead>
@@ -220,6 +221,10 @@
                                                             class="form-control total_ligne" value="0" readonly>
                                                     </td>
                                                     <td class="text-center">
+                                                        <input type="text" name="observation[]" class="form-control"
+                                                            placeholder="">
+                                                    </td>
+                                                    <td class="text-center">
                                                         <button type="button" class="btn btn-sm btn-danger"
                                                             onclick="removeArticleRow(this)">
                                                             <i class="fas fa-trash"></i>
@@ -231,7 +236,7 @@
                                             <tfoot>
                                                 <tr>
                                                     <th colspan="3" class="text-right">Total général</th>
-                                                    <th>
+                                                    <th colspan="2">
                                                         <input type="number" name="total_general" id="total_general"
                                                             class="form-control font-weight-bold" value="0" readonly>
                                                     </th>
@@ -277,6 +282,10 @@
                         </td>
                         <td>
                             <input type="number" name="total_ligne[]" class="form-control total_ligne" value="0" readonly>
+                        </td>
+                        <td class="text-center">
+                            <input type="text" name="observation[]" class="form-control"
+                                placeholder="">
                         </td>
                         <td class="text-center">
                             <button type="button" class="btn btn-sm btn-danger" onclick="removeArticleRow(this)">
@@ -683,6 +692,7 @@
                                                     <th width="140">Quantité</th>
                                                     <th width="170">Prix unitaire</th>
                                                     <th width="180">Total</th>
+                                                    <th width="170">Observation</th>
                                                     <th width="60">Action</th>
                                                 </tr>
                                             </thead>
@@ -745,7 +755,8 @@
                                         item.designation,
                                         item.quantity,
                                         item.unit_price,
-                                        item.total_price
+                                        item.total_price,
+                                        item.observations
                                     );
                                 });
                             } else {
@@ -757,7 +768,7 @@
                     });
                 }
 
-                function addEditArticleRow(article = '', quantite = 1, prix = 0, total = 0) {
+                function addEditArticleRow(article = '', quantite = 1, prix = 0, total = 0, observations = '') {
                     let row = `
                         <tr>
                             <td>
@@ -776,6 +787,10 @@
                             <td>
                                 <input type="number" name="total_ligne[]" class="form-control edit_total_ligne"
                                     value="${total}" readonly>
+                            </td>
+                            <td class="text-center">
+                                <input type="text" name="observation[]" class="form-control edit_observation"
+                                    value="${observations}">
                             </td>
                             <td class="text-center">
                                 <button type="button" class="btn btn-sm btn-danger" onclick="removeEditArticleRow(this)">
@@ -1001,6 +1016,7 @@
                                                 <td class="text-right">${item.quantity}</td>
                                                 <td class="text-right">${formatMontant(item.unit_price)} BIF</td>
                                                 <td class="text-right"><strong>${formatMontant(item.total_price)} BIF</strong></td>
+                                                <td>${item.designation}</td>
                                             </tr>
                                         `);
                                 });

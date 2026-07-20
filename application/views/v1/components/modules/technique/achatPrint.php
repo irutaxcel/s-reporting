@@ -6,310 +6,334 @@
     <title>Demande d'achat - Impression</title>
 
     <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        color: #222;
-        background: #f4f6f9;
-        margin: 0;
-        padding: 10px;
-        font-size: 11px;
-    }
-
-    .print-page {
-        width: 210mm;
-        min-height: 297mm;
-        margin: auto;
-        background: #fff;
-        padding: 12mm 14mm;
-        border: 1px solid #ddd;
-    }
-
-    .print-actions {
-        width: 210mm;
-        margin: 0 auto 8px auto;
-        text-align: right;
-    }
-
-    .btn-print,
-    .btn-back {
-        border: none;
-        padding: 7px 14px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-        color: #fff;
-        font-size: 11px;
-        text-decoration: none;
-    }
-
-    .btn-print {
-        background: #0f766e;
-    }
-
-    .btn-back {
-        background: #6c757d;
-        margin-right: 5px;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 3px solid #0f766e;
-        padding-bottom: 10px;
-        margin-bottom: 14px;
-    }
-
-    .company-left {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .logo-box {
-        width: 65px;
-        height: 65px;
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .logo-box img {
-        width: 58px;
-        height: 58px;
-        object-fit: contain;
-    }
-
-    .company-title h2 {
-        margin: 0;
-        color: #0f766e;
-        font-size: 18px;
-        text-transform: uppercase;
-    }
-
-    .company-title p {
-        margin: 3px 0 0 0;
-        color: #555;
-        font-size: 11px;
-    }
-
-    .company-info {
-        text-align: right;
-        font-size: 10px;
-        line-height: 1.45;
-    }
-
-    .document-title {
-        text-align: center;
-        margin: 14px 0 16px;
-    }
-
-    .document-title h1 {
-        display: inline-block;
-        margin: 0;
-        padding: 7px 28px;
-        border: 2px solid #0f766e;
-        color: #0f766e;
-        font-size: 18px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 7px 22px;
-        margin-bottom: 12px;
-    }
-
-    .info-item {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 5px;
-    }
-
-    .info-label {
-        font-weight: bold;
-        color: #0f766e;
-        display: inline-block;
-        width: 110px;
-    }
-
-    .validation-box {
-        margin: 10px 0 12px 0;
-        border: 1px solid #ddd;
-        padding: 9px;
-        background: #f9fafb;
-    }
-
-    .validation-title {
-        font-weight: bold;
-        color: #0f766e;
-        margin-bottom: 7px;
-        text-transform: uppercase;
-    }
-
-    .validation-row {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-
-    .validation-badge {
-        border: 1px solid #ccc;
-        padding: 4px 7px;
-        border-radius: 4px;
-        background: #fff;
-        font-size: 10px;
-    }
-
-    .validated {
-        background: #e9f7ef;
-        border-color: #28a745;
-        color: #155724;
-        font-weight: bold;
-    }
-
-    .pending {
-        background: #fff3cd;
-        border-color: #ffc107;
-        color: #856404;
-        font-weight: bold;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 8px;
-        font-size: 10.5px;
-    }
-
-    table th {
-        background: #102033;
-        color: #fff;
-        padding: 6px;
-        border: 1px solid #102033;
-    }
-
-    table td {
-        border: 1px solid #ccc;
-        padding: 5px 6px;
-        vertical-align: middle;
-    }
-
-    .text-right {
-        text-align: right;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .total-row td {
-        font-weight: bold;
-        background: #f1f5f9;
-        font-size: 11px;
-    }
-
-    .signature-section {
-        margin-top: 25px;
-    }
-
-    .signature-title {
-        font-size: 13px;
-        font-weight: bold;
-        color: #0f766e;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-    }
-
-    .signature-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-    }
-
-    .signature-box {
-        border: 1px solid #cfcfcf;
-        height: 140px;
-        padding: 10px;
-        position: relative;
-        background: #fff;
-    }
-
-    .signature-box .title {
-        font-size: 11px;
-        font-weight: bold;
-        margin-bottom: 12px;
-    }
-
-    .signature-box .name {
-        font-size: 10px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .signature-box .function {
-        font-size: 9px;
-        color: #666;
-    }
-
-    .signature-box .signature {
-        position: absolute;
-        left: 10px;
-        right: 10px;
-        bottom: 15px;
-        text-align: center;
-    }
-
-    .signature-box .signature hr {
-        border: none;
-        border-top: 1px solid #444;
-        margin-bottom: 3px;
-    }
-
-    .signature-box .signature span {
-        font-size: 8px;
-        color: #777;
-    }
-
-    .footer {
-        margin-top: 18px;
-        border-top: 2px solid #0f766e;
-        padding-top: 8px;
-        font-size: 9px;
-        color: #555;
-        text-align: center;
-    }
-
-    @media print {
-        body {
-            background: #fff;
-            padding: 0;
-            font-size: 10px;
+        * {
+            box-sizing: border-box;
         }
 
-        .print-actions {
-            display: none;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #222;
+            background: #f4f6f9;
+            margin: 0;
+            padding: 10px;
+            font-size: 11px;
         }
 
         .print-page {
-            width: 100%;
-            min-height: auto;
-            border: none;
-            padding: 6mm 8mm;
+            width: 210mm;
+            min-height: 297mm;
+            margin: auto;
+            background: #fff;
+            padding: 12mm 14mm;
+            border: 1px solid #ddd;
         }
 
-        @page {
-            size: A4;
-            margin: 6mm;
+        .print-actions {
+            width: 210mm;
+            margin: 0 auto 8px auto;
+            text-align: right;
         }
-    }
+
+        .btn-print,
+        .btn-back {
+            border: none;
+            padding: 7px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            font-size: 11px;
+            text-decoration: none;
+        }
+
+        .btn-print {
+            background: #0f766e;
+        }
+
+        .btn-back {
+            background: #6c757d;
+            margin-right: 5px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #0f766e;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+        }
+
+        .company-left {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .logo-box {
+            width: 65px;
+            height: 65px;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-box img {
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+        }
+
+        .company-title h2 {
+            margin: 0;
+            color: #0f766e;
+            font-size: 18px;
+            text-transform: uppercase;
+        }
+
+        .company-title p {
+            margin: 3px 0 0 0;
+            color: #555;
+            font-size: 11px;
+        }
+
+        .company-info {
+            text-align: right;
+            font-size: 10px;
+            line-height: 1.45;
+        }
+
+        .document-title {
+            text-align: center;
+            margin: 14px 0 16px;
+        }
+
+        .document-title h1 {
+            display: inline-block;
+            margin: 0;
+            padding: 7px 28px;
+            border: 2px solid #0f766e;
+            color: #0f766e;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px 22px;
+            margin-bottom: 12px;
+        }
+
+        .info-item {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #0f766e;
+            display: inline-block;
+            width: 110px;
+        }
+
+        .validation-box {
+            margin: 10px 0 12px 0;
+            border: 1px solid #ddd;
+            padding: 9px;
+            background: #f9fafb;
+        }
+
+        .validation-title {
+            font-weight: bold;
+            color: #0f766e;
+            margin-bottom: 7px;
+            text-transform: uppercase;
+        }
+
+        .validation-row {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .validation-badge {
+            border: 1px solid #ccc;
+            padding: 4px 7px;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 10px;
+        }
+
+        .validated {
+            background: #e9f7ef;
+            border-color: #28a745;
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .pending {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 10.5px;
+        }
+
+        table th {
+            background: #102033;
+            color: #fff;
+            padding: 6px;
+            border: 1px solid #102033;
+        }
+
+        table td {
+            border: 1px solid #ccc;
+            padding: 5px 6px;
+            vertical-align: middle;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .total-row td {
+            font-weight: bold;
+            background: #f1f5f9;
+            font-size: 11px;
+        }
+
+        .signature-section {
+            margin-top: 25px;
+        }
+
+        .signature-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #0f766e;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .signature-box {
+            border: 1px solid #cfcfcf;
+            height: 140px;
+            padding: 10px;
+            position: relative;
+            background: #fff;
+        }
+
+        .signature-box .title {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .signature {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 12px;
+        }
+
+        .signature hr {
+            margin: 0;
+            border: none;
+            border-top: 1px solid #444;
+        }
+
+        .signature span {
+            display: block;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 9px;
+            color: #666;
+        }
+
+        .signature-box .name {
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .signature-box .function {
+            font-size: 10px;
+            color: #444;
+            line-height: 18px;
+        }
+
+        .signature-box .signature {
+            position: absolute;
+            left: 10px;
+            right: 10px;
+            bottom: 15px;
+            text-align: center;
+        }
+
+        .signature-box .signature hr {
+            border: none;
+            border-top: 1px solid #444;
+            margin-bottom: 3px;
+        }
+
+        .signature-box .signature span {
+            font-size: 8px;
+            color: #777;
+        }
+
+        .footer {
+            margin-top: 18px;
+            border-top: 2px solid #0f766e;
+            padding-top: 8px;
+            font-size: 9px;
+            color: #555;
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                padding: 0;
+                font-size: 10px;
+            }
+
+            .print-actions {
+                display: none;
+            }
+
+            .print-page {
+                width: 100%;
+                min-height: auto;
+                border: none;
+                padding: 6mm 8mm;
+            }
+
+            @page {
+                size: A4;
+                margin: 6mm;
+            }
+        }
     </style>
 </head>
 
@@ -347,7 +371,7 @@
         </div>
 
         <div class="document-title">
-            <h1>Demande d'achat</h1>
+            <h1>Demande d'achat des biens / services</h1>
         </div>
 
         <div class="info-grid">
@@ -363,31 +387,32 @@
             </div>
 
             <div class="info-item">
-                <span class="info-label">Chantier :</span>
+                <span class="info-label">Destination / Chantier :</span>
                 <?= $achat->destination_chantier ?>
             </div>
 
 
 
             <div class="info-item">
+                <span class="info-label">Tresoriere :</span>
+                AHISHAKIYE Nelly Ange
+            </div>
+            <!-- <div class="info-item">
                 <span class="info-label">Demandé par :</span>
                 <?= $achat->requested_by ?>
-            </div>
+            </div> -->
 
             <div class="info-item">
                 <span class="info-label">Chargé achat :</span>
                 <?= $achat->buyer_name ?>
             </div>
 
-            <div class="info-item">
-                <span class="info-label">Vérifié par :</span>
-                <?= $achat->verified_by ?>
-            </div>
 
-            <div class="info-item">
+
+            <!-- <div class="info-item">
                 <span class="info-label">Statut :</span>
                 <?= ucfirst($achat->workflow_status) ?>
-            </div>
+            </div> -->
 
         </div>
 
@@ -427,30 +452,32 @@
                     <th width="90">Qté</th>
                     <th width="120">PU</th>
                     <th width="130">Total</th>
+                    <th>Observation</th>
                 </tr>
             </thead>
 
             <tbody>
                 <?php if (!empty($articles)) : ?>
-                <?php $i = 1; ?>
-                <?php foreach ($articles as $article) : ?>
-                <?php $total_general += $article->total_price; ?>
+                    <?php $i = 1; ?>
+                    <?php foreach ($articles as $article) : ?>
+                        <?php $total_general += $article->total_price; ?>
 
-                <tr>
-                    <td class="text-center"><?= $i++ ?></td>
-                    <td><?= $article->designation ?></td>
-                    <td class="text-right"><?= number_format($article->quantity, 2, ',', ' ') ?></td>
-                    <td class="text-right"><?= number_format($article->unit_price, 0, ',', ' ') ?> BIF</td>
-                    <td class="text-right">
-                        <strong><?= number_format($article->total_price, 0, ',', ' ') ?> BIF</strong>
-                    </td>
-                </tr>
+                        <tr>
+                            <td class="text-center"><?= $i++ ?></td>
+                            <td><?= $article->designation ?></td>
+                            <td class="text-right"><?= number_format($article->quantity, 2, ',', ' ') ?></td>
+                            <td class="text-right"><?= number_format($article->unit_price, 0, ',', ' ') ?> BIF</td>
+                            <td class="text-right">
+                                <strong><?= number_format($article->total_price, 0, ',', ' ') ?> BIF</strong>
+                            </td>
+                            <td><?= $article->observations ?></td>
+                        </tr>
 
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
                 <?php else : ?>
-                <tr>
-                    <td colspan="6" class="text-center">Aucun article trouvé.</td>
-                </tr>
+                    <tr>
+                        <td colspan="6" class="text-center">Aucun article trouvé.</td>
+                    </tr>
                 <?php endif; ?>
             </tbody>
 
@@ -465,74 +492,91 @@
         </table>
 
         <?php if (!empty($achat->notes)) : ?>
-        <p><strong>Notes :</strong> <?= nl2br($achat->notes) ?></p>
+            <p><strong>Notes :</strong> <?= nl2br($achat->notes) ?></p>
         <?php endif; ?>
 
         <div class="signature-section">
-            <div class="signature-title">Signatures</div>
+
+            <div class="signature-title">
+                SIGNATURES
+            </div>
 
             <div class="signature-grid">
 
-
-
+                <!-- Demandé -->
                 <div class="signature-box">
 
                     <div class="title">
-                        Directeur Technique
+                        Demandé par
                     </div>
-
-
 
                     <div class="function">
-                        Validation Technique
+                        <?= $achat->requested_by ?>
                     </div>
 
-                    <div class="signature">
+                    <!-- <div class="signature">
                         <hr>
                         <span>Signature & Cachet</span>
-                    </div>
+                    </div> -->
 
                 </div>
 
+                <!-- DT -->
                 <div class="signature-box">
 
                     <div class="title">
-                        Directrice Administrative et Financière
+                        Verifie Par
                     </div>
-
-
 
                     <div class="function">
-                        Validation Financière
+                        <?= $achat->verified_by ?>
                     </div>
 
-                    <div class="signature">
+                    <!-- <div class="signature">
                         <hr>
                         <span>Signature & Cachet</span>
-                    </div>
+                    </div> -->
 
                 </div>
 
+                <!-- DAF -->
                 <div class="signature-box">
 
                     <div class="title">
-                        Trésorerie
+                        Approbation Techinique
                     </div>
-
-
 
                     <div class="function">
-                        Validation Trésorerie
+                        DT. NIYIMBONA Emmanuel
                     </div>
 
-                    <div class="signature">
+                    <!-- <div class="signature">
                         <hr>
                         <span>Signature & Cachet</span>
+                    </div> -->
+
+                </div>
+
+                <!-- Trésorerie -->
+                <div class="signature-box">
+
+                    <div class="title">
+                        Approbation Financiere
                     </div>
+
+                    <div class="function">
+                        DAF. NDAGIJE Mariam
+                    </div>
+
+                    <!-- <div class="signature">
+                        <hr>
+                        <span>Signature & Cachet</span>
+                    </div> -->
 
                 </div>
 
             </div>
+
         </div>
 
         <div class="footer">

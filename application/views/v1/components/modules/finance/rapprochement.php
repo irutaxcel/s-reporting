@@ -989,12 +989,77 @@
 
                 </div>
 
+                <?php
+
+                $reconciliationStatistics =
+                    isset($reconciliationStatistics)
+                    && is_array($reconciliationStatistics)
+                    ? $reconciliationStatistics
+                    : [];
+
+                $totalBankOperations =
+                    (int) (
+                        $reconciliationStatistics['total_bank_operations']
+                        ?? 0
+                    );
+
+                $matchedOperations =
+                    (int) (
+                        $reconciliationStatistics['matched_operations']
+                        ?? 0
+                    );
+
+                $matchedPercentage =
+                    (float) (
+                        $reconciliationStatistics['matched_percentage']
+                        ?? 0
+                    );
+
+                $statementAccountsCount =
+                    (int) (
+                        $reconciliationStatistics['statement_accounts_count']
+                        ?? 0
+                    );
+
+                $statementClosingBalance =
+                    (float) (
+                        $reconciliationStatistics['statement_closing_balance']
+                        ?? 0
+                    );
+
+                $pendingOperationsCount =
+                    (int) (
+                        $reconciliationStatistics['pending_operations_count']
+                        ?? 0
+                    );
+
+                $pendingOperationsAmount =
+                    (float) (
+                        $reconciliationStatistics['pending_operations_amount']
+                        ?? 0
+                    );
+
+                $anomaliesCount =
+                    (int) (
+                        $reconciliationStatistics['anomalies_count']
+                        ?? 0
+                    );
+
+                $unjustifiedDifference =
+                    (float) (
+                        $reconciliationStatistics['unjustified_difference']
+                        ?? 0
+                    );
+
+                ?>
+
 
                 <!-- =====================================================
-         STATISTIQUES PRINCIPALES
-    ====================================================== -->
+                    STATISTIQUES PRINCIPALES
+                ====================================================== -->
                 <div class="row">
 
+                    <!-- Opérations rapprochées -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="reco-stat-card">
@@ -1006,7 +1071,13 @@
                                 </div>
 
                                 <span class="reco-stat-badge reco-badge-success">
-                                    82,5 %
+                                    <?= number_format(
+                                        $matchedPercentage,
+                                        1,
+                                        ',',
+                                        ' '
+                                    ) ?>
+                                    %
                                 </span>
 
                             </div>
@@ -1016,17 +1087,33 @@
                             </div>
 
                             <div class="reco-stat-value">
-                                146
+                                <?= number_format(
+                                    $matchedOperations,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
                             </div>
 
                             <div class="reco-stat-footer">
-                                Sur 177 opérations bancaires du mois
+                                Sur
+                                <?= number_format(
+                                    $totalBankOperations,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+                                opération<?= $totalBankOperations > 1 ? 's' : '' ?>
+                                bancaire<?= $totalBankOperations > 1 ? 's' : '' ?>
+                                du mois
                             </div>
 
                         </div>
 
                     </div>
 
+
+                    <!-- Solde des relevés -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="reco-stat-card">
@@ -1038,7 +1125,14 @@
                                 </div>
 
                                 <span class="reco-stat-badge reco-badge-info">
-                                    6 comptes
+                                    <?= number_format(
+                                        $statementAccountsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) ?>
+
+                                    compte<?= $statementAccountsCount > 1 ? 's' : '' ?>
                                 </span>
 
                             </div>
@@ -1048,17 +1142,25 @@
                             </div>
 
                             <div class="reco-stat-value">
-                                482 350 000 BIF
+                                <?= number_format(
+                                    $statementClosingBalance,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+                                BIF
                             </div>
 
                             <div class="reco-stat-footer">
-                                Solde total des relevés importés
+                                Solde total des derniers relevés importés
                             </div>
 
                         </div>
 
                     </div>
 
+
+                    <!-- En attente -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="reco-stat-card">
@@ -1070,7 +1172,14 @@
                                 </div>
 
                                 <span class="reco-stat-badge reco-badge-warning">
-                                    21 opérations
+                                    <?= number_format(
+                                        $pendingOperationsCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) ?>
+
+                                    opération<?= $pendingOperationsCount > 1 ? 's' : '' ?>
                                 </span>
 
                             </div>
@@ -1080,7 +1189,13 @@
                             </div>
 
                             <div class="reco-stat-value">
-                                38 750 000 BIF
+                                <?= number_format(
+                                    $pendingOperationsAmount,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+                                BIF
                             </div>
 
                             <div class="reco-stat-footer">
@@ -1091,6 +1206,8 @@
 
                     </div>
 
+
+                    <!-- Anomalies -->
                     <div class="col-xl-3 col-lg-6 col-md-6">
 
                         <div class="reco-stat-card">
@@ -1102,7 +1219,14 @@
                                 </div>
 
                                 <span class="reco-stat-badge reco-badge-danger">
-                                    5 anomalies
+                                    <?= number_format(
+                                        $anomaliesCount,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) ?>
+
+                                    anomalie<?= $anomaliesCount > 1 ? 's' : '' ?>
                                 </span>
 
                             </div>
@@ -1112,7 +1236,13 @@
                             </div>
 
                             <div class="reco-stat-value">
-                                3 400 000 BIF
+                                <?= number_format(
+                                    $unjustifiedDifference,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?>
+                                BIF
                             </div>
 
                             <div class="reco-stat-footer">
@@ -1127,8 +1257,8 @@
 
 
                 <!-- =====================================================
-         ACTIONS RAPIDES
-    ====================================================== -->
+                    ACTIONS RAPIDES
+                ====================================================== -->
                 <div class="reco-card">
 
                     <div class="reco-card-header">
@@ -1191,19 +1321,19 @@
 
                             <div class="col-xl-3 col-lg-6 col-md-6 mb-3 mb-md-0">
 
-                                <div class="reco-quick-action">
-
+                                <div class="reco-quick-action" data-toggle="modal"
+                                    data-target="#analyzeDifferencesModal">
                                     <div class="reco-quick-action-icon reco-action-orange">
                                         <i class="fas fa-search-dollar"></i>
                                     </div>
 
                                     <div>
                                         <strong>Analyser les écarts</strong>
+
                                         <small>
                                             Afficher les opérations non correspondantes
                                         </small>
                                     </div>
-
                                 </div>
 
                             </div>
@@ -1505,8 +1635,8 @@
 
 
                 <!-- =====================================================
-         OPÉRATIONS À RAPPROCHER + ANOMALIES
-    ====================================================== -->
+                    OPÉRATIONS À RAPPROCHER + ANOMALIES
+                ====================================================== -->
                 <div class="row">
 
                     <div class="col-xl-9 col-lg-8">
@@ -1901,8 +2031,8 @@
 
 
                     <!-- =================================================
-             ALERTES ET ANOMALIES
-        ================================================== -->
+                        ALERTES ET ANOMALIES
+                    ================================================== -->
                     <div class="col-xl-3 col-lg-4">
 
                         <div class="reco-card">
@@ -2141,13 +2271,23 @@
 
 
             <!-- =========================================================
-     MODALE : IMPORTER UN RELEVÉ BANCAIRE
-========================================================== -->
+                MODALE : IMPORTER UN RELEVÉ BANCAIRE
+            ========================================================== -->
             <div class="modal fade modal-reco" id="importStatementModal" tabindex="-1" role="dialog">
 
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
 
-                    <form action="#" method="post" enctype="multipart/form-data" style="width: 100%;">
+                    <form action="<?= base_url('finance/rapprochement/releve/import'); ?>" method="post"
+                        enctype="multipart/form-data" id="importStatementForm" style="width: 100%;">
+
+                        <?php if (
+                            config_item('csrf_protection')
+                        ): ?>
+
+                        <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>"
+                            value="<?= $this->security->get_csrf_hash(); ?>">
+
+                        <?php endif; ?>
 
                         <div class="modal-content">
 
@@ -2177,22 +2317,45 @@
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <select name="bank_account_id" class="form-control" required>
+                                            <select name="bank_account_id" id="statementBankAccount"
+                                                class="form-control" required>
                                                 <option value="">
                                                     Sélectionner le compte
                                                 </option>
 
-                                                <option value="1">
-                                                    CRDB BIF — 110000000001
+                                                <?php if (
+                                                    !empty($allBankAccounts)
+                                                ): ?>
+
+                                                <?php foreach (
+                                                        $allBankAccounts
+                                                        as $account
+                                                    ): ?>
+
+                                                <option value="<?= (int) $account->id ?>" data-currency="<?= html_escape(
+                                                                                $account->currency
+                                                                            ) ?>">
+                                                    <?= html_escape(
+                                                                $account->bank_name
+                                                            ) ?>
+
+                                                    —
+
+                                                    <?= html_escape(
+                                                                $account->name
+                                                            ) ?>
+
+                                                    —
+
+                                                    <?= html_escape(
+                                                                $account->account_number
+                                                            ) ?>
                                                 </option>
 
-                                                <option value="2">
-                                                    BANCOBU BIF — 220000000001
-                                                </option>
+                                                <?php endforeach; ?>
 
-                                                <option value="3">
-                                                    ECOBANK BIF — 330000000001
-                                                </option>
+                                                <?php endif; ?>
+
                                             </select>
 
                                         </div>
@@ -2255,8 +2418,8 @@
                                                 Solde initial du relevé
                                             </label>
 
-                                            <input type="number" name="opening_balance" class="form-control" min="0"
-                                                step="0.01" placeholder="0">
+                                            <input type="number" name="opening_balance" class="form-control" step="0.01"
+                                                value="0" placeholder="0">
 
                                         </div>
 
@@ -2271,8 +2434,8 @@
                                                 <span class="required-star">*</span>
                                             </label>
 
-                                            <input type="number" name="closing_balance" class="form-control" min="0"
-                                                step="0.01" placeholder="0" required>
+                                            <input type="number" name="closing_balance" class="form-control" step="0.01"
+                                                value="0" placeholder="0" required>
 
                                         </div>
 
@@ -2299,7 +2462,8 @@
                                             </div>
 
                                             <small class="text-muted">
-                                                Taille maximale recommandée : 10 Mo.
+                                                Formats autorisés : PDF, XLS, XLSX et CSV.
+                                                Taille maximale : 10 Mo.
                                             </small>
 
                                         </div>
@@ -2312,7 +2476,7 @@
 
                                             <label>Observation</label>
 
-                                            <textarea name="observation" class="form-control"
+                                            <textarea name="observation" class="form-control" maxlength="1000"
                                                 placeholder="Informations complémentaires sur le relevé..."></textarea>
 
                                         </div>
@@ -2346,6 +2510,49 @@
             </div>
 
 
+            <script>
+            document.addEventListener(
+                'DOMContentLoaded',
+                function() {
+
+                    const statementFileInput =
+                        document.getElementById(
+                            'statementFile'
+                        );
+
+                    if (!statementFileInput) {
+                        return;
+                    }
+
+                    statementFileInput.addEventListener(
+                        'change',
+                        function() {
+
+                            const selectedFile =
+                                this.files &&
+                                this.files.length > 0 ?
+                                this.files[0] :
+                                null;
+
+                            const fileLabel =
+                                this.nextElementSibling;
+
+                            if (!fileLabel) {
+                                return;
+                            }
+
+                            fileLabel.textContent =
+                                selectedFile ?
+                                selectedFile.name :
+                                'Choisir un fichier PDF, Excel ou CSV';
+                        }
+                    );
+
+                }
+            );
+            </script>
+
+
             <!-- =========================================================
                 MODALE : NOUVEAU RAPPROCHEMENT
             ========================================================== -->
@@ -2356,6 +2563,9 @@
 
                     <form action="<?= base_url('finance/rapprochement/store'); ?>" method="post" style="width: 100%;"
                         id="newReconciliationForm">
+
+                        <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>"
+                            value="<?= $this->security->get_csrf_hash(); ?>">
 
                         <div class="modal-content">
 
@@ -2399,7 +2609,12 @@
 
                                                 <option value="<?= (int) $account->id ?>"
                                                     data-currency="<?= html_escape($account->currency) ?>"
-                                                    data-balance="<?= (float) $account->current_balance ?>"
+                                                    data-balance="<?= number_format(
+                                                                                                                                        (float) $account->current_balance,
+                                                                                                                                        2,
+                                                                                                                                        '.',
+                                                                                                                                        ''
+                                                                                                                                    ) ?>"
                                                     data-bank="<?= html_escape($account->bank_name) ?>"
                                                     data-account-number="<?= html_escape($account->account_number) ?>">
                                                     <?= html_escape($account->bank_name) ?>
@@ -2642,60 +2857,238 @@
 
             </div>
 
+
+            <div class="modal fade modal-reco" id="analyzeDifferencesModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <form action="<?= base_url('finance/rapprochement/analyser'); ?>" method="post"
+                        style="width: 100%;">
+                        <div class="modal-content">
+
+                            <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>"
+                                value="<?= $this->security->get_csrf_hash(); ?>">
+
+                            <div class="modal-header">
+                                <h5 class="modal-title">
+                                    <i class="fas fa-search-dollar mr-2"></i>
+                                    Analyser les écarts bancaires
+                                </h5>
+
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span>&times;</span>
+                                </button>
+                            </div>
+
+                            <div class="modal-body">
+
+                                <div class="row">
+
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label>
+                                                Session de rapprochement
+                                                <span class="required-star">*</span>
+                                            </label>
+
+                                            <select name="reconciliation_id" class="form-control" required>
+                                                <option value="">
+                                                    Sélectionner une session
+                                                </option>
+
+                                                <?php if (!empty($reconciliations)): ?>
+
+                                                <?php foreach ($reconciliations as $reconciliation): ?>
+
+                                                <option value="<?= (int) $reconciliation->id ?>">
+
+                                                    <?= html_escape($reconciliation->reference) ?>
+
+                                                    —
+
+                                                    <?= html_escape($reconciliation->bank_name) ?>
+
+                                                    —
+
+                                                    <?= date(
+                                                                'd/m/Y',
+                                                                strtotime($reconciliation->period_start)
+                                                            ) ?>
+
+                                                    au
+
+                                                    <?= date(
+                                                                'd/m/Y',
+                                                                strtotime($reconciliation->period_end)
+                                                            ) ?>
+
+                                                </option>
+
+                                                <?php endforeach; ?>
+
+                                                <?php endif; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>
+                                                Tolérance sur la date
+                                            </label>
+
+                                            <select name="date_tolerance" class="form-control">
+                                                <option value="0">
+                                                    Même date uniquement
+                                                </option>
+
+                                                <option value="1">
+                                                    ± 1 jour
+                                                </option>
+
+                                                <option value="2">
+                                                    ± 2 jours
+                                                </option>
+
+                                                <option value="3" selected>
+                                                    ± 3 jours
+                                                </option>
+
+                                                <option value="5">
+                                                    ± 5 jours
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>
+                                                Tolérance sur le montant
+                                            </label>
+
+                                            <div class="input-group">
+                                                <input type="number" name="amount_tolerance" class="form-control"
+                                                    value="0" min="0" step="0.01">
+
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">
+                                                        BIF
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-12">
+
+                                        <div class="alert alert-info mb-0">
+
+                                            <i class="fas fa-info-circle mr-1"></i>
+
+                                            L’analyse va comparer les lignes du relevé
+                                            bancaire avec les opérations enregistrées
+                                            dans le système.
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-reco-outline" data-dismiss="modal">
+                                    <i class="fas fa-times mr-1"></i>
+                                    Annuler
+                                </button>
+
+                                <button type="submit" class="btn btn-reco-primary">
+                                    <i class="fas fa-search-dollar mr-1"></i>
+                                    Lancer l’analyse
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             <script>
-            $(document).ready(function() {
+            document.addEventListener('DOMContentLoaded', function() {
 
-                /**
-                 * Met à jour automatiquement :
-                 * - la devise ;
-                 * - le solde actuel du système ;
-                 * - la devise affichée à côté des soldes du relevé.
+                const accountSelect =
+                    document.getElementById('reconciliationBankAccount');
+
+                const currencyInput =
+                    document.getElementById('reconciliationCurrency');
+
+                const currencyHiddenInput =
+                    document.getElementById('reconciliationCurrencyValue');
+
+                const systemBalanceInput =
+                    document.getElementById('reconciliationSystemBalance');
+
+                const systemBalanceHiddenInput =
+                    document.getElementById('reconciliationSystemBalanceValue');
+
+                const currencyLabels =
+                    document.querySelectorAll('.reconciliation-currency-label');
+
+                /*
+                 * Vérification de sécurité.
                  */
-                function updateReconciliationAccountData() {
+                if (!accountSelect) {
+                    console.error(
+                        'Le champ #reconciliationBankAccount est introuvable.'
+                    );
 
-                    const accountSelect =
-                        $('#reconciliationBankAccount');
+                    return;
+                }
+
+                function updateSelectedBankAccount() {
 
                     const selectedOption =
-                        accountSelect.find('option:selected');
-
-                    const accountId =
-                        accountSelect.val();
+                        accountSelect.options[accountSelect.selectedIndex];
 
                     /*
-                     * Aucun compte sélectionné.
+                     * Aucun compte bancaire sélectionné.
                      */
-                    if (!accountId) {
+                    if (
+                        !selectedOption ||
+                        !selectedOption.value
+                    ) {
+                        currencyInput.value = '';
 
-                        $('#reconciliationCurrency').val('');
+                        currencyHiddenInput.value = '';
 
-                        $('#reconciliationCurrencyValue').val('');
+                        systemBalanceInput.value = '0';
 
-                        $('#reconciliationSystemBalance').val('0');
+                        systemBalanceHiddenInput.value = '0';
 
-                        $('#reconciliationSystemBalanceValue').val('0');
-
-                        $('#statementOpeningBalance').val('');
-
-                        $('.reconciliation-currency-label').text('—');
+                        currencyLabels.forEach(function(label) {
+                            label.textContent = '—';
+                        });
 
                         return;
                     }
 
                     /*
-                     * Récupération des données de l'option sélectionnée.
+                     * Récupérer les informations stockées
+                     * dans les attributs data-* de l'option.
                      */
                     const currency =
-                        selectedOption.attr('data-currency') || '';
+                        selectedOption.dataset.currency || '';
 
-                    const balanceRaw =
-                        selectedOption.attr('data-balance') || '0';
+                    const rawBalance =
+                        selectedOption.dataset.balance || '0';
 
                     const balance =
-                        parseFloat(balanceRaw) || 0;
+                        Number.parseFloat(rawBalance) || 0;
 
                     /*
-                     * Formatage uniquement pour l'affichage.
+                     * Formater le montant pour l'affichage.
                      */
                     const formattedBalance =
                         new Intl.NumberFormat(
@@ -2706,63 +3099,49 @@
                         ).format(balance);
 
                     /*
-                     * Devise visible.
+                     * Afficher la devise.
                      */
-                    $('#reconciliationCurrency').val(currency);
+                    currencyInput.value = currency;
 
                     /*
                      * Devise envoyée au contrôleur.
                      */
-                    $('#reconciliationCurrencyValue').val(currency);
+                    currencyHiddenInput.value = currency;
 
                     /*
-                     * Solde actuel visible.
+                     * Afficher le solde système.
                      */
-                    $('#reconciliationSystemBalance').val(
-                        formattedBalance + ' ' + currency
-                    );
+                    systemBalanceInput.value =
+                        formattedBalance + ' ' + currency;
 
                     /*
-                     * Solde actuel brut envoyé au contrôleur.
+                     * Solde brut envoyé au contrôleur.
                      */
-                    $('#reconciliationSystemBalanceValue').val(balance);
+                    systemBalanceHiddenInput.value =
+                        balance.toString();
 
                     /*
-                     * Mettre automatiquement le solde initial.
-                     *
-                     * Ici, le solde initial du relevé prend le solde actuel
-                     * du compte sélectionné.
+                     * Mettre la devise à côté des champs
+                     * solde initial et solde final.
                      */
-                    $('#statementOpeningBalance').val(balance);
-
-                    /*
-                     * Devise à droite des champs montant.
-                     */
-                    $('.reconciliation-currency-label').text(currency);
+                    currencyLabels.forEach(function(label) {
+                        label.textContent = currency;
+                    });
                 }
 
                 /*
-                 * Lors du changement de compte.
+                 * Mise à jour au changement du compte.
                  */
-                $(document).on(
+                accountSelect.addEventListener(
                     'change',
-                    '#reconciliationBankAccount',
-                    function() {
-                        updateReconciliationAccountData();
-                    }
+                    updateSelectedBankAccount
                 );
 
                 /*
-                 * Lors de l'ouverture du modal.
-                 *
-                 * Utile si un compte est déjà sélectionné.
+                 * Mise à jour immédiate lorsqu'un compte
+                 * est déjà sélectionné.
                  */
-                $('#newReconciliationModal').on(
-                    'shown.bs.modal',
-                    function() {
-                        updateReconciliationAccountData();
-                    }
-                );
+                updateSelectedBankAccount();
 
             });
             </script>
@@ -2809,8 +3188,8 @@
 
 
             <!-- =========================================================
-     SCRIPTS
-========================================================== -->
+                SCRIPTS
+            ========================================================== -->
             <script>
             $(document).on(
                 'change',
@@ -2861,3 +3240,46 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<?php if ($this->session->flashdata('success')): ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Rapprochement démarré',
+        html: <?= json_encode(
+                            $this->session->flashdata('success')
+                        ) ?>,
+        confirmButtonText: 'Continuer',
+        confirmButtonColor: '#0f766e'
+    });
+
+});
+</script>
+
+<?php endif; ?>
+
+
+<?php if ($this->session->flashdata('error')): ?>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    Swal.fire({
+        icon: 'error',
+        title: 'Enregistrement impossible',
+        html: <?= json_encode(
+                            $this->session->flashdata('error')
+                        ) ?>,
+        confirmButtonText: 'Corriger',
+        confirmButtonColor: '#dc2626'
+    });
+
+});
+</script>
+
+<?php endif; ?>

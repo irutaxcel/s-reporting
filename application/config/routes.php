@@ -186,5 +186,15 @@ $route['encaissements'] = 'FinanceController/encaissements';
 $route['decaissements'] = 'FinanceController/decaissements';
 
 $route['rapprochement'] = 'FinanceController/rapprochement';
+$route['finance/rapprochement/store'] =
+    'FinanceController/reconciliationStore';
+$route['finance/rapprochement/releve/import'] =
+    'FinanceController/bankStatementImportStore';
+
+
+$route['finance/rapprochement/analyser'] =
+    'FinanceController/analyzeBankReconciliationStore';
+
+
 
 $route['prevision'] = 'FinanceController/prevision';

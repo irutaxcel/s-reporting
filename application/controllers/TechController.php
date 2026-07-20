@@ -425,6 +425,7 @@ class TechController extends CI_Controller
         $quantites      = $this->input->post('quantite');
         $prix_unitaires = $this->input->post('prix_unitaire');
         $totaux_lignes  = $this->input->post('total_ligne');
+        $observation_line    = $this->input->post('observation');
 
         $data_form = [
 
@@ -479,6 +480,7 @@ class TechController extends CI_Controller
             $articles,
             $quantites,
             $prix_unitaires,
+            $observation_line,
             $totaux_lignes
         );
 
@@ -540,6 +542,7 @@ class TechController extends CI_Controller
         $verifie_par   = $this->input->post('verifie_par');
         $total_general = $this->input->post('total_general');
 
+
         $chantier = $this->TechModel->getChantierById($chantier_id);
 
         $data_form = [
@@ -555,6 +558,7 @@ class TechController extends CI_Controller
         $quantites      = $this->input->post('quantite');
         $prix_unitaires = $this->input->post('prix_unitaire');
         $totaux_lignes  = $this->input->post('total_ligne');
+        $observation   = $this->input->post('observation');
 
         $update = $this->TechModel->updateAchatMateriel(
             $id,
@@ -562,7 +566,8 @@ class TechController extends CI_Controller
             $articles,
             $quantites,
             $prix_unitaires,
-            $totaux_lignes
+            $totaux_lignes,
+            $observation
         );
 
         $this->session->set_flashdata(
