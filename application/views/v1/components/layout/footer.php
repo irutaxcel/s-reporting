@@ -96,6 +96,37 @@ Swal.fire({
 </script>
 
 <?php endif; ?>
+
+<script>
+if ('serviceWorker' in navigator) {
+
+    window.addEventListener('load', function() {
+
+        navigator.serviceWorker
+            .register('<?= base_url('service-worker.js'); ?>', {
+                scope: '/'
+            })
+            .then(function(registration) {
+
+                console.log(
+                    'Service Worker enregistré :',
+                    registration.scope
+                );
+
+            })
+            .catch(function(error) {
+
+                console.error(
+                    'Erreur Service Worker :',
+                    error
+                );
+
+            });
+
+    });
+
+}
+</script>
 </body>
 
 </html>

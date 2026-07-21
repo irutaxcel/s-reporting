@@ -437,9 +437,14 @@
                                         Date demande
                                     </th>
 
+                                    <?php if ($this->session->userdata('role_id') == 1 || $this->session->userdata('role_id') == 2 || $this->session->userdata('role_id') == 3 || $this->session->userdata('role_id') == 4 || $this->session->userdata('role_id') == 7) { ?>
                                     <th style="width:150px">
                                         Validation
                                     </th>
+                                    <?php } else { ?>
+                                    <!-- # code... -->
+                                    <?php } ?>
+
 
                                     <th style="width:170px">
                                         Statut achat
@@ -486,6 +491,7 @@
                                         <?= !empty($achat->request_date) ? date('d/m/Y', strtotime($achat->request_date)) : date('d/m/Y', strtotime($achat->created_at)) ?>
                                     </td>
 
+                                    <?php if ($this->session->userdata('role_id') == 1 || $this->session->userdata('role_id') == 2 || $this->session->userdata('role_id') == 3 || $this->session->userdata('role_id') == 4 || $this->session->userdata('role_id') == 7) { ?>
                                     <td class="text-center text-nowrap">
 
                                         <button type="button"
@@ -507,6 +513,10 @@
                                         </button>
 
                                     </td>
+                                    <?php } else { ?>
+                                    <!-- # code... -->
+                                    <?php } ?>
+
 
                                     <td class="text-center text-nowrap">
                                         <?php if ($achat->workflow_status == 'brouillon') : ?>

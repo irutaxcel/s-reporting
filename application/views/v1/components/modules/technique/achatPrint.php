@@ -190,8 +190,8 @@
     }
 
     table th {
-        background: #102033;
-        color: #fff;
+        background: #fff;
+        color: #102033;
         padding: 6px;
         border: 1px solid #102033;
     }
@@ -393,9 +393,18 @@
 
 
 
-            <div class="info-item">
+            <!-- <div class="info-item">
                 <span class="info-label">Tresoriere :</span>
                 AHISHAKIYE Nelly Ange
+            </div> -->
+
+            <div class="info-item">
+                <span class="info-label">Tresoriere / Fonds :</span>
+                <?php if ($achat->treasury_status == 'valide') { ?>
+                Oui
+                <?php } else { ?>
+                Non
+                <?php } ?>
             </div>
             <!-- <div class="info-item">
                 <span class="info-label">Demandé par :</span>
@@ -416,7 +425,7 @@
 
         </div>
 
-        <!-- <div class="validation-box">
+        <div class="validation-box">
             <div class="validation-title">Circuit de validation</div>
 
             <div class="validation-row">
@@ -431,10 +440,10 @@
                     <?= ($achat->financial_status == 'valide') ? 'Validé' : 'En attente' ?>
                 </div>
 
-                <div class="validation-badge <?= ($achat->dg_status == 'valide') ? 'validated' : 'pending' ?>">
+                <!-- <div class="validation-badge <?= ($achat->dg_status == 'valide') ? 'validated' : 'pending' ?>">
                     DG :
                     <?= ($achat->dg_status == 'valide') ? 'Validé' : 'En attente' ?>
-                </div>
+                </div> -->
 
                 <div class="validation-badge <?= ($achat->treasury_status == 'valide') ? 'validated' : 'pending' ?>">
                     Trésorerie :
@@ -442,7 +451,7 @@
                 </div>
 
             </div>
-        </div> -->
+        </div>
 
         <table>
             <thead>

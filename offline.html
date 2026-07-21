@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<meta name="theme-color" content="#0f766e" />
+
+		<title>Connexion indisponible | SATRACO</title>
+
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 20px;
+				font-family: Arial, sans-serif;
+				background: linear-gradient(135deg, #102033, #173b35, #0f766e);
+				color: #ffffff;
+			}
+
+			.offline-card {
+				width: 100%;
+				max-width: 480px;
+				padding: 40px 30px;
+				text-align: center;
+				background: rgba(255, 255, 255, 0.96);
+				color: #102033;
+				border-radius: 18px;
+				box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+			}
+
+			.offline-icon {
+				width: 90px;
+				height: 90px;
+				margin: 0 auto 20px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				border-radius: 50%;
+				font-size: 42px;
+				background: #e8f5ee;
+				color: #0f766e;
+			}
+
+			h1 {
+				margin: 0 0 15px;
+				font-size: 25px;
+			}
+
+			p {
+				margin: 0 0 25px;
+				line-height: 1.6;
+				color: #52606d;
+			}
+
+			button {
+				padding: 12px 25px;
+				border: none;
+				border-radius: 8px;
+				background: #0f766e;
+				color: #ffffff;
+				font-size: 15px;
+				font-weight: bold;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background: #0b5f59;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="offline-card">
+			<div class="offline-icon">!</div>
+
+			<h1>Connexion indisponible</h1>
+
+			<p>
+				Vous êtes actuellement hors connexion. Vérifiez votre connexion
+				Internet, puis réessayez.
+			</p>
+
+			<button type="button" onclick="window.location.reload()">
+				Réessayer
+			</button>
+		</div>
+	</body>
+</html>

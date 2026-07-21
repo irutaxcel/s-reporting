@@ -172,4 +172,24 @@
         border-top: 1px solid #e5e7eb;
     }
     </style>
+
+    <link rel="manifest" href="<?= base_url('manifest.json'); ?>">
+
+    <meta name="theme-color" content="#0f766e">
+
+    <meta name="application-name" content="SATRACO">
+
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="apple-mobile-web-app-title" content="SATRACO">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="<?= base_url('assets/pwa/icons/icon-192x192.png'); ?>">
+
+    <link rel="icon" type="image/png" sizes="192x192" href="<?= base_url('assets/pwa/icons/icon-192x192.png'); ?>">
+
+    <link rel="icon" type="image/png" sizes="512x512" href="<?= base_url('assets/pwa/icons/icon-512x512.png'); ?>">
 </head>
