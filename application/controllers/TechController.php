@@ -386,7 +386,6 @@ class TechController extends CI_Controller
 
     public function achatMateriels()
     {
-
         if (!$this->session->userdata('user_id')) {
             redirect('sign-in');
             return;
@@ -394,20 +393,64 @@ class TechController extends CI_Controller
 
         $title = 'Achats & Approvisionnement';
 
+        /*
+     * Récupération des filtres envoyés par GET
+     */
+        $filters = [
+            'chantier_id' => trim((string) $this->input->get('chantier_id', true)),
+
+            'workflow_status' => trim(
+                (string) $this->input->get('workflow_status', true)
+            ),
+
+            'date_debut' => trim(
+                (string) $this->input->get('date_debut', true)
+            ),
+
+            'date_fin' => trim(
+                (string) $this->input->get('date_fin', true)
+            )
+        ];
+
+        /*
+     * Liste des chantiers pour le champ select
+     */
         $allChantiers = $this->tech->getAllChantier();
 
-        $allAchats = $this->tech->getAllAchats();
+        /*
+     * Liste des demandes d'achat avec filtres
+     */
+        $allAchats = $this->tech->getAllAchats($filters);
 
-        $this->load->view('v1/components/layout/header', ['title' => $title]);
-        $this->load->view('v1/components/layout/sidebar');
+        /*
+     * Données envoyées à la vue
+     */
+        $data = [
+            'title'         => $title,
+            'allChantiers' => $allChantiers,
+            'allAchats'    => $allAchats,
+            'filters'      => $filters
+        ];
+
         $this->load->view(
-            'v1/components/modules/technique/achatMateriels',
+            'v1/components/layout/header',
             [
-                'allChantiers' => $allChantiers,
-                'allAchats'    => $allAchats
+                'title' => $title
             ]
         );
-        $this->load->view('v1/components/layout/footer');
+
+        $this->load->view(
+            'v1/components/layout/sidebar'
+        );
+
+        $this->load->view(
+            'v1/components/modules/technique/achatMateriels',
+            $data
+        );
+
+        $this->load->view(
+            'v1/components/layout/footer'
+        );
     }
 
     public function store_achat_materiel()
@@ -591,11 +634,67 @@ class TechController extends CI_Controller
         ]);
     }
 
+    public function storeBonPaiement()
+    {
+
+        $last = $this->tech->getLastPaymentVoucher();
+
+        $numero = $last ? $last->id + 1 : 1;
+
+        $paymentNumber = 'BP-'
+            . date('Y')
+            . '-'
+            . str_pad($numero, 6, '0', STR_PAD_LEFT);
+
+        $data = [
+
+            'company_id'         => $this->session->userdata('company_id'),
+
+            'request_id'         => $this->input->post('request_id'),
+
+            'payment_number'     => $paymentNumber,
+
+            'summary'            => $this->input->post('summary'),
+
+            'payment_mode'       => $this->input->post('payment_mode'),
+
+            'amount_paid'        => $this->input->post('amount_paid'),
+
+            'payment_reference'  => $this->input->post('payment_reference'),
+
+            'payment_date'       => $this->input->post('payment_date'),
+
+            'observation'        => $this->input->post('observation'),
+
+            'payment_status'     => 'effectue',
+
+            'created_by'         => $this->session->userdata('user_id')
+
+        ];
+
+        $this->db->insert(
+            'purchase_payment_vouchers',
+            $data
+        );
+
+        $this->session->set_flashdata(
+            'success',
+            'Bon de paiement enregistré avec succès.'
+        );
+
+        redirect('achat');
+    }
+
     public function print_achat($id)
     {
         $achat = $this->tech->getAchatById($id);
 
         $articles = $this->tech->getAchatItems($id);
+
+        /*
+        * Bon de paiement lié à la demande
+        */
+        $bonPaiement = $this->tech->getPaymentVoucherByRequestId($id);
 
         $this->load->view('v1/components/layout/header-print');
 
@@ -603,7 +702,8 @@ class TechController extends CI_Controller
             'v1/components/modules/technique/achatPrint',
             [
                 'achat' => $achat,
-                'articles' => $articles
+                'articles' => $articles,
+                'bonPaiement'  => $bonPaiement
             ]
         );
 

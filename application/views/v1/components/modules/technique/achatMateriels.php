@@ -135,7 +135,7 @@
 
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label>Chantier</label>
+                                                <label>Destination / Chantier</label>
                                                 <select name="chantier_id" class="form-control" required>
                                                     <option value="">-- Sélectionner le chantier --</option>
                                                     <?php foreach ($allChantiers as $chant) : ?>
@@ -332,47 +332,143 @@
                 <div class="card-body">
 
                     <!-- Filtres -->
-                    <div class="row mb-3">
+                    <form action="<?= current_url() ?>" method="get">
 
-                        <div class="col-md-3">
-                            <label>Chantier / Projet</label>
-                            <select class="form-control">
-                                <option>Tous les chantiers</option>
-                                <option>Chantier Bujumbura</option>
-                                <option>Chantier Gitega</option>
-                                <option>Chantier Ngozi</option>
-                            </select>
+                        <div class="row mb-3">
+
+                            <!-- Chantier -->
+                            <div class="col-md-3">
+                                <div class="form-group mb-0">
+
+                                    <label>Destination / Chantier</label>
+
+                                    <select name="chantier_id" id="filter_chantier_id" class="form-control">
+
+                                        <option value="">Tous les chantiers</option>
+
+                                        <?php if (!empty($allChantiers)) : ?>
+
+                                        <?php foreach ($allChantiers as $chantier) : ?>
+
+                                        <option value="<?= $chantier->id ?>" <?= isset($filters['chantier_id'])
+                                                                                            && (string) $filters['chantier_id'] === (string) $chantier->id
+                                                                                            ? 'selected'
+                                                                                            : '' ?>>
+
+                                            <?= html_escape($chantier->name) ?>
+
+                                        </option>
+
+                                        <?php endforeach; ?>
+
+                                        <?php endif; ?>
+
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <!-- Statut -->
+                            <div class="col-md-3">
+                                <div class="form-group mb-0">
+
+                                    <label>Statut achat</label>
+
+                                    <select name="workflow_status" id="filter_workflow_status" class="form-control">
+
+                                        <option value="">Tous les statuts</option>
+
+                                        <option value="brouillon" <?= ($filters['workflow_status'] ?? '') === 'brouillon'
+                                                                        ? 'selected'
+                                                                        : '' ?>>
+                                            Brouillon
+                                        </option>
+
+                                        <option value="en_verification" <?= ($filters['workflow_status'] ?? '') === 'en_verification'
+                                                                            ? 'selected'
+                                                                            : '' ?>>
+                                            En vérification
+                                        </option>
+
+                                        <option value="valide" <?= ($filters['workflow_status'] ?? '') === 'valide'
+                                                                    ? 'selected'
+                                                                    : '' ?>>
+                                            Validée
+                                        </option>
+
+                                        <option value="en_approvisionnement" <?= ($filters['workflow_status'] ?? '') === 'en_approvisionnement'
+                                                                                    ? 'selected'
+                                                                                    : '' ?>>
+                                            En approvisionnement
+                                        </option>
+
+                                        <option value="achat_effectue" <?= ($filters['workflow_status'] ?? '') === 'achat_effectue'
+                                                                            ? 'selected'
+                                                                            : '' ?>>
+                                            Achat effectué
+                                        </option>
+
+                                        <option value="livre" <?= ($filters['workflow_status'] ?? '') === 'livre'
+                                                                    ? 'selected'
+                                                                    : '' ?>>
+                                            Livré
+                                        </option>
+
+                                    </select>
+
+                                </div>
+                            </div>
+
+                            <!-- Date début -->
+                            <div class="col-md-2">
+                                <div class="form-group mb-0">
+
+                                    <label>Date début</label>
+
+                                    <input type="date" name="date_debut" id="filter_date_debut" class="form-control"
+                                        value="<?= html_escape($filters['date_debut'] ?? '') ?>">
+
+                                </div>
+                            </div>
+
+                            <!-- Date fin -->
+                            <div class="col-md-2">
+                                <div class="form-group mb-0">
+
+                                    <label>Date fin</label>
+
+                                    <input type="date" name="date_fin" id="filter_date_fin" class="form-control"
+                                        value="<?= html_escape($filters['date_fin'] ?? '') ?>">
+
+                                </div>
+                            </div>
+
+                            <!-- Boutons -->
+                            <div class="col-md-2 d-flex align-items-end">
+
+                                <div class="btn-group btn-block">
+
+                                    <button type="submit" class="btn btn-success">
+
+                                        <i class="fas fa-search mr-1"></i>
+                                        Filtrer
+
+                                    </button>
+
+                                    <a href="<?= base_url('achats-materiels') ?>" class="btn btn-secondary"
+                                        title="Réinitialiser les filtres">
+
+                                        <i class="fas fa-redo-alt"></i>
+
+                                    </a>
+
+                                </div>
+
+                            </div>
+
                         </div>
 
-                        <div class="col-md-3">
-                            <label>Statut achat</label>
-                            <select class="form-control">
-                                <option>Tous</option>
-                                <option>Validée</option>
-                                <option>Achat effectué</option>
-                                <option>En approvisionnement</option>
-                                <option>Livré</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-2">
-                            <label>Date début</label>
-                            <input type="date" class="form-control">
-                        </div>
-
-                        <div class="col-md-2">
-                            <label>Date fin</label>
-                            <input type="date" class="form-control">
-                        </div>
-
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button class="btn btn-success btn-block">
-                                <i class="fas fa-search mr-1"></i>
-                                Filtrer
-                            </button>
-                        </div>
-
-                    </div>
+                    </form>
 
                     <style>
                     .table-achats {
@@ -423,7 +519,7 @@
 
                                     <th style="width:120px">Référence</th>
 
-                                    <th style="width:220px">Chantier / Projet</th>
+                                    <th style="width:220px">Destination / Chantier</th>
 
                                     <th style="width:170px">Demandeur</th>
 
@@ -541,9 +637,14 @@
                                         </button>
 
                                         <!-- Créer achat -->
-                                        <button class="btn btn-sm btn-success" title="Créer achat"
-                                            onclick="creerAchat(<?= $achat->id ?>)">
-                                            <i class="fas fa-shopping-cart"></i>
+                                        <button type="button" class="btn btn-sm btn-primary"
+                                            title="Créer un bon de paiement" onclick="creerBonPaiement(
+                                                        <?= $achat->id ?>,
+                                                        '<?= html_escape($achat->articles_designation) ?>',
+                                                        '<?= $achat->total_amount ?>',
+                                                        'DA-<?= date('Y', strtotime($achat->created_at)) ?>-<?= str_pad($achat->id, 3, '0', STR_PAD_LEFT) ?>'
+                                                    )">
+                                            <i class="fas fa-file-invoice-dollar"></i>
                                         </button>
 
                                         <!-- Modifier -->
@@ -650,7 +751,7 @@
 
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <label>Chantier</label>
+                                            <label>Destination / Chantier</label>
                                             <select name="chantier_id" id="edit_chantier_id" class="form-control"
                                                 required>
                                                 <option value="">Sélectionner...</option>
@@ -756,6 +857,8 @@
                             $('#edit_charge_achat').val(achat.buyer_name);
                             $('#edit_verifie_par').val(achat.verified_by);
                             $('#edit_total_general').val(achat.total_amount);
+
+                            console.log(achat.chantier_id);
 
                             $('#editArticlesTable tbody').html('');
 
@@ -1069,6 +1172,286 @@
                     }
 
                     return date.toLocaleDateString('fr-FR');
+                }
+                </script>
+
+                <!-- Modal Bon de paiement -->
+                <div class="modal fade" id="modalBonPaiement" tabindex="-1" role="dialog"
+                    aria-labelledby="modalBonPaiementLabel" aria-hidden="true">
+
+                    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+
+                        <form action="<?= base_url('tech/store-bon-paiement') ?>" method="post" id="formBonPaiement">
+
+                            <div class="modal-content">
+
+                                <!-- ID de la demande -->
+                                <input type="hidden" name="request_id" id="payment_request_id">
+
+                                <!-- Token CSRF -->
+                                <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>"
+                                    value="<?= $this->security->get_csrf_hash(); ?>">
+
+                                <div class="modal-header bg-primary text-white">
+
+                                    <h5 class="modal-title" id="modalBonPaiementLabel">
+                                        <i class="fas fa-file-invoice-dollar mr-2"></i>
+                                        Créer un bon de paiement
+                                    </h5>
+
+                                    <button type="button" class="close text-white" data-dismiss="modal"
+                                        aria-label="Fermer">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+
+                                </div>
+
+                                <div class="modal-body">
+
+                                    <!-- Informations demande -->
+                                    <div class="alert alert-light border mb-4">
+
+                                        <div class="row">
+
+                                            <div class="col-md-6">
+                                                <small class="text-muted d-block">
+                                                    Référence de la demande
+                                                </small>
+
+                                                <strong id="payment_request_reference">
+                                                    -
+                                                </strong>
+                                            </div>
+
+                                            <div class="col-md-6 text-md-right">
+                                                <small class="text-muted d-block">
+                                                    Montant de la demande
+                                                </small>
+
+                                                <strong id="payment_request_amount_display" class="text-primary">
+                                                    0 BIF
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="row">
+
+                                        <!-- Synthèse -->
+                                        <div class="col-md-12">
+
+                                            <div class="form-group">
+
+                                                <label for="payment_summary">
+                                                    Synthèse de la demande
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <textarea name="summary" id="payment_summary" class="form-control"
+                                                    rows="3"
+                                                    placeholder="Exemple : Achat de ciment, fers à béton et gravier..."
+                                                    required></textarea>
+
+                                                <small class="form-text text-muted">
+                                                    Résumez brièvement la nature du paiement demandé.
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Mode paiement -->
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+
+                                                <label for="payment_mode">
+                                                    Mode de paiement
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <select name="payment_mode" id="payment_mode" class="form-control"
+                                                    required>
+
+                                                    <option value="">
+                                                        Sélectionner le mode de paiement
+                                                    </option>
+
+                                                    <option value="especes">
+                                                        Espèces
+                                                    </option>
+
+                                                    <option value="cheque">
+                                                        Chèque
+                                                    </option>
+
+                                                    <option value="virement_bancaire">
+                                                        Virement bancaire
+                                                    </option>
+
+                                                    <option value="transfert_mobile">
+                                                        Transfert via téléphone mobile
+                                                    </option>
+
+                                                    <option value="autre">
+                                                        Autre
+                                                    </option>
+
+                                                </select>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Montant payé -->
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+
+                                                <label for="payment_amount">
+                                                    Montant payé
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <div class="input-group">
+
+                                                    <input type="number" name="amount_paid" id="payment_amount"
+                                                        class="form-control" min="0" step="0.01" readonly required>
+
+                                                    <div class="input-group-append">
+                                                        <span class="input-group-text">
+                                                            BIF
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+
+                                                <small class="form-text text-muted">
+                                                    Le montant est récupéré automatiquement depuis la demande d'achat.
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Référence paiement -->
+                                        <div class="col-md-12">
+
+                                            <div class="form-group">
+
+                                                <label for="payment_reference">
+                                                    Référence du paiement
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <input type="text" name="payment_reference" id="payment_reference"
+                                                    class="form-control"
+                                                    placeholder="Exemple : CHQ-45869, VIR-2026-001, TX-458977..."
+                                                    required>
+
+                                                <small class="form-text text-muted">
+                                                    Numéro du chèque, référence bancaire, numéro de transaction ou autre
+                                                    justificatif.
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Date paiement -->
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+
+                                                <label for="payment_date">
+                                                    Date de paiement
+                                                    <span class="text-danger">*</span>
+                                                </label>
+
+                                                <input type="date" name="payment_date" id="payment_date"
+                                                    class="form-control" value="<?= date('Y-m-d') ?>" required>
+
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Observation -->
+                                        <div class="col-md-6">
+
+                                            <div class="form-group">
+
+                                                <label for="payment_observation">
+                                                    Observation
+                                                </label>
+
+                                                <input type="text" name="observation" id="payment_observation"
+                                                    class="form-control" placeholder="Observation facultative">
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="modal-footer">
+
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+
+                                        <i class="fas fa-times mr-1"></i>
+                                        Fermer
+
+                                    </button>
+
+                                    <button type="submit" class="btn btn-primary">
+
+                                        <i class="fas fa-save mr-1"></i>
+                                        Enregistrer le bon
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <script>
+                function creerBonPaiement(id, synthese, montant, referenceDemande) {
+                    let montantNumerique = parseFloat(montant) || 0;
+
+                    $('#payment_request_id').val(id);
+
+                    $('#payment_summary').val(
+                        synthese && synthese.trim() !== '' ?
+                        synthese :
+                        'Paiement lié à la demande ' + referenceDemande
+                    );
+
+                    $('#payment_amount').val(montantNumerique.toFixed(2));
+
+                    $('#payment_request_reference').text(referenceDemande);
+
+                    $('#payment_request_amount_display').text(
+                        montantNumerique.toLocaleString('fr-FR') + ' BIF'
+                    );
+
+                    /*
+                     * Réinitialiser les champs spécifiques au paiement
+                     */
+                    $('#payment_mode').val('');
+                    $('#payment_reference').val('');
+                    $('#payment_observation').val('');
+                    $('#payment_date').val('<?= date('Y-m-d') ?>');
+
+                    $('#modalBonPaiement').modal('show');
                 }
                 </script>
 

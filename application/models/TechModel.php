@@ -88,6 +88,106 @@ class TechModel extends CI_Model
         return $result && $result->unit_rate ? $result->unit_rate : 0;
     }
 
+    public function getAllAchats($filters = [])
+    {
+        $this->db->select("
+            prf.*,
+            p.name AS chantier_nom,
+            COUNT(pri.id) AS nombre_articles,
+            GROUP_CONCAT(
+                DISTINCT pri.designation
+                ORDER BY pri.id ASC
+                SEPARATOR ', '
+            ) AS articles_designation,
+            COALESCE(SUM(pri.total_price), 0) AS montant_articles
+        ");
+
+        $this->db->from('purchase_request_forms prf');
+
+        $this->db->join(
+            'projects p',
+            'p.id = prf.chantier_id',
+            'left'
+        );
+
+        $this->db->join(
+            'purchase_request_items pri',
+            'pri.request_id = prf.id',
+            'left'
+        );
+
+        /*
+     * Filtre chantier
+     */
+        if (!empty($filters['chantier_id'])) {
+            $this->db->where(
+                'prf.chantier_id',
+                (int) $filters['chantier_id']
+            );
+        }
+
+        /*
+     * Filtre statut
+     */
+        if (!empty($filters['workflow_status'])) {
+            $this->db->where(
+                'prf.workflow_status',
+                $filters['workflow_status']
+            );
+        }
+
+        /*
+     * Filtre date début
+     */
+        if (!empty($filters['date_debut'])) {
+            $dateDebut = date(
+                'Y-m-d',
+                strtotime($filters['date_debut'])
+            );
+
+            $this->db->where(
+                "DATE(COALESCE(prf.request_date, prf.created_at)) >= " .
+                    $this->db->escape($dateDebut),
+                null,
+                false
+            );
+        }
+
+        /*
+     * Filtre date fin
+     */
+        if (!empty($filters['date_fin'])) {
+            $dateFin = date(
+                'Y-m-d',
+                strtotime($filters['date_fin'])
+            );
+
+            $this->db->where(
+                "DATE(COALESCE(prf.request_date, prf.created_at)) <= " .
+                    $this->db->escape($dateFin),
+                null,
+                false
+            );
+        }
+
+        $this->db->group_by('prf.id');
+
+        $this->db->order_by(
+            'COALESCE(prf.request_date, prf.created_at)',
+            'DESC',
+            false
+        );
+
+        $this->db->order_by('prf.id', 'DESC');
+
+        /*
+        * Les 100 dernières demandes
+        */
+        $this->db->limit(100);
+
+        return $this->db->get()->result();
+    }
+
     public function insert_achat_materiel_form($data_form, $articles, $quantites, $prix_unitaires, $observation_line, $totaux_lignes)
     {
         $this->db->trans_start();
@@ -121,23 +221,23 @@ class TechModel extends CI_Model
         return $this->db->trans_status();
     }
 
-    public function getAllAchats()
-    {
-        $this->db->select("
-            prf.*,
-            p.name AS chantier_nom,
-            GROUP_CONCAT(pri.designation SEPARATOR ', ') AS articles_designation
-        ");
+    // public function getAllAchats()
+    // {
+    //     $this->db->select("
+    //         prf.*,
+    //         p.name AS chantier_nom,
+    //         GROUP_CONCAT(pri.designation SEPARATOR ', ') AS articles_designation
+    //     ");
 
-        $this->db->from('purchase_request_forms prf');
-        $this->db->join('chantiers p', 'p.id = prf.chantier_id', 'left');
-        $this->db->join('purchase_request_items pri', 'pri.request_id = prf.id', 'left');
+    //     $this->db->from('purchase_request_forms prf');
+    //     $this->db->join('chantiers p', 'p.id = prf.chantier_id', 'left');
+    //     $this->db->join('purchase_request_items pri', 'pri.request_id = prf.id', 'left');
 
-        $this->db->group_by('prf.id');
-        $this->db->order_by('prf.id', 'DESC');
+    //     $this->db->group_by('prf.id');
+    //     $this->db->order_by('prf.id', 'DESC');
 
-        return $this->db->get()->result();
-    }
+    //     return $this->db->get()->result();
+    // }
 
     public function validerAchat($id, $champ)
     {
@@ -964,5 +1064,23 @@ class TechModel extends CI_Model
             'total_maintenance_cost'    => $totalMaintenanceCost,
             'total_operation_cost'      => $totalFuelCost + $totalMaintenanceCost
         ];
+    }
+
+    public function getLastPaymentVoucher()
+    {
+        return $this->db
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get('purchase_payment_vouchers')
+            ->row();
+    }
+
+    public function getPaymentVoucherByRequestId($requestId)
+    {
+        return $this->db
+            ->where('request_id', (int) $requestId)
+            ->order_by('id', 'DESC')
+            ->get('purchase_payment_vouchers')
+            ->row();
     }
 }

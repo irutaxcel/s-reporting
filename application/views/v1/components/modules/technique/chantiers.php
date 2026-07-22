@@ -141,17 +141,17 @@
             </div>
 
             <?php if ($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    <?= $this->session->flashdata('error'); ?>
-                </div>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?= $this->session->flashdata('error'); ?>
+            </div>
             <?php endif; ?>
 
             <?php if ($this->session->flashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                    <?= $this->session->flashdata('success'); ?>
-                </div>
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?= $this->session->flashdata('success'); ?>
+            </div>
             <?php endif; ?>
 
             <!-- Liste -->
@@ -186,7 +186,7 @@
                                 <th>#</th>
                                 <th>Référence</th>
                                 <th>Projet</th>
-                                <th>Chantier</th>
+                                <th>Destination</th>
                                 <th>Localisation</th>
                                 <th>Chef chantier</th>
                                 <th>Début</th>
@@ -201,50 +201,50 @@
 
                             <?php if (!empty($allChantier)) : ?>
 
-                                <?php $index = 1;
+                            <?php $index = 1;
                                 foreach ($allChantier as $ch) : ?>
 
-                                    <tr>
+                            <tr>
 
-                                        <td><?= $index++ ?></td>
+                                <td><?= $index++ ?></td>
 
-                                        <td>
-                                            <strong><?= $ch->ref_chantier ?></strong>
-                                        </td>
+                                <td>
+                                    <strong><?= $ch->ref_chantier ?></strong>
+                                </td>
 
-                                        <td>
-                                            <?= !empty($ch->project_name) ? $ch->project_name : '-' ?>
-                                        </td>
+                                <td>
+                                    <?= !empty($ch->project_name) ? $ch->project_name : '-' ?>
+                                </td>
 
-                                        <td>
-                                            <?= $ch->name ?>
-                                        </td>
+                                <td>
+                                    <?= $ch->name ?>
+                                </td>
 
-                                        <td>
-                                            <i class="fas fa-map-marker-alt text-danger mr-1"></i>
-                                            <?= $ch->location ?>
-                                        </td>
+                                <td>
+                                    <i class="fas fa-map-marker-alt text-danger mr-1"></i>
+                                    <?= $ch->location ?>
+                                </td>
 
-                                        <td>
-                                            <i class="fas fa-user text-primary mr-1"></i>
-                                            <?= $ch->chef_chantier ?>
-                                        </td>
+                                <td>
+                                    <i class="fas fa-user text-primary mr-1"></i>
+                                    <?= $ch->chef_chantier ?>
+                                </td>
 
-                                        <td>
-                                            <?= !empty($ch->date_debut) ? date('d/m/Y', strtotime($ch->date_debut)) : '-' ?>
-                                        </td>
+                                <td>
+                                    <?= !empty($ch->date_debut) ? date('d/m/Y', strtotime($ch->date_debut)) : '-' ?>
+                                </td>
 
-                                        <td>
-                                            <?= !empty($ch->date_fin_prevue) ? date('d/m/Y', strtotime($ch->date_fin_prevue)) : '-' ?>
-                                        </td>
+                                <td>
+                                    <?= !empty($ch->date_fin_prevue) ? date('d/m/Y', strtotime($ch->date_fin_prevue)) : '-' ?>
+                                </td>
 
-                                        <td class="text-right">
-                                            <strong><?= number_format($ch->budget, 0, ',', ' ') ?> FBU</strong>
-                                        </td>
+                                <td class="text-right">
+                                    <strong><?= number_format($ch->budget, 0, ',', ' ') ?> FBU</strong>
+                                </td>
 
-                                        <td>
+                                <td>
 
-                                            <?php
+                                    <?php
 
                                             switch ($ch->status) {
 
@@ -274,48 +274,48 @@
 
                                             ?>
 
-                                        </td>
+                                </td>
 
-                                        <td class="text-center">
+                                <td class="text-center">
 
-                                            <button class="btn btn-info btn-xs" title="Voir">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
+                                    <button class="btn btn-info btn-xs" title="Voir">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
 
-                                            <button class="btn btn-warning btn-xs" onclick="editChantier(<?= $ch->id ?>)">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
+                                    <button class="btn btn-warning btn-xs" onclick="editChantier(<?= $ch->id ?>)">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
 
-                                            <button class="btn btn-secondary btn-xs" title="Tâches">
-                                                <i class="fas fa-tasks"></i>
-                                            </button>
+                                    <button class="btn btn-secondary btn-xs" title="Tâches">
+                                        <i class="fas fa-tasks"></i>
+                                    </button>
 
-                                            <button class="btn btn-danger btn-xs" title="Supprimer"
-                                                onclick="deleteChantier(<?= $ch->id ?>)">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                    <button class="btn btn-danger btn-xs" title="Supprimer"
+                                        onclick="deleteChantier(<?= $ch->id ?>)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
 
-                                        </td>
+                                </td>
 
-                                    </tr>
+                            </tr>
 
-                                <?php endforeach; ?>
+                            <?php endforeach; ?>
 
                             <?php else : ?>
 
-                                <tr>
+                            <tr>
 
-                                    <td colspan="11" class="text-center text-muted">
+                                <td colspan="11" class="text-center text-muted">
 
-                                        <i class="fas fa-folder-open fa-2x mb-2"></i>
+                                    <i class="fas fa-folder-open fa-2x mb-2"></i>
 
-                                        <br>
+                                    <br>
 
-                                        Aucun chantier disponible.
+                                    Aucun chantier disponible.
 
-                                    </td>
+                                </td>
 
-                                </tr>
+                            </tr>
 
                             <?php endif; ?>
 
@@ -356,7 +356,7 @@
                                 <select class="form-control" name="projet_id" required>
                                     <option value="">-- Sélectionner le projet --</option>
                                     <?php foreach ($allProject as $p) : ?>
-                                        <option value="<?= $p->id ?>"><?= $p->name ?></option>
+                                    <option value="<?= $p->id ?>"><?= $p->name ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -488,7 +488,7 @@
                                 <select class="form-control" name="projet_id" id="edit_project_id" required>
                                     <option value="">-- Sélectionner le projet --</option>
                                     <?php foreach ($allProject as $p) : ?>
-                                        <option value="<?= $p->id ?>"><?= $p->name ?></option>
+                                    <option value="<?= $p->id ?>"><?= $p->name ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -595,112 +595,96 @@
 
 
 <script>
-    function editChantier(id) {
-        $.ajax({
-            url: "<?= base_url('chantier-edit-ajax') ?>",
-            type: "POST",
-            data: {
-                id: id
-            },
-            dataType: "json",
-            success: function(res) {
-                $("#edit_id").val(res.id);
-                $("#edit_project_id").val(res.project_id);
-                $("#edit_reference").val(res.ref_chantier);
-                $("#edit_nom").val(res.name);
-                $("#edit_chef").val(res.chef_chantier);
-                $("#edit_location").val(res.location);
-                $("#edit_budget").val(res.budget);
-                $("#edit_date_debut").val(res.date_debut);
-                $("#edit_date_fin").val(res.date_fin_prevue);
-                $("#edit_status").val(res.status);
+function editChantier(id) {
+    $.ajax({
+        url: "<?= base_url('chantier-edit-ajax') ?>",
+        type: "POST",
+        data: {
+            id: id
+        },
+        dataType: "json",
+        success: function(res) {
+            $("#edit_id").val(res.id);
+            $("#edit_project_id").val(res.project_id);
+            $("#edit_reference").val(res.ref_chantier);
+            $("#edit_nom").val(res.name);
+            $("#edit_chef").val(res.chef_chantier);
+            $("#edit_location").val(res.location);
+            $("#edit_budget").val(res.budget);
+            $("#edit_date_debut").val(res.date_debut);
+            $("#edit_date_fin").val(res.date_fin_prevue);
+            $("#edit_status").val(res.status);
 
-                $("#editChantierModal").modal("show");
-            },
-            error: function() {
-                alert("Erreur lors du chargement du chantier.");
-            }
-        });
-    }
+            $("#editChantierModal").modal("show");
+        },
+        error: function() {
+            alert("Erreur lors du chargement du chantier.");
+        }
+    });
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    function deleteChantier(id) {
+function deleteChantier(id) {
 
-        Swal.fire({
+    Swal.fire({
 
-            title: 'Supprimer ce chantier ?',
+        title: 'Supprimer ce chantier ?',
 
-            text: "Cette opération est irréversible.",
+        text: "Cette opération est irréversible.",
 
-            icon: 'warning',
+        icon: 'warning',
 
-            showCancelButton: true,
+        showCancelButton: true,
 
-            confirmButtonColor: '#d33',
+        confirmButtonColor: '#d33',
 
-            cancelButtonColor: '#6c757d',
+        cancelButtonColor: '#6c757d',
 
-            confirmButtonText: 'Oui, supprimer',
+        confirmButtonText: 'Oui, supprimer',
 
-            cancelButtonText: 'Annuler'
+        cancelButtonText: 'Annuler'
 
-        }).then((result) => {
+    }).then((result) => {
 
-            if (result.isConfirmed) {
+        if (result.isConfirmed) {
 
-                $.ajax({
+            $.ajax({
 
-                    url: "<?= base_url('chantier-delete-ajax') ?>",
+                url: "<?= base_url('chantier-delete-ajax') ?>",
 
-                    type: "POST",
+                type: "POST",
 
-                    data: {
-                        id: id
-                    },
+                data: {
+                    id: id
+                },
 
-                    dataType: "json",
+                dataType: "json",
 
-                    success: function(res) {
+                success: function(res) {
 
-                        if (res.status) {
+                    if (res.status) {
 
-                            Swal.fire({
+                        Swal.fire({
 
-                                icon: 'success',
+                            icon: 'success',
 
-                                title: 'Supprimé',
+                            title: 'Supprimé',
 
-                                text: res.message,
+                            text: res.message,
 
-                                timer: 1500,
+                            timer: 1500,
 
-                                showConfirmButton: false
+                            showConfirmButton: false
 
-                            }).then(() => {
+                        }).then(() => {
 
-                                location.reload();
+                            location.reload();
 
-                            });
+                        });
 
-                        } else {
-
-                            Swal.fire({
-
-                                icon: 'error',
-
-                                title: 'Erreur',
-
-                                text: res.message
-
-                            });
-
-                        }
-
-                    },
-
-                    error: function() {
+                    } else {
 
                         Swal.fire({
 
@@ -708,17 +692,33 @@
 
                             title: 'Erreur',
 
-                            text: 'Impossible de communiquer avec le serveur.'
+                            text: res.message
 
                         });
 
                     }
 
-                });
+                },
 
-            }
+                error: function() {
 
-        });
+                    Swal.fire({
 
-    }
+                        icon: 'error',
+
+                        title: 'Erreur',
+
+                        text: 'Impossible de communiquer avec le serveur.'
+
+                    });
+
+                }
+
+            });
+
+        }
+
+    });
+
+}
 </script>

@@ -70,6 +70,10 @@ $route['personnel-chantier-print'] = 'TechController/personnelChantierPrint';
 
 $route['achat'] = 'TechController/achatMateriels';
 
+$route['achats-materiels'] = 'TechController/achatMateriels';
+
+$route['tech/store-bon-paiement'] = 'TechController/storeBonPaiement';
+
 $route['tech/store_achat_materiel'] = 'TechController/store_achat_materiel';
 
 $route['tech/valider-achat'] = 'TechController/valider_achat';
