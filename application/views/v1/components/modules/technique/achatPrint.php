@@ -16,7 +16,7 @@
         background: #f4f6f9;
         margin: 0;
         padding: 10px;
-        font-size: 11px;
+        font-size: 14px;
     }
 
     .print-page {
@@ -42,7 +42,7 @@
         cursor: pointer;
         font-weight: bold;
         color: #fff;
-        font-size: 11px;
+        font-size: 14px;
         text-decoration: none;
     }
 
@@ -96,12 +96,12 @@
     .company-title p {
         margin: 3px 0 0 0;
         color: #555;
-        font-size: 11px;
+        font-size: 14px;
     }
 
     .company-info {
         text-align: right;
-        font-size: 10px;
+        font-size: 11px;
         line-height: 1.45;
     }
 
@@ -165,7 +165,7 @@
         padding: 4px 7px;
         border-radius: 4px;
         background: #fff;
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .validated {
@@ -186,7 +186,7 @@
         width: 100%;
         border-collapse: collapse;
         margin-top: 8px;
-        font-size: 10.5px;
+        font-size: 11.5px;
     }
 
     table th {
@@ -213,7 +213,7 @@
     .total-row td {
         font-weight: bold;
         background: #f1f5f9;
-        font-size: 11px;
+        font-size: 14px;
     }
 
     .signature-section {
@@ -245,7 +245,7 @@
     }
 
     .signature-box .title {
-        font-size: 11px;
+        font-size: 14px;
         font-weight: bold;
         margin-bottom: 12px;
     }
@@ -272,13 +272,13 @@
     }
 
     .signature-box .name {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: bold;
         margin-bottom: 5px;
     }
 
     .signature-box .function {
-        font-size: 10px;
+        font-size: 11px;
         color: #444;
         line-height: 18px;
     }
@@ -337,7 +337,7 @@
     }
 
     .payment-voucher-number {
-        font-size: 11px;
+        font-size: 14px;
         font-weight: bold;
         background: rgba(255, 255, 255, .15);
         border: 1px solid rgba(255, 255, 255, .4);
@@ -359,14 +359,14 @@
     .payment-summary-label {
         display: block;
         color: #0f766e;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: bold;
         text-transform: uppercase;
         margin-bottom: 4px;
     }
 
     .payment-summary-value {
-        font-size: 11px;
+        font-size: 14px;
         line-height: 1.4;
     }
 
@@ -379,7 +379,7 @@
     .payment-info-item {
         border-bottom: 1px solid #d8dee4;
         padding: 5px 0;
-        font-size: 10.5px;
+        font-size: 11.5px;
     }
 
     .payment-info-label {
@@ -418,7 +418,7 @@
 
     .payment-signature-box strong {
         display: block;
-        font-size: 10px;
+        font-size: 11px;
     }
 
     .payment-signature-line {
@@ -439,7 +439,7 @@
         border: 1px dashed #cbd5e1;
         color: #6b7280;
         text-align: center;
-        font-size: 10px;
+        font-size: 11px;
         background: #f8fafc;
     }
 
