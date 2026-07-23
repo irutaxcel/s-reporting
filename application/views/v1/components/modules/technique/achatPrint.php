@@ -2,971 +2,1274 @@
 <html lang="fr">
 
 <head>
+
     <meta charset="UTF-8">
-    <title>Demande d'achat - Impression</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Demande d'achat - Impression
+    </title>
 
     <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        color: #222;
-        background: #f4f6f9;
-        margin: 0;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .print-page {
-        width: 210mm;
-        min-height: 297mm;
-        margin: auto;
-        background: #fff;
-        padding: 12mm 14mm;
-        border: 1px solid #ddd;
-    }
-
-    .print-actions {
-        width: 210mm;
-        margin: 0 auto 8px auto;
-        text-align: right;
-    }
-
-    .btn-print,
-    .btn-back {
-        border: none;
-        padding: 7px 14px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-        color: #fff;
-        font-size: 14px;
-        text-decoration: none;
-    }
-
-    .btn-print {
-        background: #0f766e;
-    }
-
-    .btn-back {
-        background: #6c757d;
-        margin-right: 5px;
-    }
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 3px solid #0f766e;
-        padding-bottom: 10px;
-        margin-bottom: 14px;
-    }
-
-    .company-left {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .logo-box {
-        width: 65px;
-        height: 65px;
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .logo-box img {
-        width: 58px;
-        height: 58px;
-        object-fit: contain;
-    }
-
-    .company-title h2 {
-        margin: 0;
-        color: #0f766e;
-        font-size: 18px;
-        text-transform: uppercase;
-    }
-
-    .company-title p {
-        margin: 3px 0 0 0;
-        color: #555;
-        font-size: 14px;
-    }
-
-    .company-info {
-        text-align: right;
-        font-size: 11px;
-        line-height: 1.45;
-    }
-
-    .document-title {
-        text-align: center;
-        margin: 14px 0 16px;
-    }
-
-    .document-title h1 {
-        display: inline-block;
-        margin: 0;
-        padding: 7px 28px;
-        border: 2px solid #0f766e;
-        color: #0f766e;
-        font-size: 18px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 7px 22px;
-        margin-bottom: 12px;
-    }
-
-    .info-item {
-        border-bottom: 1px solid #ddd;
-        padding-bottom: 5px;
-    }
-
-    .info-label {
-        font-weight: bold;
-        color: #0f766e;
-        display: inline-block;
-        width: 110px;
-    }
-
-    .validation-box {
-        margin: 10px 0 12px 0;
-        border: 1px solid #ddd;
-        padding: 9px;
-        background: #f9fafb;
-    }
-
-    .validation-title {
-        font-weight: bold;
-        color: #0f766e;
-        margin-bottom: 7px;
-        text-transform: uppercase;
-    }
-
-    .validation-row {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-    }
-
-    .validation-badge {
-        border: 1px solid #ccc;
-        padding: 4px 7px;
-        border-radius: 4px;
-        background: #fff;
-        font-size: 11px;
-    }
-
-    .validated {
-        background: #e9f7ef;
-        border-color: #28a745;
-        color: #155724;
-        font-weight: bold;
-    }
-
-    .pending {
-        background: #fff3cd;
-        border-color: #ffc107;
-        color: #856404;
-        font-weight: bold;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 8px;
-        font-size: 11.5px;
-    }
-
-    table th {
-        background: #fff;
-        color: #102033;
-        padding: 6px;
-        border: 1px solid #102033;
-    }
-
-    table td {
-        border: 1px solid #ccc;
-        padding: 5px 6px;
-        vertical-align: middle;
-    }
-
-    .text-right {
-        text-align: right;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .total-row td {
-        font-weight: bold;
-        background: #f1f5f9;
-        font-size: 14px;
-    }
-
-    .signature-section {
-        margin-top: 25px;
-    }
-
-    .signature-title {
-        font-size: 13px;
-        font-weight: bold;
-        color: #0f766e;
-        margin-bottom: 12px;
-        text-transform: uppercase;
-    }
-
-
-
-    .signature-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-    }
-
-    .signature-box {
-        border: 1px solid #cfcfcf;
-        height: 140px;
-        padding: 10px;
-        position: relative;
-        background: #fff;
-    }
-
-    .signature-box .title {
-        font-size: 14px;
-        font-weight: bold;
-        margin-bottom: 12px;
-    }
-
-    .signature {
-        position: absolute;
-        left: 10px;
-        right: 10px;
-        bottom: 12px;
-    }
-
-    .signature hr {
-        margin: 0;
-        border: none;
-        border-top: 1px solid #444;
-    }
-
-    .signature span {
-        display: block;
-        text-align: center;
-        margin-top: 4px;
-        font-size: 10px;
-        color: #666;
-    }
-
-    .signature-box .name {
-        font-size: 11px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .signature-box .function {
-        font-size: 11px;
-        color: #444;
-        line-height: 18px;
-    }
-
-    .signature-box .signature {
-        position: absolute;
-        left: 10px;
-        right: 10px;
-        bottom: 15px;
-        text-align: center;
-    }
-
-    .signature-box .signature hr {
-        border: none;
-        border-top: 1px solid #444;
-        margin-bottom: 3px;
-    }
-
-    .signature-box .signature span {
-        font-size: 8px;
-        color: #777;
-    }
-
-    .footer {
-        margin-top: 18px;
-        border-top: 2px solid #0f766e;
-        padding-top: 8px;
-        font-size: 10px;
-        color: #555;
-        text-align: center;
-    }
-
-
-
-    .payment-voucher-section {
-        margin-top: 22px;
-        border: 1px solid #cbd5e1;
-        page-break-inside: avoid;
-        background: #fff;
-    }
-
-    .payment-voucher-header {
-        background: #fff;
-        color: #0f766e;
-        padding: 8px 12px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .payment-voucher-header h3 {
-        margin: 0;
-        font-size: 13px;
-        text-transform: uppercase;
-        letter-spacing: .5px;
-    }
-
-    .payment-voucher-number {
-        font-size: 14px;
-        font-weight: bold;
-        background: rgba(255, 255, 255, .15);
-        border: 1px solid rgba(255, 255, 255, .4);
-        padding: 4px 8px;
-        border-radius: 3px;
-    }
-
-    .payment-voucher-body {
-        padding: 12px;
-    }
-
-    .payment-summary {
-        border: 1px solid #d8dee4;
-        background: #f8fafc;
-        padding: 9px;
-        margin-bottom: 10px;
-    }
-
-    .payment-summary-label {
-        display: block;
-        color: #0f766e;
-        font-size: 11px;
-        font-weight: bold;
-        text-transform: uppercase;
-        margin-bottom: 4px;
-    }
-
-    .payment-summary-value {
-        font-size: 14px;
-        line-height: 1.4;
-    }
-
-    .payment-info-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px 18px;
-    }
-
-    .payment-info-item {
-        border-bottom: 1px solid #d8dee4;
-        padding: 5px 0;
-        font-size: 11.5px;
-    }
-
-    .payment-info-label {
-        display: inline-block;
-        width: 125px;
-        font-weight: bold;
-        color: #0f766e;
-    }
-
-    .payment-amount {
-        font-size: 13px;
-        font-weight: bold;
-        color: #102033;
-    }
-
-    .payment-observation {
-        margin-top: 10px;
-        border: 1px solid #d8dee4;
-        padding: 8px;
-        min-height: 42px;
-    }
-
-    .payment-signatures {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        margin-top: 14px;
-    }
-
-    .payment-signature-box {
-        height: 95px;
-        border: 1px solid #cbd5e1;
-        padding: 8px;
-        position: relative;
-    }
-
-    .payment-signature-box strong {
-        display: block;
-        font-size: 11px;
-    }
-
-    .payment-signature-line {
-        position: absolute;
-        left: 8px;
-        right: 8px;
-        bottom: 10px;
-        border-top: 1px solid #333;
-        padding-top: 3px;
-        text-align: center;
-        font-size: 8.5px;
-        color: #666;
-    }
-
-    .no-payment-voucher {
-        margin-top: 18px;
-        padding: 10px;
-        border: 1px dashed #cbd5e1;
-        color: #6b7280;
-        text-align: center;
-        font-size: 11px;
-        background: #f8fafc;
-    }
-
-
-
-    /* =========================================
-   BON DE PAIEMENT
-========================================= */
-
-    .payment-voucher-section {
-        width: 100%;
-        max-width: 100%;
-        margin-top: 18px;
-        border: 1px solid #cbd5e1;
-        background: #fff;
-        overflow: hidden;
-    }
-
-    .payment-voucher-body {
-        width: 100%;
-        max-width: 100%;
-        padding: 12px;
-        overflow: hidden;
-    }
-
-    /* Synthèse 70 % / Chantier 30 % */
-    .payment-summary-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
-        gap: 14px;
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 12px;
-        align-items: stretch;
-    }
-
-    .payment-summary-grid .payment-summary {
-        width: 100%;
-        min-width: 0;
-        max-width: 100%;
-        min-height: 76px;
-        margin: 0;
-        padding: 10px 12px;
-        border: 1px solid #d8dee4;
-        background: #f8fafc;
-        overflow: hidden;
-    }
-
-    .payment-summary-label {
-        display: block;
-        max-width: 100%;
-        margin-bottom: 5px;
-        color: #0f766e;
-        font-size: 11px;
-        font-weight: bold;
-        line-height: 1.25;
-        text-transform: uppercase;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-    }
-
-    .payment-summary-value {
-        display: block;
-        max-width: 100%;
-        color: #222;
-        font-size: 14px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-        word-break: normal;
-    }
-
-    /* Informations du paiement */
-    .payment-info-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 8px 18px;
-        width: 100%;
-    }
-
-    .payment-info-item {
-        min-width: 0;
-        border-bottom: 1px solid #d8dee4;
-        padding: 5px 0;
-        font-size: 11.5px;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-info-label {
-        display: inline-block;
-        width: 125px;
-        max-width: 45%;
-        font-weight: bold;
-        color: #0f766e;
-        vertical-align: top;
-    }
-
-    .payment-amount {
-        color: #102033;
-        font-size: 13px;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-
-    .payment-observation {
-        width: 100%;
-        min-height: 42px;
-        margin-top: 10px;
-        padding: 8px;
-        border: 1px solid #d8dee4;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-signatures {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-        width: 100%;
-        margin-top: 14px;
-    }
-
-    .payment-signature-box {
-        min-width: 0;
-        height: 95px;
-        padding: 8px;
-        border: 1px solid #cbd5e1;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .payment-signature-box strong {
-        display: block;
-        font-size: 11px;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-signature-box .function {
-        margin-top: 3px;
-        font-size: 11px;
-        line-height: 1.25;
-        overflow-wrap: anywhere;
-    }
-
-    @media screen and (max-width: 700px) {
-
-        .payment-summary-grid {
-            grid-template-columns: 1fr;
-            gap: 10px;
+        /* =====================================================
+           CONFIGURATION GÉNÉRALE
+        ===================================================== */
+
+        * {
+            box-sizing: border-box;
         }
 
-        .payment-info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .payment-signatures {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media print {
-
-        @page {
-            size: A4 portrait;
-            margin: 5mm;
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #102033;
+            --border: #cbd5e1;
+            --border-soft: #d8dee4;
+            --background-soft: #f8fafc;
+            --text: #222;
+            --muted: #555;
         }
 
         html,
         body {
-            width: 100%;
             margin: 0;
             padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: #f4f6f9;
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .print-page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: auto;
+            padding: 11mm 13mm;
+            background: #fff;
+            border: 1px solid #ddd;
+        }
+
+        /* =====================================================
+           BOUTONS
+        ===================================================== */
+
+        .print-actions {
+            width: 210mm;
+            margin: 0 auto 8px;
+            text-align: right;
+        }
+
+        .btn-print,
+        .btn-back {
+            display: inline-block;
+            border: none;
+            border-radius: 4px;
+            padding: 7px 14px;
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: var(--primary);
+        }
+
+        .btn-back {
+            margin-right: 5px;
+            background: #6c757d;
+        }
+
+        /* =====================================================
+           EN-TÊTE SATRACO
+        ===================================================== */
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 13px;
+            padding-bottom: 9px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .company-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 62px;
+            width: 62px;
+            height: 62px;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        .logo-box img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .company-title {
+            min-width: 0;
+        }
+
+        .company-title h2 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 18px;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .company-title p {
+            margin: 3px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .company-info {
+            flex: 0 0 auto;
+            text-align: right;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        /* =====================================================
+           TITRES DES DOCUMENTS
+        ===================================================== */
+
+        .document-title,
+        .payment-document-title {
+            text-align: center;
+        }
+
+        .document-title {
+            margin: 13px 0 15px;
+        }
+
+        .document-title h1,
+        .payment-document-title span {
+            display: inline-block;
+            margin: 0;
+            padding: 7px 28px;
+            border: 2px solid var(--primary);
+            background: #fff;
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* =====================================================
+           INFORMATIONS DE LA DEMANDE
+        ===================================================== */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 7px 22px;
+            margin-bottom: 11px;
+        }
+
+        .info-item {
+            min-width: 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+            overflow-wrap: anywhere;
+        }
+
+        .info-label {
+            display: inline-block;
+            width: 120px;
+            max-width: 45%;
+            color: var(--primary);
+            font-weight: bold;
+            vertical-align: top;
+        }
+
+        /* =====================================================
+           VALIDATIONS
+        ===================================================== */
+
+        .validation-box {
+            margin: 9px 0 11px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            background: #f9fafb;
+        }
+
+        .validation-title {
+            margin-bottom: 7px;
+            color: var(--primary);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .validation-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .validation-badge {
+            padding: 4px 7px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             background: #fff;
             font-size: 10px;
         }
 
-        .print-actions {
-            display: none !important;
+        .validated {
+            color: #155724;
+            background: #e9f7ef;
+            border-color: #28a745;
+            font-weight: bold;
         }
 
-        .print-page {
+        .pending {
+            color: #856404;
+            background: #fff3cd;
+            border-color: #ffc107;
+            font-weight: bold;
+        }
+
+        /* =====================================================
+           TABLEAU DES ARTICLES
+        ===================================================== */
+
+        .items-table {
             width: 100%;
-            max-width: 100%;
-            min-height: 0;
-            margin: 0;
-            padding: 4mm 6mm;
-            border: none;
-            box-shadow: none;
+            margin-top: 7px;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 10.5px;
         }
 
-        .header,
-        .document-title,
-        .info-grid,
-        .validation-box,
-        table,
-        .signature-section,
+        .items-table th {
+            padding: 6px;
+            border: 1px solid var(--primary-dark);
+            background: #fff;
+            color: var(--primary-dark);
+            text-align: center;
+        }
+
+        .items-table td {
+            padding: 5px 6px;
+            border: 1px solid #ccc;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+        }
+
+        .items-table .col-number {
+            width: 5%;
+        }
+
+        .items-table .col-designation {
+            width: 31%;
+        }
+
+        .items-table .col-quantity {
+            width: 11%;
+        }
+
+        .items-table .col-unit-price {
+            width: 16%;
+        }
+
+        .items-table .col-total {
+            width: 17%;
+        }
+
+        .items-table .col-observation {
+            width: 20%;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .total-row td {
+            background: #f1f5f9;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .notes-box {
+            margin-top: 8px;
+            padding: 7px;
+            border: 1px solid var(--border-soft);
+            overflow-wrap: anywhere;
+        }
+
+        /* =====================================================
+           SIGNATURES DE LA DEMANDE
+        ===================================================== */
+
+        .signature-section {
+            margin-top: 20px;
+        }
+
+        .signature-title {
+            margin-bottom: 9px;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .signature-box {
+            min-width: 0;
+            height: 120px;
+            padding: 9px;
+            border: 1px solid #cfcfcf;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .signature-box .title {
+            margin-bottom: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .signature-box .function {
+            color: #444;
+            font-size: 10px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+
+        /* =====================================================
+           SÉPARATEUR DU BON DE PAIEMENT
+        ===================================================== */
+
         .payment-divider {
-            break-inside: avoid;
-            page-break-inside: avoid;
+            width: 100%;
+            margin-top: 28px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .payment-divider-line {
+            width: 100%;
+            height: 3px;
+            margin-bottom: 15px;
+            background: var(--primary);
         }
 
         /*
-     * Le bon peut continuer sur la page suivante si nécessaire
-     */
+         * Même contour que le titre de la demande d'achat
+         */
+        .payment-document-title span {
+            min-width: 300px;
+        }
+
+        /* =====================================================
+           BON DE PAIEMENT
+        ===================================================== */
+
         .payment-voucher-section {
-            width: 100% !important;
-            max-width: 100% !important;
-            margin-top: 12px;
-            overflow: hidden !important;
-            page-break-inside: auto !important;
-            break-inside: auto !important;
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow: hidden;
         }
 
         .payment-voucher-body {
-            width: 100% !important;
-            max-width: 100% !important;
-            padding: 8px;
-            overflow: hidden !important;
+            width: 100%;
+            max-width: 100%;
+            padding: 11px;
+            overflow: hidden;
         }
 
         /*
-     * Conserver réellement 70 % / 30 % à l’impression
-     */
+         * Synthèse 70 % / chantier 30 %
+         * Utiliser 7fr / 3fr évite de dépasser 100 % avec le gap.
+         */
         .payment-summary-grid {
-            display: grid !important;
-            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
-            gap: 8px !important;
-            width: 100% !important;
-            max-width: 100% !important;
-            margin-bottom: 6px;
+            display: grid;
+            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 10px;
+            align-items: stretch;
         }
 
-        .payment-summary-grid .payment-summary {
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            min-height: 48px;
-            margin: 0 !important;
-            padding: 6px 8px !important;
-            overflow: hidden !important;
+        .payment-summary {
+            width: 100%;
+            min-width: 0;
+            min-height: 68px;
+            margin: 0;
+            padding: 9px 10px;
+            border: 1px solid var(--border-soft);
+            background: var(--background-soft);
+            overflow: hidden;
         }
 
         .payment-summary-label {
-            font-size: 8px;
-            line-height: 1.2;
+            display: block;
+            max-width: 100%;
+            margin-bottom: 5px;
+            color: var(--primary);
+            font-size: 10px;
+            font-weight: bold;
+            line-height: 1.25;
+            text-transform: uppercase;
+            overflow-wrap: anywhere;
         }
 
         .payment-summary-value {
-            font-size: 9px;
-            line-height: 1.25;
+            display: block;
+            max-width: 100%;
+            color: var(--text);
+            font-size: 12px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
         }
 
+        /* Informations du bon */
+
         .payment-info-grid {
-            display: grid !important;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-            gap: 4px 12px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 7px 18px;
             width: 100%;
         }
 
         .payment-info-item {
             min-width: 0;
-            padding: 3px 0;
-            font-size: 9px;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-soft);
+            font-size: 10.5px;
+            overflow-wrap: anywhere;
         }
 
         .payment-info-label {
-            width: 105px;
+            display: inline-block;
+            width: 135px;
             max-width: 48%;
+            color: var(--primary);
+            font-weight: bold;
+            vertical-align: top;
         }
 
         .payment-amount {
-            font-size: 10px;
+            color: var(--primary-dark);
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
         .payment-observation {
-            min-height: 30px;
-            margin-top: 6px;
-            padding: 6px;
-            font-size: 9px;
+            width: 100%;
+            min-height: 42px;
+            margin-top: 10px;
+            padding: 8px;
+            border: 1px solid var(--border-soft);
+            overflow-wrap: anywhere;
         }
 
+        /* Signatures du paiement */
+
         .payment-signatures {
-            display: grid !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 8px;
-            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-top: 12px;
         }
 
         .payment-signature-box {
             min-width: 0;
-            height: 65px;
-            padding: 6px;
+            height: 90px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow: hidden;
         }
 
-        .payment-signature-box strong,
-        .payment-signature-box .function {
-            font-size: 8px;
-        }
-
-        .payment-divider {
-            margin-top: 18px;
-            margin-bottom: 10px;
-        }
-
-        .payment-divider-line {
-            height: 2px;
-            margin-bottom: 8px;
-        }
-
-        .payment-divider-title span {
-            min-width: 250px;
-            padding: 6px 24px;
-            border-width: 2px;
-            font-size: 16px;
-        }
-
-        .signature-section {
-            margin-top: 14px;
-        }
-
-        .signature-title {
-            margin-bottom: 6px;
+        .payment-signature-box strong {
+            display: block;
+            margin-bottom: 3px;
             font-size: 10px;
+            overflow-wrap: anywhere;
         }
 
-        .signature-grid {
-            gap: 8px;
+        .payment-signature-box .function {
+            font-size: 10px;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
         }
 
-        .signature-box {
-            height: 85px;
-            padding: 7px;
-        }
-
-        .signature-box .title {
-            margin-bottom: 7px;
-            font-size: 9px;
-        }
-
-        .signature-box .function {
-            font-size: 8px;
-            line-height: 12px;
-        }
+        /* =====================================================
+           PIED DE PAGE
+        ===================================================== */
 
         .footer {
-            margin-top: 8px;
-            padding-top: 5px;
-            font-size: 7.5px;
+            margin-top: 16px;
+            padding-top: 7px;
+            border-top: 2px solid var(--primary);
+            color: var(--muted);
+            font-size: 8.5px;
+            line-height: 1.35;
+            text-align: center;
         }
-    }
+
+        /* =====================================================
+           RESPONSIVE ÉCRAN
+        ===================================================== */
+
+        @media screen and (max-width: 800px) {
+
+            body {
+                padding: 0;
+            }
+
+            .print-actions,
+            .print-page {
+                width: 100%;
+            }
+
+            .print-page {
+                min-height: auto;
+                padding: 15px;
+                border: none;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .company-info {
+                font-size: 9px;
+            }
+
+            .info-grid,
+            .payment-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .payment-signatures {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* =====================================================
+           IMPRESSION A4
+        ===================================================== */
+
+        @media print {
+
+            @page {
+                size: A4 portrait;
+                margin: 5mm;
+            }
+
+            html,
+            body {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+                font-size: 9px;
+            }
+
+            .print-actions {
+                display: none !important;
+            }
+
+            .print-page {
+                width: 100%;
+                max-width: 100%;
+                min-height: 0;
+                margin: 0;
+                padding: 4mm 6mm;
+                border: none;
+                box-shadow: none;
+            }
+
+            .header,
+            .document-title,
+            .info-grid,
+            .validation-box,
+            .items-table,
+            .signature-section,
+            .payment-divider {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            /* En-tête */
+
+            .header {
+                margin-bottom: 8px;
+                padding-bottom: 6px;
+            }
+
+            .logo-box {
+                flex-basis: 45px;
+                width: 45px;
+                height: 45px;
+            }
+
+            .logo-box img {
+                width: 40px;
+                height: 40px;
+            }
+
+            .company-title h2 {
+                font-size: 13px;
+            }
+
+            .company-title p {
+                font-size: 7px;
+            }
+
+            .company-info {
+                font-size: 7px;
+            }
+
+            /* Titres */
+
+            .document-title {
+                margin: 8px 0 9px;
+            }
+
+            .document-title h1,
+            .payment-document-title span {
+                padding: 5px 20px;
+                border-width: 2px;
+                font-size: 13px;
+            }
+
+            /* Informations */
+
+            .info-grid {
+                gap: 4px 14px;
+                margin-bottom: 7px;
+            }
+
+            .info-item {
+                padding-bottom: 3px;
+                font-size: 8px;
+            }
+
+            .info-label {
+                width: 95px;
+            }
+
+            /* Validation */
+
+            .validation-box {
+                margin: 6px 0 7px;
+                padding: 6px;
+            }
+
+            .validation-title {
+                margin-bottom: 4px;
+                font-size: 8px;
+            }
+
+            .validation-badge {
+                padding: 3px 5px;
+                font-size: 7px;
+            }
+
+            /* Tableau */
+
+            .items-table {
+                margin-top: 5px;
+                font-size: 7.5px;
+            }
+
+            .items-table th,
+            .items-table td {
+                padding: 3px 4px;
+            }
+
+            .total-row td {
+                font-size: 8px;
+            }
+
+            /* Signatures demande */
+
+            .signature-section {
+                margin-top: 12px;
+            }
+
+            .signature-title {
+                margin-bottom: 5px;
+                font-size: 8px;
+            }
+
+            .signature-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+                gap: 7px;
+            }
+
+            .signature-box {
+                height: 72px;
+                padding: 6px;
+            }
+
+            .signature-box .title {
+                margin-bottom: 5px;
+                font-size: 7.5px;
+            }
+
+            .signature-box .function {
+                font-size: 7px;
+                line-height: 1.2;
+            }
+
+            /* Séparation paiement */
+
+            .payment-divider {
+                margin-top: 14px;
+                margin-bottom: 8px;
+            }
+
+            .payment-divider-line {
+                height: 2px;
+                margin-bottom: 8px;
+            }
+
+            .payment-document-title span {
+                min-width: 220px;
+                padding: 5px 20px;
+                font-size: 12px;
+            }
+
+            /* Bon de paiement */
+
+            .payment-voucher-section {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: hidden !important;
+                page-break-inside: auto !important;
+                break-inside: auto !important;
+            }
+
+            .payment-voucher-body {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 7px;
+                overflow: hidden !important;
+            }
+
+            /*
+             * Conserver obligatoirement 70 % / 30 %
+             */
+            .payment-summary-grid {
+                display: grid !important;
+                grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
+                gap: 7px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin-bottom: 5px;
+            }
+
+            .payment-summary {
+                width: 100% !important;
+                min-width: 0 !important;
+                min-height: 42px;
+                margin: 0 !important;
+                padding: 5px 6px !important;
+            }
+
+            .payment-summary-label {
+                margin-bottom: 3px;
+                font-size: 7px;
+                line-height: 1.15;
+            }
+
+            .payment-summary-value {
+                font-size: 8px;
+                line-height: 1.2;
+            }
+
+            .payment-info-grid {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+                gap: 3px 10px;
+            }
+
+            .payment-info-item {
+                padding: 3px 0;
+                font-size: 7.5px;
+            }
+
+            .payment-info-label {
+                width: 95px;
+                max-width: 50%;
+            }
+
+            .payment-amount {
+                font-size: 8px;
+            }
+
+            .payment-observation {
+                min-height: 27px;
+                margin-top: 5px;
+                padding: 5px;
+                font-size: 7.5px;
+            }
+
+            .payment-signatures {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 7px;
+                margin-top: 6px;
+            }
+
+            .payment-signature-box {
+                height: 55px;
+                padding: 5px;
+            }
+
+            .payment-signature-box strong,
+            .payment-signature-box .function {
+                font-size: 7px;
+            }
+
+            .footer {
+                margin-top: 6px;
+                padding-top: 4px;
+                font-size: 6px;
+            }
+        }
     </style>
+
 </head>
 
 <body>
 
     <?php
-    $reference = 'DA-' . date('Y', strtotime($achat->created_at)) . '-' . str_pad($achat->id, 3, '0', STR_PAD_LEFT);
+
+    $reference = 'DA-'
+        . date('Y', strtotime($achat->created_at))
+        . '-'
+        . str_pad($achat->id, 3, '0', STR_PAD_LEFT);
+
     $total_general = 0;
+
+    $paymentModes = [
+        'especes'           => 'Espèces',
+        'cheque'            => 'Chèque',
+        'virement_bancaire' => 'Virement bancaire',
+        'transfert_mobile'  => 'Transfert via téléphone mobile',
+        'autre'             => 'Autre'
+    ];
+
+    $paymentStatuses = [
+        'en_attente' => 'En attente',
+        'effectue'   => 'Effectué',
+        'annule'     => 'Annulé'
+    ];
+
+    $modePaiement = null;
+    $statutPaiement = null;
+
+    if (!empty($bonPaiement)) {
+
+        $modePaiement = $paymentModes[$bonPaiement->payment_mode]
+            ?? ucfirst(str_replace('_', ' ', $bonPaiement->payment_mode));
+
+        $statutPaiement = $paymentStatuses[$bonPaiement->payment_status]
+            ?? ucfirst(str_replace('_', ' ', $bonPaiement->payment_status));
+    }
+
     ?>
 
     <div class="print-actions">
-        <!-- <a href="javascript:history.back()" class="btn-back">Retour</a> -->
-        <button onclick="window.print()" class="btn-print">Imprimer</button>
+
+        <a href="javascript:history.back()" class="btn-back">
+            Retour
+        </a>
+
+        <button type="button" class="btn-print" onclick="window.print()">
+            Imprimer
+        </button>
+
     </div>
 
     <div class="print-page">
 
-        <div class="header">
+        <!-- =====================================================
+         EN-TÊTE
+    ====================================================== -->
+
+        <header class="header">
+
             <div class="company-left">
+
                 <div class="logo-box">
-                    <img src="<?= base_url('assets/v1/dist/img/logoUpdate.png') ?>" alt="Logo">
+
+                    <img src="<?= base_url('assets/v1/dist/img/logoUpdate.png') ?>" alt="Logo SATRACO">
+
                 </div>
 
                 <div class="company-title">
-                    <h2>SATRACO Construction</h2>
-                    <p>Construction Management System - CMS</p>
+
+                    <h2>
+                        SATRACO Construction
+                    </h2>
+
+                    <p>
+                        Construction Management System - CMS
+                    </p>
+
                 </div>
+
             </div>
 
             <div class="company-info">
+
                 <strong>NIF :</strong> 4000070948<br>
-                <strong>R C : </strong> 46865<br>
-                <strong>TÉL :</strong> +257 68 13 13 13 / +257 22 24 50 97<br>
+
+                <strong>R C :</strong> 46865<br>
+
+                <strong>TÉL :</strong>
+                +257 68 13 13 13 /
+                +257 22 24 50 97
+
             </div>
-        </div>
+
+        </header>
+
+        <!-- =====================================================
+         TITRE DEMANDE
+    ====================================================== -->
 
         <div class="document-title">
-            <h1>Demande d'achat des biens / services</h1>
+
+            <h1>
+                Demande d'achat des biens / services
+            </h1>
+
         </div>
+
+        <!-- =====================================================
+         INFORMATIONS DEMANDE
+    ====================================================== -->
 
         <div class="info-grid">
 
             <div class="info-item">
-                <span class="info-label">Référence :</span>
-                <?= $reference ?>
+
+                <span class="info-label">
+                    Référence :
+                </span>
+
+                <?= html_escape($reference) ?>
+
             </div>
 
             <div class="info-item">
-                <span class="info-label">Date demande :</span>
-                <?= !empty($achat->request_date) ? date('d/m/Y', strtotime($achat->request_date)) : date('d/m/Y', strtotime($achat->created_at)) ?>
+
+                <span class="info-label">
+                    Date demande :
+                </span>
+
+                <?= !empty($achat->request_date)
+                    ? date('d/m/Y', strtotime($achat->request_date))
+                    : date('d/m/Y', strtotime($achat->created_at)) ?>
+
             </div>
 
             <div class="info-item">
-                <span class="info-label">Destination / Chantier :</span>
-                <?= $achat->destination_chantier ?>
+
+                <span class="info-label">
+                    Destination / Chantier :
+                </span>
+
+                <?= html_escape($achat->destination_chantier) ?>
+
             </div>
-
-
-
-            <!-- <div class="info-item">
-                <span class="info-label">Tresoriere :</span>
-                AHISHAKIYE Nelly Ange
-            </div> -->
 
             <div class="info-item">
-                <span class="info-label">Tresoriere / Fonds :</span>
-                <?php if ($achat->treasury_status == 'valide') { ?>
-                Fonds Disponible
-                <?php } else { ?>
-                Fonds Non Disponible
-                <?php } ?>
+
+                <span class="info-label">
+                    Trésorerie / Fonds :
+                </span>
+
+                <?= $achat->treasury_status === 'valide'
+                    ? 'Fonds disponibles'
+                    : 'Fonds non disponibles' ?>
+
             </div>
-            <!-- <div class="info-item">
-                <span class="info-label">Demandé par :</span>
-                <?= $achat->requested_by ?>
-            </div> -->
 
             <div class="info-item">
-                <span class="info-label">Chargé achat :</span>
-                <?= $achat->buyer_name ?>
+
+                <span class="info-label">
+                    Chargé achat :
+                </span>
+
+                <?= html_escape($achat->buyer_name) ?>
+
             </div>
-
-
-
-            <!-- <div class="info-item">
-                <span class="info-label">Statut :</span>
-                <?= ucfirst($achat->workflow_status) ?>
-            </div> -->
 
         </div>
 
+        <!-- =====================================================
+         VALIDATION
+    ====================================================== -->
+
         <div class="validation-box">
-            <div class="validation-title">Circuit de validation</div>
+
+            <div class="validation-title">
+                Circuit de validation
+            </div>
 
             <div class="validation-row">
 
-                <div class="validation-badge <?= ($achat->technical_status == 'valide') ? 'validated' : 'pending' ?>">
+                <div class="validation-badge
+                <?= $achat->technical_status === 'valide'
+                    ? 'validated'
+                    : 'pending' ?>">
+
                     DT :
-                    <?= ($achat->technical_status == 'valide') ? 'Validé' : 'En attente' ?>
+                    <?= $achat->technical_status === 'valide'
+                        ? 'Validé'
+                        : 'En attente' ?>
+
                 </div>
 
-                <div class="validation-badge <?= ($achat->financial_status == 'valide') ? 'validated' : 'pending' ?>">
+                <div class="validation-badge
+                <?= $achat->financial_status === 'valide'
+                    ? 'validated'
+                    : 'pending' ?>">
+
                     DAF :
-                    <?= ($achat->financial_status == 'valide') ? 'Validé' : 'En attente' ?>
+                    <?= $achat->financial_status === 'valide'
+                        ? 'Validé'
+                        : 'En attente' ?>
+
                 </div>
 
-                <!-- <div class="validation-badge <?= ($achat->dg_status == 'valide') ? 'validated' : 'pending' ?>">
-                    DG :
-                    <?= ($achat->dg_status == 'valide') ? 'Validé' : 'En attente' ?>
-                </div> -->
+                <div class="validation-badge
+                <?= $achat->treasury_status === 'valide'
+                    ? 'validated'
+                    : 'pending' ?>">
 
-                <div class="validation-badge <?= ($achat->treasury_status == 'valide') ? 'validated' : 'pending' ?>">
                     Trésorerie :
-                    <?= ($achat->treasury_status == 'valide') ? 'Validé' : 'En attente' ?>
+                    <?= $achat->treasury_status === 'valide'
+                        ? 'Validé'
+                        : 'En attente' ?>
+
                 </div>
 
             </div>
+
         </div>
 
-        <table>
+        <!-- =====================================================
+         ARTICLES
+    ====================================================== -->
+
+        <table class="items-table">
+
             <thead>
+
                 <tr>
-                    <th width="40"><strong>N°</strong></th>
-                    <th><strong>Désignation</strong></th>
-                    <th width="90"><strong>Qté</strong></th>
-                    <th width="120"><strong>PU</strong></th>
-                    <th width="130"><strong>Total</strong></th>
-                    <th><strong>Observation</strong></th>
+
+                    <th class="col-number">
+                        N°
+                    </th>
+
+                    <th class="col-designation">
+                        Désignation
+                    </th>
+
+                    <th class="col-quantity">
+                        Qté
+                    </th>
+
+                    <th class="col-unit-price">
+                        PU
+                    </th>
+
+                    <th class="col-total">
+                        Total
+                    </th>
+
+                    <th class="col-observation">
+                        Observation
+                    </th>
+
                 </tr>
+
             </thead>
 
             <tbody>
+
                 <?php if (!empty($articles)) : ?>
-                <?php $i = 1; ?>
-                <?php foreach ($articles as $article) : ?>
-                <?php $total_general += $article->total_price; ?>
 
-                <tr>
-                    <td class="text-center"><?= $i++ ?></td>
-                    <td><?= $article->designation ?></td>
-                    <td class="text-right"><?= number_format($article->quantity, 2, ',', ' ') ?></td>
-                    <td class="text-right"><?= number_format($article->unit_price, 0, ',', ' ') ?> BIF</td>
-                    <td class="text-right">
-                        <strong><?= number_format($article->total_price, 0, ',', ' ') ?> BIF</strong>
-                    </td>
-                    <td><?= $article->observations ?></td>
-                </tr>
+                    <?php foreach ($articles as $index => $article) : ?>
 
-                <?php endforeach; ?>
+                        <?php
+                        $articleTotal = (float) $article->total_price;
+                        $total_general += $articleTotal;
+                        ?>
+
+                        <tr>
+
+                            <td class="text-center">
+                                <?= $index + 1 ?>
+                            </td>
+
+                            <td>
+                                <?= html_escape($article->designation) ?>
+                            </td>
+
+                            <td class="text-right">
+                                <?= number_format(
+                                    (float) $article->quantity,
+                                    2,
+                                    ',',
+                                    ' '
+                                ) ?>
+                            </td>
+
+                            <td class="text-right">
+                                <?= number_format(
+                                    (float) $article->unit_price,
+                                    0,
+                                    ',',
+                                    ' '
+                                ) ?> BIF
+                            </td>
+
+                            <td class="text-right">
+
+                                <strong>
+                                    <?= number_format(
+                                        $articleTotal,
+                                        0,
+                                        ',',
+                                        ' '
+                                    ) ?> BIF
+                                </strong>
+
+                            </td>
+
+                            <td>
+                                <?= !empty($article->observations)
+                                    ? html_escape($article->observations)
+                                    : '-' ?>
+                            </td>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
                 <?php else : ?>
-                <tr>
-                    <td colspan="6" class="text-center">Aucun article trouvé.</td>
-                </tr>
+
+                    <tr>
+
+                        <td colspan="6" class="text-center">
+
+                            Aucun article trouvé.
+
+                        </td>
+
+                    </tr>
+
                 <?php endif; ?>
+
             </tbody>
 
             <tfoot>
+
                 <tr class="total-row">
-                    <td colspan="4" class="text-right">Total général</td>
-                    <td class="text-right">
-                        <?= number_format($total_general, 0, ',', ' ') ?> BIF
+
+                    <td colspan="4" class="text-right">
+
+                        Total général
+
                     </td>
+
+                    <td class="text-right">
+
+                        <?= number_format(
+                            $total_general,
+                            0,
+                            ',',
+                            ' '
+                        ) ?> BIF
+
+                    </td>
+
+                    <td></td>
+
                 </tr>
+
             </tfoot>
+
         </table>
 
         <?php if (!empty($achat->notes)) : ?>
-        <p><strong>Notes :</strong> <?= nl2br($achat->notes) ?></p>
+
+            <div class="notes-box">
+
+                <strong>Notes :</strong><br>
+
+                <?= nl2br(html_escape($achat->notes)) ?>
+
+            </div>
+
         <?php endif; ?>
 
-        <div class="signature-section">
+        <!-- =====================================================
+         SIGNATURES DEMANDE
+    ====================================================== -->
+
+        <section class="signature-section">
 
             <div class="signature-title">
-                SIGNATURES
+                Signatures
             </div>
 
             <div class="signature-grid">
 
-                <!-- Demandé -->
                 <div class="signature-box">
 
                     <div class="title">
@@ -974,323 +1277,280 @@
                     </div>
 
                     <div class="function">
-                        <?= $achat->requested_by ?>
+                        <?= html_escape($achat->requested_by) ?>
                     </div>
-
-
 
                 </div>
 
-                <!-- DT -->
                 <div class="signature-box">
 
                     <div class="title">
-                        Verifie Par
+                        Vérifié par
                     </div>
 
                     <div class="function">
-                        <?= $achat->verified_by ?>
+                        <?= html_escape($achat->verified_by) ?>
                     </div>
-
-
 
                 </div>
 
-                <!-- DAF -->
                 <div class="signature-box">
 
                     <div class="title">
-                        Approbation Techinique
+                        Approbation technique
                     </div>
 
                     <div class="function">
-                        DT. NIYIMBONA Emmanuel
+                        <?= !empty($achat->technical_approver)
+                            ? html_escape($achat->technical_approver)
+                            : 'DT. NIYIMBONA Emmanuel' ?>
                     </div>
-
-
 
                 </div>
 
-                <!-- Trésorerie -->
                 <div class="signature-box">
 
                     <div class="title">
-                        Approbation Financiere
+                        Approbation financière
                     </div>
 
                     <div class="function">
-                        DAF. NDAGIJE Mariam
+                        <?= !empty($achat->financial_approver)
+                            ? html_escape($achat->financial_approver)
+                            : 'DAF. NDAGIJE Mariam' ?>
                     </div>
-
-
 
                 </div>
 
             </div>
 
-        </div>
+        </section>
 
-        <!-- ici le bon de Paiement -->
-
-        <!-- =========================
-            Séparation Bon Paiement
-        ========================== -->
+        <!-- =====================================================
+         BON DE PAIEMENT
+    ====================================================== -->
 
         <?php if (!empty($bonPaiement)) : ?>
 
-        <div class="payment-divider">
+            <!-- Ligne de séparation + titre encadré -->
 
-            <div class="payment-divider-line"></div>
+            <div class="payment-divider">
 
-            <div class="payment-divider-title">
-                <span>Bon de paiement</span>
+                <div class="payment-divider-line"></div>
+
+                <div class="payment-document-title">
+
+                    <span>
+                        Bon de paiement
+                    </span>
+
+                </div>
+
             </div>
 
-        </div>
+            <section class="payment-voucher-section">
 
-        <?php endif; ?>
+                <div class="payment-voucher-body">
 
-        <?php if (!empty($bonPaiement)) : ?>
+                    <!-- Synthèse 70 % / Destination 30 % -->
 
-        <?php
-            $paymentModes = [
-                'especes'            => 'Espèces',
-                'cheque'             => 'Chèque',
-                'virement_bancaire'  => 'Virement bancaire',
-                'transfert_mobile'   => 'Transfert via téléphone mobile',
-                'autre'              => 'Autre'
-            ];
+                    <div class="payment-summary-grid">
 
-            $paymentStatuses = [
-                'en_attente' => 'En attente',
-                'effectue'   => 'Effectué',
-                'annule'     => 'Annulé'
-            ];
+                        <div class="payment-summary">
 
-            $modePaiement = isset($paymentModes[$bonPaiement->payment_mode])
-                ? $paymentModes[$bonPaiement->payment_mode]
-                : ucfirst(str_replace('_', ' ', $bonPaiement->payment_mode));
+                            <span class="payment-summary-label">
+                                Synthèse de la demande
+                            </span>
 
-            $statutPaiement = isset($paymentStatuses[$bonPaiement->payment_status])
-                ? $paymentStatuses[$bonPaiement->payment_status]
-                : ucfirst(str_replace('_', ' ', $bonPaiement->payment_status));
-            ?>
+                            <div class="payment-summary-value">
 
-        <div class="payment-voucher-section">
+                                <?= nl2br(
+                                    html_escape($bonPaiement->summary)
+                                ) ?>
 
-            <!-- <div class="payment-voucher-header">
+                            </div>
 
-                <h3>
-                    Bon de paiement
-                </h3>
+                        </div>
 
-                <div class="payment-voucher-number">
-                    <?= html_escape($bonPaiement->payment_number) ?>
-                </div>
+                        <div class="payment-summary">
 
-            </div> -->
+                            <span class="payment-summary-label">
+                                Destination / Chantier
+                            </span>
 
-            <div class="payment-voucher-body">
+                            <div class="payment-summary-value">
 
-                <!-- Synthèse + Destination -->
-                <div class="payment-summary-grid">
+                                <?= html_escape(
+                                    $achat->destination_chantier
+                                ) ?>
 
-                    <!-- Synthèse -->
-                    <div class="payment-summary">
+                            </div>
 
-                        <span class="payment-summary-label">
-                            Synthèse de la demande
-                        </span>
-
-                        <div class="payment-summary-value">
-                            <?= nl2br(html_escape($bonPaiement->summary)) ?>
                         </div>
 
                     </div>
 
-                    <!-- Destination -->
-                    <div class="payment-summary">
+                    <!-- Informations du paiement -->
 
-                        <span class="payment-summary-label">
-                            Destination / Chantier
-                        </span>
+                    <div class="payment-info-grid">
 
-                        <div class="payment-summary-value">
-                            <?= html_escape($achat->destination_chantier) ?>
+                        <div class="payment-info-item">
+
+                            <span class="payment-info-label">
+                                Référence demande :
+                            </span>
+
+                            <?= html_escape($reference) ?>
+
                         </div>
 
-                    </div>
+                        <div class="payment-info-item">
 
-                </div>
+                            <span class="payment-info-label">
+                                Numéro du bon :
+                            </span>
 
-                <!-- Informations paiement -->
-                <div class="payment-info-grid">
+                            <?= html_escape(
+                                $bonPaiement->payment_number
+                            ) ?>
 
-                    <div class="payment-info-item">
+                        </div>
 
-                        <span class="payment-info-label">
-                            Référence demande :
-                        </span>
+                        <div class="payment-info-item">
 
-                        <?= html_escape($reference) ?>
+                            <span class="payment-info-label">
+                                Mode de paiement :
+                            </span>
 
-                    </div>
+                            <?= html_escape($modePaiement) ?>
 
-                    <div class="payment-info-item">
+                        </div>
 
-                        <span class="payment-info-label">
-                            Numéro du bon :
-                        </span>
+                        <div class="payment-info-item">
 
-                        <?= html_escape($bonPaiement->payment_number) ?>
+                            <span class="payment-info-label">
+                                Référence paiement :
+                            </span>
 
-                    </div>
+                            <?= html_escape(
+                                $bonPaiement->payment_reference
+                            ) ?>
 
-                    <div class="payment-info-item">
+                        </div>
 
-                        <span class="payment-info-label">
-                            Mode de paiement :
-                        </span>
+                        <div class="payment-info-item">
 
-                        <?= html_escape($modePaiement) ?>
+                            <span class="payment-info-label">
+                                Date de paiement :
+                            </span>
 
-                    </div>
-
-                    <div class="payment-info-item">
-
-                        <span class="payment-info-label">
-                            Référence paiement :
-                        </span>
-
-                        <?= html_escape($bonPaiement->payment_reference) ?>
-
-                    </div>
-
-                    <div class="payment-info-item">
-
-                        <span class="payment-info-label">
-                            Date de paiement :
-                        </span>
-
-                        <?= !empty($bonPaiement->payment_date)
-                                ? date('d/m/Y', strtotime($bonPaiement->payment_date))
+                            <?= !empty($bonPaiement->payment_date)
+                                ? date(
+                                    'd/m/Y',
+                                    strtotime($bonPaiement->payment_date)
+                                )
                                 : '-' ?>
 
-                    </div>
+                        </div>
 
-                    <!-- <div class="payment-info-item">
+                        <div class="payment-info-item">
 
-                        <span class="payment-info-label">
-                            Statut :
-                        </span>
+                            <span class="payment-info-label">
+                                Montant payé :
+                            </span>
 
-                        <?= html_escape($statutPaiement) ?>
+                            <span class="payment-amount">
 
-                    </div> -->
-
-                    <div class="payment-info-item">
-
-                        <span class="payment-info-label">
-                            Montant payé :
-                        </span>
-
-                        <span class="payment-amount">
-                            <?= number_format(
+                                <?= number_format(
                                     (float) $bonPaiement->amount_paid,
                                     0,
                                     ',',
                                     ' '
                                 ) ?> BIF
-                        </span>
 
-                    </div>
+                            </span>
 
-                    <!-- <div class="payment-info-item">
-
-                        <span class="payment-info-label">
-                            Destination / Chantier :
-                        </span>
-
-                        <?= html_escape($achat->destination_chantier) ?>
-
-                    </div> -->
-
-                </div>
-
-                <?php if (!empty($bonPaiement->observation)) : ?>
-
-                <div class="payment-observation">
-
-                    <strong>Observation :</strong><br>
-
-                    <?= nl2br(html_escape($bonPaiement->observation)) ?>
-
-                </div>
-
-                <?php endif; ?>
-
-                <!-- Signatures du paiement -->
-                <div class="payment-signatures">
-
-                    <div class="payment-signature-box">
-
-                        <strong>
-                            Trésorerie
-                        </strong>
-
-                        <div class="function">
-                            AHISHAKIYE Nelly Ange
                         </div>
 
-                        <!-- <div class="payment-signature-line">
-                            Nom, signature et cachet
-                        </div> -->
-
                     </div>
 
-                    <div class="payment-signature-box">
+                    <?php if (!empty($bonPaiement->observation)) : ?>
 
-                        <strong>
-                            Pour la remise de fonds
-                        </strong>
+                        <div class="payment-observation">
 
+                            <strong>
+                                Observation :
+                            </strong>
 
+                            <br>
 
-                        <!-- <div class="payment-signature-line">
-                            Nom, signature et cachet
-                        </div> -->
+                            <?= nl2br(
+                                html_escape($bonPaiement->observation)
+                            ) ?>
 
-                    </div>
+                        </div>
 
+                    <?php endif; ?>
 
+                    <!-- Signatures du paiement -->
 
-                    <div class="payment-signature-box">
+                    <div class="payment-signatures">
 
-                        <strong>
-                            Pour la reception de fonds
-                        </strong>
+                        <div class="payment-signature-box">
 
-                        <!-- <div class="payment-signature-line">
-                            Nom et signature
-                        </div> -->
+                            <strong>
+                                Trésorerie
+                            </strong>
+
+                            <div class="function">
+                                AHISHAKIYE Nelly Ange
+                            </div>
+
+                        </div>
+
+                        <div class="payment-signature-box">
+
+                            <strong>
+                                Pour la remise de fonds
+                            </strong>
+
+                        </div>
+
+                        <div class="payment-signature-box">
+
+                            <strong>
+                                Pour la réception de fonds
+                            </strong>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
-
-        </div>
+            </section>
 
         <?php endif; ?>
 
-        <div class="footer">
-            © <?= date('Y') ?> SATRACO Construction - Document généré automatiquement par Construction Management System
-            (CMS).
+        <!-- =====================================================
+         PIED DE PAGE
+    ====================================================== -->
+
+        <footer class="footer">
+
+            © <?= date('Y') ?>
+            SATRACO Construction -
+            Document généré automatiquement par
+            Construction Management System (CMS).
+
             <br>
+
             Adresse :
-            Bujumbura, Commune NTAHANGWA, ZONE NGAGARA, Q. INDUSTRIEL, Numero 15
-        </div>
+            Bujumbura, Commune NTAHANGWA,
+            Zone Ngagara, Quartier Industriel,
+            Numéro 15
+
+        </footer>
 
     </div>
 
