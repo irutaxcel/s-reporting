@@ -12,1079 +12,1079 @@
     </title>
 
     <style>
-    /* =====================================================
+        /* =====================================================
        CONFIGURATION GÉNÉRALE
     ===================================================== */
 
-    * {
-        box-sizing: border-box;
-    }
-
-    :root {
-        --primary: #0f766e;
-        --primary-dark: #102033;
-        --border: #cbd5e1;
-        --border-soft: #d8dee4;
-        --background-soft: #f8fafc;
-        --text: #222;
-        --muted: #555;
-    }
-
-    html,
-    body {
-        margin: 0;
-        padding: 0;
-    }
-
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-        color: var(--text);
-        background: #f4f6f9;
-        padding: 10px;
-        font-size: 14px;
-    }
-
-    .print-page {
-        width: 210mm;
-        min-height: 297mm;
-        margin: auto;
-        padding: 11mm 13mm;
-        background: #fff;
-        border: 1px solid #ddd;
-    }
-
-    /* =====================================================
-       BOUTONS
-    ===================================================== */
-
-    .print-actions {
-        width: 210mm;
-        margin: 0 auto 8px;
-        text-align: right;
-    }
-
-    .btn-print,
-    .btn-back {
-        display: inline-block;
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        color: #fff;
-        font-size: 14px;
-        font-weight: bold;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .btn-print {
-        background: var(--primary);
-    }
-
-    .btn-back {
-        margin-right: 5px;
-        background: #6c757d;
-    }
-
-    /* =====================================================
-       EN-TÊTE SATRACO
-    ===================================================== */
-
-    .header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 14px;
-        padding-bottom: 10px;
-        border-bottom: 3px solid var(--primary);
-    }
-
-    .company-left {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        min-width: 0;
-    }
-
-    .logo-box {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex: 0 0 65px;
-        width: 65px;
-        height: 65px;
-        border: 1px solid #ddd;
-        border-radius: 50%;
-        overflow: hidden;
-    }
-
-    .logo-box img {
-        width: 58px;
-        height: 58px;
-        object-fit: contain;
-    }
-
-    .company-title {
-        min-width: 0;
-    }
-
-    .company-title h2 {
-        margin: 0;
-        color: var(--primary);
-        font-size: 22px;
-        font-weight: 700;
-        line-height: 1.2;
-        text-transform: uppercase;
-    }
-
-    .company-title p {
-        margin: 4px 0 0;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.3;
-    }
-
-    .company-info {
-        flex: 0 0 auto;
-        color: #222;
-        text-align: right;
-        font-size: 12px;
-        line-height: 1.55;
-    }
-
-    /* =====================================================
-       TITRES DES DOCUMENTS
-    ===================================================== */
-
-    .document-title,
-    .payment-document-title {
-        text-align: center;
-    }
-
-    .document-title {
-        margin: 14px 0 16px;
-    }
-
-    .document-title h1,
-    .payment-document-title span {
-        display: inline-block;
-        margin: 0;
-        padding: 8px 30px;
-        border: 2px solid var(--primary);
-        background: #fff;
-        color: var(--primary);
-        font-size: 21px;
-        font-weight: 700;
-        line-height: 1.2;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    /* =====================================================
-       INFORMATIONS DE LA DEMANDE
-    ===================================================== */
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 8px 22px;
-        margin-bottom: 12px;
-    }
-
-    .info-item {
-        min-width: 0;
-        padding-bottom: 6px;
-        border-bottom: 1px solid #ddd;
-        font-size: 14px;
-        line-height: 1.35;
-        overflow-wrap: anywhere;
-    }
-
-    .info-label {
-        display: inline-block;
-        width: 135px;
-        max-width: 48%;
-        color: var(--primary);
-        font-size: 14px;
-        font-weight: bold;
-        vertical-align: top;
-    }
-
-    /* =====================================================
-       VALIDATIONS
-    ===================================================== */
-
-    .validation-box {
-        margin: 10px 0 12px;
-        padding: 10px;
-        border: 1px solid #ddd;
-        background: #f9fafb;
-    }
-
-    .validation-title {
-        margin-bottom: 8px;
-        color: var(--primary);
-        font-size: 14px;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
-
-    .validation-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
-    }
-
-    .validation-badge {
-        padding: 5px 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background: #fff;
-        font-size: 12px;
-    }
-
-    .validated {
-        color: #155724;
-        background: #e9f7ef;
-        border-color: #28a745;
-        font-weight: bold;
-    }
-
-    .pending {
-        color: #856404;
-        background: #fff3cd;
-        border-color: #ffc107;
-        font-weight: bold;
-    }
-
-    /* =====================================================
-       TABLEAU DES ARTICLES
-    ===================================================== */
-
-    .items-table {
-        width: 100%;
-        margin-top: 8px;
-        border-collapse: collapse;
-        table-layout: fixed;
-        font-size: 13px;
-    }
-
-    .items-table th {
-        padding: 7px 6px;
-        border: 1px solid var(--primary-dark);
-        background: #fff;
-        color: var(--primary-dark);
-        font-size: 13px;
-        font-weight: 700;
-        text-align: center;
-    }
-
-    .items-table td {
-        padding: 6px 7px;
-        border: 1px solid #ccc;
-        font-size: 13px;
-        line-height: 1.35;
-        vertical-align: middle;
-        overflow-wrap: anywhere;
-    }
-
-    .items-table .col-number {
-        width: 5%;
-    }
-
-    .items-table .col-designation {
-        width: 31%;
-    }
-
-    .items-table .col-quantity {
-        width: 11%;
-    }
-
-    .items-table .col-unit-price {
-        width: 16%;
-    }
-
-    .items-table .col-total {
-        width: 17%;
-    }
-
-    .items-table .col-observation {
-        width: 20%;
-    }
-
-    .text-right {
-        text-align: right;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .total-row td {
-        background: #f1f5f9;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    .notes-box {
-        margin-top: 9px;
-        padding: 8px;
-        border: 1px solid var(--border-soft);
-        font-size: 13px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-    }
-
-    /* =====================================================
-       SIGNATURES DE LA DEMANDE
-    ===================================================== */
-
-    .signature-section {
-        margin-top: 22px;
-    }
-
-    .signature-title {
-        margin-bottom: 10px;
-        color: var(--primary);
-        font-size: 16px;
-        font-weight: bold;
-        text-transform: uppercase;
-    }
-
-    .signature-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-    }
-
-    .signature-box {
-        min-width: 0;
-        height: 128px;
-        padding: 10px;
-        border: 1px solid #cfcfcf;
-        background: #fff;
-        overflow: hidden;
-    }
-
-    .signature-box .title {
-        margin-bottom: 10px;
-        font-size: 14px;
-        font-weight: bold;
-        line-height: 1.25;
-        overflow-wrap: anywhere;
-    }
-
-    .signature-box .function {
-        color: #444;
-        font-size: 13px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-    }
-
-    /* =====================================================
-       SÉPARATEUR DU BON DE PAIEMENT
-    ===================================================== */
-
-    .payment-divider {
-        width: 100%;
-        margin-top: 30px;
-        margin-bottom: 17px;
-        text-align: center;
-    }
-
-    .payment-divider-line {
-        width: 100%;
-        height: 3px;
-        margin-bottom: 16px;
-        background: var(--primary);
-    }
-
-    .payment-document-title span {
-        min-width: 320px;
-    }
-
-    /* =====================================================
-       BON DE PAIEMENT
-    ===================================================== */
-
-    .payment-voucher-section {
-        width: 100%;
-        max-width: 100%;
-        border: 1px solid var(--border);
-        background: #fff;
-        overflow: hidden;
-    }
-
-    .payment-voucher-body {
-        width: 100%;
-        max-width: 100%;
-        padding: 12px;
-        overflow: hidden;
-    }
-
-    /* Synthèse 70 % / Chantier 30 % */
-
-    .payment-summary-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
-        gap: 12px;
-        width: 100%;
-        max-width: 100%;
-        margin-bottom: 11px;
-        align-items: stretch;
-    }
-
-    .payment-summary {
-        width: 100%;
-        min-width: 0;
-        min-height: 75px;
-        margin: 0;
-        padding: 10px 12px;
-        border: 1px solid var(--border-soft);
-        background: var(--background-soft);
-        overflow: hidden;
-    }
-
-    .payment-summary-label {
-        display: block;
-        max-width: 100%;
-        margin-bottom: 6px;
-        color: var(--primary);
-        font-size: 14px;
-        font-weight: bold;
-        line-height: 1.25;
-        text-transform: uppercase;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-summary-value {
-        display: block;
-        max-width: 100%;
-        color: var(--text);
-        font-size: 17px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-    }
-
-    /* Informations du bon */
-
-    .payment-info-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 8px 18px;
-        width: 100%;
-    }
-
-    .payment-info-item {
-        min-width: 0;
-        padding: 6px 0;
-        border-bottom: 1px solid var(--border-soft);
-        font-size: 14px;
-        line-height: 1.35;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-info-label {
-        display: inline-block;
-        width: 155px;
-        max-width: 50%;
-        color: var(--primary);
-        font-size: 14px;
-        font-weight: bold;
-        vertical-align: top;
-    }
-
-    .payment-amount {
-        color: var(--primary-dark);
-        font-size: 16px;
-        font-weight: bold;
-        white-space: nowrap;
-    }
-
-    .payment-observation {
-        width: 100%;
-        min-height: 48px;
-        margin-top: 11px;
-        padding: 9px;
-        border: 1px solid var(--border-soft);
-        font-size: 14px;
-        line-height: 1.4;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-observation strong {
-        font-size: 14px;
-    }
-
-    /* Signatures du paiement */
-
-    .payment-signatures {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 13px;
-        width: 100%;
-        margin-top: 13px;
-    }
-
-    .payment-signature-box {
-        min-width: 0;
-        height: 100px;
-        padding: 9px;
-        border: 1px solid var(--border);
-        background: #fff;
-        overflow: hidden;
-    }
-
-    .payment-signature-box strong {
-        display: block;
-        margin-bottom: 4px;
-        font-size: 14px;
-        line-height: 1.25;
-        overflow-wrap: anywhere;
-    }
-
-    .payment-signature-box .function {
-        font-size: 13px;
-        line-height: 1.35;
-        overflow-wrap: anywhere;
-    }
-
-    /* =====================================================
-       PIED DE PAGE
-    ===================================================== */
-
-    .footer {
-        margin-top: 17px;
-        padding-top: 8px;
-        border-top: 2px solid var(--primary);
-        color: var(--muted);
-        font-size: 11px;
-        line-height: 1.4;
-        text-align: center;
-    }
-
-    /* =====================================================
-       RESPONSIVE ÉCRAN
-    ===================================================== */
-
-    @media screen and (max-width: 800px) {
-
-        body {
-            padding: 0;
+        * {
+            box-sizing: border-box;
         }
 
-        .print-actions,
-        .print-page {
-            width: 100%;
-        }
-
-        .print-page {
-            min-height: auto;
-            padding: 15px;
-            border: none;
-        }
-
-        .header {
-            align-items: flex-start;
-        }
-
-        .company-title h2 {
-            font-size: 18px;
-        }
-
-        .company-title p {
-            font-size: 12px;
-        }
-
-        .company-info {
-            font-size: 10px;
-        }
-
-        .info-grid,
-        .payment-info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .payment-summary-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .signature-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        .payment-signatures {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* =====================================================
-       IMPRESSION A4
-    ===================================================== */
-
-    /* ==========================================================
-   CORRECTION FINALE IMPRESSION
-   Polices plus lisibles + bordures noires renforcées
-========================================================== */
-
-    @media print {
-
-        @page {
-            size: A4 portrait;
-            margin: 5mm;
+        :root {
+            --primary: #0f766e;
+            --primary-dark: #102033;
+            --border: #cbd5e1;
+            --border-soft: #d8dee4;
+            --background-soft: #f8fafc;
+            --text: #222;
+            --muted: #555;
         }
 
         html,
         body {
-            font-size: 12px !important;
-            color: #000 !important;
-            background: #fff !important;
+            margin: 0;
+            padding: 0;
         }
 
-        .print-actions {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: #f4f6f9;
+            padding: 10px;
+            font-size: 14px;
         }
 
         .print-page {
-            width: 100% !important;
-            max-width: 100% !important;
-            min-height: auto !important;
-            margin: 0 !important;
-            padding: 5mm 7mm !important;
-            border: none !important;
-            color: #000 !important;
+            width: 210mm;
+            min-height: 297mm;
+            margin: auto;
+            padding: 11mm 13mm;
+            background: #fff;
+            border: 1px solid #ddd;
         }
 
-        /* ======================================================
-        EN-TÊTE
-        ====================================================== */
+        /* =====================================================
+       BOUTONS
+    ===================================================== */
+
+        .print-actions {
+            width: 210mm;
+            margin: 0 auto 8px;
+            text-align: right;
+        }
+
+        .btn-print,
+        .btn-back {
+            display: inline-block;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: var(--primary);
+        }
+
+        .btn-back {
+            margin-right: 5px;
+            background: #6c757d;
+        }
+
+        /* =====================================================
+       EN-TÊTE SATRACO
+    ===================================================== */
 
         .header {
-            margin-bottom: 10px !important;
-            padding-bottom: 8px !important;
-            border-bottom: 3px solid #000 !important;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .company-left {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            min-width: 0;
         }
 
         .logo-box {
-            width: 52px !important;
-            height: 52px !important;
-            flex-basis: 52px !important;
-            border: 1.5px solid #000 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 65px;
+            width: 65px;
+            height: 65px;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            overflow: hidden;
         }
 
         .logo-box img {
-            width: 47px !important;
-            height: 47px !important;
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
+        }
+
+        .company-title {
+            min-width: 0;
         }
 
         .company-title h2 {
-            font-size: 18px !important;
-            font-weight: 800 !important;
-            color: #000 !important;
+            margin: 0;
+            color: var(--primary);
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-transform: uppercase;
         }
 
         .company-title p {
-            font-size: 11px !important;
-            color: #000 !important;
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.3;
         }
 
         .company-info {
-            font-size: 10.5px !important;
-            line-height: 1.45 !important;
-            color: #000 !important;
+            flex: 0 0 auto;
+            color: #222;
+            text-align: right;
+            font-size: 12px;
+            line-height: 1.55;
         }
 
-        /* ======================================================
-        TITRES
-        ====================================================== */
+        /* =====================================================
+       TITRES DES DOCUMENTS
+    ===================================================== */
+
+        .document-title,
+        .payment-document-title {
+            text-align: center;
+        }
 
         .document-title {
-            margin: 10px 0 11px !important;
+            margin: 14px 0 16px;
         }
 
         .document-title h1,
         .payment-document-title span {
-            padding: 6px 24px !important;
-            border: 2px solid #000 !important;
-            color: #000 !important;
-            background: #fff !important;
-            font-size: 18px !important;
-            font-weight: 800 !important;
-            letter-spacing: 1px !important;
+            display: inline-block;
+            margin: 0;
+            padding: 8px 30px;
+            border: 2px solid var(--primary);
+            background: #fff;
+            color: var(--primary);
+            font-size: 21px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        /* ======================================================
-        INFORMATIONS DE LA DEMANDE
-        ====================================================== */
+        /* =====================================================
+       INFORMATIONS DE LA DEMANDE
+    ===================================================== */
 
         .info-grid {
-            gap: 5px 16px !important;
-            margin-bottom: 9px !important;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 8px 22px;
+            margin-bottom: 12px;
         }
 
         .info-item {
-            padding: 4px 0 !important;
-            border-bottom: 1.5px solid #000 !important;
-            color: #000 !important;
-            font-size: 11.5px !important;
-            line-height: 1.35 !important;
+            min-width: 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
         }
 
         .info-label {
-            width: 120px !important;
-            max-width: 48% !important;
-            color: #000 !important;
-            font-size: 11.5px !important;
-            font-weight: 800 !important;
+            display: inline-block;
+            width: 135px;
+            max-width: 48%;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: bold;
+            vertical-align: top;
         }
 
-        /* ======================================================
-        CIRCUIT DE VALIDATION
-        ====================================================== */
+        /* =====================================================
+       VALIDATIONS
+    ===================================================== */
 
         .validation-box {
-            margin: 8px 0 9px !important;
-            padding: 8px !important;
-            border: 1.5px solid #000 !important;
-            background: #fff !important;
+            margin: 10px 0 12px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: #f9fafb;
         }
 
         .validation-title {
-            margin-bottom: 6px !important;
-            color: #000 !important;
-            font-size: 11.5px !important;
-            font-weight: 800 !important;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .validation-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
         }
 
         .validation-badge {
-            padding: 4px 7px !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            background: #fff !important;
-            font-size: 10.5px !important;
-            font-weight: 700 !important;
+            padding: 5px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+            font-size: 12px;
         }
 
-        .validated,
+        .validated {
+            color: #155724;
+            background: #e9f7ef;
+            border-color: #28a745;
+            font-weight: bold;
+        }
+
         .pending {
-            color: #000 !important;
-            border-color: #000 !important;
-            background: #fff !important;
+            color: #856404;
+            background: #fff3cd;
+            border-color: #ffc107;
+            font-weight: bold;
         }
 
-        /* ======================================================
-        TABLEAU DES ARTICLES
-        ====================================================== */
+        /* =====================================================
+       TABLEAU DES ARTICLES
+    ===================================================== */
 
         .items-table {
-            margin-top: 6px !important;
-            border-collapse: collapse !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            font-size: 11px !important;
+            width: 100%;
+            margin-top: 8px;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 13px;
         }
 
         .items-table th {
-            padding: 5px !important;
-            border: 1.5px solid #000 !important;
-            background: #fff !important;
-            color: #000 !important;
-            font-size: 11px !important;
-            font-weight: 800 !important;
+            padding: 7px 6px;
+            border: 1px solid var(--primary-dark);
+            background: #fff;
+            color: var(--primary-dark);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
         }
 
         .items-table td {
-            padding: 5px !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            font-size: 11px !important;
-            line-height: 1.3 !important;
+            padding: 6px 7px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+            line-height: 1.35;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+        }
+
+        .items-table .col-number {
+            width: 5%;
+        }
+
+        .items-table .col-designation {
+            width: 31%;
+        }
+
+        .items-table .col-quantity {
+            width: 11%;
+        }
+
+        .items-table .col-unit-price {
+            width: 16%;
+        }
+
+        .items-table .col-total {
+            width: 17%;
+        }
+
+        .items-table .col-observation {
+            width: 20%;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .text-center {
+            text-align: center;
         }
 
         .total-row td {
-            border: 1.5px solid #000 !important;
-            background: #fff !important;
-            color: #000 !important;
-            font-size: 11.5px !important;
-            font-weight: 800 !important;
+            background: #f1f5f9;
+            font-size: 14px;
+            font-weight: bold;
         }
-
-        /* ======================================================
-        NOTES
-        ====================================================== */
 
         .notes-box {
-            margin-top: 7px !important;
-            padding: 7px !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            font-size: 11px !important;
+            margin-top: 9px;
+            padding: 8px;
+            border: 1px solid var(--border-soft);
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
         }
 
-        /* ======================================================
-        SIGNATURES DE LA DEMANDE
-        ====================================================== */
+        /* =====================================================
+       SIGNATURES DE LA DEMANDE
+    ===================================================== */
 
         .signature-section {
-            margin-top: 14px !important;
+            margin-top: 22px;
         }
 
         .signature-title {
-            margin-bottom: 7px !important;
-            color: #000 !important;
-            font-size: 12.5px !important;
-            font-weight: 800 !important;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .signature-grid {
-            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-            gap: 8px !important;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
         }
 
         .signature-box {
-            height: 88px !important;
-            padding: 7px !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            background: #fff !important;
+            min-width: 0;
+            height: 128px;
+            padding: 10px;
+            border: 1px solid #cfcfcf;
+            background: #fff;
+            overflow: hidden;
         }
 
         .signature-box .title {
-            margin-bottom: 6px !important;
-            color: #000 !important;
-            font-size: 10.5px !important;
-            font-weight: 800 !important;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
         }
 
         .signature-box .function {
-            color: #000 !important;
-            font-size: 10px !important;
-            line-height: 1.3 !important;
+            color: #444;
+            font-size: 13px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
         }
 
-        /* ======================================================
-        SÉPARATION ET TITRE DU BON DE PAIEMENT
-        ====================================================== */
+        /* =====================================================
+       SÉPARATEUR DU BON DE PAIEMENT
+    ===================================================== */
 
         .payment-divider {
-            margin-top: 16px !important;
-            margin-bottom: 10px !important;
+            width: 100%;
+            margin-top: 30px;
+            margin-bottom: 17px;
+            text-align: center;
         }
 
         .payment-divider-line {
-            height: 3px !important;
-            margin-bottom: 9px !important;
-            background: #000 !important;
+            width: 100%;
+            height: 3px;
+            margin-bottom: 16px;
+            background: var(--primary);
         }
 
         .payment-document-title span {
-            min-width: 250px !important;
-            padding: 6px 22px !important;
-            border: 2px solid #000 !important;
-            color: #000 !important;
-            font-size: 17px !important;
-            font-weight: 800 !important;
+            min-width: 320px;
         }
 
-        /* ======================================================
-        CONTENEUR DU BON DE PAIEMENT
-        ====================================================== */
+        /* =====================================================
+       BON DE PAIEMENT
+    ===================================================== */
 
         .payment-voucher-section {
-            width: 100% !important;
-            max-width: 100% !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            background: #fff !important;
-            overflow: hidden !important;
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow: hidden;
         }
 
         .payment-voucher-body {
-            padding: 8px !important;
-            color: #000 !important;
+            width: 100%;
+            max-width: 100%;
+            padding: 12px;
+            overflow: hidden;
         }
 
-        /* ======================================================
-        SYNTHÈSE 70 % / CHANTIER 30 %
-        ====================================================== */
+        /* Synthèse 70 % / Chantier 30 % */
 
         .payment-summary-grid {
-            display: grid !important;
-            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
-            width: 100% !important;
-            gap: 0 !important;
-            border: 1.5px solid #000 !important;
+            display: grid;
+            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+            gap: 12px;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 11px;
+            align-items: stretch;
         }
 
         .payment-summary {
-            min-width: 0 !important;
-            min-height: 52px !important;
-            margin: 0 !important;
-            padding: 7px 8px !important;
-            border: none !important;
-            background: #fff !important;
-        }
-
-        .payment-summary:first-child {
-            border-right: 1.5px solid #000 !important;
+            width: 100%;
+            min-width: 0;
+            min-height: 75px;
+            margin: 0;
+            padding: 10px 12px;
+            border: 1px solid var(--border-soft);
+            background: var(--background-soft);
+            overflow: hidden;
         }
 
         .payment-summary-label {
-            font-size: 10.5px !important;
-            color: #000 !important;
+            display: block;
+            max-width: 100%;
+            margin-bottom: 6px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.25;
+            text-transform: uppercase;
+            overflow-wrap: anywhere;
         }
 
         .payment-summary-value {
-            font-size: 12px !important;
-            color: #000 !important;
+            display: block;
+            max-width: 100%;
+            color: var(--text);
+            font-size: 17px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
         }
 
-        /* ======================================================
-        INFORMATIONS DU PAIEMENT
-        ====================================================== */
+        /* Informations du bon */
 
         .payment-info-grid {
-            display: grid !important;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-            gap: 4px 12px !important;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 8px 18px;
+            width: 100%;
         }
 
         .payment-info-item {
-            padding: 4px 0 !important;
-            border-bottom: 1.5px solid #000 !important;
-            color: #000 !important;
-            font-size: 11px !important;
-            line-height: 1.3 !important;
+            min-width: 0;
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-soft);
+            font-size: 14px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
         }
 
         .payment-info-label {
-            width: 120px !important;
-            max-width: 52% !important;
-            color: #000 !important;
-            font-size: 11px !important;
-            font-weight: 800 !important;
+            display: inline-block;
+            width: 155px;
+            max-width: 50%;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: bold;
+            vertical-align: top;
         }
 
         .payment-amount {
-            color: #000 !important;
-            font-size: 13px !important;
-            font-weight: 800 !important;
+            color: var(--primary-dark);
+            font-size: 16px;
+            font-weight: bold;
+            white-space: nowrap;
         }
 
-        /* ======================================================
-        OBSERVATION DU PAIEMENT
-        ====================================================== */
-
         .payment-observation {
-            min-height: 36px !important;
-            margin-top: 7px !important;
-            padding: 7px !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            background: #fff !important;
-            font-size: 11px !important;
-            line-height: 1.3 !important;
+            width: 100%;
+            min-height: 48px;
+            margin-top: 11px;
+            padding: 9px;
+            border: 1px solid var(--border-soft);
+            font-size: 14px;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
         }
 
         .payment-observation strong {
-            color: #000 !important;
-            font-size: 11.5px !important;
-            font-weight: 800 !important;
+            font-size: 14px;
         }
 
-        /* ======================================================
-        SIGNATURES DU PAIEMENT
-        ====================================================== */
+        /* Signatures du paiement */
 
         .payment-signatures {
-            display: grid !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 8px !important;
-            margin-top: 8px !important;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 13px;
+            width: 100%;
+            margin-top: 13px;
         }
 
         .payment-signature-box {
-            height: 70px !important;
-            padding: 7px !important;
-            border: 1.5px solid #000 !important;
-            color: #000 !important;
-            background: #fff !important;
+            min-width: 0;
+            height: 100px;
+            padding: 9px;
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow: hidden;
         }
 
         .payment-signature-box strong {
-            margin-bottom: 4px !important;
-            color: #000 !important;
-            font-size: 10.5px !important;
-            font-weight: 800 !important;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
         }
 
         .payment-signature-box .function {
-            color: #000 !important;
-            font-size: 10px !important;
-            line-height: 1.25 !important;
+            font-size: 13px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
         }
 
-        /* ======================================================
+        /* =====================================================
+       PIED DE PAGE
+    ===================================================== */
+
+        .footer {
+            margin-top: 17px;
+            padding-top: 8px;
+            border-top: 2px solid var(--primary);
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.4;
+            text-align: center;
+        }
+
+        /* =====================================================
+       RESPONSIVE ÉCRAN
+    ===================================================== */
+
+        @media screen and (max-width: 800px) {
+
+            body {
+                padding: 0;
+            }
+
+            .print-actions,
+            .print-page {
+                width: 100%;
+            }
+
+            .print-page {
+                min-height: auto;
+                padding: 15px;
+                border: none;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .company-title h2 {
+                font-size: 18px;
+            }
+
+            .company-title p {
+                font-size: 12px;
+            }
+
+            .company-info {
+                font-size: 10px;
+            }
+
+            .info-grid,
+            .payment-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .payment-summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .signature-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .payment-signatures {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* =====================================================
+       IMPRESSION A4
+    ===================================================== */
+
+        /* ==========================================================
+   CORRECTION FINALE IMPRESSION
+   Polices plus lisibles + bordures noires renforcées
+========================================================== */
+
+        @media print {
+
+            @page {
+                size: A4 portrait;
+                margin: 5mm;
+            }
+
+            html,
+            body {
+                font-size: 12px !important;
+                color: #000 !important;
+                background: #fff !important;
+            }
+
+            .print-actions {
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .print-page {
+                width: 100% !important;
+                max-width: 100% !important;
+                min-height: auto !important;
+                margin: 0 !important;
+                padding: 5mm 7mm !important;
+                border: none !important;
+                color: #000 !important;
+            }
+
+            /* ======================================================
+        EN-TÊTE
+        ====================================================== */
+
+            .header {
+                margin-bottom: 10px !important;
+                padding-bottom: 8px !important;
+                border-bottom: 3px solid #000 !important;
+            }
+
+            .logo-box {
+                width: 52px !important;
+                height: 52px !important;
+                flex-basis: 52px !important;
+                border: 1.5px solid #000 !important;
+            }
+
+            .logo-box img {
+                width: 47px !important;
+                height: 47px !important;
+            }
+
+            .company-title h2 {
+                font-size: 18px !important;
+                font-weight: 800 !important;
+                color: #000 !important;
+            }
+
+            .company-title p {
+                font-size: 11px !important;
+                color: #000 !important;
+            }
+
+            .company-info {
+                font-size: 10.5px !important;
+                line-height: 1.45 !important;
+                color: #000 !important;
+            }
+
+            /* ======================================================
+        TITRES
+        ====================================================== */
+
+            .document-title {
+                margin: 10px 0 11px !important;
+            }
+
+            .document-title h1,
+            .payment-document-title span {
+                padding: 6px 24px !important;
+                border: 2px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+                font-size: 18px !important;
+                font-weight: 800 !important;
+                letter-spacing: 1px !important;
+            }
+
+            /* ======================================================
+        INFORMATIONS DE LA DEMANDE
+        ====================================================== */
+
+            .info-grid {
+                gap: 5px 16px !important;
+                margin-bottom: 9px !important;
+            }
+
+            .info-item {
+                padding: 4px 0 !important;
+                border-bottom: 1.5px solid #000 !important;
+                color: #000 !important;
+                font-size: 11.5px !important;
+                line-height: 1.35 !important;
+            }
+
+            .info-label {
+                width: 120px !important;
+                max-width: 48% !important;
+                color: #000 !important;
+                font-size: 11.5px !important;
+                font-weight: 800 !important;
+            }
+
+            /* ======================================================
+        CIRCUIT DE VALIDATION
+        ====================================================== */
+
+            .validation-box {
+                margin: 8px 0 9px !important;
+                padding: 8px !important;
+                border: 1.5px solid #000 !important;
+                background: #fff !important;
+            }
+
+            .validation-title {
+                margin-bottom: 6px !important;
+                color: #000 !important;
+                font-size: 11.5px !important;
+                font-weight: 800 !important;
+            }
+
+            .validation-badge {
+                padding: 4px 7px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+                font-size: 10.5px !important;
+                font-weight: 700 !important;
+            }
+
+            .validated,
+            .pending {
+                color: #000 !important;
+                border-color: #000 !important;
+                background: #fff !important;
+            }
+
+            /* ======================================================
+        TABLEAU DES ARTICLES
+        ====================================================== */
+
+            .items-table {
+                margin-top: 6px !important;
+                border-collapse: collapse !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                font-size: 11px !important;
+            }
+
+            .items-table th {
+                padding: 5px !important;
+                border: 1.5px solid #000 !important;
+                background: #fff !important;
+                color: #000 !important;
+                font-size: 11px !important;
+                font-weight: 800 !important;
+            }
+
+            .items-table td {
+                padding: 5px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+            }
+
+            .total-row td {
+                border: 1.5px solid #000 !important;
+                background: #fff !important;
+                color: #000 !important;
+                font-size: 11.5px !important;
+                font-weight: 800 !important;
+            }
+
+            /* ======================================================
+        NOTES
+        ====================================================== */
+
+            .notes-box {
+                margin-top: 7px !important;
+                padding: 7px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                font-size: 11px !important;
+            }
+
+            /* ======================================================
+        SIGNATURES DE LA DEMANDE
+        ====================================================== */
+
+            .signature-section {
+                margin-top: 14px !important;
+            }
+
+            .signature-title {
+                margin-bottom: 7px !important;
+                color: #000 !important;
+                font-size: 12.5px !important;
+                font-weight: 800 !important;
+            }
+
+            .signature-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+            }
+
+            .signature-box {
+                height: 88px !important;
+                padding: 7px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+            }
+
+            .signature-box .title {
+                margin-bottom: 6px !important;
+                color: #000 !important;
+                font-size: 10.5px !important;
+                font-weight: 800 !important;
+            }
+
+            .signature-box .function {
+                color: #000 !important;
+                font-size: 10px !important;
+                line-height: 1.3 !important;
+            }
+
+            /* ======================================================
+        SÉPARATION ET TITRE DU BON DE PAIEMENT
+        ====================================================== */
+
+            .payment-divider {
+                margin-top: 16px !important;
+                margin-bottom: 10px !important;
+            }
+
+            .payment-divider-line {
+                height: 3px !important;
+                margin-bottom: 9px !important;
+                background: #000 !important;
+            }
+
+            .payment-document-title span {
+                min-width: 250px !important;
+                padding: 6px 22px !important;
+                border: 2px solid #000 !important;
+                color: #000 !important;
+                font-size: 17px !important;
+                font-weight: 800 !important;
+            }
+
+            /* ======================================================
+        CONTENEUR DU BON DE PAIEMENT
+        ====================================================== */
+
+            .payment-voucher-section {
+                width: 100% !important;
+                max-width: 100% !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+                overflow: hidden !important;
+            }
+
+            .payment-voucher-body {
+                padding: 8px !important;
+                color: #000 !important;
+            }
+
+            /* ======================================================
+        SYNTHÈSE 70 % / CHANTIER 30 %
+        ====================================================== */
+
+            .payment-summary-grid {
+                display: grid !important;
+                grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
+                width: 100% !important;
+                gap: 0 !important;
+                border: 1.5px solid #000 !important;
+            }
+
+            .payment-summary {
+                min-width: 0 !important;
+                min-height: 52px !important;
+                margin: 0 !important;
+                padding: 7px 8px !important;
+                border: none !important;
+                background: #fff !important;
+            }
+
+            .payment-summary:first-child {
+                border-right: 1.5px solid #000 !important;
+            }
+
+            .payment-summary-label {
+                font-size: 10.5px !important;
+                color: #000 !important;
+            }
+
+            .payment-summary-value {
+                font-size: 12px !important;
+                color: #000 !important;
+            }
+
+            /* ======================================================
+        INFORMATIONS DU PAIEMENT
+        ====================================================== */
+
+            .payment-info-grid {
+                display: grid !important;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+                gap: 4px 12px !important;
+            }
+
+            .payment-info-item {
+                padding: 4px 0 !important;
+                border-bottom: 1.5px solid #000 !important;
+                color: #000 !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+            }
+
+            .payment-info-label {
+                width: 120px !important;
+                max-width: 52% !important;
+                color: #000 !important;
+                font-size: 11px !important;
+                font-weight: 800 !important;
+            }
+
+            .payment-amount {
+                color: #000 !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+            }
+
+            /* ======================================================
+        OBSERVATION DU PAIEMENT
+        ====================================================== */
+
+            .payment-observation {
+                min-height: 36px !important;
+                margin-top: 7px !important;
+                padding: 7px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+                font-size: 11px !important;
+                line-height: 1.3 !important;
+            }
+
+            .payment-observation strong {
+                color: #000 !important;
+                font-size: 11.5px !important;
+                font-weight: 800 !important;
+            }
+
+            /* ======================================================
+        SIGNATURES DU PAIEMENT
+        ====================================================== */
+
+            .payment-signatures {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 8px !important;
+                margin-top: 8px !important;
+            }
+
+            .payment-signature-box {
+                height: 70px !important;
+                padding: 7px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+            }
+
+            .payment-signature-box strong {
+                margin-bottom: 4px !important;
+                color: #000 !important;
+                font-size: 10.5px !important;
+                font-weight: 800 !important;
+            }
+
+            .payment-signature-box .function {
+                color: #000 !important;
+                font-size: 10px !important;
+                line-height: 1.25 !important;
+            }
+
+            /* ======================================================
         PIED DE PAGE
         ====================================================== */
 
-        .footer {
-            margin-top: 8px !important;
-            padding-top: 5px !important;
-            border-top: 2px solid #000 !important;
-            color: #000 !important;
-            font-size: 8.5px !important;
-            line-height: 1.3 !important;
-        }
+            .footer {
+                margin-top: 8px !important;
+                padding-top: 5px !important;
+                border-top: 2px solid #000 !important;
+                color: #000 !important;
+                font-size: 8.5px !important;
+                line-height: 1.3 !important;
+            }
 
-        .payment-summary-grid {
-            display: grid !important;
-            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
-            width: 100% !important;
-            gap: 0 !important;
+            .payment-summary-grid {
+                display: grid !important;
+                grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
+                width: 100% !important;
+                gap: 0 !important;
 
-            border: 2px solid #000 !important;
-            background: #fff !important;
-            overflow: hidden !important;
+                border: 2px solid #000 !important;
+                background: #fff !important;
+                overflow: hidden !important;
 
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
 
-        .payment-summary {
-            width: 100% !important;
-            min-width: 0 !important;
-            min-height: 52px !important;
-            margin: 0 !important;
-            padding: 7px 8px !important;
+            .payment-summary {
+                width: 100% !important;
+                min-width: 0 !important;
+                min-height: 52px !important;
+                margin: 0 !important;
+                padding: 7px 8px !important;
 
-            border: none !important;
-            background: #fff !important;
-            color: #000 !important;
-        }
+                border: none !important;
+                background: #fff !important;
+                color: #000 !important;
+            }
 
-        /*
+            /*
      * Séparation de 3px :
      * elle restera visible même lorsque l’aperçu est réduit.
      */
-        .payment-summary+.payment-summary {
-            border-left: 3px solid #000 !important;
-        }
+            .payment-summary+.payment-summary {
+                border-left: 3px solid #000 !important;
+            }
 
-        .payment-summary-label {
-            color: #000 !important;
-            font-size: 10.5px !important;
-            font-weight: 800 !important;
-        }
+            .payment-summary-label {
+                color: #000 !important;
+                font-size: 10.5px !important;
+                font-weight: 800 !important;
+            }
 
-        .payment-summary-value {
-            color: #000 !important;
-            font-size: 12px !important;
+            .payment-summary-value {
+                color: #000 !important;
+                font-size: 12px !important;
+            }
         }
-    }
     </style>
 
 </head>
@@ -1237,12 +1237,12 @@
             <div class="info-item">
 
                 <span class="info-label">
-                    Trésorerie / Fonds :
+                    Trésorerie :
                 </span>
 
                 <?= $achat->treasury_status === 'valide'
-                    ? 'Fonds disponibles'
-                    : 'Fonds en attentes' ?>
+                    ? 'Fonds disponible'
+                    : 'Fonds en attente' ?>
 
             </div>
 
@@ -1311,8 +1311,8 @@
         </div>
 
         <!-- =====================================================
-         ARTICLES
-    ====================================================== -->
+            ARTICLES
+        ====================================================== -->
 
         <table class="items-table">
 
@@ -1352,75 +1352,75 @@
 
                 <?php if (!empty($articles)) : ?>
 
-                <?php foreach ($articles as $index => $article) : ?>
+                    <?php foreach ($articles as $index => $article) : ?>
 
-                <?php
+                        <?php
                         $articleTotal = (float) $article->total_price;
                         $total_general += $articleTotal;
                         ?>
 
-                <tr>
+                        <tr>
 
-                    <td class="text-center">
-                        <?= $index + 1 ?>
-                    </td>
+                            <td class="text-center">
+                                <?= $index + 1 ?>
+                            </td>
 
-                    <td>
-                        <?= html_escape($article->designation) ?>
-                    </td>
+                            <td>
+                                <?= html_escape($article->designation) ?>
+                            </td>
 
-                    <td class="text-right">
-                        <?= number_format(
+                            <td class="text-right">
+                                <?= number_format(
                                     (float) $article->quantity,
                                     2,
                                     ',',
                                     ' '
                                 ) ?>
-                    </td>
+                            </td>
 
-                    <td class="text-right">
-                        <?= number_format(
+                            <td class="text-right">
+                                <?= number_format(
                                     (float) $article->unit_price,
                                     0,
                                     ',',
                                     ' '
                                 ) ?> BIF
-                    </td>
+                            </td>
 
-                    <td class="text-right">
+                            <td class="text-right">
 
-                        <strong>
-                            <?= number_format(
+                                <strong>
+                                    <?= number_format(
                                         $articleTotal,
                                         0,
                                         ',',
                                         ' '
                                     ) ?> BIF
-                        </strong>
+                                </strong>
 
-                    </td>
+                            </td>
 
-                    <td>
-                        <?= !empty($article->observations)
+                            <td>
+                                <?= !empty($article->observations)
                                     ? html_escape($article->observations)
                                     : '-' ?>
-                    </td>
+                            </td>
 
-                </tr>
+                        </tr>
 
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
 
                 <?php else : ?>
 
-                <tr>
+                    <tr>
 
-                    <td colspan="6" class="text-center">
+                        <td colspan="6" class="text-center">
 
-                        Aucun article trouvé.
+                            Aucun article trouvé.
 
-                    </td>
+                        </td>
 
-                </tr>
+                    </tr>
 
                 <?php endif; ?>
 
@@ -1457,13 +1457,13 @@
 
         <?php if (!empty($achat->notes)) : ?>
 
-        <div class="notes-box">
+            <div class="notes-box">
 
-            <strong>Notes :</strong><br>
+                <strong>Notes :</strong><br>
 
-            <?= nl2br(html_escape($achat->notes)) ?>
+                <?= nl2br(html_escape($achat->notes)) ?>
 
-        </div>
+            </div>
 
         <?php endif; ?>
 
@@ -1541,203 +1541,203 @@
 
         <?php if (!empty($bonPaiement)) : ?>
 
-        <!-- Ligne de séparation + titre encadré -->
+            <!-- Ligne de séparation + titre encadré -->
 
-        <div class="payment-divider">
+            <div class="payment-divider">
 
-            <div class="payment-divider-line"></div>
+                <div class="payment-divider-line"></div>
 
-            <div class="payment-document-title">
+                <div class="payment-document-title">
 
-                <span>
-                    Bon de paiement
-                </span>
-
-            </div>
-
-        </div>
-
-        <section class="payment-voucher-section">
-
-            <div class="payment-voucher-body">
-
-                <!-- Synthèse 70 % / Destination 30 % -->
-
-                <div class="payment-summary-grid">
-
-                    <div class="payment-summary">
-
-                        <span class="payment-summary-label">
-                            Synthèse de la demande
-                        </span>
-
-                        <div class="payment-summary-value">
-
-                            <?= nl2br(
-                                    html_escape($bonPaiement->summary)
-                                ) ?>
-
-                        </div>
-
-                    </div>
-
-                    <div class="payment-summary">
-
-                        <span class="payment-summary-label">
-                            Destination / Chantier
-                        </span>
-
-                        <div class="payment-summary-value">
-
-                            <?= html_escape(
-                                    $achat->destination_chantier
-                                ) ?>
-
-                        </div>
-
-                    </div>
+                    <span>
+                        Bon de paiement
+                    </span>
 
                 </div>
 
-                <!-- Informations du paiement -->
+            </div>
 
-                <div class="payment-info-grid">
+            <section class="payment-voucher-section">
 
-                    <div class="payment-info-item">
+                <div class="payment-voucher-body">
 
-                        <span class="payment-info-label">
-                            Référence demande :
-                        </span>
+                    <!-- Synthèse 70 % / Destination 30 % -->
 
-                        <?= html_escape($reference) ?>
+                    <div class="payment-summary-grid">
+
+                        <div class="payment-summary">
+
+                            <span class="payment-summary-label">
+                                Synthèse de la demande
+                            </span>
+
+                            <div class="payment-summary-value">
+
+                                <?= nl2br(
+                                    html_escape($bonPaiement->summary)
+                                ) ?>
+
+                            </div>
+
+                        </div>
+
+                        <div class="payment-summary">
+
+                            <span class="payment-summary-label">
+                                Destination / Chantier
+                            </span>
+
+                            <div class="payment-summary-value">
+
+                                <?= html_escape(
+                                    $achat->destination_chantier
+                                ) ?>
+
+                            </div>
+
+                        </div>
 
                     </div>
 
-                    <div class="payment-info-item">
+                    <!-- Informations du paiement -->
 
-                        <span class="payment-info-label">
-                            Numéro du bon :
-                        </span>
+                    <div class="payment-info-grid">
 
-                        <?= html_escape(
+                        <div class="payment-info-item">
+
+                            <span class="payment-info-label">
+                                Référence demande :
+                            </span>
+
+                            <?= html_escape($reference) ?>
+
+                        </div>
+
+                        <div class="payment-info-item">
+
+                            <span class="payment-info-label">
+                                Numéro du bon :
+                            </span>
+
+                            <?= html_escape(
                                 $bonPaiement->payment_number
                             ) ?>
 
-                    </div>
+                        </div>
 
-                    <div class="payment-info-item">
+                        <div class="payment-info-item">
 
-                        <span class="payment-info-label">
-                            Mode de paiement :
-                        </span>
+                            <span class="payment-info-label">
+                                Mode de paiement :
+                            </span>
 
-                        <?= html_escape($modePaiement) ?>
+                            <?= html_escape($modePaiement) ?>
 
-                    </div>
+                        </div>
 
-                    <div class="payment-info-item">
+                        <div class="payment-info-item">
 
-                        <span class="payment-info-label">
-                            Référence paiement :
-                        </span>
+                            <span class="payment-info-label">
+                                Référence paiement :
+                            </span>
 
-                        <?= html_escape(
+                            <?= html_escape(
                                 $bonPaiement->payment_reference
                             ) ?>
 
-                    </div>
+                        </div>
 
-                    <div class="payment-info-item">
+                        <div class="payment-info-item">
 
-                        <span class="payment-info-label">
-                            Date de paiement :
-                        </span>
+                            <span class="payment-info-label">
+                                Date de paiement :
+                            </span>
 
-                        <?= !empty($bonPaiement->payment_date)
+                            <?= !empty($bonPaiement->payment_date)
                                 ? date(
                                     'd/m/Y',
                                     strtotime($bonPaiement->payment_date)
                                 )
                                 : '-' ?>
 
-                    </div>
+                        </div>
 
-                    <div class="payment-info-item">
+                        <div class="payment-info-item">
 
-                        <span class="payment-info-label">
-                            Montant payé :
-                        </span>
+                            <span class="payment-info-label">
+                                Montant payé :
+                            </span>
 
-                        <span class="payment-amount">
+                            <span class="payment-amount">
 
-                            <?= number_format(
+                                <?= number_format(
                                     (float) $bonPaiement->amount_paid,
                                     0,
                                     ',',
                                     ' '
                                 ) ?> BIF
 
-                        </span>
+                            </span>
 
-                    </div>
-
-                </div>
-
-                <?php if (!empty($bonPaiement->observation)) : ?>
-
-                <div class="payment-observation">
-
-                    <strong>
-                        Observation :
-                    </strong>
-
-                    <br>
-
-                    <?= nl2br(
-                                html_escape($bonPaiement->observation)
-                            ) ?>
-
-                </div>
-
-                <?php endif; ?>
-
-                <!-- Signatures du paiement -->
-
-                <div class="payment-signatures">
-
-                    <div class="payment-signature-box">
-
-                        <strong>
-                            Trésorerie
-                        </strong>
-
-                        <div class="function">
-                            AHISHAKIYE Nelly Ange
                         </div>
 
                     </div>
 
-                    <div class="payment-signature-box">
+                    <?php if (!empty($bonPaiement->observation)) : ?>
 
-                        <strong>
-                            Pour la remise de fonds
-                        </strong>
+                        <div class="payment-observation">
 
-                    </div>
+                            <strong>
+                                Observation :
+                            </strong>
 
-                    <div class="payment-signature-box">
+                            <br>
 
-                        <strong>
-                            Pour la réception de fonds
-                        </strong>
+                            <?= nl2br(
+                                html_escape($bonPaiement->observation)
+                            ) ?>
+
+                        </div>
+
+                    <?php endif; ?>
+
+                    <!-- Signatures du paiement -->
+
+                    <div class="payment-signatures">
+
+                        <div class="payment-signature-box">
+
+                            <strong>
+                                Trésorerie
+                            </strong>
+
+                            <div class="function">
+                                AHISHAKIYE Nelly Ange
+                            </div>
+
+                        </div>
+
+                        <div class="payment-signature-box">
+
+                            <strong>
+                                Pour la remise de fonds
+                            </strong>
+
+                        </div>
+
+                        <div class="payment-signature-box">
+
+                            <strong>
+                                Pour la réception de fonds
+                            </strong>
+
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
-
-        </section>
+            </section>
 
         <?php endif; ?>
 
