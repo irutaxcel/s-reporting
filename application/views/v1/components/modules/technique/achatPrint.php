@@ -622,6 +622,11 @@
        IMPRESSION A4
     ===================================================== */
 
+    /* ==========================================================
+   CORRECTION FINALE IMPRESSION
+   Polices plus lisibles + bordures noires renforcées
+========================================================== */
+
     @media print {
 
         @page {
@@ -631,286 +636,453 @@
 
         html,
         body {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            background: #fff;
-            font-size: 10.5px;
+            font-size: 12px !important;
+            color: #000 !important;
+            background: #fff !important;
         }
 
         .print-actions {
             display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
         }
 
         .print-page {
-            width: 100%;
-            max-width: 100%;
-            min-height: 0;
-            margin: 0;
-            padding: 4mm 6mm;
-            border: none;
-            box-shadow: none;
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            margin: 0 !important;
+            padding: 5mm 7mm !important;
+            border: none !important;
+            color: #000 !important;
         }
 
-        .header,
-        .document-title,
-        .info-grid,
-        .validation-box,
-        .items-table,
-        .signature-section,
-        .payment-divider {
-            break-inside: avoid;
-            page-break-inside: avoid;
-        }
-
-        /* En-tête */
+        /* ======================================================
+        EN-TÊTE
+        ====================================================== */
 
         .header {
-            margin-bottom: 8px;
-            padding-bottom: 6px;
+            margin-bottom: 10px !important;
+            padding-bottom: 8px !important;
+            border-bottom: 3px solid #000 !important;
         }
 
         .logo-box {
-            flex-basis: 48px;
-            width: 48px;
-            height: 48px;
+            width: 52px !important;
+            height: 52px !important;
+            flex-basis: 52px !important;
+            border: 1.5px solid #000 !important;
         }
 
         .logo-box img {
-            width: 43px;
-            height: 43px;
+            width: 47px !important;
+            height: 47px !important;
         }
 
         .company-title h2 {
-            font-size: 16px;
+            font-size: 18px !important;
+            font-weight: 800 !important;
+            color: #000 !important;
         }
 
         .company-title p {
-            font-size: 9px;
+            font-size: 11px !important;
+            color: #000 !important;
         }
 
         .company-info {
-            font-size: 8.5px;
+            font-size: 10.5px !important;
+            line-height: 1.45 !important;
+            color: #000 !important;
         }
 
-        /* Titres */
+        /* ======================================================
+        TITRES
+        ====================================================== */
 
         .document-title {
-            margin: 8px 0 9px;
+            margin: 10px 0 11px !important;
         }
 
         .document-title h1,
         .payment-document-title span {
-            padding: 5px 22px;
-            border-width: 2px;
-            font-size: 16px;
+            padding: 6px 24px !important;
+            border: 2px solid #000 !important;
+            color: #000 !important;
+            background: #fff !important;
+            font-size: 18px !important;
+            font-weight: 800 !important;
+            letter-spacing: 1px !important;
         }
 
-        /* Informations */
+        /* ======================================================
+        INFORMATIONS DE LA DEMANDE
+        ====================================================== */
 
         .info-grid {
-            gap: 4px 14px;
-            margin-bottom: 7px;
+            gap: 5px 16px !important;
+            margin-bottom: 9px !important;
         }
 
         .info-item {
-            padding-bottom: 3px;
-            font-size: 10px;
+            padding: 4px 0 !important;
+            border-bottom: 1.5px solid #000 !important;
+            color: #000 !important;
+            font-size: 11.5px !important;
+            line-height: 1.35 !important;
         }
 
         .info-label {
-            width: 110px;
-            font-size: 10px;
+            width: 120px !important;
+            max-width: 48% !important;
+            color: #000 !important;
+            font-size: 11.5px !important;
+            font-weight: 800 !important;
         }
 
-        /* Validation */
+        /* ======================================================
+        CIRCUIT DE VALIDATION
+        ====================================================== */
 
         .validation-box {
-            margin: 6px 0 7px;
-            padding: 6px;
+            margin: 8px 0 9px !important;
+            padding: 8px !important;
+            border: 1.5px solid #000 !important;
+            background: #fff !important;
         }
 
         .validation-title {
-            margin-bottom: 4px;
-            font-size: 10px;
+            margin-bottom: 6px !important;
+            color: #000 !important;
+            font-size: 11.5px !important;
+            font-weight: 800 !important;
         }
 
         .validation-badge {
-            padding: 3px 5px;
-            font-size: 9px;
+            padding: 4px 7px !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            background: #fff !important;
+            font-size: 10.5px !important;
+            font-weight: 700 !important;
         }
 
-        /* Tableau */
+        .validated,
+        .pending {
+            color: #000 !important;
+            border-color: #000 !important;
+            background: #fff !important;
+        }
+
+        /* ======================================================
+        TABLEAU DES ARTICLES
+        ====================================================== */
 
         .items-table {
-            margin-top: 5px;
-            font-size: 9.5px;
+            margin-top: 6px !important;
+            border-collapse: collapse !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            font-size: 11px !important;
         }
 
         .items-table th {
-            padding: 4px;
-            font-size: 9.5px;
+            padding: 5px !important;
+            border: 1.5px solid #000 !important;
+            background: #fff !important;
+            color: #000 !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
         }
 
         .items-table td {
-            padding: 4px;
-            font-size: 9.5px;
+            padding: 5px !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            font-size: 11px !important;
+            line-height: 1.3 !important;
         }
 
         .total-row td {
-            font-size: 10px;
+            border: 1.5px solid #000 !important;
+            background: #fff !important;
+            color: #000 !important;
+            font-size: 11.5px !important;
+            font-weight: 800 !important;
         }
 
-        /* Signatures demande */
+        /* ======================================================
+        NOTES
+        ====================================================== */
+
+        .notes-box {
+            margin-top: 7px !important;
+            padding: 7px !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            font-size: 11px !important;
+        }
+
+        /* ======================================================
+        SIGNATURES DE LA DEMANDE
+        ====================================================== */
 
         .signature-section {
-            margin-top: 12px;
+            margin-top: 14px !important;
         }
 
         .signature-title {
-            margin-bottom: 6px;
-            font-size: 11px;
+            margin-bottom: 7px !important;
+            color: #000 !important;
+            font-size: 12.5px !important;
+            font-weight: 800 !important;
         }
 
         .signature-grid {
             grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-            gap: 7px;
+            gap: 8px !important;
         }
 
         .signature-box {
-            height: 78px;
-            padding: 6px;
+            height: 88px !important;
+            padding: 7px !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            background: #fff !important;
         }
 
         .signature-box .title {
-            margin-bottom: 5px;
-            font-size: 9px;
+            margin-bottom: 6px !important;
+            color: #000 !important;
+            font-size: 10.5px !important;
+            font-weight: 800 !important;
         }
 
         .signature-box .function {
-            font-size: 8.5px;
-            line-height: 1.25;
+            color: #000 !important;
+            font-size: 10px !important;
+            line-height: 1.3 !important;
         }
 
-        /* Séparation paiement */
+        /* ======================================================
+        SÉPARATION ET TITRE DU BON DE PAIEMENT
+        ====================================================== */
 
         .payment-divider {
-            margin-top: 14px;
-            margin-bottom: 8px;
+            margin-top: 16px !important;
+            margin-bottom: 10px !important;
         }
 
         .payment-divider-line {
-            height: 2px;
-            margin-bottom: 8px;
+            height: 3px !important;
+            margin-bottom: 9px !important;
+            background: #000 !important;
         }
 
         .payment-document-title span {
-            min-width: 230px;
-            padding: 5px 20px;
-            font-size: 15px;
+            min-width: 250px !important;
+            padding: 6px 22px !important;
+            border: 2px solid #000 !important;
+            color: #000 !important;
+            font-size: 17px !important;
+            font-weight: 800 !important;
         }
 
-        /* Bon de paiement */
+        /* ======================================================
+        CONTENEUR DU BON DE PAIEMENT
+        ====================================================== */
 
         .payment-voucher-section {
             width: 100% !important;
             max-width: 100% !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            background: #fff !important;
             overflow: hidden !important;
-            page-break-inside: auto !important;
-            break-inside: auto !important;
         }
 
         .payment-voucher-body {
+            padding: 8px !important;
+            color: #000 !important;
+        }
+
+        /* ======================================================
+        SYNTHÈSE 70 % / CHANTIER 30 %
+        ====================================================== */
+
+        .payment-summary-grid {
+            display: grid !important;
+            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
             width: 100% !important;
-            max-width: 100% !important;
-            padding: 7px;
-            overflow: hidden !important;
+            gap: 0 !important;
+            border: 1.5px solid #000 !important;
+        }
+
+        .payment-summary {
+            min-width: 0 !important;
+            min-height: 52px !important;
+            margin: 0 !important;
+            padding: 7px 8px !important;
+            border: none !important;
+            background: #fff !important;
+        }
+
+        .payment-summary:first-child {
+            border-right: 1.5px solid #000 !important;
+        }
+
+        .payment-summary-label {
+            font-size: 10.5px !important;
+            color: #000 !important;
+        }
+
+        .payment-summary-value {
+            font-size: 12px !important;
+            color: #000 !important;
+        }
+
+        /* ======================================================
+        INFORMATIONS DU PAIEMENT
+        ====================================================== */
+
+        .payment-info-grid {
+            display: grid !important;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+            gap: 4px 12px !important;
+        }
+
+        .payment-info-item {
+            padding: 4px 0 !important;
+            border-bottom: 1.5px solid #000 !important;
+            color: #000 !important;
+            font-size: 11px !important;
+            line-height: 1.3 !important;
+        }
+
+        .payment-info-label {
+            width: 120px !important;
+            max-width: 52% !important;
+            color: #000 !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+        }
+
+        .payment-amount {
+            color: #000 !important;
+            font-size: 13px !important;
+            font-weight: 800 !important;
+        }
+
+        /* ======================================================
+        OBSERVATION DU PAIEMENT
+        ====================================================== */
+
+        .payment-observation {
+            min-height: 36px !important;
+            margin-top: 7px !important;
+            padding: 7px !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            background: #fff !important;
+            font-size: 11px !important;
+            line-height: 1.3 !important;
+        }
+
+        .payment-observation strong {
+            color: #000 !important;
+            font-size: 11.5px !important;
+            font-weight: 800 !important;
+        }
+
+        /* ======================================================
+        SIGNATURES DU PAIEMENT
+        ====================================================== */
+
+        .payment-signatures {
+            display: grid !important;
+            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+            gap: 8px !important;
+            margin-top: 8px !important;
+        }
+
+        .payment-signature-box {
+            height: 70px !important;
+            padding: 7px !important;
+            border: 1.5px solid #000 !important;
+            color: #000 !important;
+            background: #fff !important;
+        }
+
+        .payment-signature-box strong {
+            margin-bottom: 4px !important;
+            color: #000 !important;
+            font-size: 10.5px !important;
+            font-weight: 800 !important;
+        }
+
+        .payment-signature-box .function {
+            color: #000 !important;
+            font-size: 10px !important;
+            line-height: 1.25 !important;
+        }
+
+        /* ======================================================
+        PIED DE PAGE
+        ====================================================== */
+
+        .footer {
+            margin-top: 8px !important;
+            padding-top: 5px !important;
+            border-top: 2px solid #000 !important;
+            color: #000 !important;
+            font-size: 8.5px !important;
+            line-height: 1.3 !important;
         }
 
         .payment-summary-grid {
             display: grid !important;
             grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
-            gap: 7px !important;
             width: 100% !important;
-            max-width: 100% !important;
-            margin-bottom: 5px;
+            gap: 0 !important;
+
+            border: 2px solid #000 !important;
+            background: #fff !important;
+            overflow: hidden !important;
+
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         .payment-summary {
             width: 100% !important;
             min-width: 0 !important;
-            min-height: 46px;
+            min-height: 52px !important;
             margin: 0 !important;
-            padding: 6px 7px !important;
+            padding: 7px 8px !important;
+
+            border: none !important;
+            background: #fff !important;
+            color: #000 !important;
+        }
+
+        /*
+     * Séparation de 3px :
+     * elle restera visible même lorsque l’aperçu est réduit.
+     */
+        .payment-summary+.payment-summary {
+            border-left: 3px solid #000 !important;
         }
 
         .payment-summary-label {
-            margin-bottom: 3px;
-            font-size: 9px;
-            line-height: 1.15;
+            color: #000 !important;
+            font-size: 10.5px !important;
+            font-weight: 800 !important;
         }
 
         .payment-summary-value {
-            font-size: 10.5px;
-            line-height: 1.25;
-        }
-
-        .payment-info-grid {
-            display: grid !important;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-            gap: 3px 10px;
-        }
-
-        .payment-info-item {
-            padding: 3px 0;
-            font-size: 9.5px;
-        }
-
-        .payment-info-label {
-            width: 110px;
-            max-width: 50%;
-            font-size: 9.5px;
-        }
-
-        .payment-amount {
-            font-size: 11px;
-        }
-
-        .payment-observation {
-            min-height: 30px;
-            margin-top: 5px;
-            padding: 5px;
-            font-size: 9.5px;
-        }
-
-        .payment-observation strong {
-            font-size: 9.5px;
-        }
-
-        .payment-signatures {
-            display: grid !important;
-            grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-            gap: 7px;
-            margin-top: 6px;
-        }
-
-        .payment-signature-box {
-            height: 60px;
-            padding: 5px;
-        }
-
-        .payment-signature-box strong {
-            font-size: 9px;
-        }
-
-        .payment-signature-box .function {
-            font-size: 8.5px;
-        }
-
-        .footer {
-            margin-top: 7px;
-            padding-top: 5px;
-            font-size: 7.5px;
+            color: #000 !important;
+            font-size: 12px !important;
         }
     }
     </style>
@@ -971,8 +1143,8 @@
     <div class="print-page">
 
         <!-- =====================================================
-         EN-TÊTE
-    ====================================================== -->
+            EN-TÊTE
+        ====================================================== -->
 
         <header class="header">
 
@@ -1013,8 +1185,8 @@
         </header>
 
         <!-- =====================================================
-         TITRE DEMANDE
-    ====================================================== -->
+            TITRE DEMANDE
+        ====================================================== -->
 
         <div class="document-title">
 
@@ -1025,8 +1197,8 @@
         </div>
 
         <!-- =====================================================
-         INFORMATIONS DEMANDE
-    ====================================================== -->
+            INFORMATIONS DEMANDE
+        ====================================================== -->
 
         <div class="info-grid">
 
@@ -1055,7 +1227,7 @@
             <div class="info-item">
 
                 <span class="info-label">
-                    Destination / Chantier :
+                    Destination :
                 </span>
 
                 <?= html_escape($achat->destination_chantier) ?>
@@ -1070,7 +1242,7 @@
 
                 <?= $achat->treasury_status === 'valide'
                     ? 'Fonds disponibles'
-                    : 'Fonds non disponibles' ?>
+                    : 'Fonds en attentes' ?>
 
             </div>
 
@@ -1087,8 +1259,8 @@
         </div>
 
         <!-- =====================================================
-         VALIDATION
-    ====================================================== -->
+            VALIDATION
+        ====================================================== -->
 
         <div class="validation-box">
 
@@ -1570,8 +1742,8 @@
         <?php endif; ?>
 
         <!-- =====================================================
-         PIED DE PAGE
-    ====================================================== -->
+            PIED DE PAGE
+        ====================================================== -->
 
         <footer class="footer">
 
