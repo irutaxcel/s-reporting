@@ -1083,4 +1083,202 @@ class TechModel extends CI_Model
             ->get('purchase_payment_vouchers')
             ->row();
     }
+
+
+    public function getPaymentVoucherById($id)
+    {
+        return $this->db
+            ->select('
+            ppv.*,
+            prf.created_at AS request_created_at
+        ')
+            ->from('purchase_payment_vouchers ppv')
+            ->join(
+                'purchase_request_forms prf',
+                'prf.id = ppv.request_id',
+                'left'
+            )
+            ->where('ppv.id', (int) $id)
+            ->get()
+            ->row();
+    }
+
+    public function updatePaymentVoucher($id, array $data)
+    {
+        return $this->db
+            ->where('id', (int) $id)
+            ->update(
+                'purchase_payment_vouchers',
+                $data
+            );
+    }
+
+
+
+    // ---------- Génération de la référence JP-AAAA-### ----------
+    public function getNextJournalReference()
+    {
+        $row = $this->db->select_max('id')->get('tbl_journal_production')->row();
+        $next = (!empty($row->id) ? (int) $row->id : 0) + 1;
+        return 'JP-' . date('Y') . '-' . str_pad($next, 3, '0', STR_PAD_LEFT);
+    }
+
+    // ---------- Insertion journal + engins (transaction) ----------
+    public function createJournalProduction($data, $enginRows)
+    {
+        $this->db->trans_start();
+
+        $this->db->insert('tbl_journal_production', $data);
+        $journal_id = $this->db->insert_id();
+
+        foreach ($enginRows as $row) {
+            $row['journal_production_id'] = $journal_id;
+            $row['created_at'] = date('Y-m-d H:i:s');
+            $this->db->insert('tbl_journal_production_engins', $row);
+        }
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status() ? $journal_id : false;
+    }
+
+    // ---------- Liste des journaux (pour le tableau) ----------
+    // public function getJournalProduction()
+    // {
+    //     $this->db->select('jp.*, c.name AS chantier_name,
+    //     (SELECT COUNT(*) FROM tbl_journal_production_engins e
+    //      WHERE e.journal_production_id = jp.id) AS nb_engins,
+    //     (SELECT IFNULL(SUM(e.heures_utilisation), 0) FROM tbl_journal_production_engins e
+    //      WHERE e.journal_production_id = jp.id) AS total_heures_engins');
+    //     $this->db->from('tbl_journal_production jp');
+    //     $this->db->join('chantiers c', 'c.id = jp.chantier_id', 'left');
+    //     $this->db->order_by('jp.journal_date', 'DESC');
+    //     $this->db->order_by('jp.id', 'DESC');
+    //     return $this->db->get()->result();
+    // }
+
+    // // ---------- Engins d'un journal (pour le détail / modification) ----------
+    // public function getJournalProductionEngins($journal_id)
+    // {
+    //     return $this->db->get_where('tbl_journal_production_engins', [
+    //         'journal_production_id' => $journal_id
+    //     ])->result();
+    // }
+
+    // ---------- Un journal + nom du chantier ----------
+    public function getJournalProductionById($id)
+    {
+        $this->db->select('jp.*, c.name AS chantier_name');
+        $this->db->from('tbl_journal_production jp');
+        $this->db->join('chantiers c', 'c.id = jp.chantier_id', 'left');
+        $this->db->where('jp.id', $id);
+        return $this->db->get()->row();
+    }
+
+    // ---------- Engins du journal (avec désignation) ----------
+    public function getJournalProductionEngins($journal_id)
+    {
+        $this->db->select('e.*, eng.designation AS engin_name');
+        $this->db->from('tbl_journal_production_engins e');
+        $this->db->join('tbl_engin_materiel eng', 'eng.id = e.engin_id', 'left');
+        $this->db->where('e.journal_production_id', $journal_id);
+        return $this->db->get()->result();
+    }
+
+    // ---------- Mise à jour journal + remplacement des engins ----------
+    public function updateJournalProduction($id, $data, $enginRows)
+    {
+        $this->db->trans_start();
+
+        // 1) Entête du journal
+        $this->db->where('id', $id);
+        $this->db->update('tbl_journal_production', $data);
+
+        // 2) On remplace les lignes d'engins
+        $this->db->where('journal_production_id', $id);
+        $this->db->delete('tbl_journal_production_engins');
+
+        foreach ($enginRows as $row) {
+            $row['journal_production_id'] = $id;
+            $row['created_at'] = date('Y-m-d H:i:s');
+            $this->db->insert('tbl_journal_production_engins', $row);
+        }
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    // ---------- Suppression journal + ses engins ----------
+    public function deleteJournalProduction($id)
+    {
+        $this->db->trans_start();
+
+        // 1) Les lignes d'engins d'abord
+        $this->db->where('journal_production_id', $id);
+        $this->db->delete('tbl_journal_production_engins');
+
+        // 2) Puis le journal lui-même
+        $this->db->where('id', $id);
+        $this->db->delete('tbl_journal_production');
+
+        $this->db->trans_complete();
+        return $this->db->trans_status();
+    }
+
+    // ---------- Nombre de journaux du mois en cours ----------
+    public function countJournalProductionMois()
+    {
+        return $this->db
+            ->where('YEAR(journal_date)', date('Y'))
+            ->where('MONTH(journal_date)', date('n'))
+            ->count_all_results('tbl_journal_production');
+    }
+
+    // ---------- Nombre de journaux selon le statut ----------
+    public function countJournalProductionByStatut($statut)
+    {
+        return $this->db
+            ->where('statut', $statut)
+            ->count_all_results('tbl_journal_production');
+    }
+
+    // ---------- Total des heures d'engins (toutes lignes confondues) ----------
+    public function sumHeuresEngins()
+    {
+        $this->db->select('IFNULL(SUM(heures_utilisation), 0) AS total');
+        $row = $this->db->get('tbl_journal_production_engins')->row();
+        return $row->total;
+    }
+
+    public function getJournalProduction($filters = [])
+    {
+        $this->db->select('jp.*, c.name AS chantier_name,
+        (SELECT COUNT(*) FROM tbl_journal_production_engins e
+         WHERE e.journal_production_id = jp.id) AS nb_engins,
+        (SELECT IFNULL(SUM(e.heures_utilisation), 0) FROM tbl_journal_production_engins e
+         WHERE e.journal_production_id = jp.id) AS total_heures_engins');
+        $this->db->from('tbl_journal_production jp');
+        $this->db->join('chantiers c', 'c.id = jp.chantier_id', 'left');
+
+        // ----- Filtres -----
+        if (!empty($filters['date_debut'])) {
+            $this->db->where('jp.journal_date >=', $filters['date_debut']);
+        }
+
+        if (!empty($filters['date_fin'])) {
+            $this->db->where('jp.journal_date <=', $filters['date_fin']);
+        }
+
+        if (!empty($filters['chantier'])) {
+            $this->db->where('jp.chantier_id', $filters['chantier']);
+        }
+
+        if (!empty($filters['statut'])) {
+            $this->db->where('jp.statut', $filters['statut']);
+        }
+
+        $this->db->order_by('jp.journal_date', 'DESC');
+        $this->db->order_by('jp.id', 'DESC');
+        return $this->db->get()->result();
+    }
 }

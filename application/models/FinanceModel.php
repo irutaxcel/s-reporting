@@ -744,116 +744,78 @@ class FinanceModel extends CI_Model
             ->row();
     }
 
-    public function createCashboxOperation(array $data): array
+    /**
+     * Enregistre une opération de caisse et met à jour les soldes.
+     *
+     * @param array $operationData
+     * @return array
+     */
+    public function createCashboxOperation(array $operationData): array
     {
-        $year = (int) date(
-            'Y',
-            strtotime($data['operation_date'])
-        );
+        $operationType = isset($operationData['operation_type'])
+            ? trim((string) $operationData['operation_type'])
+            : '';
 
-        $lockName = 'cashbox_operation_reference_' . $year;
+        $sourceCashboxId = !empty($operationData['source_cashbox_id'])
+            ? (int) $operationData['source_cashbox_id']
+            : null;
+
+        $destinationCashboxId = !empty($operationData['destination_cashbox_id'])
+            ? (int) $operationData['destination_cashbox_id']
+            : null;
+
+        $amount = isset($operationData['amount'])
+            ? (float) $operationData['amount']
+            : 0;
+
+        if (
+            !in_array(
+                $operationType,
+                [
+                    'encaissement',
+                    'decaissement',
+                    'approvisionnement',
+                ],
+                true
+            )
+        ) {
+            return [
+                'status' => false,
+                'message' => 'Le type d’opération est invalide.',
+            ];
+        }
+
+        if ($amount <= 0) {
+            return [
+                'status' => false,
+                'message' => 'Le montant doit être supérieur à zéro.',
+            ];
+        }
 
         $this->db->trans_begin();
 
         try {
-            /*
-         * Verrou de génération de référence.
-         */
-            $lockQuery = $this->db->query(
-                'SELECT GET_LOCK(?, 10) AS lock_status',
-                [$lockName]
-            );
-
-            $lockResult = $lockQuery->row();
-
-            if (
-                !$lockResult
-                || (int) $lockResult->lock_status !== 1
-            ) {
-                throw new RuntimeException(
-                    'Impossible de générer la référence de l’opération.'
-                );
-            }
-
-            $data['reference'] =
-                $this->getNextCashboxOperationReference($year);
-
-            $operationType = $data['operation_type'];
-            $amount = (float) $data['amount'];
-
-            if ($amount <= 0) {
-                throw new RuntimeException(
-                    'Le montant doit être supérieur à zéro.'
-                );
-            }
+            $sourceCashbox = null;
+            $destinationCashbox = null;
 
             /*
-         * ENCAISSEMENT
-         */
-            if ($operationType === 'encaissement') {
-                $destinationId = (int) $data['destination_cashbox_id'];
-
-                $destinationCashbox =
-                    $this->getCashboxForUpdate($destinationId);
-
-                if (!$destinationCashbox) {
-                    throw new RuntimeException(
-                        'La caisse sélectionnée est introuvable.'
-                    );
-                }
-
-                if ($destinationCashbox->status !== 'active') {
-                    throw new RuntimeException(
-                        'La caisse sélectionnée n’est pas active.'
-                    );
-                }
-
-                if ($destinationCashbox->devise !== $data['currency']) {
-                    throw new RuntimeException(
-                        'La devise de l’opération ne correspond pas à celle de la caisse.'
-                    );
-                }
-
-                $newBalance =
-                    (float) $destinationCashbox->current_balance
-                    + $amount;
-
-                $this->db
-                    ->where('id', $destinationId)
-                    ->update(
-                        'tbl_finance_cashbox',
-                        [
-                            'current_balance' => $newBalance,
-                            'updated_at'      => date('Y-m-d H:i:s'),
-                        ]
-                    );
-
-                $data['source_cashbox_id'] = null;
-            }
-
-            /*
-         * DÉCAISSEMENT
-         */ elseif ($operationType === 'decaissement') {
-                $sourceId = (int) $data['source_cashbox_id'];
-
+            * Verrouiller la caisse source.
+            */
+            if ($sourceCashboxId !== null) {
                 $sourceCashbox =
-                    $this->getCashboxForUpdate($sourceId);
+                    $this->getCashboxByIdForUpdate(
+                        $sourceCashboxId
+                    );
 
                 if (!$sourceCashbox) {
                     throw new RuntimeException(
-                        'La caisse sélectionnée est introuvable.'
+                        'La caisse source est introuvable.'
                     );
                 }
 
                 if ($sourceCashbox->status !== 'active') {
                     throw new RuntimeException(
-                        'La caisse sélectionnée n’est pas active.'
-                    );
-                }
-
-                if ($sourceCashbox->devise !== $data['currency']) {
-                    throw new RuntimeException(
-                        'La devise de l’opération ne correspond pas à celle de la caisse.'
+                        'La caisse source n’est pas active.'
                     );
                 }
 
@@ -862,190 +824,158 @@ class FinanceModel extends CI_Model
                     < $amount
                 ) {
                     throw new RuntimeException(
-                        'Le solde disponible dans la caisse est insuffisant.'
+                        'Le solde disponible dans la caisse source est insuffisant.'
                     );
                 }
-
-                $newBalance =
-                    (float) $sourceCashbox->current_balance
-                    - $amount;
-
-                $this->db
-                    ->where('id', $sourceId)
-                    ->update(
-                        'tbl_finance_cashbox',
-                        [
-                            'current_balance' => $newBalance,
-                            'updated_at'      => date('Y-m-d H:i:s'),
-                        ]
-                    );
-
-                $data['destination_cashbox_id'] = null;
             }
 
             /*
-         * APPROVISIONNEMENT / TRANSFERT INTERNE
-         */ elseif ($operationType === 'approvisionnement') {
-                $sourceId = (int) $data['source_cashbox_id'];
-                $destinationId =
-                    (int) $data['destination_cashbox_id'];
-
-                if ($sourceId === $destinationId) {
-                    throw new RuntimeException(
-                        'La caisse source et la caisse destination doivent être différentes.'
-                    );
-                }
-
-                /*
-             * On verrouille dans l’ordre croissant des IDs
-             * pour réduire le risque d’interblocage.
-             */
-                $firstId = min($sourceId, $destinationId);
-                $secondId = max($sourceId, $destinationId);
-
-                $firstCashbox =
-                    $this->getCashboxForUpdate($firstId);
-
-                $secondCashbox =
-                    $this->getCashboxForUpdate($secondId);
-
-                if (!$firstCashbox || !$secondCashbox) {
-                    throw new RuntimeException(
-                        'Une des caisses sélectionnées est introuvable.'
-                    );
-                }
-
-                $sourceCashbox = $sourceId === $firstId
-                    ? $firstCashbox
-                    : $secondCashbox;
-
+            * Verrouiller la caisse destination.
+            */
+            if ($destinationCashboxId !== null) {
                 $destinationCashbox =
-                    $destinationId === $firstId
-                    ? $firstCashbox
-                    : $secondCashbox;
+                    $this->getCashboxByIdForUpdate(
+                        $destinationCashboxId
+                    );
 
-                if (
-                    $sourceCashbox->status !== 'active'
-                    || $destinationCashbox->status !== 'active'
-                ) {
+                if (!$destinationCashbox) {
                     throw new RuntimeException(
-                        'Les deux caisses doivent être actives.'
+                        'La caisse destination est introuvable.'
                     );
                 }
 
-                if (
-                    $sourceCashbox->devise
-                    !== $destinationCashbox->devise
-                ) {
+                if ($destinationCashbox->status !== 'active') {
                     throw new RuntimeException(
-                        'Le transfert ne peut pas être effectué entre deux caisses de devises différentes.'
+                        'La caisse destination n’est pas active.'
                     );
                 }
+            }
 
-                if (
-                    $sourceCashbox->devise
-                    !== $data['currency']
-                ) {
-                    throw new RuntimeException(
-                        'La devise de l’opération est incorrecte.'
-                    );
-                }
+            /*
+            * Vérifier les devises lors d’un transfert.
+            */
+            if (
+                $operationType === 'approvisionnement'
+                && $sourceCashbox
+                && $destinationCashbox
+                && $sourceCashbox->devise
+                !== $destinationCashbox->devise
+            ) {
+                throw new RuntimeException(
+                    'Les deux caisses doivent utiliser la même devise.'
+                );
+            }
 
-                if (
-                    (float) $sourceCashbox->current_balance
-                    < $amount
-                ) {
-                    throw new RuntimeException(
-                        'Le solde de la caisse source est insuffisant.'
-                    );
-                }
+            /*
+            * Générer la référence.
+            */
+            $reference =
+                $this->getNextCashboxOperationReference();
 
+            $operationData['reference'] =
+                $reference;
+
+            /*
+            * Insérer l’opération.
+            */
+            $inserted =
+                $this->db->insert(
+                    'tbl_finance_cashbox_operation',
+                    $operationData
+                );
+
+            if (!$inserted) {
+                throw new RuntimeException(
+                    'Impossible d’enregistrer l’opération.'
+                );
+            }
+
+            $operationId =
+                (int) $this->db->insert_id();
+
+            /*
+            * Débiter la caisse source.
+            */
+            if ($sourceCashbox) {
                 $newSourceBalance =
                     (float) $sourceCashbox->current_balance
                     - $amount;
 
+                $updatedSource =
+                    $this->db
+                    ->where(
+                        'id',
+                        $sourceCashboxId
+                    )
+                    ->update(
+                        'tbl_finance_cashbox',
+                        [
+                            'current_balance' =>
+                            $newSourceBalance,
+                        ]
+                    );
+
+                if (!$updatedSource) {
+                    throw new RuntimeException(
+                        'Impossible de débiter la caisse source.'
+                    );
+                }
+            }
+
+            /*
+            * Créditer la caisse destination.
+            */
+            if ($destinationCashbox) {
                 $newDestinationBalance =
                     (float) $destinationCashbox->current_balance
                     + $amount;
 
-                $this->db
-                    ->where('id', $sourceId)
-                    ->update(
-                        'tbl_finance_cashbox',
-                        [
-                            'current_balance' => $newSourceBalance,
-                            'updated_at'      => date('Y-m-d H:i:s'),
-                        ]
-                    );
-
-                $this->db
-                    ->where('id', $destinationId)
+                $updatedDestination =
+                    $this->db
+                    ->where(
+                        'id',
+                        $destinationCashboxId
+                    )
                     ->update(
                         'tbl_finance_cashbox',
                         [
                             'current_balance' =>
                             $newDestinationBalance,
-
-                            'updated_at' =>
-                            date('Y-m-d H:i:s'),
                         ]
                     );
-            } else {
-                throw new RuntimeException(
-                    'Type d’opération invalide.'
-                );
+
+                if (!$updatedDestination) {
+                    throw new RuntimeException(
+                        'Impossible de créditer la caisse destination.'
+                    );
+                }
             }
-
-            /*
-         * Insertion du mouvement.
-         */
-            $this->db->insert(
-                'tbl_finance_cashbox_operation',
-                $data
-            );
-
-            if ($this->db->affected_rows() !== 1) {
-                throw new RuntimeException(
-                    'L’opération n’a pas pu être enregistrée.'
-                );
-            }
-
-            $operationId = $this->db->insert_id();
-
-            $this->db->query(
-                'SELECT RELEASE_LOCK(?)',
-                [$lockName]
-            );
 
             if ($this->db->trans_status() === false) {
                 throw new RuntimeException(
-                    'Erreur pendant la transaction.'
+                    'Une erreur est survenue pendant la transaction.'
                 );
             }
 
             $this->db->trans_commit();
 
             return [
-                'status'    => true,
-                'id'        => $operationId,
-                'reference' => $data['reference'],
+                'status' => true,
+                'operation_id' => $operationId,
+                'reference' => $reference,
+                'message' => 'Opération enregistrée avec succès.',
             ];
         } catch (Throwable $exception) {
             $this->db->trans_rollback();
 
-            $this->db->query(
-                'SELECT RELEASE_LOCK(?)',
-                [$lockName]
-            );
-
             log_message(
                 'error',
-                'Erreur opération caisse : '
+                'Erreur opération de caisse : '
                     . $exception->getMessage()
             );
 
             return [
-                'status'  => false,
+                'status' => false,
                 'message' => $exception->getMessage(),
             ];
         }
@@ -1693,134 +1623,134 @@ class FinanceModel extends CI_Model
     public function getCashboxSummaryByChantier(): array
     {
         $sql = "
-        SELECT
-            c.id AS cashbox_id,
-            c.code AS cashbox_code,
-            c.name AS cashbox_name,
-            c.chantier_id,
-            c.devise,
-            c.opening_balance,
-            c.current_balance,
-            c.alert_threshold,
-            c.status AS cashbox_status,
+            SELECT
+                c.id AS cashbox_id,
+                c.code AS cashbox_code,
+                c.name AS cashbox_name,
+                c.chantier_id,
+                c.devise,
+                c.opening_balance,
+                c.current_balance,
+                c.alert_threshold,
+                c.status AS cashbox_status,
 
-            ch.name AS chantier_name,
-            ch.ref_chantier,
-            ch.location,
-            ch.status AS chantier_status,
+                ch.name AS chantier_name,
+                ch.ref_chantier,
+                ch.location,
+                ch.status AS chantier_status,
 
-            /*
-             * Total de toutes les entrées reçues par la caisse.
-             *
-             * Cela inclut :
-             * - les encaissements directs ;
-             * - les approvisionnements internes reçus.
-             */
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN op.destination_cashbox_id = c.id
-                        AND op.status = 'validated'
-                        THEN op.amount
-                        ELSE 0
+                /*
+                * Total de toutes les entrées reçues par la caisse.
+                *
+                * Cela inclut :
+                * - les encaissements directs ;
+                * - les approvisionnements internes reçus.
+                */
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN op.destination_cashbox_id = c.id
+                            AND op.status = 'validated'
+                            THEN op.amount
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS total_entries,
+
+                /*
+                * Consommation réelle :
+                * uniquement les décaissements.
+                */
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN op.source_cashbox_id = c.id
+                            AND op.operation_type = 'decaissement'
+                            AND op.status = 'validated'
+                            THEN op.amount
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS total_consumed,
+
+                /*
+                * Transferts envoyés vers une autre caisse.
+                *
+                * Ce montant ne représente pas une dépense,
+                * mais il réduit quand même le solde disponible.
+                */
+                COALESCE(
+                    SUM(
+                        CASE
+                            WHEN op.source_cashbox_id = c.id
+                            AND op.operation_type = 'approvisionnement'
+                            AND op.status = 'validated'
+                            THEN op.amount
+                            ELSE 0
+                        END
+                    ),
+                    0
+                ) AS total_transferred_out,
+
+                /*
+                * Nombre total des mouvements liés à la caisse.
+                */
+                COUNT(
+                    DISTINCT CASE
+                        WHEN
+                            (
+                                op.source_cashbox_id = c.id
+                                OR op.destination_cashbox_id = c.id
+                            )
+                            AND op.status = 'validated'
+                        THEN op.id
+                        ELSE NULL
                     END
-                ),
-                0
-            ) AS total_entries,
+                ) AS total_operations
 
-            /*
-             * Consommation réelle :
-             * uniquement les décaissements.
-             */
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN op.source_cashbox_id = c.id
-                        AND op.operation_type = 'decaissement'
-                        AND op.status = 'validated'
-                        THEN op.amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS total_consumed,
+            FROM tbl_finance_cashbox c
 
-            /*
-             * Transferts envoyés vers une autre caisse.
-             *
-             * Ce montant ne représente pas une dépense,
-             * mais il réduit quand même le solde disponible.
-             */
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN op.source_cashbox_id = c.id
-                        AND op.operation_type = 'approvisionnement'
-                        AND op.status = 'validated'
-                        THEN op.amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS total_transferred_out,
+            LEFT JOIN chantiers ch
+                ON ch.id = c.chantier_id
 
-            /*
-             * Nombre total des mouvements liés à la caisse.
-             */
-            COUNT(
-                DISTINCT CASE
-                    WHEN
-                        (
-                            op.source_cashbox_id = c.id
-                            OR op.destination_cashbox_id = c.id
-                        )
-                        AND op.status = 'validated'
-                    THEN op.id
-                    ELSE NULL
-                END
-            ) AS total_operations
+            LEFT JOIN tbl_finance_cashbox_operation op
+                ON
+                (
+                    op.source_cashbox_id = c.id
+                    OR op.destination_cashbox_id = c.id
+                )
 
-        FROM tbl_finance_cashbox c
+            WHERE c.type = 'chantier'
+            AND c.status = 'active'
 
-        LEFT JOIN chantiers ch
-            ON ch.id = c.chantier_id
+            GROUP BY
+                c.id,
+                c.code,
+                c.name,
+                c.chantier_id,
+                c.devise,
+                c.opening_balance,
+                c.current_balance,
+                c.alert_threshold,
+                c.status,
+                ch.name,
+                ch.ref_chantier,
+                ch.location,
+                ch.status
 
-        LEFT JOIN tbl_finance_cashbox_operation op
-            ON
-            (
-                op.source_cashbox_id = c.id
-                OR op.destination_cashbox_id = c.id
-            )
+            ORDER BY
+                CASE
+                    WHEN c.current_balance <= c.alert_threshold
+                        THEN 0
+                    ELSE 1
+                END ASC,
 
-        WHERE c.type = 'chantier'
-        AND c.status = 'active'
+                c.current_balance ASC,
 
-        GROUP BY
-            c.id,
-            c.code,
-            c.name,
-            c.chantier_id,
-            c.devise,
-            c.opening_balance,
-            c.current_balance,
-            c.alert_threshold,
-            c.status,
-            ch.name,
-            ch.ref_chantier,
-            ch.location,
-            ch.status
-
-        ORDER BY
-            CASE
-                WHEN c.current_balance <= c.alert_threshold
-                    THEN 0
-                ELSE 1
-            END ASC,
-
-            c.current_balance ASC,
-
-            ch.name ASC
-    ";
+                ch.name ASC
+        ";
 
         $results = $this->db
             ->query($sql)
@@ -8462,9 +8392,9 @@ class FinanceModel extends CI_Model
             );
 
         /*
-     * Débit sur le relevé :
-     * argent sorti du compte.
-     */
+        * Débit sur le relevé :
+        * argent sorti du compte.
+        */
         if (
             $statementLine->operation_direction
             === 'debit'
@@ -8484,9 +8414,9 @@ class FinanceModel extends CI_Model
         }
 
         /*
-     * Crédit sur le relevé :
-     * argent entré dans le compte.
-     */
+        * Crédit sur le relevé :
+        * argent entré dans le compte.
+        */
         if (
             $statementLine->operation_direction
             === 'credit'
@@ -8506,8 +8436,8 @@ class FinanceModel extends CI_Model
         }
 
         /*
-     * Exclure les opérations déjà rapprochées.
-     */
+        * Exclure les opérations déjà rapprochées.
+        */
         $this->db->where(
             "
         NOT EXISTS (
@@ -8619,5 +8549,760 @@ class FinanceModel extends CI_Model
                 'tbl_finance_bank_reconciliation',
                 $data
             );
+    }
+
+    public function getPayablePurchaseRequests(): array
+    {
+        $this->db->select(
+            "
+        prf.id,
+
+        CONCAT(
+            'DA-',
+            YEAR(prf.created_at),
+            '-',
+            LPAD(prf.id, 3, '0')
+        ) AS request_reference,
+
+        prf.chantier_id,
+        prf.destination_chantier,
+        prf.created_at AS request_created_at,
+
+        p.name AS chantier_name,
+
+        ppv.id AS payment_voucher_id,
+        ppv.payment_number,
+        ppv.summary AS payment_summary,
+        ppv.payment_mode,
+        ppv.amount_paid,
+        ppv.payment_reference,
+        ppv.payment_date,
+        ppv.observation AS payment_observation,
+        ppv.payment_status,
+
+        GROUP_CONCAT(
+            DISTINCT pri.designation
+            ORDER BY pri.id ASC
+            SEPARATOR ', '
+        ) AS purchase_items_summary
+        ",
+            false
+        );
+
+        $this->db->from(
+            'purchase_request_forms prf'
+        );
+
+        $this->db->join(
+            'purchase_request_items pri',
+            'pri.request_id = prf.id',
+            'left'
+        );
+
+        $this->db->join(
+            'projects p',
+            'p.id = prf.chantier_id',
+            'left'
+        );
+
+        $this->db->join(
+            'purchase_payment_vouchers ppv',
+            'ppv.request_id = prf.id',
+            'inner'
+        );
+
+        /*
+        * Pour commencer, vérifier uniquement
+        * que le bon de paiement est effectué.
+        */
+        $this->db->where(
+            'ppv.payment_status',
+            'effectue'
+        );
+
+        $this->db->where("
+        NOT EXISTS (
+            SELECT 1
+            FROM tbl_finance_cashbox_operation cfo
+            WHERE cfo.payment_voucher_id = ppv.id
+            AND cfo.operation_type = 'decaissement'
+        )", NULL, FALSE);
+
+        $this->db->group_by([
+            'prf.id',
+            'prf.created_at',
+            'prf.chantier_id',
+            'prf.destination_chantier',
+            'p.name',
+            'ppv.id',
+            'ppv.payment_number',
+            'ppv.summary',
+            'ppv.payment_mode',
+            'ppv.amount_paid',
+            'ppv.payment_reference',
+            'ppv.payment_date',
+            'ppv.observation',
+            'ppv.payment_status',
+        ]);
+
+        $this->db->order_by(
+            'ppv.payment_date',
+            'DESC'
+        );
+
+        $this->db->order_by(
+            'ppv.id',
+            'DESC'
+        );
+
+        return $this->db
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Récupère et verrouille une caisse pendant une transaction.
+     *
+     * Cette méthode doit être appelée après trans_begin().
+     *
+     * @param int $cashboxId
+     * @return object|null
+     */
+    public function getCashboxByIdForUpdate(int $cashboxId)
+    {
+        if ($cashboxId <= 0) {
+            return null;
+        }
+
+        $sql = "
+        SELECT
+            id,
+            code,
+            name,
+            type,
+            chantier_id,
+            devise,
+            current_balance,
+            status
+
+        FROM tbl_finance_cashbox
+
+        WHERE id = ?
+
+        LIMIT 1
+
+        FOR UPDATE
+    ";
+
+        return $this->db
+            ->query(
+                $sql,
+                [$cashboxId]
+            )
+            ->row();
+    }
+
+    /**
+     * Récupérer une caisse par son identifiant.
+     */
+    public function getCashboxById(int $cashboxId)
+    {
+        if ($cashboxId <= 0) {
+            return null;
+        }
+
+        return $this->db
+            ->where('id', $cashboxId)
+            ->limit(1)
+            ->get('tbl_finance_cashbox')
+            ->row();
+    }
+
+    /**
+     * Récupérer un bon de paiement par son identifiant.
+     */
+    public function getPurchasePaymentVoucherById(
+        int $paymentVoucherId
+    ) {
+        if ($paymentVoucherId <= 0) {
+            return null;
+        }
+
+        return $this->db
+            ->where(
+                'id',
+                $paymentVoucherId
+            )
+            ->limit(1)
+            ->get(
+                'purchase_payment_vouchers'
+            )
+            ->row();
+    }
+
+    /**
+     * =====================================================
+     * STATISTIQUES DU JOURNAL DE CAISSE SUR UNE PÉRIODE
+     * =====================================================
+     * Uniquement les opérations VALIDÉES comptent dans les
+     * montants (les transferts/approvisionnements sont des
+     * mouvements internes : ils ne sont ni des entrées ni
+     * des sorties globales).
+     */
+    public function getJournalPeriodStatistics($dateFrom, $dateTo)
+    {
+        /* Totaux de la période courante */
+        $current = $this->getJournalPeriodTotals($dateFrom, $dateTo);
+
+        /* Période précédente (même durée) pour la variation % */
+        $fromTs     = strtotime($dateFrom);
+        $toTs       = strtotime($dateTo);
+        $lengthDays = (int) round(($toTs - $fromTs) / 86400) + 1;
+
+        $prevFrom = date('Y-m-d', $fromTs - ($lengthDays * 86400));
+        $prevTo   = date('Y-m-d', $fromTs - 86400);
+
+        $previous = $this->getJournalPeriodTotals($prevFrom, $prevTo);
+
+        $totalIn  = (float) $current['total_in'];
+        $totalOut = (float) $current['total_out'];
+
+        /* Variation des encaissements */
+        $inVariation = null;
+        if ((float) $previous['total_in'] > 0) {
+            $inVariation = (($totalIn - (float) $previous['total_in'])
+                / (float) $previous['total_in']) * 100;
+        }
+
+        /* Variation des décaissements */
+        $outVariation = null;
+        if ((float) $previous['total_out'] > 0) {
+            $outVariation = (($totalOut - (float) $previous['total_out'])
+                / (float) $previous['total_out']) * 100;
+        }
+
+        return array(
+            'total_in'         => $totalIn,
+            'total_out'        => $totalOut,
+            'count_in'         => (int) $current['count_in'],
+            'count_out'        => (int) $current['count_out'],
+            'total_operations' => (int) $current['total_operations'],
+            'pending_count'    => (int) $current['pending_count'],
+            'cancelled_count'  => (int) $current['cancelled_count'],
+            'transfer_count'   => (int) $current['transfer_count'],
+            'net_flow'         => $totalIn - $totalOut,
+            'in_variation'     => $inVariation,
+            'out_variation'    => $outVariation,
+        );
+    }
+
+    /**
+     * =====================================================
+     * TOTAUX D'UNE PÉRIODE (helper interne)
+     * =====================================================
+     */
+    protected function getJournalPeriodTotals($dateFrom, $dateTo)
+    {
+        /* FALSE : empêche CI de casser les expressions CASE */
+        $this->db->select("
+            SUM(CASE WHEN operation_type = 'encaissement'
+                    AND status = 'validated'
+                    THEN amount ELSE 0 END) AS total_in,
+            SUM(CASE WHEN operation_type = 'decaissement'
+                    AND status = 'validated'
+                    THEN amount ELSE 0 END) AS total_out,
+            SUM(CASE WHEN operation_type = 'encaissement'
+                    AND status = 'validated'
+                    THEN 1 ELSE 0 END) AS count_in,
+            SUM(CASE WHEN operation_type = 'decaissement'
+                    AND status = 'validated'
+                    THEN 1 ELSE 0 END) AS count_out,
+            COUNT(id) AS total_operations,
+            SUM(CASE WHEN status = 'pending'   THEN 1 ELSE 0 END) AS pending_count,
+            SUM(CASE WHEN status = 'cancelled' THEN 1 ELSE 0 END) AS cancelled_count,
+            SUM(CASE WHEN operation_type = 'approvisionnement'
+                    THEN 1 ELSE 0 END) AS transfer_count
+        ", FALSE);
+        $this->db->where('operation_date >=', $dateFrom);
+        $this->db->where('operation_date <=', $dateTo);
+
+        $row = $this->db->get('tbl_finance_cashbox_operation')->row();
+
+        return array(
+            'total_in'         => ($row && $row->total_in !== null)         ? (float) $row->total_in         : 0,
+            'total_out'        => ($row && $row->total_out !== null)        ? (float) $row->total_out        : 0,
+            'count_in'         => ($row && $row->count_in !== null)         ? (int) $row->count_in           : 0,
+            'count_out'        => ($row && $row->count_out !== null)        ? (int) $row->count_out          : 0,
+            'total_operations' => ($row && $row->total_operations !== null) ? (int) $row->total_operations   : 0,
+            'pending_count'    => ($row && $row->pending_count !== null)    ? (int) $row->pending_count      : 0,
+            'cancelled_count'  => ($row && $row->cancelled_count !== null)  ? (int) $row->cancelled_count    : 0,
+            'transfer_count'   => ($row && $row->transfer_count !== null)   ? (int) $row->transfer_count     : 0,
+        );
+    }
+
+    /**
+     * =====================================================
+     * SOLDES APRÈS OPÉRATION RECALCULÉS « À REBOURS »
+     * =====================================================
+     * Repart du current_balance de chaque caisse, puis
+     * remonte les opérations de la plus récente à la
+     * plus ancienne en « rembobinant » les montants validés.
+     *
+     * Garantie : la dernière opération validée d'une caisse
+     * a un balance_after ÉGAL au current_balance de la caisse.
+     */
+    public function getJournalRunningBalances()
+    {
+        /* Soldes actuels de toutes les caisses */
+        $cashboxes = $this->db->select('id, current_balance')
+            ->get('tbl_finance_cashbox')
+            ->result();
+
+        $running = [];
+        foreach ($cashboxes as $cashbox) {
+            $running[(int) $cashbox->id] = (float) $cashbox->current_balance;
+        }
+
+        /* Toutes les opérations, de la plus récente à la plus ancienne */
+        $operations = $this->db->select('id, operation_type, status, amount, source_cashbox_id, destination_cashbox_id')
+            ->order_by('operation_date', 'DESC')
+            ->order_by('created_at', 'DESC')
+            ->order_by('id', 'DESC')
+            ->get('tbl_finance_cashbox_operation')
+            ->result();
+
+        $balances = [];
+
+        foreach ($operations as $op) {
+            $amount   = (float) $op->amount;
+            $sourceId = (int) $op->source_cashbox_id;
+            $destId   = (int) $op->destination_cashbox_id;
+
+            /* Caisse concernée : source, ou destination pour un encaissement */
+            $concernedId = ($op->operation_type === 'encaissement')
+                ? ($destId > 0 ? $destId : $sourceId)
+                : $sourceId;
+
+            if (!isset($running[$concernedId])) {
+                $running[$concernedId] = 0;
+            }
+
+            /* Solde APRÈS cette opération (état à rebours avant rembobinage) */
+            $balances[(int) $op->id] = $running[$concernedId];
+
+            /* Rembobiner uniquement les opérations validées */
+            if ($op->status === 'validated') {
+                if ($op->operation_type === 'encaissement') {
+                    /* L'entrée a crédité la caisse : on la retire à rebours */
+                    $running[$concernedId] -= $amount;
+                } elseif ($op->operation_type === 'decaissement') {
+                    /* La sortie a débité la caisse : on la rajoute à rebours */
+                    $running[$sourceId] += $amount;
+                } elseif ($op->operation_type === 'approvisionnement') {
+                    /* Transfert : débit source + crédit destination */
+                    if ($sourceId > 0) {
+                        $running[$sourceId] += $amount;
+                    }
+                    if ($destId > 0) {
+                        if (!isset($running[$destId])) {
+                            $running[$destId] = 0;
+                        }
+                        $running[$destId] -= $amount;
+                    }
+                }
+            }
+            /* pending / cancelled : ne modifient pas le solde, rien à rembobiner */
+        }
+
+        return $balances; /* [id_opération => balance_after] */
+    }
+
+    /**
+     * =====================================================
+     * JOURNAL DE CAISSE : OPÉRATIONS PAGINÉES
+     * =====================================================
+     */
+    public function getJournalOperations($dateFrom, $dateTo, $filters = [], $limit = 15, $offset = 0)
+    {
+        $this->db->select("
+            o.*,
+            sc.name  AS source_cashbox_name,
+            sc.code  AS source_cashbox_code,
+            dc.name  AS destination_cashbox_name,
+            dc.code  AS destination_cashbox_code
+        ", FALSE);
+        $this->db->from('tbl_finance_cashbox_operation o');
+        $this->db->join('tbl_finance_cashbox sc', 'sc.id = o.source_cashbox_id', 'left');
+        $this->db->join('tbl_finance_cashbox dc', 'dc.id = o.destination_cashbox_id', 'left');
+
+        $this->applyJournalFilters($dateFrom, $dateTo, $filters);
+
+        $this->db->order_by('o.operation_date', 'DESC');
+        $this->db->order_by('o.created_at', 'DESC');
+        $this->db->order_by('o.id', 'DESC');
+        $this->db->limit($limit, $offset);
+
+        $rows = $this->db->get()->result();
+
+        /* -------------------------------------------------
+        * Injecter les soldes après opération recalculés
+        * (écrase les balance_before/after à 0 de la BDD)
+        * ------------------------------------------------- */
+        if (!empty($rows)) {
+            $balances = $this->getJournalRunningBalances();
+            foreach ($rows as $row) {
+                if (isset($balances[(int) $row->id])) {
+                    $row->balance_after = $balances[(int) $row->id];
+                }
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
+     * =====================================================
+     * NOMBRE TOTAL D'OPÉRATIONS (pagination)
+     * =====================================================
+     */
+    public function countJournalOperations($dateFrom, $dateTo, $filters = [])
+    {
+        $this->db->from('tbl_finance_cashbox_operation o');
+        $this->applyJournalFilters($dateFrom, $dateTo, $filters);
+        return (int) $this->db->count_all_results();
+    }
+
+    /**
+     * =====================================================
+     * TOTAUX PAR JOURNÉE (lignes de séparation)
+     * =====================================================
+     * day_in       = encaissements validés
+     * day_out      = décaissements validés
+     * day_transfer = transferts/approvisionnements validés
+     */
+    public function getJournalDayTotals($dateFrom, $dateTo, $filters = [])
+    {
+        $this->db->select("
+        o.operation_date AS day_date,
+        COUNT(o.id) AS day_count,
+        SUM(CASE WHEN o.operation_type = 'encaissement'
+                  AND o.status = 'validated'
+                 THEN o.amount ELSE 0 END) AS day_in,
+        SUM(CASE WHEN o.operation_type = 'decaissement'
+                  AND o.status = 'validated'
+                 THEN o.amount ELSE 0 END) AS day_out,
+        SUM(CASE WHEN o.operation_type = 'approvisionnement'
+                  AND o.status = 'validated'
+                 THEN o.amount ELSE 0 END) AS day_transfer
+    ", FALSE);
+        $this->db->from('tbl_finance_cashbox_operation o');
+        $this->applyJournalFilters($dateFrom, $dateTo, $filters);
+        $this->db->group_by('o.operation_date');
+        $this->db->order_by('o.operation_date', 'DESC');
+
+        $rows = $this->db->get()->result();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row->day_date] = $row;
+        }
+        return $map;
+    }
+
+    /**
+     * =====================================================
+     * OPTIONS DU FILTRE « CAISSE »
+     * =====================================================
+     */
+    public function getJournalCashboxOptions()
+    {
+        $this->db->select('id, code, name, type');
+        $this->db->where('status', 'active');
+        $this->db->order_by('code', 'ASC');
+        return $this->db->get('tbl_finance_cashbox')->result();
+    }
+
+    /**
+     * =====================================================
+     * FILTRES COMMUNS DU JOURNAL (helper interne)
+     * =====================================================
+     */
+    protected function applyJournalFilters($dateFrom, $dateTo, $filters = [])
+    {
+        $this->db->where('o.operation_date >=', $dateFrom);
+        $this->db->where('o.operation_date <=', $dateTo);
+
+        /* Recherche : référence, libellé, tiers, pièce, catégorie */
+        if (!empty($filters['search'])) {
+            $term = $filters['search'];
+            $this->db->group_start();
+            $this->db->like('o.reference', $term);
+            $this->db->or_like('o.label', $term);
+            $this->db->or_like('o.third_party', $term);
+            $this->db->or_like('o.document_number', $term);
+            $this->db->or_like('o.category', $term);
+            $this->db->group_end();
+        }
+
+        /* Caisse (source ou destination) */
+        if (!empty($filters['cashbox_id'])) {
+            $this->db->group_start();
+            $this->db->where('o.source_cashbox_id', (int) $filters['cashbox_id']);
+            $this->db->or_where('o.destination_cashbox_id', (int) $filters['cashbox_id']);
+            $this->db->group_end();
+        }
+
+        /* Type d'opération */
+        if (
+            !empty($filters['type'])
+            && in_array($filters['type'], ['encaissement', 'decaissement', 'approvisionnement'], true)
+        ) {
+            $this->db->where('o.operation_type', $filters['type']);
+        }
+
+        /* Statut */
+        if (
+            !empty($filters['status'])
+            && in_array($filters['status'], ['validated', 'pending', 'cancelled'], true)
+        ) {
+            $this->db->where('o.status', $filters['status']);
+        }
+    }
+
+    /**
+     * =====================================================
+     * RÉPARTITION PAR TYPE D'OPÉRATION
+     * =====================================================
+     * Compte toutes les opérations (tous statuts confondus)
+     * sur la période filtrée.
+     */
+    public function getJournalTypeDistribution($dateFrom, $dateTo, $filters = [])
+    {
+        $this->db->select("
+            SUM(CASE WHEN o.operation_type = 'encaissement'
+                    THEN 1 ELSE 0 END) AS encaissement_count,
+            SUM(CASE WHEN o.operation_type = 'decaissement'
+                    THEN 1 ELSE 0 END) AS decaissement_count,
+            SUM(CASE WHEN o.operation_type = 'approvisionnement'
+                    THEN 1 ELSE 0 END) AS transfert_count,
+            COUNT(o.id) AS total_count
+        ", FALSE);
+        $this->db->from('tbl_finance_cashbox_operation o');
+        $this->applyJournalFilters($dateFrom, $dateTo, $filters);
+
+        $row = $this->db->get()->row();
+
+        $encaissement = $row ? (int) $row->encaissement_count : 0;
+        $decaissement = $row ? (int) $row->decaissement_count : 0;
+        $transfert    = $row ? (int) $row->transfert_count    : 0;
+        $total        = $row ? (int) $row->total_count        : 0;
+
+        return array(
+            'encaissement' => $encaissement,
+            'decaissement' => $decaissement,
+            'transfert'    => $transfert,
+            'total'        => $total,
+            'encaissement_percentage' => $total > 0 ? round(($encaissement / $total) * 100) : 0,
+            'decaissement_percentage' => $total > 0 ? round(($decaissement / $total) * 100) : 0,
+            'transfert_percentage'    => $total > 0 ? round(($transfert / $total) * 100) : 0,
+        );
+    }
+
+    /**
+     * =====================================================
+     * CAISSES LES PLUS ACTIVES
+     * =====================================================
+     * Une opération compte pour sa caisse source ET pour
+     * sa caisse destination (dans le cas d'un transfert).
+     */
+    public function getJournalCashboxActivity($dateFrom, $dateTo, $filters = [], $limit = 5)
+    {
+        /* Récupérer les caisses impliquées dans les opérations filtrées */
+        $this->db->select('o.source_cashbox_id, o.destination_cashbox_id');
+        $this->db->from('tbl_finance_cashbox_operation o');
+        $this->applyJournalFilters($dateFrom, $dateTo, $filters);
+        $rows = $this->db->get()->result();
+
+        /* Comptage par caisse */
+        $counts = [];
+        foreach ($rows as $row) {
+            if (!empty($row->source_cashbox_id)) {
+                $sid = (int) $row->source_cashbox_id;
+                $counts[$sid] = isset($counts[$sid]) ? $counts[$sid] + 1 : 1;
+            }
+            if (
+                !empty($row->destination_cashbox_id)
+                && (int) $row->destination_cashbox_id !== (int) $row->source_cashbox_id
+            ) {
+                $did = (int) $row->destination_cashbox_id;
+                $counts[$did] = isset($counts[$did]) ? $counts[$did] + 1 : 1;
+            }
+        }
+
+        if (empty($counts)) {
+            return [];
+        }
+
+        /* Informations des caisses concernées */
+        $this->db->select('id, code, name, type');
+        $this->db->from('tbl_finance_cashbox');
+        $this->db->where_in('id', array_keys($counts));
+        $this->db->where('status', 'active');
+        $cashboxes = $this->db->get()->result();
+
+        $activity = [];
+        foreach ($cashboxes as $cashbox) {
+            $activity[] = array(
+                'id'               => (int) $cashbox->id,
+                'code'             => $cashbox->code,
+                'name'             => $cashbox->name,
+                'type'             => $cashbox->type,
+                'operations_count' => isset($counts[(int) $cashbox->id]) ? $counts[(int) $cashbox->id] : 0,
+            );
+        }
+
+        /* Tri : les plus actives d'abord */
+        usort($activity, function ($a, $b) {
+            return $b['operations_count'] - $a['operations_count'];
+        });
+
+        return array_slice($activity, 0, $limit);
+    }
+
+    /**
+     * =====================================================
+     * CAISSE + INFOS CHANTIER PAR ID
+     * =====================================================
+     */
+    // public function getCashboxById($cashboxId)
+    // {
+    //     $this->db->select('c.*, ch.name AS chantier_name, ch.ref_chantier, ch.location');
+    //     $this->db->from('tbl_finance_cashbox c');
+    //     $this->db->join('chantiers ch', 'ch.id = c.chantier_id', 'left');
+    //     $this->db->where('c.id', (int) $cashboxId);
+
+    //     return $this->db->get()->row();
+    // }
+
+    /**
+     * =====================================================
+     * SOLDES « RESTANT DANS LA CAISSE » À REBOURS
+     * =====================================================
+     * Repart du current_balance de LA caisse et rembobine
+     * uniquement SES opérations (entrée = destination,
+     * sortie = source). Dernière opération validée
+     * => solde = current_balance.
+     */
+    public function getLivreRunningBalances($cashboxId)
+    {
+        $cashboxId = (int) $cashboxId;
+
+        $cashbox = $this->db->select('current_balance')
+            ->where('id', $cashboxId)
+            ->get('tbl_finance_cashbox')
+            ->row();
+
+        $running = $cashbox ? (float) $cashbox->current_balance : 0;
+
+        $operations = $this->db->select('id, status, amount, source_cashbox_id, destination_cashbox_id')
+            ->group_start()
+            ->where('source_cashbox_id', $cashboxId)
+            ->or_where('destination_cashbox_id', $cashboxId)
+            ->group_end()
+            ->order_by('operation_date', 'DESC')
+            ->order_by('created_at', 'DESC')
+            ->order_by('id', 'DESC')
+            ->get('tbl_finance_cashbox_operation')
+            ->result();
+
+        $balances = [];
+
+        foreach ($operations as $op) {
+            $amount  = (float) $op->amount;
+            $isEntry = ((int) $op->destination_cashbox_id === $cashboxId);
+
+            /* Solde après cette opération */
+            $balances[(int) $op->id] = $running;
+
+            /* Rembobiner uniquement les opérations validées */
+            if ($op->status === 'validated') {
+                $running = $isEntry ? $running - $amount : $running + $amount;
+            }
+        }
+
+        return $balances;
+    }
+
+    /**
+     * =====================================================
+     * LIGNES DU LIVRE DE CAISSE (filtrées + chronologiques)
+     * =====================================================
+     * Le livre ne consigne que les opérations VALIDÉES.
+     * Entrée = caisse en destination ; Sortie = caisse en source.
+     */
+    public function getLivreOperations($cashboxId, $dateFrom, $dateTo, $filters = [])
+    {
+        $cashboxId = (int) $cashboxId;
+
+        $this->db->select("
+        o.*,
+        sc.code AS source_code,
+        sc.name AS source_name,
+        dc.code AS destination_code,
+        dc.name AS destination_name
+    ", FALSE);
+        $this->db->from('tbl_finance_cashbox_operation o');
+        $this->db->join('tbl_finance_cashbox sc', 'sc.id = o.source_cashbox_id', 'left');
+        $this->db->join('tbl_finance_cashbox dc', 'dc.id = o.destination_cashbox_id', 'left');
+
+        $this->db->where('o.operation_date >=', $dateFrom);
+        $this->db->where('o.operation_date <=', $dateTo);
+        $this->db->where('o.status', 'validated');
+
+        /* Direction du mouvement */
+        if (!empty($filters['type']) && $filters['type'] === 'entree') {
+            $this->db->where('o.destination_cashbox_id', $cashboxId);
+        } elseif (!empty($filters['type']) && $filters['type'] === 'sortie') {
+            $this->db->where('o.source_cashbox_id', $cashboxId);
+        } else {
+            $this->db->group_start();
+            $this->db->where('o.source_cashbox_id', $cashboxId);
+            $this->db->or_where('o.destination_cashbox_id', $cashboxId);
+            $this->db->group_end();
+        }
+
+        /* Recherche */
+        if (!empty($filters['search'])) {
+            $term = $filters['search'];
+            $this->db->group_start();
+            $this->db->like('o.label', $term);
+            $this->db->or_like('o.expense_justification', $term);
+            $this->db->or_like('o.third_party', $term);
+            $this->db->or_like('o.document_number', $term);
+            $this->db->or_like('o.purchase_request_reference', $term);
+            $this->db->or_like('o.category', $term);
+            $this->db->group_end();
+        }
+
+        /* Ordre chronologique (comme le papier) */
+        $this->db->order_by('o.operation_date', 'ASC');
+        $this->db->order_by('o.created_at', 'ASC');
+        $this->db->order_by('o.id', 'ASC');
+
+        $rows = $this->db->get()->result();
+
+        /* Injecter direction + solde restant */
+        $balances = $this->getLivreRunningBalances($cashboxId);
+
+        foreach ($rows as $row) {
+            $row->livre_direction = ((int) $row->destination_cashbox_id === $cashboxId)
+                ? 'entree'
+                : 'sortie';
+            $row->livre_balance_after = isset($balances[(int) $row->id])
+                ? $balances[(int) $row->id]
+                : 0;
+        }
+
+        return $rows;
     }
 }

@@ -152,7 +152,7 @@
             class="brand-image img-circle elevation-2">
 
         <span class="brand-text font-weight-bold">
-            SATRACO Construction
+            SATRACO Construction ERP
         </span>
 
     </a>
@@ -216,7 +216,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel' || $title == 'Maintenance & Carburant' || $title == 'Coût Réel & Rentabilité') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel' || $title == 'Maintenance & Carburant' || $title == 'Coût Réel & Rentabilité' || $title == 'Journal Production') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -352,10 +352,17 @@
                         </li>
 
                         <li class="nav-item">
+                            <?php if ($title == 'Journal Production') { ?>
+                            <a href="<?= base_url('journal-production') ?>" class="nav-link active">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Journal Production</p>
+                            </a>
+                            <?php } else { ?>
                             <a href="<?= base_url('journal-production') ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Journal Production</p>
                             </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">
@@ -412,9 +419,9 @@
                 </li>
 
                 <!-- ==========================
-                    DAF / FINANCE
-                =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie') { ?>
+                        DAF / FINANCE
+                    =========================== -->
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Journal de caisse' ||  $title == 'Livre de Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -590,7 +597,7 @@
                 </li>
 
                 <!-- TRESORERIE -->
-                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie') { ?>
+                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie' || $title == 'Journal de caisse' || $title == 'Livre de Caisse') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -610,7 +617,7 @@
 
                         <!-- Caisse -->
                         <li class="nav-item">
-                            <?php if ($title == 'Caisse') { ?>
+                            <?php if ($title == 'Caisse' || $title == 'Journal de caisse' || $title == 'Livre de Caisse') { ?>
                             <a href="<?= base_url('caisse') ?>" class="nav-link active">
                                 <i class="fas fa-cash-register nav-icon text-success"></i>
                                 <p>Caisse</p>
@@ -845,8 +852,14 @@
             </li>
 
             <!-- ADMIN -->
+            <?php if ($title == 'Utilisateurs' || $title == 'Matrice des access' || $title == 'Rôles & Permissions' || $title == 'Paramètres') { ?>
+            <li class="nav-item menu-open">
+                <a href="#" class="nav-link active">
+                    <?php } else { ?>
             <li class="nav-item">
                 <a href="#" class="nav-link">
+                    <?php } ?>
+
                     <i class="nav-icon fas fa-cogs"></i>
                     <p>
                         Administration
@@ -857,24 +870,59 @@
                 <ul class="nav nav-treeview">
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <?php if ($title == 'Utilisateurs') { ?>
+                        <a href="<?= base_url('users') ?>" class="nav-link active">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Utilisateurs</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('users') ?>" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Utilisateurs</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <?php if ($title == 'Matrice des access') { ?>
+                        <a href="<?= base_url('matrice-access') ?>" class="nav-link active">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Matrice des access</p>
+                        </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('matrice-access') ?>" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Matrice des access</p>
+                        </a>
+                        <?php } ?>
+                    </li>
+                    <li class="nav-item">
+                        <?php if ($title == 'Rôles & Permissions') { ?>
+                        <a href="<?= base_url('roles-permissions') ?>" class="nav-link active">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Rôles & Permissions</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('roles-permissions') ?>" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Rôles & Permissions</p>
+                        </a>
+                        <?php } ?>
                     </li>
 
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <?php if ($title == 'Paramètres') { ?>
+                        <a href="<?= base_url('settings') ?>" class="nav-link active">
                             <i class="far fa-circle nav-icon"></i>
                             <p>Paramètres</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('settings') ?>" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>Paramètres</p>
+                        </a>
+                        <?php } ?>
                     </li>
 
                 </ul>

@@ -1,18 +1,18 @@
 <style>
-.main-footer {
-    border-top: 3px solid #74c476;
-    background: #ffffff;
-    color: #495057;
-    font-size: 14px;
-}
+    .main-footer {
+        border-top: 3px solid #74c476;
+        background: #ffffff;
+        color: #495057;
+        font-size: 14px;
+    }
 
-.main-footer strong {
-    color: #173b35;
-}
+    .main-footer strong {
+        color: #173b35;
+    }
 
-.main-footer .float-right {
-    color: #6c757d;
-}
+    .main-footer .float-right {
+        color: #6c757d;
+    }
 </style>
 <footer class="main-footer">
 
@@ -46,7 +46,7 @@
 <script src="<?= base_url('assets/v1/plugins/') ?>jquery-ui/jquery-ui.min.js"></script>
 <!-- Resolve conflict in jQuery UI tooltip with Bootstrap tooltip -->
 <script>
-$.widget.bridge('uibutton', $.ui.button)
+    $.widget.bridge('uibutton', $.ui.button)
 </script>
 <!-- Bootstrap 4 -->
 <script src="<?= base_url('assets/v1/plugins/') ?>bootstrap/js/bootstrap.bundle.min.js"></script>
@@ -79,53 +79,53 @@ $.widget.bridge('uibutton', $.ui.button)
 
 <?php if ($this->session->flashdata('success')): ?>
 
-<script>
-Swal.fire({
+    <script>
+        Swal.fire({
 
-    icon: 'success',
+            icon: 'success',
 
-    title: 'Succès',
+            title: 'Succès',
 
-    text: '<?= $this->session->flashdata('success'); ?>',
+            text: '<?= $this->session->flashdata('success'); ?>',
 
-    timer: 1800,
+            timer: 1800,
 
-    showConfirmButton: false
+            showConfirmButton: false
 
-});
-</script>
+        });
+    </script>
 
 <?php endif; ?>
 
 <script>
-if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
 
-    window.addEventListener('load', function() {
+        window.addEventListener('load', function() {
 
-        navigator.serviceWorker
-            .register('<?= base_url('service-worker.js'); ?>', {
-                scope: '/'
-            })
-            .then(function(registration) {
+            navigator.serviceWorker
+                .register('<?= base_url('service-worker.js'); ?>', {
+                    scope: '/'
+                })
+                .then(function(registration) {
 
-                console.log(
-                    'Service Worker enregistré :',
-                    registration.scope
-                );
+                    console.log(
+                        'Service Worker enregistré :',
+                        registration.scope
+                    );
 
-            })
-            .catch(function(error) {
+                })
+                .catch(function(error) {
 
-                console.error(
-                    'Erreur Service Worker :',
-                    error
-                );
+                    console.error(
+                        'Erreur Service Worker :',
+                        error
+                    );
 
-            });
+                });
 
-    });
+        });
 
-}
+    }
 </script>
 </body>
 

@@ -218,488 +218,878 @@ $disbursementBadgeClass =
 ========================================================== -->
 
 <style>
-    :root {
-        --caisse-primary: #0f766e;
-        --caisse-primary-dark: #115e59;
-        --caisse-secondary: #102033;
-        --caisse-success: #16a34a;
-        --caisse-warning: #f59e0b;
-        --caisse-danger: #dc2626;
-        --caisse-info: #0284c7;
-        --caisse-purple: #7c3aed;
-        --caisse-light: #f8fafc;
-        --caisse-border: #e2e8f0;
-        --caisse-text: #334155;
-        --caisse-muted: #64748b;
-    }
+:root {
+    --caisse-primary: #0f766e;
+    --caisse-primary-dark: #115e59;
+    --caisse-secondary: #102033;
+    --caisse-success: #16a34a;
+    --caisse-warning: #f59e0b;
+    --caisse-danger: #dc2626;
+    --caisse-info: #0284c7;
+    --caisse-purple: #7c3aed;
+    --caisse-light: #f8fafc;
+    --caisse-border: #e2e8f0;
+    --caisse-text: #334155;
+    --caisse-muted: #64748b;
+}
 
-    .content-wrapper {
-        background: #f4f7f6;
-    }
+.content-wrapper {
+    background: #f4f7f6;
+}
 
-    .caisse-page {
-        font-family: "Segoe UI", Arial, sans-serif;
-        color: var(--caisse-text);
-    }
+.caisse-page {
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: var(--caisse-text);
+}
 
-    /* =====================================================
+/* =====================================================
        EN-TÊTE
     ====================================================== */
 
-    .caisse-hero {
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 22px;
-        padding: 24px 26px;
-        color: #fff;
-        border-radius: 16px;
-        background:
-            linear-gradient(135deg,
-                rgba(15, 118, 110, .98),
-                rgba(16, 32, 51, .98));
-        box-shadow: 0 10px 30px rgba(15, 118, 110, .18);
-    }
+.caisse-hero {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 22px;
+    padding: 24px 26px;
+    color: #fff;
+    border-radius: 16px;
+    background:
+        linear-gradient(135deg,
+            rgba(15, 118, 110, .98),
+            rgba(16, 32, 51, .98));
+    box-shadow: 0 10px 30px rgba(15, 118, 110, .18);
+}
 
-    .caisse-hero::before {
-        position: absolute;
-        top: -80px;
-        right: -50px;
-        width: 220px;
-        height: 220px;
-        content: "";
-        border-radius: 50%;
-        background: rgba(255, 255, 255, .08);
-    }
+.caisse-hero::before {
+    position: absolute;
+    top: -80px;
+    right: -50px;
+    width: 220px;
+    height: 220px;
+    content: "";
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .08);
+}
 
-    .caisse-hero::after {
-        position: absolute;
-        right: 150px;
-        bottom: -100px;
-        width: 190px;
-        height: 190px;
-        content: "";
-        border-radius: 50%;
-        background: rgba(255, 255, 255, .05);
-    }
+.caisse-hero::after {
+    position: absolute;
+    right: 150px;
+    bottom: -100px;
+    width: 190px;
+    height: 190px;
+    content: "";
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .05);
+}
 
-    .caisse-hero-content {
-        position: relative;
-        z-index: 2;
-    }
+.caisse-hero-content {
+    position: relative;
+    z-index: 2;
+}
 
-    .caisse-hero-title {
-        display: flex;
-        align-items: center;
-        margin-bottom: 7px;
-        font-size: 25px;
-        font-weight: 800;
-    }
+.caisse-hero-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 7px;
+    font-size: 25px;
+    font-weight: 800;
+}
 
-    .caisse-hero-title-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 45px;
-        height: 45px;
-        margin-right: 13px;
-        border-radius: 13px;
-        background: rgba(255, 255, 255, .16);
-    }
+.caisse-hero-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    margin-right: 13px;
+    border-radius: 13px;
+    background: rgba(255, 255, 255, .16);
+}
 
-    .caisse-hero p {
-        max-width: 760px;
-        margin: 0;
-        color: rgba(255, 255, 255, .85);
-        font-size: 14px;
-    }
+.caisse-hero p {
+    max-width: 760px;
+    margin: 0;
+    color: rgba(255, 255, 255, .85);
+    font-size: 14px;
+}
 
-    .caisse-date-box {
-        min-width: 190px;
-        padding: 12px 15px;
-        text-align: right;
-        border: 1px solid rgba(255, 255, 255, .18);
-        border-radius: 12px;
-        background: rgba(255, 255, 255, .10);
-        backdrop-filter: blur(5px);
-    }
+.caisse-date-box {
+    min-width: 190px;
+    padding: 12px 15px;
+    text-align: right;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .10);
+    backdrop-filter: blur(5px);
+}
 
-    .caisse-date-box small {
-        display: block;
-        margin-bottom: 3px;
-        color: rgba(255, 255, 255, .75);
-    }
+.caisse-date-box small {
+    display: block;
+    margin-bottom: 3px;
+    color: rgba(255, 255, 255, .75);
+}
 
-    .caisse-date-box strong {
-        font-size: 14px;
-        font-weight: 700;
-    }
+.caisse-date-box strong {
+    font-size: 14px;
+    font-weight: 700;
+}
 
-    /* =====================================================
+/* =====================================================
        BOUTONS
     ====================================================== */
 
-    .btn-caisse-primary,
-    .btn-caisse-outline,
-    .btn-caisse-success,
-    .btn-caisse-danger {
-        min-height: 40px;
-        padding: 9px 15px;
-        border-radius: 9px;
-        font-size: 13px;
-        font-weight: 700;
-        transition: all .2s ease;
-    }
+.btn-caisse-primary,
+.btn-caisse-outline,
+.btn-caisse-success,
+.btn-caisse-danger {
+    min-height: 40px;
+    padding: 9px 15px;
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 700;
+    transition: all .2s ease;
+}
 
-    .btn-caisse-primary {
-        color: #fff;
-        border: 1px solid var(--caisse-primary);
-        background: var(--caisse-primary);
-    }
+.btn-caisse-primary {
+    color: #fff;
+    border: 1px solid var(--caisse-primary);
+    background: var(--caisse-primary);
+}
 
-    .btn-caisse-primary:hover {
-        color: #fff;
-        border-color: var(--caisse-primary-dark);
-        background: var(--caisse-primary-dark);
-        transform: translateY(-1px);
-    }
+.btn-caisse-primary:hover {
+    color: #fff;
+    border-color: var(--caisse-primary-dark);
+    background: var(--caisse-primary-dark);
+    transform: translateY(-1px);
+}
 
-    .btn-caisse-outline {
-        color: var(--caisse-primary);
-        border: 1px solid #b8d8d4;
-        background: #fff;
-    }
+.btn-caisse-outline {
+    color: var(--caisse-primary);
+    border: 1px solid #b8d8d4;
+    background: #fff;
+}
 
-    .btn-caisse-outline:hover {
-        color: #fff;
-        border-color: var(--caisse-primary);
-        background: var(--caisse-primary);
-    }
+.btn-caisse-outline:hover {
+    color: #fff;
+    border-color: var(--caisse-primary);
+    background: var(--caisse-primary);
+}
 
-    .btn-caisse-success {
-        color: #fff;
-        border: 1px solid #16a34a;
-        background: #16a34a;
-    }
+.btn-caisse-success {
+    color: #fff;
+    border: 1px solid #16a34a;
+    background: #16a34a;
+}
 
-    .btn-caisse-danger {
-        color: #fff;
-        border: 1px solid #dc2626;
-        background: #dc2626;
-    }
+.btn-caisse-danger {
+    color: #fff;
+    border: 1px solid #dc2626;
+    background: #dc2626;
+}
 
-    /* =====================================================
+/* =====================================================
        CARTES KPI
     ====================================================== */
 
-    .caisse-stat-card {
-        position: relative;
-        overflow: hidden;
-        min-height: 148px;
-        margin-bottom: 20px;
-        padding: 20px;
-        border: 1px solid var(--caisse-border);
-        border-radius: 15px;
-        background: #fff;
-        box-shadow: 0 7px 25px rgba(15, 23, 42, .06);
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
+.caisse-stat-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 148px;
+    margin-bottom: 20px;
+    padding: 20px;
+    border: 1px solid var(--caisse-border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 7px 25px rgba(15, 23, 42, .06);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
 
-    .caisse-stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 30px rgba(15, 23, 42, .10);
-    }
+.caisse-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(15, 23, 42, .10);
+}
 
-    .caisse-stat-card::after {
-        position: absolute;
-        right: -32px;
-        bottom: -35px;
-        width: 110px;
-        height: 110px;
-        content: "";
-        border-radius: 50%;
-        background: rgba(15, 118, 110, .06);
-    }
+.caisse-stat-card::after {
+    position: absolute;
+    right: -32px;
+    bottom: -35px;
+    width: 110px;
+    height: 110px;
+    content: "";
+    border-radius: 50%;
+    background: rgba(15, 118, 110, .06);
+}
 
-    .caisse-stat-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        margin-bottom: 14px;
-    }
+.caisse-stat-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
 
-    .caisse-stat-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 48px;
-        height: 48px;
-        border-radius: 13px;
-        font-size: 19px;
-    }
+.caisse-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    font-size: 19px;
+}
 
-    .icon-green {
-        color: #15803d;
-        background: #dcfce7;
-    }
+.icon-green {
+    color: #15803d;
+    background: #dcfce7;
+}
 
-    .icon-blue {
-        color: #0369a1;
-        background: #e0f2fe;
-    }
+.icon-blue {
+    color: #0369a1;
+    background: #e0f2fe;
+}
 
-    .icon-orange {
-        color: #b45309;
-        background: #fef3c7;
-    }
+.icon-orange {
+    color: #b45309;
+    background: #fef3c7;
+}
 
-    .icon-red {
-        color: #b91c1c;
-        background: #fee2e2;
-    }
+.icon-red {
+    color: #b91c1c;
+    background: #fee2e2;
+}
 
-    .icon-purple {
-        color: #6d28d9;
-        background: #ede9fe;
-    }
+.icon-purple {
+    color: #6d28d9;
+    background: #ede9fe;
+}
 
-    .caisse-stat-badge {
-        padding: 5px 9px;
-        border-radius: 30px;
-        font-size: 10px;
-        font-weight: 800;
-    }
+.caisse-stat-badge {
+    padding: 5px 9px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 800;
+}
 
-    .badge-positive {
-        color: #15803d;
-        background: #dcfce7;
-    }
+.badge-positive {
+    color: #15803d;
+    background: #dcfce7;
+}
 
-    .badge-neutral {
-        color: #0369a1;
-        background: #e0f2fe;
-    }
+.badge-neutral {
+    color: #0369a1;
+    background: #e0f2fe;
+}
 
-    .badge-negative {
-        color: #b91c1c;
-        background: #fee2e2;
-    }
+.badge-negative {
+    color: #b91c1c;
+    background: #fee2e2;
+}
 
-    .caisse-stat-label {
-        margin-bottom: 5px;
-        color: var(--caisse-muted);
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .4px;
-    }
+.caisse-stat-label {
+    margin-bottom: 5px;
+    color: var(--caisse-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+}
 
-    .caisse-stat-value {
-        margin-bottom: 4px;
-        color: var(--caisse-secondary);
-        font-size: 22px;
-        font-weight: 800;
-        line-height: 1.2;
-    }
+.caisse-stat-value {
+    margin-bottom: 4px;
+    color: var(--caisse-secondary);
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.2;
+}
 
-    .caisse-stat-footer {
-        color: var(--caisse-muted);
-        font-size: 11px;
-    }
+.caisse-stat-footer {
+    color: var(--caisse-muted);
+    font-size: 11px;
+}
 
-    /* =====================================================
+/* =====================================================
        CARTES GÉNÉRALES
     ====================================================== */
 
-    .caisse-card {
-        margin-bottom: 22px;
-        border: 1px solid var(--caisse-border);
-        border-radius: 15px;
-        background: #fff;
-        box-shadow: 0 7px 24px rgba(15, 23, 42, .05);
-    }
+.caisse-card {
+    margin-bottom: 22px;
+    border: 1px solid var(--caisse-border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 7px 24px rgba(15, 23, 42, .05);
+}
 
-    .caisse-card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 64px;
-        padding: 15px 20px;
-        border-bottom: 1px solid #edf2f7;
-    }
+.caisse-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+    padding: 15px 20px;
+    border-bottom: 1px solid #edf2f7;
+}
 
-    .caisse-card-title {
-        display: flex;
-        align-items: center;
-        margin: 0;
-        color: var(--caisse-secondary);
-        font-size: 15px;
-        font-weight: 800;
-    }
+.caisse-card-title {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    color: var(--caisse-secondary);
+    font-size: 15px;
+    font-weight: 800;
+}
 
-    .caisse-card-title i {
-        margin-right: 9px;
-        color: var(--caisse-primary);
-    }
+.caisse-card-title i {
+    margin-right: 9px;
+    color: var(--caisse-primary);
+}
 
-    .caisse-card-subtitle {
-        display: block;
-        margin-top: 3px;
-        color: var(--caisse-muted);
-        font-size: 11px;
-        font-weight: 500;
-    }
+.caisse-card-subtitle {
+    display: block;
+    margin-top: 3px;
+    color: var(--caisse-muted);
+    font-size: 11px;
+    font-weight: 500;
+}
 
-    .caisse-card-body {
-        padding: 20px;
-    }
+.caisse-card-body {
+    padding: 20px;
+}
 
-    /* =====================================================
+/* =====================================================
        ACTIONS RAPIDES
     ====================================================== */
 
-    .quick-action {
-        display: flex;
-        align-items: center;
-        min-height: 78px;
-        margin-bottom: 12px;
-        padding: 13px;
-        color: var(--caisse-text);
-        border: 1px solid var(--caisse-border);
-        border-radius: 12px;
-        background: #fff;
-        transition: all .2s ease;
-        cursor: pointer;
-    }
+.quick-action {
+    display: flex;
+    align-items: center;
+    min-height: 78px;
+    margin-bottom: 12px;
+    padding: 13px;
+    color: var(--caisse-text);
+    border: 1px solid var(--caisse-border);
+    border-radius: 12px;
+    background: #fff;
+    transition: all .2s ease;
+    cursor: pointer;
+}
 
-    .quick-action:hover {
-        color: var(--caisse-primary);
-        border-color: #9bcac5;
-        background: #f0fdfa;
-        transform: translateY(-2px);
-    }
+.quick-action:hover {
+    color: var(--caisse-primary);
+    border-color: #9bcac5;
+    background: #f0fdfa;
+    transform: translateY(-2px);
+}
 
-    .quick-action-icon {
-        display: flex;
-        flex: 0 0 43px;
-        align-items: center;
-        justify-content: center;
-        width: 43px;
-        height: 43px;
-        margin-right: 12px;
-        border-radius: 11px;
-        font-size: 17px;
-    }
+.quick-action-icon {
+    display: flex;
+    flex: 0 0 43px;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    margin-right: 12px;
+    border-radius: 11px;
+    font-size: 17px;
+}
 
-    .quick-action-title {
-        display: block;
-        margin-bottom: 2px;
-        font-size: 12px;
-        font-weight: 800;
-    }
+.quick-action-title {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 12px;
+    font-weight: 800;
+}
 
-    .quick-action-text {
-        color: var(--caisse-muted);
-        font-size: 10px;
-        line-height: 1.3;
-    }
+.quick-action-text {
+    color: var(--caisse-muted);
+    font-size: 10px;
+    line-height: 1.3;
+}
 
-    /* =====================================================
+/* =====================================================
        FILTRES
     ====================================================== */
 
-    .caisse-filter-box {
-        margin-bottom: 22px;
-        padding: 18px;
-        border: 1px solid var(--caisse-border);
-        border-radius: 14px;
-        background: #fff;
-        box-shadow: 0 5px 20px rgba(15, 23, 42, .04);
-    }
+.caisse-filter-box {
+    margin-bottom: 22px;
+    padding: 18px;
+    border: 1px solid var(--caisse-border);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, .04);
+}
 
-    .caisse-filter-box label {
-        margin-bottom: 6px;
-        color: #475569;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-    }
+.caisse-filter-box label {
+    margin-bottom: 6px;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
 
-    .caisse-filter-box .form-control {
-        height: 41px;
-        border: 1px solid #dbe4ea;
-        border-radius: 8px;
-        font-size: 12px;
-    }
+.caisse-filter-box .form-control {
+    height: 41px;
+    border: 1px solid #dbe4ea;
+    border-radius: 8px;
+    font-size: 12px;
+}
 
-    .caisse-filter-box .form-control:focus {
-        border-color: var(--caisse-primary);
-        box-shadow: 0 0 0 .15rem rgba(15, 118, 110, .14);
-    }
+.caisse-filter-box .form-control:focus {
+    border-color: var(--caisse-primary);
+    box-shadow: 0 0 0 .15rem rgba(15, 118, 110, .14);
+}
 
-    /* =====================================================
+/* =====================================================
        CARTES CAISSES
     ====================================================== */
 
-    .cash-box {
-        position: relative;
-        overflow: hidden;
-        min-height: 195px;
-        margin-bottom: 18px;
-        border: 1px solid var(--caisse-border);
-        border-radius: 15px;
-        background: #fff;
-        box-shadow: 0 6px 22px rgba(15, 23, 42, .05);
-        transition: all .2s ease;
+.cash-box {
+    position: relative;
+    overflow: hidden;
+    min-height: 195px;
+    margin-bottom: 18px;
+    border: 1px solid var(--caisse-border);
+    border-radius: 15px;
+    background: #fff;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, .05);
+    transition: all .2s ease;
+}
+
+.cash-box:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, .10);
+}
+
+.cash-box-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 17px 12px;
+}
+
+.cash-box-name {
+    display: flex;
+    align-items: center;
+}
+
+.cash-box-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    margin-right: 11px;
+    color: var(--caisse-primary);
+    border-radius: 12px;
+    background: #ccfbf1;
+}
+
+.cash-box-name h6 {
+    margin: 0 0 3px;
+    color: var(--caisse-secondary);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.cash-box-code {
+    color: var(--caisse-muted);
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.cash-status {
+    padding: 5px 9px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cash-status-active {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.cash-status-warning {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+.cash-status-danger {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.cash-box-balance {
+    padding: 8px 17px 15px;
+}
+
+.cash-box-balance span {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--caisse-muted);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.cash-box-balance strong {
+    color: var(--caisse-secondary);
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.cash-progress {
+    height: 6px;
+    margin: 0 17px 13px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e9eef3;
+}
+
+.cash-progress-bar {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #14b8a6, #0f766e);
+}
+
+.cash-box-footer {
+    display: flex;
+    border-top: 1px solid #edf2f7;
+    background: #fbfdfd;
+}
+
+.cash-box-footer-item {
+    flex: 1;
+    padding: 10px 8px;
+    text-align: center;
+    border-right: 1px solid #edf2f7;
+}
+
+.cash-box-footer-item:last-child {
+    border-right: none;
+}
+
+.cash-box-footer-item span {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--caisse-muted);
+    font-size: 9px;
+}
+
+.cash-box-footer-item strong {
+    color: var(--caisse-secondary);
+    font-size: 11px;
+}
+
+/* =====================================================
+       TABLEAU
+    ====================================================== */
+
+.caisse-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.caisse-table thead th {
+    padding: 12px 10px;
+    color: #475569;
+    border-top: none;
+    border-bottom: 1px solid #dfe7ed;
+    background: #f8fafc;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.caisse-table tbody td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    border-top: 1px solid #edf2f7;
+    color: #475569;
+    font-size: 11px;
+}
+
+.caisse-table tbody tr:hover {
+    background: #f8fffd;
+}
+
+.operation-reference {
+    color: var(--caisse-secondary);
+    font-weight: 800;
+}
+
+.operation-label {
+    max-width: 230px;
+}
+
+.operation-label strong {
+    display: block;
+    margin-bottom: 2px;
+    color: var(--caisse-secondary);
+    font-size: 11px;
+}
+
+.operation-label small {
+    color: var(--caisse-muted);
+    font-size: 9px;
+}
+
+.amount-in {
+    color: #15803d;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.amount-out {
+    color: #b91c1c;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.badge-operation {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    border-radius: 30px;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.badge-entree {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.badge-sortie {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.badge-transfert {
+    color: #0369a1;
+    background: #e0f2fe;
+}
+
+.badge-en-attente {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+.btn-table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 31px;
+    height: 31px;
+    margin: 1px;
+    border: 1px solid #dbe4ea;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 11px;
+}
+
+.btn-table-view {
+    color: #0369a1;
+}
+
+.btn-table-edit {
+    color: #b45309;
+}
+
+.btn-table-print {
+    color: #475569;
+}
+
+/* =====================================================
+       ALERTES
+    ====================================================== */
+
+.treasury-alert {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    padding: 12px;
+    border: 1px solid;
+    border-radius: 11px;
+}
+
+.treasury-alert:last-child {
+    margin-bottom: 0;
+}
+
+.treasury-alert-icon {
+    display: flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    margin-right: 10px;
+    border-radius: 9px;
+}
+
+.treasury-alert h6 {
+    margin: 0 0 3px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.treasury-alert p {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+.alert-danger-soft {
+    color: #991b1b;
+    border-color: #fecaca;
+    background: #fff7f7;
+}
+
+.alert-danger-soft .treasury-alert-icon {
+    background: #fee2e2;
+}
+
+.alert-warning-soft {
+    color: #92400e;
+    border-color: #fde68a;
+    background: #fffbeb;
+}
+
+.alert-warning-soft .treasury-alert-icon {
+    background: #fef3c7;
+}
+
+.alert-info-soft {
+    color: #075985;
+    border-color: #bae6fd;
+    background: #f0f9ff;
+}
+
+.alert-info-soft .treasury-alert-icon {
+    background: #e0f2fe;
+}
+
+/* =====================================================
+       TOP DÉPENSES
+    ====================================================== */
+
+.expense-item {
+    margin-bottom: 16px;
+}
+
+.expense-item:last-child {
+    margin-bottom: 0;
+}
+
+.expense-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
+
+.expense-item-title {
+    display: flex;
+    align-items: center;
+    color: var(--caisse-text);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.expense-item-title i {
+    width: 25px;
+    color: var(--caisse-primary);
+}
+
+.expense-item-value {
+    color: var(--caisse-secondary);
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.expense-progress {
+    height: 6px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e9eef3;
+}
+
+.expense-progress span {
+    display: block;
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #14b8a6, #0f766e);
+}
+
+/* =====================================================
+       MODALES
+    ====================================================== */
+
+.modal-caisse .modal-content {
+    overflow: hidden;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, .20);
+}
+
+.modal-caisse .modal-header {
+    color: #fff;
+    border-bottom: none;
+    background: linear-gradient(135deg, #0f766e, #102033);
+}
+
+.modal-caisse .modal-title {
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.modal-caisse .close {
+    color: #fff;
+    opacity: .9;
+}
+
+.modal-caisse label {
+    margin-bottom: 6px;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.modal-caisse .form-control {
+    min-height: 42px;
+    border: 1px solid #dbe4ea;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.modal-caisse textarea.form-control {
+    min-height: 90px;
+}
+
+.required-star {
+    color: #dc2626;
+}
+
+@media (max-width: 767px) {
+    .caisse-hero {
+        padding: 20px;
     }
 
-    .cash-box:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 28px rgba(15, 23, 42, .10);
+    .caisse-date-box {
+        margin-top: 15px;
+        text-align: left;
     }
 
-    .cash-box-top {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 16px 17px 12px;
+    .caisse-card-header {
+        display: block;
     }
 
-    .cash-box-name {
-        display: flex;
-        align-items: center;
+    .caisse-card-header .btn {
+        margin-top: 10px;
     }
 
-    .cash-box-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 43px;
-        height: 43px;
-        margin-right: 11px;
-        color: var(--caisse-primary);
-        border-radius: 12px;
-        background: #ccfbf1;
-    }
-
-    .cash-box-name h6 {
-        margin: 0 0 3px;
-        color: var(--caisse-secondary);
-        font-size: 13px;
-        font-weight: 800;
-    }
-
-    .cash-box-code {
-        color: var(--caisse-muted);
-        font-size: 10px;
-        font-weight: 600;
-    }
-
-    .cash-status {
-        padding: 5px 9px;
-        border-radius: 30px;
-        font-size: 9px;
-        font-weight: 800;
-        text-transform: uppercase;
+    .caisse-stat-value {
+        font-size: 19px;
     }
 
     .cash-status-active {
@@ -707,777 +1097,664 @@ $disbursementBadgeClass =
         background: #dcfce7;
     }
 
-    .cash-status-warning {
-        color: #b45309;
-        background: #fef3c7;
-    }
-
     .cash-status-danger {
         color: #b91c1c;
         background: #fee2e2;
     }
 
-    .cash-box-balance {
-        padding: 8px 17px 15px;
-    }
-
-    .cash-box-balance span {
-        display: block;
-        margin-bottom: 2px;
-        color: var(--caisse-muted);
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .cash-box-balance strong {
-        color: var(--caisse-secondary);
-        font-size: 21px;
-        font-weight: 800;
-    }
-
-    .cash-progress {
-        height: 6px;
-        margin: 0 17px 13px;
-        overflow: hidden;
-        border-radius: 20px;
-        background: #e9eef3;
-    }
-
-    .cash-progress-bar {
-        height: 100%;
-        border-radius: 20px;
-        background: linear-gradient(90deg, #14b8a6, #0f766e);
-    }
-
-    .cash-box-footer {
-        display: flex;
-        border-top: 1px solid #edf2f7;
-        background: #fbfdfd;
-    }
-
-    .cash-box-footer-item {
-        flex: 1;
-        padding: 10px 8px;
-        text-align: center;
-        border-right: 1px solid #edf2f7;
-    }
-
-    .cash-box-footer-item:last-child {
-        border-right: none;
-    }
-
-    .cash-box-footer-item span {
-        display: block;
-        margin-bottom: 2px;
-        color: var(--caisse-muted);
-        font-size: 9px;
-    }
-
-    .cash-box-footer-item strong {
-        color: var(--caisse-secondary);
-        font-size: 11px;
-    }
-
-    /* =====================================================
-       TABLEAU
-    ====================================================== */
-
-    .caisse-table {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
-    .caisse-table thead th {
-        padding: 12px 10px;
-        color: #475569;
-        border-top: none;
-        border-bottom: 1px solid #dfe7ed;
-        background: #f8fafc;
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        white-space: nowrap;
-    }
-
-    .caisse-table tbody td {
-        padding: 12px 10px;
-        vertical-align: middle;
-        border-top: 1px solid #edf2f7;
-        color: #475569;
-        font-size: 11px;
-    }
-
-    .caisse-table tbody tr:hover {
-        background: #f8fffd;
-    }
-
-    .operation-reference {
-        color: var(--caisse-secondary);
-        font-weight: 800;
-    }
-
-    .operation-label {
-        max-width: 230px;
-    }
-
-    .operation-label strong {
-        display: block;
-        margin-bottom: 2px;
-        color: var(--caisse-secondary);
-        font-size: 11px;
-    }
-
-    .operation-label small {
-        color: var(--caisse-muted);
-        font-size: 9px;
-    }
-
-    .amount-in {
-        color: #15803d;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-    .amount-out {
-        color: #b91c1c;
-        font-weight: 800;
-        white-space: nowrap;
-    }
-
-    .badge-operation {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px 8px;
-        border-radius: 30px;
-        font-size: 9px;
-        font-weight: 800;
-    }
-
-    .badge-entree {
-        color: #15803d;
-        background: #dcfce7;
-    }
-
-    .badge-sortie {
-        color: #b91c1c;
-        background: #fee2e2;
-    }
-
-    .badge-transfert {
-        color: #0369a1;
-        background: #e0f2fe;
-    }
-
-    .badge-en-attente {
+    .cash-status-warning {
         color: #b45309;
         background: #fef3c7;
     }
 
-    .btn-table-action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 31px;
-        height: 31px;
-        margin: 1px;
-        border: 1px solid #dbe4ea;
-        border-radius: 8px;
-        background: #fff;
-        font-size: 11px;
-    }
-
-    .btn-table-view {
-        color: #0369a1;
-    }
-
-    .btn-table-edit {
+    .cash-status-warning {
         color: #b45309;
+        background: #fef3c7;
     }
 
-    .btn-table-print {
-        color: #475569;
-    }
-
-    /* =====================================================
-       ALERTES
-    ====================================================== */
-
-    .treasury-alert {
+    .cash-box-name {
         display: flex;
-        align-items: flex-start;
-        margin-bottom: 12px;
-        padding: 12px;
-        border: 1px solid;
-        border-radius: 11px;
-    }
-
-    .treasury-alert:last-child {
-        margin-bottom: 0;
-    }
-
-    .treasury-alert-icon {
-        display: flex;
-        flex: 0 0 36px;
         align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        margin-right: 10px;
-        border-radius: 9px;
+        min-width: 0;
     }
 
-    .treasury-alert h6 {
+    .cash-box-name>div:last-child {
+        min-width: 0;
+    }
+
+    .cash-box-name h6 {
+        max-width: 175px;
         margin: 0 0 3px;
-        font-size: 11px;
-        font-weight: 800;
-    }
-
-    .treasury-alert p {
-        margin: 0;
-        font-size: 10px;
-        line-height: 1.4;
-    }
-
-    .alert-danger-soft {
-        color: #991b1b;
-        border-color: #fecaca;
-        background: #fff7f7;
-    }
-
-    .alert-danger-soft .treasury-alert-icon {
-        background: #fee2e2;
-    }
-
-    .alert-warning-soft {
-        color: #92400e;
-        border-color: #fde68a;
-        background: #fffbeb;
-    }
-
-    .alert-warning-soft .treasury-alert-icon {
-        background: #fef3c7;
-    }
-
-    .alert-info-soft {
-        color: #075985;
-        border-color: #bae6fd;
-        background: #f0f9ff;
-    }
-
-    .alert-info-soft .treasury-alert-icon {
-        background: #e0f2fe;
-    }
-
-    /* =====================================================
-       TOP DÉPENSES
-    ====================================================== */
-
-    .expense-item {
-        margin-bottom: 16px;
-    }
-
-    .expense-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .expense-item-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 7px;
-    }
-
-    .expense-item-title {
-        display: flex;
-        align-items: center;
-        color: var(--caisse-text);
-        font-size: 11px;
-        font-weight: 700;
-    }
-
-    .expense-item-title i {
-        width: 25px;
-        color: var(--caisse-primary);
-    }
-
-    .expense-item-value {
+        overflow: hidden;
         color: var(--caisse-secondary);
-        font-size: 11px;
+        font-size: 13px;
         font-weight: 800;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
-    .expense-progress {
-        height: 6px;
+    .cash-box-code {
+        max-width: 175px;
         overflow: hidden;
-        border-radius: 20px;
-        background: #e9eef3;
+        color: var(--caisse-muted);
+        font-size: 10px;
+        font-weight: 600;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
+}
 
-    .expense-progress span {
-        display: block;
-        height: 100%;
-        border-radius: 20px;
-        background: linear-gradient(90deg, #14b8a6, #0f766e);
-    }
-
-    /* =====================================================
-       MODALES
-    ====================================================== */
-
-    .modal-caisse .modal-content {
-        overflow: hidden;
-        border: none;
-        border-radius: 15px;
-        box-shadow: 0 20px 45px rgba(15, 23, 42, .20);
-    }
-
-    .modal-caisse .modal-header {
-        color: #fff;
-        border-bottom: none;
-        background: linear-gradient(135deg, #0f766e, #102033);
-    }
-
-    .modal-caisse .modal-title {
-        font-size: 16px;
-        font-weight: 800;
-    }
-
-    .modal-caisse .close {
-        color: #fff;
-        opacity: .9;
-    }
-
-    .modal-caisse label {
-        margin-bottom: 6px;
-        color: #475569;
-        font-size: 11px;
-        font-weight: 800;
-    }
-
-    .modal-caisse .form-control {
-        min-height: 42px;
-        border: 1px solid #dbe4ea;
-        border-radius: 8px;
-        font-size: 12px;
-    }
-
-    .modal-caisse textarea.form-control {
-        min-height: 90px;
-    }
-
-    .required-star {
-        color: #dc2626;
-    }
-
-    @media (max-width: 767px) {
-        .caisse-hero {
-            padding: 20px;
-        }
-
-        .caisse-date-box {
-            margin-top: 15px;
-            text-align: left;
-        }
-
-        .caisse-card-header {
-            display: block;
-        }
-
-        .caisse-card-header .btn {
-            margin-top: 10px;
-        }
-
-        .caisse-stat-value {
-            font-size: 19px;
-        }
-
-        .cash-status-active {
-            color: #15803d;
-            background: #dcfce7;
-        }
-
-        .cash-status-danger {
-            color: #b91c1c;
-            background: #fee2e2;
-        }
-
-        .cash-status-warning {
-            color: #b45309;
-            background: #fef3c7;
-        }
-
-        .cash-status-warning {
-            color: #b45309;
-            background: #fef3c7;
-        }
-
-        .cash-box-name {
-            display: flex;
-            align-items: center;
-            min-width: 0;
-        }
-
-        .cash-box-name>div:last-child {
-            min-width: 0;
-        }
-
-        .cash-box-name h6 {
-            max-width: 175px;
-            margin: 0 0 3px;
-            overflow: hidden;
-            color: var(--caisse-secondary);
-            font-size: 13px;
-            font-weight: 800;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .cash-box-code {
-            max-width: 175px;
-            overflow: hidden;
-            color: var(--caisse-muted);
-            font-size: 10px;
-            font-weight: 600;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-    }
-
-    /* =====================================================
+/* =====================================================
    PRINCIPALES DÉPENSES
 ===================================================== */
 
-    .expense-item {
-        margin-bottom: 18px;
-    }
+.expense-item {
+    margin-bottom: 18px;
+}
 
-    .expense-item:last-child {
-        margin-bottom: 0;
-    }
+.expense-item:last-child {
+    margin-bottom: 0;
+}
 
-    .expense-item-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 7px;
-    }
+.expense-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 7px;
+}
 
-    .expense-item-title {
-        display: flex;
-        align-items: center;
-        min-width: 0;
-        color: #334155;
-        font-size: 11px;
-        font-weight: 700;
-    }
+.expense-item-title {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 700;
+}
 
-    .expense-item-title i {
-        flex: 0 0 25px;
-        width: 25px;
-        color: #0f766e;
-    }
+.expense-item-title i {
+    flex: 0 0 25px;
+    width: 25px;
+    color: #0f766e;
+}
 
-    .expense-item-value {
-        margin-left: 10px;
-        color: #102033;
-        font-size: 11px;
-        font-weight: 800;
-        white-space: nowrap;
-    }
+.expense-item-value {
+    margin-left: 10px;
+    color: #102033;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
 
-    .expense-progress {
-        width: 100%;
-        height: 7px;
-        overflow: hidden;
-        border-radius: 20px;
-        background: #e9eef3;
-    }
+.expense-progress {
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e9eef3;
+}
 
-    .expense-progress span {
-        display: block;
-        height: 100%;
-        border-radius: 20px;
-        background: linear-gradient(90deg,
-                #14b8a6,
-                #0f766e);
-        transition: width .35s ease;
-    }
+.expense-progress span {
+    display: block;
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg,
+            #14b8a6,
+            #0f766e);
+    transition: width .35s ease;
+}
 
-    /* =====================================================
+/* =====================================================
    SYNTHÈSE PAR CHANTIER
 ===================================================== */
 
-    .caisse-summary-table-wrapper {
-        max-height: 430px;
-        overflow-x: auto;
-        overflow-y: auto;
-    }
+.caisse-summary-table-wrapper {
+    max-height: 430px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
 
-    .caisse-summary-table-wrapper thead th {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-        background: #f8fafc;
-    }
+.caisse-summary-table-wrapper thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #f8fafc;
+}
 
-    .caisse-summary-table-wrapper tbody td:first-child strong {
-        display: block;
-        max-width: 210px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
+.caisse-summary-table-wrapper tbody td:first-child strong {
+    display: block;
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    .caisse-summary-table-wrapper .progress {
-        height: 7px;
-        overflow: hidden;
-        border-radius: 20px;
-        background: #e5e7eb;
-    }
+.caisse-summary-table-wrapper .progress {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e5e7eb;
+}
 
-    .caisse-summary-table-wrapper .progress-bar {
-        border-radius: 20px;
-        transition: width .35s ease;
-    }
+.caisse-summary-table-wrapper .progress-bar {
+    border-radius: 20px;
+    transition: width .35s ease;
+}
 
-    /* =====================================================
+/* =====================================================
    RÉSUMÉ DU GRAPHIQUE
 ===================================================== */
 
-    .cashflow-summary {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 18px;
-    }
+.cashflow-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
 
-    .cashflow-summary-item {
-        padding: 11px 13px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        background: #f8fafc;
-    }
+.cashflow-summary-item {
+    padding: 11px 13px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
 
-    .cashflow-summary-item span {
-        display: block;
-        margin-bottom: 4px;
-        color: #64748b;
-        font-size: 9px;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
+.cashflow-summary-item span {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
 
-    .cashflow-summary-item strong {
-        display: block;
-        font-size: 13px;
-        font-weight: 800;
-    }
+.cashflow-summary-item strong {
+    display: block;
+    font-size: 13px;
+    font-weight: 800;
+}
 
-    .cashflow-chart-wrapper {
-        position: relative;
-        width: 100%;
-        height: 305px;
-    }
+.cashflow-chart-wrapper {
+    position: relative;
+    width: 100%;
+    height: 305px;
+}
 
-    .cashflow-chart-wrapper canvas {
-        width: 100% !important;
-        height: 100% !important;
-    }
+.cashflow-chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
 
-    /* =====================================================
+/* =====================================================
    ALERTES
 ===================================================== */
 
-    .treasury-alerts-wrapper {
-        max-height: 410px;
-        overflow-y: auto;
+.treasury-alerts-wrapper {
+    max-height: 410px;
+    overflow-y: auto;
+}
+
+.treasury-alert-content {
+    min-width: 0;
+}
+
+.treasury-alert-content h6 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.treasury-empty-alert {
+    padding: 30px 15px;
+    text-align: center;
+}
+
+.treasury-empty-alert-icon {
+    margin-bottom: 12px;
+    color: #16a34a;
+    font-size: 44px;
+}
+
+.treasury-empty-alert h6 {
+    margin-bottom: 7px;
+    color: #102033;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.treasury-empty-alert p {
+    max-width: 300px;
+    margin: auto;
+    color: #64748b;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+@media (max-width: 767px) {
+    .cashflow-summary {
+        grid-template-columns: 1fr;
     }
 
-    .treasury-alert-content {
-        min-width: 0;
+    .cashflow-chart-wrapper {
+        height: 260px;
     }
+}
 
-    .treasury-alert-content h6 {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .treasury-empty-alert {
-        padding: 30px 15px;
-        text-align: center;
-    }
-
-    .treasury-empty-alert-icon {
-        margin-bottom: 12px;
-        color: #16a34a;
-        font-size: 44px;
-    }
-
-    .treasury-empty-alert h6 {
-        margin-bottom: 7px;
-        color: #102033;
-        font-size: 14px;
-        font-weight: 800;
-    }
-
-    .treasury-empty-alert p {
-        max-width: 300px;
-        margin: auto;
-        color: #64748b;
-        font-size: 10px;
-        line-height: 1.6;
-    }
-
-    @media (max-width: 767px) {
-        .cashflow-summary {
-            grid-template-columns: 1fr;
-        }
-
-        .cashflow-chart-wrapper {
-            height: 260px;
-        }
-    }
-
-    /* =====================================================
+/* =====================================================
    FILTRES DES CAISSES
 ===================================================== */
 
-    .caisse-filter-box {
-        margin-bottom: 22px;
-        padding: 18px;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        background: #ffffff;
-        box-shadow: 0 5px 20px rgba(15, 23, 42, .04);
-    }
+.caisse-filter-box {
+    margin-bottom: 22px;
+    padding: 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 5px 20px rgba(15, 23, 42, .04);
+}
 
-    .caisse-filter-box label {
-        display: block;
-        margin-bottom: 6px;
-        color: #475569;
-        font-size: 10px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: .15px;
-    }
+.caisse-filter-box label {
+    display: block;
+    margin-bottom: 6px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .15px;
+}
 
-    .caisse-filter-box .form-control {
-        min-height: 40px;
-        border: 1px solid #dbe4ea;
-        border-radius: 8px;
-        color: #334155;
-        font-size: 11px;
-    }
+.caisse-filter-box .form-control {
+    min-height: 40px;
+    border: 1px solid #dbe4ea;
+    border-radius: 8px;
+    color: #334155;
+    font-size: 11px;
+}
 
-    .caisse-filter-box .form-control:focus {
-        border-color: #0f766e;
-        box-shadow:
-            0 0 0 .15rem rgba(15, 118, 110, .13);
-    }
+.caisse-filter-box .form-control:focus {
+    border-color: #0f766e;
+    box-shadow:
+        0 0 0 .15rem rgba(15, 118, 110, .13);
+}
 
-    .caisse-filter-box .input-group .form-control {
-        border-radius: 8px 0 0 8px;
-    }
+.caisse-filter-box .input-group .form-control {
+    border-radius: 8px 0 0 8px;
+}
 
-    .caisse-filter-box .input-group-text {
-        min-width: 43px;
-        justify-content: center;
-        color: #334155;
-        border-color: #dbe4ea;
-        background: #f1f5f9;
-    }
+.caisse-filter-box .input-group-text {
+    min-width: 43px;
+    justify-content: center;
+    color: #334155;
+    border-color: #dbe4ea;
+    background: #f1f5f9;
+}
 
-    .caisse-filter-box button.input-group-text {
-        appearance: none;
-    }
+.caisse-filter-box button.input-group-text {
+    appearance: none;
+}
 
-    .caisse-filter-box button.input-group-text:hover {
-        color: #ffffff;
-        border-color: #0f766e;
-        background: #0f766e;
-    }
+.caisse-filter-box button.input-group-text:hover {
+    color: #ffffff;
+    border-color: #0f766e;
+    background: #0f766e;
+}
 
-    .cashbox-filter-actions {
-        display: flex;
-        align-items: center;
-        min-height: 40px;
-    }
+.cashbox-filter-actions {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+}
 
-    /* =====================================================
+/* =====================================================
    FILTRES ACTIFS
 ===================================================== */
 
-    .cashbox-active-filters {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
+.cashbox-active-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin-top: 15px;
+    padding-top: 14px;
+    border-top: 1px solid #edf2f7;
+}
+
+.cashbox-active-filters-label {
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.cashbox-filter-tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 27px;
+    padding: 5px 9px;
+    color: #0f766e;
+    border: 1px solid #99d5ce;
+    border-radius: 20px;
+    background: #f0fdfa;
+    font-size: 9px;
+}
+
+.cashbox-filter-tag strong {
+    margin-left: 4px;
+}
+
+.cashbox-filter-results {
+    margin-left: auto;
+    padding: 5px 9px;
+    color: #0369a1;
+    border-radius: 20px;
+    background: #e0f2fe;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+@media (max-width: 991px) {
+    .caisse-filter-box .form-group {
+        margin-bottom: 13px !important;
+    }
+
+    .cashbox-filter-actions {
+        margin-top: 2px;
+    }
+}
+
+@media (max-width: 575px) {
+    .cashbox-filter-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
         gap: 7px;
-        margin-top: 15px;
-        padding-top: 14px;
-        border-top: 1px solid #edf2f7;
     }
 
-    .cashbox-active-filters-label {
-        color: #475569;
-        font-size: 10px;
-        font-weight: 800;
-    }
-
-    .cashbox-filter-tag {
-        display: inline-flex;
-        align-items: center;
-        min-height: 27px;
-        padding: 5px 9px;
-        color: #0f766e;
-        border: 1px solid #99d5ce;
-        border-radius: 20px;
-        background: #f0fdfa;
-        font-size: 9px;
-    }
-
-    .cashbox-filter-tag strong {
-        margin-left: 4px;
+    .cashbox-filter-actions .btn {
+        margin-right: 0 !important;
     }
 
     .cashbox-filter-results {
-        margin-left: auto;
-        padding: 5px 9px;
-        color: #0369a1;
-        border-radius: 20px;
-        background: #e0f2fe;
-        font-size: 9px;
-        font-weight: 800;
+        width: 100%;
+        margin-left: 0;
+        text-align: center;
+    }
+}
+
+/* =========================================================
+   ACTIONS RAPIDES DE CAISSE
+========================================================= */
+
+.caisse-card-body .row {
+    margin-left: -7px;
+    margin-right: -7px;
+}
+
+.caisse-card-body .row>[class*="col-"] {
+    padding-left: 7px;
+    padding-right: 7px;
+}
+
+/*
+ * Carte principale de chaque action.
+ */
+.quick-action {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 104px;
+    padding: 16px;
+    overflow: hidden;
+
+    background: #ffffff;
+    border: 1px solid #d9e3ec;
+    border-radius: 14px;
+
+    color: #1e293b;
+    text-align: left;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease,
+        background-color 0.2s ease;
+}
+
+/*
+ * Retirer le style natif des boutons.
+ */
+button.quick-action {
+    appearance: none;
+    -webkit-appearance: none;
+
+    font-family: inherit;
+    line-height: inherit;
+}
+
+/*
+ * Petit fond décoratif.
+ */
+.quick-action::after {
+    content: "";
+    position: absolute;
+    right: -32px;
+    bottom: -42px;
+
+    width: 92px;
+    height: 92px;
+
+    border-radius: 50%;
+    background: rgba(15, 118, 110, 0.035);
+
+    transition:
+        transform 0.25s ease,
+        background-color 0.25s ease;
+}
+
+/*
+ * Survol.
+ */
+.quick-action:hover,
+.quick-action:focus {
+    color: #0f766e;
+    text-decoration: none;
+
+    border-color: rgba(15, 118, 110, 0.38);
+    background: #ffffff;
+
+    box-shadow:
+        0 10px 24px rgba(15, 23, 42, 0.09);
+
+    transform: translateY(-3px);
+
+    outline: none;
+}
+
+.quick-action:hover::after,
+.quick-action:focus::after {
+    transform: scale(1.18);
+    background: rgba(15, 118, 110, 0.07);
+}
+
+/*
+ * État actif au clic.
+ */
+.quick-action:active {
+    transform: translateY(-1px);
+    box-shadow:
+        0 5px 14px rgba(15, 23, 42, 0.08);
+}
+
+/*
+ * Bloc de l’icône.
+ */
+.quick-action-icon {
+    position: relative;
+    z-index: 2;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+
+    margin-right: 13px;
+
+    border-radius: 13px;
+
+    font-size: 19px;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.quick-action:hover .quick-action-icon {
+    transform: scale(1.06);
+}
+
+/*
+ * Contenu texte.
+ */
+.quick-action-content {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+}
+
+/*
+ * Titre.
+ */
+.quick-action-title {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #243247;
+
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+/*
+ * Description.
+ */
+.quick-action-text {
+    display: block;
+
+    color: #64748b;
+
+    font-size: 11.5px;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+/*
+ * Couleurs des icônes.
+ */
+.quick-action-icon.icon-green {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.quick-action-icon.icon-blue {
+    color: #0369a1;
+    background: #e0f2fe;
+}
+
+.quick-action-icon.icon-red {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.quick-action-icon.icon-orange {
+    color: #c25b08;
+    background: #fef3c7;
+}
+
+.quick-action-icon.icon-purple {
+    color: #6d28d9;
+    background: #ede9fe;
+}
+
+/*
+ * Effet spécifique au décaissement.
+ */
+.quick-action:has(.icon-red):hover {
+    color: #b91c1c;
+    border-color: rgba(220, 38, 38, 0.35);
+}
+
+.quick-action:has(.icon-red):hover::after {
+    background: rgba(220, 38, 38, 0.06);
+}
+
+/*
+ * Éviter que les liens ou boutons héritent
+ * d’un soulignement ou d’une bordure native.
+ */
+.quick-action-button,
+.quick-action-link {
+    border-style: solid;
+}
+
+.quick-action-link:visited {
+    color: #1e293b;
+}
+
+.quick-action-danger:hover,
+.quick-action-danger:focus {
+    color: #b91c1c;
+    border-color: rgba(220, 38, 38, 0.35);
+}
+
+.quick-action-danger:hover::after,
+.quick-action-danger:focus::after {
+    background: rgba(220, 38, 38, 0.06);
+}
+
+/*
+ * Responsive.
+ */
+@media (max-width: 1199.98px) {
+    .quick-action {
+        min-height: 96px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .quick-action {
+        min-height: 88px;
+        padding: 14px;
     }
 
-    @media (max-width: 991px) {
-        .caisse-filter-box .form-group {
-            margin-bottom: 13px !important;
-        }
+    .quick-action-icon {
+        flex-basis: 44px;
+        width: 44px;
+        height: 44px;
 
-        .cashbox-filter-actions {
-            margin-top: 2px;
-        }
+        margin-right: 11px;
+
+        font-size: 17px;
     }
 
-    @media (max-width: 575px) {
-        .cashbox-filter-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 7px;
-        }
-
-        .cashbox-filter-actions .btn {
-            margin-right: 0 !important;
-        }
-
-        .cashbox-filter-results {
-            width: 100%;
-            margin-left: 0;
-            text-align: center;
-        }
+    .quick-action-title {
+        font-size: 13.5px;
     }
+
+    .quick-action-text {
+        font-size: 11px;
+    }
+}
 </style>
 
 <div class="content-wrapper caisse-page">
@@ -1688,12 +1965,12 @@ $disbursementBadgeClass =
 
                             <?php if ($headOfficeCount > 1): ?>
 
-                                <small class="ml-1 text-muted" style="
+                            <small class="ml-1 text-muted" style="
                             font-size: 8px;
                             text-transform: none;
                         ">
-                                    (<?= $headOfficeCount ?> caisses)
-                                </small>
+                                (<?= $headOfficeCount ?> caisses)
+                            </small>
 
                             <?php endif; ?>
 
@@ -1860,11 +2137,11 @@ $disbursementBadgeClass =
                                 $todayDisbursementCount > 0
                             ): ?>
 
-                                Sorties validées enregistrées aujourd’hui
+                            Sorties validées enregistrées aujourd’hui
 
                             <?php else: ?>
 
-                                Aucun décaissement validé aujourd’hui
+                            Aucun décaissement validé aujourd’hui
 
                             <?php endif; ?>
 
@@ -1877,8 +2154,8 @@ $disbursementBadgeClass =
             </div>
 
             <!-- =================================================
-                 ACTIONS RAPIDES
-            ================================================== -->
+     ACTIONS RAPIDES
+================================================== -->
             <div class="caisse-card">
 
                 <div class="caisse-card-header">
@@ -1900,15 +2177,19 @@ $disbursementBadgeClass =
 
                     <div class="row">
 
-                        <div class="col-xl-2 col-lg-4 col-md-6">
+                        <!-- =================================================
+                 NOUVELLE CAISSE
+            ================================================== -->
+                        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
 
-                            <div class="quick-action" data-toggle="modal" data-target="#addCaisseModal">
-
-                                <div class="quick-action-icon icon-green">
+                            <button type="button" class="quick-action quick-action-button" data-toggle="modal"
+                                data-target="#addCaisseModal">
+                                <span class="quick-action-icon icon-green">
                                     <i class="fas fa-plus"></i>
-                                </div>
+                                </span>
 
-                                <div>
+                                <span class="quick-action-content">
+
                                     <span class="quick-action-title">
                                         Nouvelle caisse
                                     </span>
@@ -1916,22 +2197,25 @@ $disbursementBadgeClass =
                                     <span class="quick-action-text">
                                         Créer une caisse siège ou chantier
                                     </span>
-                                </div>
 
-                            </div>
+                                </span>
+                            </button>
 
                         </div>
 
-                        <div class="col-xl-2 col-lg-4 col-md-6">
+                        <!-- =================================================
+                 APPROVISIONNEMENT
+            ================================================== -->
+                        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
 
-                            <div class="quick-action" data-toggle="modal" data-target="#addOperationModal"
-                                onclick="prepareOperation('approvisionnement')">
-
-                                <div class="quick-action-icon icon-blue">
+                            <button type="button" class="quick-action quick-action-button" data-toggle="modal"
+                                data-target="#addOperationModal" onclick="prepareOperation('approvisionnement')">
+                                <span class="quick-action-icon icon-blue">
                                     <i class="fas fa-hand-holding-usd"></i>
-                                </div>
+                                </span>
 
-                                <div>
+                                <span class="quick-action-content">
+
                                     <span class="quick-action-title">
                                         Approvisionner
                                     </span>
@@ -1939,22 +2223,25 @@ $disbursementBadgeClass =
                                     <span class="quick-action-text">
                                         Alimenter une caisse chantier
                                     </span>
-                                </div>
 
-                            </div>
+                                </span>
+                            </button>
 
                         </div>
 
-                        <div class="col-xl-2 col-lg-4 col-md-6">
+                        <!-- =================================================
+                 ENCAISSEMENT
+            ================================================== -->
+                        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
 
-                            <div class="quick-action" data-toggle="modal" data-target="#addOperationModal"
-                                onclick="prepareOperation('encaissement')">
-
-                                <div class="quick-action-icon icon-green">
+                            <button type="button" class="quick-action quick-action-button" data-toggle="modal"
+                                data-target="#addOperationModal" onclick="prepareOperation('encaissement')">
+                                <span class="quick-action-icon icon-green">
                                     <i class="fas fa-arrow-down"></i>
-                                </div>
+                                </span>
 
-                                <div>
+                                <span class="quick-action-content">
+
                                     <span class="quick-action-title">
                                         Encaissement
                                     </span>
@@ -1962,22 +2249,25 @@ $disbursementBadgeClass =
                                     <span class="quick-action-text">
                                         Enregistrer une entrée d’argent
                                     </span>
-                                </div>
 
-                            </div>
+                                </span>
+                            </button>
 
                         </div>
 
-                        <div class="col-xl-2 col-lg-4 col-md-6">
+                        <!-- =================================================
+                 DÉCAISSEMENT
+            ================================================== -->
+                        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
 
-                            <div class="quick-action" data-toggle="modal" data-target="#addOperationModal"
-                                onclick="prepareOperation('decaissement')">
-
-                                <div class="quick-action-icon icon-red">
+                            <button type="button" class="quick-action quick-action-button" data-toggle="modal"
+                                data-target="#addOperationModal" onclick="prepareOperation('decaissement')">
+                                <span class="quick-action-icon icon-red">
                                     <i class="fas fa-arrow-up"></i>
-                                </div>
+                                </span>
 
-                                <div>
+                                <span class="quick-action-content">
+
                                     <span class="quick-action-title">
                                         Décaissement
                                     </span>
@@ -1985,21 +2275,24 @@ $disbursementBadgeClass =
                                     <span class="quick-action-text">
                                         Enregistrer une sortie d’argent
                                     </span>
-                                </div>
 
-                            </div>
+                                </span>
+                            </button>
 
                         </div>
 
-                        <div class="col-xl-2 col-lg-4 col-md-6">
+                        <!-- =================================================
+                            JOURNAL DE CAISSE
+                        ================================================== -->
+                        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
 
-                            <div class="quick-action">
-
-                                <div class="quick-action-icon icon-orange">
+                            <a href="<?= base_url('caisse-journal') ?>" class="quick-action quick-action-link">
+                                <span class="quick-action-icon icon-orange">
                                     <i class="fas fa-print"></i>
-                                </div>
+                                </span>
 
-                                <div>
+                                <span class="quick-action-content">
+
                                     <span class="quick-action-title">
                                         Journal de caisse
                                     </span>
@@ -2007,21 +2300,24 @@ $disbursementBadgeClass =
                                     <span class="quick-action-text">
                                         Imprimer les mouvements
                                     </span>
-                                </div>
 
-                            </div>
+                                </span>
+                            </a>
 
                         </div>
 
-                        <div class="col-xl-2 col-lg-4 col-md-6">
+                        <!-- =================================================
+                 EXPORTER
+            ================================================== -->
+                        <div class="col-xl-2 col-lg-4 col-md-6 mb-3">
 
-                            <div class="quick-action">
-
-                                <div class="quick-action-icon icon-purple">
+                            <a href="<?= base_url('finance/caisse/export') ?>" class="quick-action quick-action-link">
+                                <span class="quick-action-icon icon-purple">
                                     <i class="fas fa-file-excel"></i>
-                                </div>
+                                </span>
 
-                                <div>
+                                <span class="quick-action-content">
+
                                     <span class="quick-action-title">
                                         Exporter
                                     </span>
@@ -2029,9 +2325,9 @@ $disbursementBadgeClass =
                                     <span class="quick-action-text">
                                         Exporter les données vers Excel
                                     </span>
-                                </div>
 
-                            </div>
+                                </span>
+                            </a>
 
                         </div>
 
@@ -2042,13 +2338,13 @@ $disbursementBadgeClass =
             </div>
 
             <!-- =================================================
-     GRAPHIQUE + ALERTES DE TRÉSORERIE
-================================================== -->
+                GRAPHIQUE + ALERTES DE TRÉSORERIE
+            ================================================== -->
             <div class="row">
 
                 <!-- =================================================
-         ÉVOLUTION DE LA TRÉSORERIE
-    ================================================== -->
+                    ÉVOLUTION DE LA TRÉSORERIE
+                ================================================== -->
                 <div class="col-xl-8 col-lg-8">
 
                     <div class="caisse-card">
@@ -2257,24 +2553,24 @@ $disbursementBadgeClass =
 
                             <?php if ($treasuryAlertsCount > 0): ?>
 
-                                <span class="badge badge-danger">
+                            <span class="badge badge-danger">
 
-                                    <?= (int) $treasuryAlertsCount ?>
+                                <?= (int) $treasuryAlertsCount ?>
 
-                                    alerte<?= $treasuryAlertsCount > 1
+                                alerte<?= $treasuryAlertsCount > 1
                                                 ? 's'
                                                 : ''
                                             ?>
 
-                                </span>
+                            </span>
 
                             <?php else: ?>
 
-                                <span class="badge badge-success">
+                            <span class="badge badge-success">
 
-                                    Aucune alerte
+                                Aucune alerte
 
-                                </span>
+                            </span>
 
                             <?php endif; ?>
 
@@ -2284,11 +2580,11 @@ $disbursementBadgeClass =
 
                             <?php if (!empty($treasuryAlerts)): ?>
 
-                                <?php foreach (
+                            <?php foreach (
                                     $treasuryAlerts as $alert
                                 ): ?>
 
-                                    <?php
+                            <?php
 
                                     $alertClass =
                                         'alert-info-soft';
@@ -2305,66 +2601,66 @@ $disbursementBadgeClass =
 
                                     ?>
 
-                                    <div class="
+                            <div class="
                                 treasury-alert
                                 <?= html_escape($alertClass) ?>
                             ">
 
-                                        <div class="treasury-alert-icon">
+                                <div class="treasury-alert-icon">
 
-                                            <i class="<?= html_escape(
+                                    <i class="<?= html_escape(
                                                             $alert['icon']
                                                         ) ?>"></i>
 
-                                        </div>
+                                </div>
 
-                                        <div class="treasury-alert-content">
+                                <div class="treasury-alert-content">
 
-                                            <h6>
+                                    <h6>
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $alert['title']
                                                 ) ?>
 
-                                            </h6>
-
-                                            <p>
-
-                                                <?= html_escape(
-                                                    $alert['message']
-                                                ) ?>
-
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-                                <?php endforeach; ?>
-
-                            <?php else: ?>
-
-                                <div class="treasury-empty-alert">
-
-                                    <div class="treasury-empty-alert-icon">
-
-                                        <i class="fas fa-check-circle"></i>
-
-                                    </div>
-
-                                    <h6>
-                                        Trésorerie sous contrôle
                                     </h6>
 
                                     <p>
 
-                                        Aucun solde critique, aucune opération
-                                        en attente et aucun justificatif
-                                        manquant n’a été détecté.
+                                        <?= html_escape(
+                                                    $alert['message']
+                                                ) ?>
 
                                     </p>
 
                                 </div>
+
+                            </div>
+
+                            <?php endforeach; ?>
+
+                            <?php else: ?>
+
+                            <div class="treasury-empty-alert">
+
+                                <div class="treasury-empty-alert-icon">
+
+                                    <i class="fas fa-check-circle"></i>
+
+                                </div>
+
+                                <h6>
+                                    Trésorerie sous contrôle
+                                </h6>
+
+                                <p>
+
+                                    Aucun solde critique, aucune opération
+                                    en attente et aucun justificatif
+                                    manquant n’a été détecté.
+
+                                </p>
+
+                            </div>
 
                             <?php endif; ?>
 
@@ -2413,8 +2709,8 @@ $disbursementBadgeClass =
             ?>
 
             <!-- =================================================
-     FILTRES DES CAISSES
-================================================== -->
+                FILTRES DES CAISSES
+            ================================================== -->
             <div class="caisse-filter-box">
 
                 <form action="<?= current_url() ?>" method="get" id="cashboxFilterForm">
@@ -2423,11 +2719,11 @@ $disbursementBadgeClass =
                         !empty($cashFlowPeriod)
                     ): ?>
 
-                        <!--
-                Conserver le filtre du graphique lorsque
-                les filtres de caisse sont appliqués.
-            -->
-                        <input type="hidden" name="cashflow_period" value="<?= html_escape(
+                    <!--
+                        Conserver le filtre du graphique lorsque
+                        les filtres de caisse sont appliqués.
+                    -->
+                    <input type="hidden" name="cashflow_period" value="<?= html_escape(
                                                                                 $cashFlowPeriod
                                                                             ) ?>">
 
@@ -2436,8 +2732,8 @@ $disbursementBadgeClass =
                     <div class="row align-items-end">
 
                         <!-- =========================================
-                 RECHERCHE
-            ========================================== -->
+                            RECHERCHE
+                        ========================================== -->
                         <div class="col-xl-3 col-lg-3 col-md-6">
 
                             <div class="form-group mb-lg-0">
@@ -2458,10 +2754,10 @@ $disbursementBadgeClass =
                                     <div class="input-group-append">
 
                                         <button type="submit" class="input-group-text" title="Rechercher" style="
-                                    border-radius:
-                                    0 8px 8px 0;
-                                    cursor: pointer;
-                                ">
+                                            border-radius:
+                                            0 8px 8px 0;
+                                            cursor: pointer;
+                                        ">
 
                                             <i class="fas fa-search"></i>
 
@@ -2476,8 +2772,8 @@ $disbursementBadgeClass =
                         </div>
 
                         <!-- =========================================
-                 TYPE DE CAISSE
-            ========================================== -->
+                            TYPE DE CAISSE
+                        ========================================== -->
                         <div class="col-xl-2 col-lg-2 col-md-6">
 
                             <div class="form-group mb-lg-0">
@@ -2515,8 +2811,8 @@ $disbursementBadgeClass =
                         </div>
 
                         <!-- =========================================
-                 CHANTIER
-            ========================================== -->
+                            CHANTIER
+                        ========================================== -->
                         <div class="col-xl-2 col-lg-2 col-md-6">
 
                             <div class="form-group mb-lg-0">
@@ -2535,35 +2831,35 @@ $disbursementBadgeClass =
 
                                     <?php if (!empty($allChantiers)): ?>
 
-                                        <?php foreach (
+                                    <?php foreach (
                                             $allChantiers as $chantier
                                         ): ?>
 
-                                            <option value="<?= (int) $chantier->id ?>" <?= $filterChantierId
+                                    <option value="<?= (int) $chantier->id ?>" <?= $filterChantierId
                                                                                             === (int) $chantier->id
                                                                                             ? 'selected'
                                                                                             : ''
                                                                                         ?>>
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $chantier->name
                                                 ) ?>
 
-                                                <?php if (
+                                        <?php if (
                                                     !empty($chantier->ref_chantier)
                                                 ): ?>
 
-                                                    —
-                                                    <?= html_escape(
+                                        —
+                                        <?= html_escape(
                                                         $chantier
                                                             ->ref_chantier
                                                     ) ?>
 
-                                                <?php endif; ?>
+                                        <?php endif; ?>
 
-                                            </option>
+                                    </option>
 
-                                        <?php endforeach; ?>
+                                    <?php endforeach; ?>
 
                                     <?php endif; ?>
 
@@ -2574,8 +2870,8 @@ $disbursementBadgeClass =
                         </div>
 
                         <!-- =========================================
-                 SITUATION
-            ========================================== -->
+                            SITUATION
+                        ========================================== -->
                         <div class="col-xl-2 col-lg-2 col-md-6">
 
                             <div class="form-group mb-lg-0">
@@ -2620,17 +2916,17 @@ $disbursementBadgeClass =
                         </div>
 
                         <!-- =========================================
-                 ACTIONS
-            ========================================== -->
+                            ACTIONS
+                        ========================================== -->
                         <div class="col-xl-3 col-lg-3 col-md-12">
 
                             <div class="cashbox-filter-actions">
 
                                 <button type="submit" class="
-                            btn
-                            btn-caisse-primary
-                            mr-1
-                        ">
+                                    btn
+                                    btn-caisse-primary
+                                    mr-1
+                                ">
 
                                     <i class="fas fa-filter mr-1"></i>
 
@@ -2659,8 +2955,8 @@ $disbursementBadgeClass =
                     </div>
 
                     <!-- =============================================
-             RÉSUMÉ DES FILTRES ACTIFS
-        ============================================== -->
+                        RÉSUMÉ DES FILTRES ACTIFS
+                    ============================================== -->
                     <?php
 
                     $hasActiveCashboxFilter =
@@ -2673,54 +2969,54 @@ $disbursementBadgeClass =
 
                     <?php if ($hasActiveCashboxFilter): ?>
 
-                        <div class="cashbox-active-filters">
+                    <div class="cashbox-active-filters">
 
-                            <span class="cashbox-active-filters-label">
+                        <span class="cashbox-active-filters-label">
 
-                                <i class="fas fa-filter mr-1"></i>
+                            <i class="fas fa-filter mr-1"></i>
 
-                                Filtres actifs :
+                            Filtres actifs :
 
-                            </span>
+                        </span>
 
-                            <?php if ($filterSearch !== ''): ?>
+                        <?php if ($filterSearch !== ''): ?>
 
-                                <span class="cashbox-filter-tag">
+                        <span class="cashbox-filter-tag">
 
-                                    Recherche :
+                            Recherche :
 
-                                    <strong>
-                                        <?= html_escape(
+                            <strong>
+                                <?= html_escape(
                                             $filterSearch
                                         ) ?>
-                                    </strong>
+                            </strong>
 
-                                </span>
+                        </span>
 
-                            <?php endif; ?>
+                        <?php endif; ?>
 
-                            <?php if ($filterType !== ''): ?>
+                        <?php if ($filterType !== ''): ?>
 
-                                <span class="cashbox-filter-tag">
+                        <span class="cashbox-filter-tag">
 
-                                    Type :
+                            Type :
 
-                                    <strong>
+                            <strong>
 
-                                        <?= $filterType === 'siege'
+                                <?= $filterType === 'siege'
                                             ? 'Caisse siège'
                                             : 'Caisse chantier'
                                         ?>
 
-                                    </strong>
+                            </strong>
 
-                                </span>
+                        </span>
 
-                            <?php endif; ?>
+                        <?php endif; ?>
 
-                            <?php if ($filterChantierId > 0): ?>
+                        <?php if ($filterChantierId > 0): ?>
 
-                                <?php
+                        <?php
 
                                 $selectedChantierName =
                                     'Chantier sélectionné';
@@ -2741,31 +3037,31 @@ $disbursementBadgeClass =
 
                                 ?>
 
-                                <span class="cashbox-filter-tag">
+                        <span class="cashbox-filter-tag">
 
-                                    Chantier :
+                            Chantier :
 
-                                    <strong>
+                            <strong>
 
-                                        <?= html_escape(
+                                <?= html_escape(
                                             $selectedChantierName
                                         ) ?>
 
-                                    </strong>
+                            </strong>
 
-                                </span>
+                        </span>
 
-                            <?php endif; ?>
+                        <?php endif; ?>
 
-                            <?php if ($filterSituation !== ''): ?>
+                        <?php if ($filterSituation !== ''): ?>
 
-                                <span class="cashbox-filter-tag">
+                        <span class="cashbox-filter-tag">
 
-                                    Situation :
+                            Situation :
 
-                                    <strong>
+                            <strong>
 
-                                        <?php
+                                <?php
 
                                         $situationLabels = [
                                             'normal' =>
@@ -2784,24 +3080,24 @@ $disbursementBadgeClass =
 
                                         ?>
 
-                                    </strong>
+                            </strong>
 
-                                </span>
+                        </span>
 
-                            <?php endif; ?>
+                        <?php endif; ?>
 
-                            <span class="cashbox-filter-results">
+                        <span class="cashbox-filter-results">
 
-                                <?= (int) $filteredCashboxesCount ?>
+                            <?= (int) $filteredCashboxesCount ?>
 
-                                résultat<?= $filteredCashboxesCount > 1
+                            résultat<?= $filteredCashboxesCount > 1
                                             ? 's'
                                             : ''
                                         ?>
 
-                            </span>
+                        </span>
 
-                        </div>
+                    </div>
 
                     <?php endif; ?>
 
@@ -2810,8 +3106,8 @@ $disbursementBadgeClass =
             </div>
 
             <!-- =================================================
-     SITUATION DES CAISSES
-================================================== -->
+                SITUATION DES CAISSES
+            ================================================== -->
             <div class="caisse-card">
 
                 <div class="caisse-card-header">
@@ -2851,27 +3147,27 @@ $disbursementBadgeClass =
 
                         <?php if ($hasCashboxFilters): ?>
 
-                            <?= (int) $filteredCashboxesCount ?>
+                        <?= (int) $filteredCashboxesCount ?>
 
-                            résultat<?= $filteredCashboxesCount > 1
+                        résultat<?= $filteredCashboxesCount > 1
                                         ? 's'
                                         : ''
                                     ?>
 
-                            sur
+                        sur
 
-                            <?= (int) $activeCashboxesCount ?>
+                        <?= (int) $activeCashboxesCount ?>
 
                         <?php else: ?>
 
-                            <?= (int) $activeCashboxesCount ?>
+                        <?= (int) $activeCashboxesCount ?>
 
-                            caisse<?= $activeCashboxesCount > 1
+                        caisse<?= $activeCashboxesCount > 1
                                         ? 's'
                                         : ''
                                     ?>
 
-                            active<?= $activeCashboxesCount > 1
+                        active<?= $activeCashboxesCount > 1
                                         ? 's'
                                         : ''
                                     ?>
@@ -2886,17 +3182,17 @@ $disbursementBadgeClass =
 
                     <?php if (!empty($cashboxSituations)): ?>
 
-                        <div class="row">
+                    <div class="row">
 
-                            <?php foreach ($cashboxSituations as $cashbox): ?>
+                        <?php foreach ($cashboxSituations as $cashbox): ?>
 
-                                <?php
+                        <?php
 
                                 /*
-                     * =================================================
-                     * DÉTERMINATION DU STATUT DU SOLDE
-                     * =================================================
-                     */
+                                * =================================================
+                                * DÉTERMINATION DU STATUT DU SOLDE
+                                * =================================================
+                                */
 
                                 $currentBalance = (float) $cashbox->current_balance;
                                 $openingBalance = (float) $cashbox->opening_balance;
@@ -2908,16 +3204,16 @@ $disbursementBadgeClass =
                                 $iconClass = 'fas fa-hard-hat';
 
                                 /*
-                     * Icône différente pour la caisse siège.
-                     */
+                                * Icône différente pour la caisse siège.
+                                */
                                 if ($cashbox->type === 'siege') {
                                     $iconClass = 'fas fa-building';
                                 }
 
                                 /*
-                     * Solde critique :
-                     * solde inférieur ou égal au seuil d’alerte.
-                     */
+                                * Solde critique :
+                                * solde inférieur ou égal au seuil d’alerte.
+                                */
                                 if (
                                     $alertThreshold > 0
                                     && $currentBalance <= $alertThreshold
@@ -2928,9 +3224,9 @@ $disbursementBadgeClass =
                                 }
 
                                 /*
-                     * Solde faible :
-                     * supérieur au seuil mais inférieur au double.
-                     */ elseif (
+                                * Solde faible :
+                                * supérieur au seuil mais inférieur au double.
+                                */ elseif (
                                     $alertThreshold > 0
                                     && $currentBalance <= ($alertThreshold * 2)
                                 ) {
@@ -2940,16 +3236,16 @@ $disbursementBadgeClass =
                                 }
 
                                 /*
-                     * =================================================
-                     * CALCUL DU POURCENTAGE DE LA BARRE
-                     * =================================================
-                     *
-                     * On utilise comme référence :
-                     * - le solde initial s’il est supérieur à zéro ;
-                     * - sinon 5 fois le seuil d’alerte ;
-                     * - sinon le solde courant ;
-                     * - sinon 1 pour éviter une division par zéro.
-                     */
+                                * =================================================
+                                * CALCUL DU POURCENTAGE DE LA BARRE
+                                * =================================================
+                                *
+                                * On utilise comme référence :
+                                * - le solde initial s’il est supérieur à zéro ;
+                                * - sinon 5 fois le seuil d’alerte ;
+                                * - sinon le solde courant ;
+                                * - sinon 1 pour éviter une division par zéro.
+                                */
 
                                 $referenceBalance = $openingBalance;
 
@@ -2970,8 +3266,8 @@ $disbursementBadgeClass =
                                 ) * 100;
 
                                 /*
-                     * Limiter la barre entre 0 % et 100 %.
-                     */
+                                * Limiter la barre entre 0 % et 100 %.
+                                */
                                 $progressPercentage = max(
                                     0,
                                     min(
@@ -2981,8 +3277,8 @@ $disbursementBadgeClass =
                                 );
 
                                 /*
-                     * Pour qu’un faible montant reste visible.
-                     */
+                                * Pour qu’un faible montant reste visible.
+                                */
                                 if (
                                     $currentBalance > 0
                                     && $progressPercentage < 4
@@ -2991,8 +3287,8 @@ $disbursementBadgeClass =
                                 }
 
                                 /*
-                     * Nom à afficher.
-                     */
+                                * Nom à afficher.
+                                */
                                 $displayName = $cashbox->name;
 
                                 if (
@@ -3004,88 +3300,92 @@ $disbursementBadgeClass =
 
                                 ?>
 
-                                <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="col-xl-3 col-lg-4 col-md-6">
 
-                                    <div class="cash-box">
+                            <a href="<?= base_url(
+                                                    'finance-cashbox/'
+                                                        . (int) $cashbox->id
+                                                ) ?>" class="cash-box-link">
+                                <div class="cash-box">
 
-                                        <!-- En-tête de la carte -->
-                                        <div class="cash-box-top">
+                                    <!-- En-tête de la carte -->
+                                    <div class="cash-box-top">
 
-                                            <div class="cash-box-name">
+                                        <div class="cash-box-name">
 
-                                                <div class="cash-box-icon">
+                                            <div class="cash-box-icon">
 
-                                                    <i class="<?= $iconClass ?>"></i>
+                                                <i class="<?= $iconClass ?>"></i>
 
-                                                </div>
+                                            </div>
 
-                                                <div>
+                                            <div>
 
-                                                    <h6 title="<?= html_escape($cashbox->name) ?>">
+                                                <h6 title="<?= html_escape($cashbox->name) ?>">
 
-                                                        <?= html_escape($displayName) ?>
+                                                    <?= html_escape($displayName) ?>
 
-                                                    </h6>
+                                                </h6>
 
-                                                    <div class="cash-box-code">
+                                                <div class="cash-box-code">
 
-                                                        <?= html_escape($cashbox->code) ?>
+                                                    <?= html_escape($cashbox->code) ?>
 
-                                                        <?php if (
-                                                            !empty($cashbox->ref_chantier)
-                                                            && $cashbox->type === 'chantier'
-                                                        ): ?>
+                                                    <?php if (
+                                                                !empty($cashbox->ref_chantier)
+                                                                && $cashbox->type === 'chantier'
+                                                            ): ?>
 
-                                                            <span class="ml-1">
+                                                    <span class="ml-1">
 
-                                                                · <?= html_escape(
-                                                                        $cashbox->ref_chantier
-                                                                    ) ?>
+                                                        · <?= html_escape(
+                                                                            $cashbox->ref_chantier
+                                                                        ) ?>
 
-                                                            </span>
+                                                    </span>
 
-                                                        <?php endif; ?>
-
-                                                    </div>
+                                                    <?php endif; ?>
 
                                                 </div>
 
                                             </div>
 
-                                            <span class="cash-status <?= $statusClass ?>">
-
-                                                <?= $statusLabel ?>
-
-                                            </span>
-
                                         </div>
 
-                                        <!-- Solde -->
-                                        <div class="cash-box-balance">
+                                        <span class="cash-status <?= $statusClass ?>">
 
-                                            <span>
-                                                Solde disponible
-                                            </span>
+                                            <?= $statusLabel ?>
 
-                                            <strong>
+                                        </span>
 
-                                                <?= number_format(
-                                                    $currentBalance,
-                                                    0,
-                                                    ',',
-                                                    ' '
-                                                ) ?>
+                                    </div>
 
-                                                <?= html_escape($cashbox->devise) ?>
+                                    <!-- Solde -->
+                                    <div class="cash-box-balance">
 
-                                            </strong>
+                                        <span>
+                                            Solde disponible
+                                        </span>
 
-                                        </div>
+                                        <strong>
 
-                                        <!-- Barre de niveau -->
-                                        <div class="cash-progress">
+                                            <?= number_format(
+                                                        $currentBalance,
+                                                        0,
+                                                        ',',
+                                                        ' '
+                                                    ) ?>
 
-                                            <div class="cash-progress-bar" style="
+                                            <?= html_escape($cashbox->devise) ?>
+
+                                        </strong>
+
+                                    </div>
+
+                                    <!-- Barre de niveau -->
+                                    <div class="cash-progress">
+
+                                        <div class="cash-progress-bar" style="
                                         width:
                                         <?= number_format(
                                             $progressPercentage,
@@ -3100,109 +3400,112 @@ $disbursementBadgeClass =
                                             . ';'
                                             : ''
                                         ?>
-                                    "></div>
+                                        ">
+                                        </div>
+
+                                    </div>
+
+                                    <!-- Statistiques mensuelles -->
+                                    <div class="cash-box-footer">
+
+                                        <div class="cash-box-footer-item">
+
+                                            <span>
+                                                Entrées mois
+                                            </span>
+
+                                            <strong>
+
+                                                <?= formatCompactAmount(
+                                                            $cashbox->monthly_entries
+                                                        ) ?>
+
+                                            </strong>
 
                                         </div>
 
-                                        <!-- Statistiques mensuelles -->
-                                        <div class="cash-box-footer">
+                                        <div class="cash-box-footer-item">
 
-                                            <div class="cash-box-footer-item">
+                                            <span>
+                                                Sorties mois
+                                            </span>
 
-                                                <span>
-                                                    Entrées mois
-                                                </span>
+                                            <strong>
 
-                                                <strong>
+                                                <?= formatCompactAmount(
+                                                            $cashbox->monthly_outputs
+                                                        ) ?>
 
-                                                    <?= formatCompactAmount(
-                                                        $cashbox->monthly_entries
-                                                    ) ?>
+                                            </strong>
 
-                                                </strong>
+                                        </div>
 
-                                            </div>
+                                        <div class="cash-box-footer-item">
 
-                                            <div class="cash-box-footer-item">
+                                            <span>
+                                                Opérations
+                                            </span>
 
-                                                <span>
-                                                    Sorties mois
-                                                </span>
+                                            <strong>
 
-                                                <strong>
+                                                <?= (int) $cashbox
+                                                            ->monthly_operations ?>
 
-                                                    <?= formatCompactAmount(
-                                                        $cashbox->monthly_outputs
-                                                    ) ?>
-
-                                                </strong>
-
-                                            </div>
-
-                                            <div class="cash-box-footer-item">
-
-                                                <span>
-                                                    Opérations
-                                                </span>
-
-                                                <strong>
-
-                                                    <?= (int) $cashbox
-                                                        ->monthly_operations ?>
-
-                                                </strong>
-
-                                            </div>
+                                            </strong>
 
                                         </div>
 
                                     </div>
 
                                 </div>
+                            </a>
 
-                            <?php endforeach; ?>
 
                         </div>
 
+                        <?php endforeach; ?>
+
+                    </div>
+
                     <?php else: ?>
 
-                        <div class="text-center py-5">
+                    <div class="text-center py-5">
 
-                            <div class="mb-3" style="
+                        <div class="mb-3" style="
                         font-size: 45px;
                         color: #cbd5e1;
                     ">
 
-                                <i class="fas fa-wallet"></i>
+                            <i class="fas fa-wallet"></i>
 
-                            </div>
+                        </div>
 
-                            <h5 style="
+                        <h5 style="
                         color: #334155;
                         font-weight: 800;
                     ">
 
-                                Aucune caisse disponible
+                            Aucune caisse disponible
 
-                            </h5>
+                        </h5>
 
-                            <p class="text-muted">
+                        <p class="text-muted">
 
-                                Créez une caisse siège ou une caisse chantier
-                                pour commencer à enregistrer les opérations.
+                            Créez une caisse siège ou une caisse chantier
+                            pour commencer à enregistrer les opérations.
 
-                            </p>
+                        </p>
 
-                            <button type="button" class="btn btn-caisse-primary" data-toggle="modal"
-                                data-target="#addCaisseModal">
+                        <button type="button" class="btn btn-caisse-primary" data-toggle="modal"
+                            data-target="#addCaisseModal">
 
-                                <i class="fas fa-plus mr-1"></i>
+                            <i class="fas fa-plus mr-1"></i>
 
-                                Créer une caisse
+                            Créer une caisse
 
-                            </button>
+                        </button>
 
-                        </div>
+                    </div>
 
                     <?php endif; ?>
 
@@ -3211,8 +3514,8 @@ $disbursementBadgeClass =
             </div>
 
             <!-- =================================================
-     TABLEAU DES MOUVEMENTS RÉCENTS
-================================================== -->
+                TABLEAU DES MOUVEMENTS RÉCENTS
+            ================================================== -->
             <div class="caisse-card">
 
                 <div class="caisse-card-header">
@@ -3296,17 +3599,17 @@ $disbursementBadgeClass =
                                 !empty($recentCashboxMovements)
                             ): ?>
 
-                                <?php foreach (
+                            <?php foreach (
                                     $recentCashboxMovements as $index => $movement
                                 ): ?>
 
-                                    <?php
+                            <?php
 
                                     /*
-                         * =============================================
-                         * TYPE D’OPÉRATION
-                         * =============================================
-                         */
+                                    * =============================================
+                                    * TYPE D’OPÉRATION
+                                    * =============================================
+                                    */
 
                                     $typeLabel = 'Opération';
                                     $typeClass = 'badge-transfert';
@@ -3425,129 +3728,129 @@ $disbursementBadgeClass =
 
                                     ?>
 
-                                    <tr>
+                            <tr>
 
-                                        <!-- Numéro -->
-                                        <td>
+                                <!-- Numéro -->
+                                <td>
 
-                                            <?= $index + 1 ?>
+                                    <?= $index + 1 ?>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Date -->
-                                        <td>
+                                <!-- Date -->
+                                <td>
 
-                                            <?= formatCashboxDate(
+                                    <?= formatCashboxDate(
                                                 $movement->operation_date
                                             ) ?>
 
-                                            <small class="d-block text-muted">
+                                    <small class="d-block text-muted">
 
-                                                <?= formatCashboxTime(
+                                        <?= formatCashboxTime(
                                                     $movement->created_at
                                                 ) ?>
 
-                                            </small>
+                                    </small>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Référence -->
-                                        <td>
+                                <!-- Référence -->
+                                <td>
 
-                                            <span class="operation-reference">
+                                    <span class="operation-reference">
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $movement->reference
                                                 ) ?>
 
-                                            </span>
+                                    </span>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Caisse -->
-                                        <td>
+                                <!-- Caisse -->
+                                <td>
 
-                                            <strong>
+                                    <strong>
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $movement->cashbox_name
                                                 ) ?>
 
-                                            </strong>
+                                    </strong>
 
-                                            <small class="d-block text-muted">
+                                    <small class="d-block text-muted">
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $movement->cashbox_code
                                                 ) ?>
 
-                                            </small>
+                                    </small>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Type -->
-                                        <td>
+                                <!-- Type -->
+                                <td>
 
-                                            <span class="
+                                    <span class="
                                         badge-operation
                                         <?= $typeClass ?>
                                     ">
 
-                                                <i class="
+                                        <i class="
                                             <?= $typeIcon ?>
                                             mr-1
                                         "></i>
 
-                                                <?= $typeLabel ?>
+                                        <?= $typeLabel ?>
 
-                                            </span>
+                                    </span>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Libellé -->
-                                        <td class="operation-label">
+                                <!-- Libellé -->
+                                <td class="operation-label">
 
-                                            <strong title="<?= html_escape(
+                                    <strong title="<?= html_escape(
                                                                 $movement->label
                                                             ) ?>">
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $movement->label
                                                 ) ?>
 
-                                            </strong>
+                                    </strong>
 
-                                            <?php if (
+                                    <?php if (
                                                 $secondaryLabel !== ''
                                             ): ?>
 
-                                                <small>
+                                    <small>
 
-                                                    <?= html_escape(
+                                        <?= html_escape(
                                                         $secondaryLabel
                                                     ) ?>
 
-                                                </small>
+                                    </small>
 
-                                            <?php elseif (
+                                    <?php elseif (
                                                 !empty($movement->category)
                                             ): ?>
 
-                                                <small>
+                                    <small>
 
-                                                    Catégorie :
-                                                    <?= html_escape(
+                                        Catégorie :
+                                        <?= html_escape(
                                                         $movement->category
                                                     ) ?>
 
-                                                </small>
+                                    </small>
 
-                                            <?php endif; ?>
+                                    <?php endif; ?>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Entrée -->
-                                        <td class="
+                                <!-- Entrée -->
+                                <td class="
                                     text-right
                                     <?= $entryAmount !== null
                                         ? 'amount-in'
@@ -3555,24 +3858,24 @@ $disbursementBadgeClass =
                                     ?>
                                 ">
 
-                                            <?php if (
+                                    <?php if (
                                                 $entryAmount !== null
                                             ): ?>
 
-                                                + <?= formatCashboxAmount(
+                                    + <?= formatCashboxAmount(
                                                         $entryAmount
                                                     ) ?>
 
-                                            <?php else: ?>
+                                    <?php else: ?>
 
-                                                —
+                                    —
 
-                                            <?php endif; ?>
+                                    <?php endif; ?>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Sortie -->
-                                        <td class="
+                                <!-- Sortie -->
+                                <td class="
                                     text-right
                                     <?= $outputAmount !== null
                                         ? 'amount-out'
@@ -3580,94 +3883,94 @@ $disbursementBadgeClass =
                                     ?>
                                 ">
 
-                                            <?php if (
+                                    <?php if (
                                                 $outputAmount !== null
                                             ): ?>
 
-                                                - <?= formatCashboxAmount(
+                                    - <?= formatCashboxAmount(
                                                         $outputAmount
                                                     ) ?>
 
-                                            <?php else: ?>
+                                    <?php else: ?>
 
-                                                —
+                                    —
 
-                                            <?php endif; ?>
+                                    <?php endif; ?>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Solde après -->
-                                        <td class="text-right">
+                                <!-- Solde après -->
+                                <td class="text-right">
 
-                                            <strong>
+                                    <strong>
 
-                                                <?= formatCashboxAmount(
+                                        <?= formatCashboxAmount(
                                                     $movement->balance_after
                                                 ) ?>
 
-                                            </strong>
+                                    </strong>
 
-                                            <small class="d-block text-muted">
+                                    <small class="d-block text-muted">
 
-                                                <?= html_escape(
+                                        <?= html_escape(
                                                     $movement->currency
                                                 ) ?>
 
-                                            </small>
+                                    </small>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Statut -->
-                                        <td>
+                                <!-- Statut -->
+                                <td>
 
-                                            <span class="
+                                    <span class="
                                         badge
                                         <?= $statusClass ?>
                                     ">
 
-                                                <?= $statusLabel ?>
+                                        <?= $statusLabel ?>
 
-                                            </span>
+                                    </span>
 
-                                        </td>
+                                </td>
 
-                                        <!-- Actions -->
-                                        <td class="text-center">
+                                <!-- Actions -->
+                                <td class="text-center">
 
-                                            <button type="button" class="
+                                    <button type="button" class="
                                         btn-table-action
                                         btn-table-view
                                     " title="Voir les détails" onclick="viewCashboxMovement(
                                         <?= (int) $movement->id ?>
                                     )">
 
-                                                <i class="fas fa-eye"></i>
+                                        <i class="fas fa-eye"></i>
 
-                                            </button>
+                                    </button>
 
-                                            <?php if (
+                                    <?php if (
                                                 $movement->status
                                                 === 'pending'
                                             ): ?>
 
-                                                <button type="button" class="
+                                    <button type="button" class="
                                             btn-table-action
                                             btn-table-edit
                                         " title="Modifier" onclick="editCashboxMovement(
                                             <?= (int) $movement->id ?>
                                         )">
 
-                                                    <i class="fas fa-edit"></i>
+                                        <i class="fas fa-edit"></i>
 
-                                                </button>
+                                    </button>
 
-                                            <?php endif; ?>
+                                    <?php endif; ?>
 
-                                            <?php if (
+                                    <?php if (
                                                 !empty($movement->attachment)
                                             ): ?>
 
-                                                <a href="<?= base_url(
+                                    <a href="<?= base_url(
                                                                 'uploads/finance/'
                                                                     . 'cashbox_operations/'
                                                                     . rawurlencode(
@@ -3678,13 +3981,13 @@ $disbursementBadgeClass =
                                             btn-table-print
                                         " title="Voir le justificatif">
 
-                                                    <i class="fas fa-paperclip"></i>
+                                        <i class="fas fa-paperclip"></i>
 
-                                                </a>
+                                    </a>
 
-                                            <?php endif; ?>
+                                    <?php endif; ?>
 
-                                            <a href="<?= base_url(
+                                    <a href="<?= base_url(
                                                             'finance/cashbox-operation-print/'
                                                                 . (int) $movement->id
                                                         ) ?>" target="_blank" class="
@@ -3692,67 +3995,67 @@ $disbursementBadgeClass =
                                         btn-table-print
                                     " title="Imprimer">
 
-                                                <i class="fas fa-print"></i>
+                                        <i class="fas fa-print"></i>
 
-                                            </a>
+                                    </a>
 
-                                        </td>
+                                </td>
 
-                                    </tr>
+                            </tr>
 
-                                <?php endforeach; ?>
+                            <?php endforeach; ?>
 
                             <?php else: ?>
 
-                                <tr>
+                            <tr>
 
-                                    <td colspan="11" class="text-center py-5">
+                                <td colspan="11" class="text-center py-5">
 
-                                        <div class="mb-3" style="
+                                    <div class="mb-3" style="
                                     color: #cbd5e1;
                                     font-size: 42px;
                                 ">
 
-                                            <i class="fas fa-exchange-alt"></i>
+                                        <i class="fas fa-exchange-alt"></i>
 
-                                        </div>
+                                    </div>
 
-                                        <h6 style="
+                                    <h6 style="
                                     color: #334155;
                                     font-weight: 800;
                                 ">
 
-                                            Aucun mouvement enregistré
+                                        Aucun mouvement enregistré
 
-                                        </h6>
+                                    </h6>
 
-                                        <p class="
+                                    <p class="
                                     text-muted
                                     mb-3
                                 ">
 
-                                            Les encaissements,
-                                            décaissements et transferts
-                                            apparaîtront ici.
+                                        Les encaissements,
+                                        décaissements et transferts
+                                        apparaîtront ici.
 
-                                        </p>
+                                    </p>
 
-                                        <button type="button" class="btn btn-caisse-primary" data-toggle="modal"
-                                            data-target="#addOperationModal" onclick="
+                                    <button type="button" class="btn btn-caisse-primary" data-toggle="modal"
+                                        data-target="#addOperationModal" onclick="
                                     prepareOperation(
                                         'encaissement'
                                     )
                                 ">
 
-                                            <i class="fas fa-plus mr-1"></i>
+                                        <i class="fas fa-plus mr-1"></i>
 
-                                            Enregistrer une opération
+                                        Enregistrer une opération
 
-                                        </button>
+                                    </button>
 
-                                    </td>
+                                </td>
 
-                                </tr>
+                            </tr>
 
                             <?php endif; ?>
 
@@ -3852,13 +4155,13 @@ $disbursementBadgeClass =
 
                             <?php if (!empty($monthlyMainExpenses)): ?>
 
-                                <span class="badge badge-light">
+                            <span class="badge badge-light">
 
-                                    <?= count($monthlyMainExpenses) ?>
+                                <?= count($monthlyMainExpenses) ?>
 
-                                    catégorie<?= count($monthlyMainExpenses) > 1 ? 's' : '' ?>
+                                catégorie<?= count($monthlyMainExpenses) > 1 ? 's' : '' ?>
 
-                                </span>
+                            </span>
 
                             <?php endif; ?>
 
@@ -3868,9 +4171,9 @@ $disbursementBadgeClass =
 
                             <?php if (!empty($monthlyMainExpenses)): ?>
 
-                                <?php foreach ($monthlyMainExpenses as $expense): ?>
+                            <?php foreach ($monthlyMainExpenses as $expense): ?>
 
-                                    <?php
+                            <?php
                                     /*
                          * =============================================
                          * INFORMATIONS DE LA CATÉGORIE
@@ -4046,63 +4349,63 @@ $disbursementBadgeClass =
                                     );
                                     ?>
 
-                                    <div class="expense-item">
+                            <div class="expense-item">
 
-                                        <div class="expense-item-header">
+                                <div class="expense-item-header">
 
-                                            <span class="expense-item-title">
+                                    <span class="expense-item-title">
 
-                                                <i class="<?= html_escape($categoryIcon) ?>"></i>
+                                        <i class="<?= html_escape($categoryIcon) ?>"></i>
 
-                                                <?= html_escape($categoryName) ?>
+                                        <?= html_escape($categoryName) ?>
 
-                                                <small class="text-muted ml-1" title="Nombre d’opérations">
-                                                    (<?= $expenseOperations ?>)
-                                                </small>
+                                        <small class="text-muted ml-1" title="Nombre d’opérations">
+                                            (<?= $expenseOperations ?>)
+                                        </small>
 
-                                            </span>
+                                    </span>
 
-                                            <span class="expense-item-value">
+                                    <span class="expense-item-value">
 
-                                                <?= formatCashboxAmount($expenseTotal) ?>
+                                        <?= formatCashboxAmount($expenseTotal) ?>
 
-                                                BIF
+                                        BIF
 
-                                            </span>
+                                    </span>
 
-                                        </div>
+                                </div>
 
-                                        <div class="expense-progress">
+                                <div class="expense-progress">
 
-                                            <span style="width: <?= $expensePercentageFormatted ?>%;"></span>
+                                    <span style="width: <?= $expensePercentageFormatted ?>%;"></span>
 
-                                        </div>
+                                </div>
 
-                                    </div>
+                            </div>
 
-                                <?php endforeach; ?>
+                            <?php endforeach; ?>
 
                             <?php else: ?>
 
-                                <div class="text-center py-4">
+                            <div class="text-center py-4">
 
-                                    <div class="mb-3" style="color: #cbd5e1; font-size: 40px;">
-                                        <i class="fas fa-chart-bar"></i>
-                                    </div>
+                                <div class="mb-3" style="color: #cbd5e1; font-size: 40px;">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
 
-                                    <h6 style="
+                                <h6 style="
                                 color: #334155;
                                 font-weight: 800;
                             ">
-                                        Aucune dépense ce mois
-                                    </h6>
+                                    Aucune dépense ce mois
+                                </h6>
 
-                                    <p class="text-muted mb-0">
-                                        Les décaissements validés apparaîtront
-                                        automatiquement dans cette section.
-                                    </p>
+                                <p class="text-muted mb-0">
+                                    Les décaissements validés apparaîtront
+                                    automatiquement dans cette section.
+                                </p>
 
-                                </div>
+                            </div>
 
                             <?php endif; ?>
 
@@ -4142,13 +4445,13 @@ $disbursementBadgeClass =
 
                             <?php if (!empty($cashboxSummaryByChantier)): ?>
 
-                                <span class="badge badge-success">
+                            <span class="badge badge-success">
 
-                                    <?= count($cashboxSummaryByChantier) ?>
+                                <?= count($cashboxSummaryByChantier) ?>
 
-                                    chantier<?= count($cashboxSummaryByChantier) > 1 ? 's' : '' ?>
+                                chantier<?= count($cashboxSummaryByChantier) > 1 ? 's' : '' ?>
 
-                                </span>
+                            </span>
 
                             <?php endif; ?>
 
@@ -4188,12 +4491,12 @@ $disbursementBadgeClass =
 
                                     <?php if (!empty($cashboxSummaryByChantier)): ?>
 
-                                        <?php foreach (
+                                    <?php foreach (
                                             $cashboxSummaryByChantier
                                             as $chantierSummary
                                         ): ?>
 
-                                            <?php
+                                    <?php
                                             /*
                                  * =====================================
                                  * VALEURS FINANCIÈRES
@@ -4322,168 +4625,168 @@ $disbursementBadgeClass =
                                             }
                                             ?>
 
-                                            <tr>
+                                    <tr>
 
-                                                <!-- Chantier -->
-                                                <td>
+                                        <!-- Chantier -->
+                                        <td>
 
-                                                    <strong title="<?= html_escape(
+                                            <strong title="<?= html_escape(
                                                                         $chantierSummary->cashbox_name
                                                                     ) ?>">
-                                                        <?= html_escape($chantierName) ?>
-                                                    </strong>
+                                                <?= html_escape($chantierName) ?>
+                                            </strong>
 
-                                                    <small class="d-block text-muted">
+                                            <small class="d-block text-muted">
 
-                                                        <?= html_escape(
+                                                <?= html_escape(
                                                             $chantierReference
                                                         ) ?>
 
-                                                        <?php if (
+                                                <?php if (
                                                             !empty($chantierSummary->location)
                                                         ): ?>
 
-                                                            · <?= html_escape(
+                                                · <?= html_escape(
                                                                     $chantierSummary->location
                                                                 ) ?>
 
-                                                        <?php endif; ?>
+                                                <?php endif; ?>
 
-                                                    </small>
+                                            </small>
 
-                                                </td>
+                                        </td>
 
-                                                <!-- Approvisionné -->
-                                                <td class="text-right">
+                                        <!-- Approvisionné -->
+                                        <td class="text-right">
 
-                                                    <strong>
+                                            <strong>
 
-                                                        <?= formatCashboxAmount(
+                                                <?= formatCashboxAmount(
                                                             $totalFunded
                                                         ) ?>
 
-                                                    </strong>
+                                            </strong>
 
-                                                    <small class="d-block text-muted">
+                                            <small class="d-block text-muted">
 
-                                                        <?= html_escape($devise) ?>
+                                                <?= html_escape($devise) ?>
 
-                                                    </small>
+                                            </small>
 
-                                                </td>
+                                        </td>
 
-                                                <!-- Consommé -->
-                                                <td class="text-right amount-out">
+                                        <!-- Consommé -->
+                                        <td class="text-right amount-out">
 
-                                                    <strong>
+                                            <strong>
 
-                                                        <?= formatCashboxAmount(
+                                                <?= formatCashboxAmount(
                                                             $totalConsumed
                                                         ) ?>
 
-                                                    </strong>
+                                            </strong>
 
-                                                    <small class="d-block text-muted">
+                                            <small class="d-block text-muted">
 
-                                                        <?= html_escape($devise) ?>
+                                                <?= html_escape($devise) ?>
 
-                                                    </small>
+                                            </small>
 
-                                                </td>
+                                        </td>
 
-                                                <!-- Disponible -->
-                                                <td class="
+                                        <!-- Disponible -->
+                                        <td class="
                                             text-right
                                             <?= html_escape(
                                                 $availableAmountClass
                                             ) ?>
                                         ">
 
-                                                    <strong>
+                                            <strong>
 
-                                                        <?= formatCashboxAmount(
+                                                <?= formatCashboxAmount(
                                                             $currentBalance
                                                         ) ?>
 
-                                                    </strong>
+                                            </strong>
 
-                                                    <small class="d-block text-muted">
+                                            <small class="d-block text-muted">
 
-                                                        <?= html_escape($devise) ?>
+                                                <?= html_escape($devise) ?>
 
-                                                    </small>
+                                            </small>
 
-                                                </td>
+                                        </td>
 
-                                                <!-- Consommation -->
-                                                <td style="min-width: 165px;">
+                                        <!-- Consommation -->
+                                        <td style="min-width: 165px;">
 
-                                                    <div class="progress progress-xs mb-1">
+                                            <div class="progress progress-xs mb-1">
 
-                                                        <div class="progress-bar <?= html_escape(
+                                                <div class="progress-bar <?= html_escape(
                                                                                         $progressClass
                                                                                     ) ?>"
-                                                            style="width: <?= $visualPercentageFormatted ?>%;"></div>
+                                                    style="width: <?= $visualPercentageFormatted ?>%;"></div>
 
-                                                    </div>
+                                            </div>
 
-                                                    <small>
+                                            <small>
 
-                                                        <?= number_format(
+                                                <?= number_format(
                                                             $percentage,
                                                             1,
                                                             ',',
                                                             ' '
                                                         ) ?>
 
-                                                        %
+                                                %
 
-                                                        <span class="text-muted ml-1">
+                                                <span class="text-muted ml-1">
 
-                                                            <?= html_escape(
+                                                    <?= html_escape(
                                                                 $consumptionStatus
                                                             ) ?>
 
-                                                        </span>
+                                                </span>
 
-                                                    </small>
+                                            </small>
 
-                                                </td>
+                                        </td>
 
-                                            </tr>
+                                    </tr>
 
-                                        <?php endforeach; ?>
+                                    <?php endforeach; ?>
 
                                     <?php else: ?>
 
-                                        <tr>
+                                    <tr>
 
-                                            <td colspan="5" class="text-center py-5">
+                                        <td colspan="5" class="text-center py-5">
 
-                                                <div class="mb-3" style="
+                                            <div class="mb-3" style="
                                             color: #cbd5e1;
                                             font-size: 40px;
                                         ">
-                                                    <i class="fas fa-project-diagram"></i>
-                                                </div>
+                                                <i class="fas fa-project-diagram"></i>
+                                            </div>
 
-                                                <h6 style="
+                                            <h6 style="
                                             color: #334155;
                                             font-weight: 800;
                                         ">
-                                                    Aucune caisse chantier
-                                                </h6>
+                                                Aucune caisse chantier
+                                            </h6>
 
-                                                <p class="text-muted mb-0">
+                                            <p class="text-muted mb-0">
 
-                                                    Les caisses associées aux
-                                                    chantiers apparaîtront ici.
+                                                Les caisses associées aux
+                                                chantiers apparaîtront ici.
 
-                                                </p>
+                                            </p>
 
-                                            </td>
+                                        </td>
 
-                                        </tr>
+                                    </tr>
 
                                     <?php endif; ?>
 
@@ -4513,8 +4816,8 @@ $disbursementBadgeClass =
                 $this->config->item('csrf_protection')
             ): ?>
 
-                <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>"
-                    value="<?= $this->security->get_csrf_hash() ?>">
+            <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>"
+                value="<?= $this->security->get_csrf_hash() ?>">
 
             <?php endif; ?>
 
@@ -4628,14 +4931,14 @@ $disbursementBadgeClass =
                                         $allChantiers as $chantier
                                     ): ?>
 
-                                        <option value="<?= (int) $chantier->id ?>" <?= set_select(
+                                    <option value="<?= (int) $chantier->id ?>" <?= set_select(
                                                                                         'chantier_id',
                                                                                         $chantier->id
                                                                                     ) ?>>
-                                            <?= html_escape(
+                                        <?= html_escape(
                                                 $chantier->name
                                             ) ?>
-                                        </option>
+                                    </option>
 
                                     <?php endforeach; ?>
 
@@ -4782,58 +5085,79 @@ $disbursementBadgeClass =
 </div>
 
 <!-- =========================================================
-     MODALE : NOUVELLE OPÉRATION
+     MODALE : NOUVELLE OPÉRATION DE CAISSE
 ========================================================== -->
-<div class="modal fade modal-caisse" id="addOperationModal" tabindex="-1" role="dialog">
-
+<div class="modal fade modal-caisse" id="addOperationModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-
         <form action="<?= base_url('finance/cashbox-operation-store') ?>" method="post" enctype="multipart/form-data"
             id="cashboxOperationForm" style="width: 100%;">
-
+            <!-- CSRF -->
             <input type="hidden" name="<?= $this->security->get_csrf_token_name() ?>"
                 value="<?= $this->security->get_csrf_hash() ?>">
 
+            <!-- Type d'opération -->
+            <input type="hidden" name="operation_type" id="operationType">
+
+            <!-- Bon de paiement -->
+            <input type="hidden" name="payment_voucher_id" id="paymentVoucherId">
+
+            <!-- Référence de demande -->
+            <input type="hidden" name="purchase_request_reference" id="purchaseRequestReference">
+
+            <!-- Référence du bon -->
+            <input type="hidden" name="payment_voucher_reference" id="paymentVoucherReference">
+
             <div class="modal-content">
 
+                <!-- =================================================
+                     EN-TÊTE
+                ================================================== -->
                 <div class="modal-header">
 
                     <h5 class="modal-title">
                         <i class="fas fa-exchange-alt mr-2"></i>
+
                         <span id="operationModalTitle">
                             Nouvelle opération de caisse
                         </span>
                     </h5>
 
-                    <button type="button" class="close" data-dismiss="modal">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">
                         <span>&times;</span>
                     </button>
 
                 </div>
 
+                <!-- =================================================
+                     CORPS
+                ================================================== -->
                 <div class="modal-body">
-
-                    <input type="hidden" name="operation_type" id="operationType">
 
                     <div class="row">
 
+                        <!-- Date -->
                         <div class="col-md-4">
+
                             <div class="form-group">
-                                <label>
+
+                                <label for="operationDate">
                                     Date de l’opération
                                     <span class="required-star">*</span>
                                 </label>
 
-                                <input type="date" name="operation_date" class="form-control"
-                                    value="<?= date('Y-m-d'); ?>" required>
+                                <input type="date" name="operation_date" id="operationDate" class="form-control"
+                                    value="<?= date('Y-m-d') ?>" required>
+
                             </div>
+
                         </div>
 
-
-
+                        <!-- Caisse concernée -->
                         <div class="col-md-4">
+
                             <div class="form-group">
-                                <label>
+
+                                <label id="operationCashboxLabel" for="operationCashboxId">
                                     Caisse concernée
                                     <span class="required-star">*</span>
                                 </label>
@@ -4843,43 +5167,168 @@ $disbursementBadgeClass =
                                         Sélectionner la caisse
                                     </option>
 
-                                    <?php foreach ($allCashboxes as $cashbox): ?>
+                                    <?php if (!empty($allCashboxes)): ?>
 
-                                        <option value="<?= (int) $cashbox->id ?>"
-                                            data-devise="<?= html_escape($cashbox->devise) ?>"
-                                            data-balance="<?= (float) $cashbox->current_balance ?>">
-                                            <?= html_escape($cashbox->code) ?>
-                                            —
-                                            <?= html_escape($cashbox->name) ?>
-                                            —
-                                            <?= number_format(
-                                                $cashbox->current_balance,
-                                                0,
-                                                ',',
-                                                ' '
-                                            ) ?>
-                                            <?= html_escape($cashbox->devise) ?>
-                                        </option>
+                                    <?php foreach (
+                                            $allCashboxes
+                                            as $cashbox
+                                        ): ?>
+
+                                    <option value="<?= (int) $cashbox->id ?>" data-currency="<?= html_escape(
+                                                                                                            $cashbox->devise
+                                                                                                        ) ?>"
+                                        data-balance="<?= (float) $cashbox->current_balance ?>"
+                                        data-name="<?= html_escape(
+                                                                                                                        $cashbox->name
+                                                                                                                    ) ?>">
+                                        <?= html_escape($cashbox->code) ?>
+
+                                        —
+
+                                        <?= html_escape($cashbox->name) ?>
+
+                                        —
+
+                                        <?= number_format(
+                                                    $cashbox->current_balance,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                        <?= html_escape($cashbox->devise) ?>
+                                    </option>
 
                                     <?php endforeach; ?>
+
+                                    <?php endif; ?>
                                 </select>
+
                             </div>
 
-                            <div id="selectedCashboxBalance" class="mt-2" style="display: none;">
-                                <small class="text-muted">
-                                    Solde disponible :
+                            <div id="selectedCashboxBalance" class="cashbox-selected-balance" style="display: none;">
+                                <small>
+                                    Solde disponible
                                 </small>
 
-                                <strong id="selectedCashboxBalanceValue" class="text-success">
+                                <strong id="selectedCashboxBalanceValue">
                                     0 BIF
                                 </strong>
                             </div>
+
                         </div>
 
-                        <div class="col-md-4" id="destinationCashboxField" style="display: none;">
-
+                        <!-- Demande d'achat -->
+                        <div class="col-md-4" id="purchaseRequestField" style="display: none;">
                             <div class="form-group">
-                                <label>
+
+                                <label for="purchaseRequestId">
+                                    Demande d’achat
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <select name="purchase_request_id" id="purchaseRequestId" class="form-control" disabled>
+                                    <option value="">
+                                        Sélectionner la demande
+                                    </option>
+
+                                    <?php if (
+                                        !empty($payablePurchaseRequests)
+                                    ): ?>
+
+                                    <?php foreach (
+                                            $payablePurchaseRequests
+                                            as $request
+                                        ): ?>
+
+                                    <?php
+                                            $chantierName =
+                                                !empty($request->chantier_name)
+                                                ? $request->chantier_name
+                                                : (
+                                                    !empty($request->destination_chantier)
+                                                    ? $request->destination_chantier
+                                                    : 'Non affecté'
+                                                );
+
+                                            $expenseSummary =
+                                                !empty($request->payment_summary)
+                                                ? $request->payment_summary
+                                                : (
+                                                    !empty($request->purchase_items_summary)
+                                                    ? $request->purchase_items_summary
+                                                    : 'Décaissement lié à la demande d’achat'
+                                                );
+                                            ?>
+
+                                    <option value="<?= (int) $request->id ?>"
+                                        data-payment-voucher-id="<?= (int) $request->payment_voucher_id ?>"
+                                        data-request-reference="<?= html_escape(
+                                                                            $request->request_reference
+                                                                        ) ?>" data-voucher-reference="<?= html_escape(
+                                                                                                            $request->payment_number
+                                                                                                        ) ?>"
+                                        data-payment-reference="<?= html_escape(
+                                                                            $request->payment_reference
+                                                                        ) ?>"
+                                        data-amount="<?= (float) $request->amount_paid ?>"
+                                        data-summary="<?= html_escape(
+                                                                                                                        $expenseSummary
+                                                                                                                    ) ?>" data-chantier="<?= html_escape(
+                                                                    $chantierName
+                                                                ) ?>" data-payment-mode="<?= html_escape(
+                                                                        $request->payment_mode
+                                                                    ) ?>" data-payment-date="<?= html_escape(
+                                                                        $request->payment_date
+                                                                    ) ?>" data-observation="<?= html_escape(
+                                                                        $request->payment_observation
+                                                                    ) ?>">
+                                        <?= html_escape(
+                                                    $request->request_reference
+                                                ) ?>
+
+                                        —
+
+                                        <?= html_escape(
+                                                    $request->payment_number
+                                                ) ?>
+
+                                        —
+
+                                        <?= html_escape(
+                                                    $chantierName
+                                                ) ?>
+
+                                        —
+
+                                        <?= number_format(
+                                                    $request->amount_paid,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                        BIF
+                                    </option>
+
+                                    <?php endforeach; ?>
+
+                                    <?php endif; ?>
+                                </select>
+
+                                <small class="text-muted">
+                                    Seules les demandes validées avec un bon
+                                    de paiement effectué sont affichées.
+                                </small>
+
+                            </div>
+                        </div>
+
+                        <!-- Caisse destination -->
+                        <div class="col-md-4" id="destinationCashboxField" style="display: none;">
+                            <div class="form-group">
+
+                                <label for="destinationCashboxId">
                                     Caisse destination
                                     <span class="required-star">*</span>
                                 </label>
@@ -4890,120 +5339,252 @@ $disbursementBadgeClass =
                                         Sélectionner la destination
                                     </option>
 
-                                    <?php foreach ($allCashboxes as $cashbox): ?>
+                                    <?php if (!empty($allCashboxes)): ?>
 
-                                        <option value="<?= (int) $cashbox->id ?>"
-                                            data-devise="<?= html_escape($cashbox->devise) ?>">
-                                            <?= html_escape($cashbox->code) ?>
-                                            —
-                                            <?= html_escape($cashbox->name) ?>
-                                        </option>
+                                    <?php foreach (
+                                            $allCashboxes
+                                            as $cashbox
+                                        ): ?>
+
+                                    <option value="<?= (int) $cashbox->id ?>" data-currency="<?= html_escape(
+                                                                                                            $cashbox->devise
+                                                                                                        ) ?>">
+                                        <?= html_escape($cashbox->code) ?>
+
+                                        —
+
+                                        <?= html_escape($cashbox->name) ?>
+
+                                        —
+
+                                        <?= number_format(
+                                                    $cashbox->current_balance,
+                                                    0,
+                                                    ',',
+                                                    ' '
+                                                ) ?>
+
+                                        <?= html_escape($cashbox->devise) ?>
+                                    </option>
 
                                     <?php endforeach; ?>
-                                </select>
-                            </div>
 
+                                    <?php endif; ?>
+                                </select>
+
+                            </div>
                         </div>
 
+                        <!-- Montant -->
                         <div class="col-md-4">
+
                             <div class="form-group">
-                                <label>
+
+                                <label for="operationAmount">
                                     Montant
                                     <span class="required-star">*</span>
                                 </label>
 
                                 <div class="input-group">
 
-                                    <input type="number" name="amount" class="form-control" min="0" step="0.01"
-                                        placeholder="0" required>
+                                    <input type="number" name="amount" id="operationAmount" class="form-control"
+                                        min="0.01" step="0.01" placeholder="0" required>
 
                                     <div class="input-group-append">
-                                        <span class="input-group-text">
+
+                                        <span class="input-group-text" id="operationCurrencyLabel">
                                             BIF
                                         </span>
+
                                     </div>
 
                                 </div>
+
+                                <small class="text-danger" id="amountError" style="display: none;">
+                                    Le montant dépasse le solde disponible.
+                                </small>
+
                             </div>
+
                         </div>
 
+                        <!-- Catégorie -->
                         <div class="col-md-4">
+
                             <div class="form-group">
-                                <label>Catégorie</label>
 
-                                <select name="category" class="form-control">
+                                <label for="operationCategory">
+                                    Catégorie
+                                </label>
 
-                                    <option value="">Sélectionner</option>
-                                    <option>Approvisionnement</option>
-                                    <option>Carburant</option>
-                                    <option>Main-d’œuvre</option>
-                                    <option>Fournitures</option>
-                                    <option>Sous-traitance</option>
-                                    <option>Maintenance engin</option>
-                                    <option>Transport</option>
-                                    <option>Autre</option>
+                                <select name="category" id="operationCategory" class="form-control">
+                                    <option value="">
+                                        Sélectionner
+                                    </option>
 
+                                    <option value="Approvisionnement">
+                                        Approvisionnement
+                                    </option>
+
+                                    <option value="Paiement demande achat">
+                                        Paiement demande d’achat
+                                    </option>
+
+                                    <option value="Carburant">
+                                        Carburant
+                                    </option>
+
+                                    <option value="Main-d’œuvre">
+                                        Main-d’œuvre
+                                    </option>
+
+                                    <option value="Fournitures">
+                                        Fournitures
+                                    </option>
+
+                                    <option value="Sous-traitance">
+                                        Sous-traitance
+                                    </option>
+
+                                    <option value="Maintenance engin">
+                                        Maintenance engin
+                                    </option>
+
+                                    <option value="Transport">
+                                        Transport
+                                    </option>
+
+                                    <option value="Autre">
+                                        Autre
+                                    </option>
                                 </select>
+
                             </div>
+
                         </div>
 
+                        <!-- Bénéficiaire -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Bénéficiaire / Provenance</label>
 
-                                <input type="text" name="third_party" class="form-control"
+                            <div class="form-group">
+
+                                <label for="operationThirdParty">
+                                    Bénéficiaire / Provenance
+                                </label>
+
+                                <input type="text" name="third_party" id="operationThirdParty" class="form-control"
                                     placeholder="Nom du bénéficiaire ou de la source">
+
                             </div>
+
                         </div>
 
+                        <!-- Mode de règlement -->
                         <div class="col-md-4">
+
                             <div class="form-group">
-                                <label>Mode de règlement</label>
 
-                                <select name="payment_method" class="form-control">
+                                <label for="operationPaymentMethod">
+                                    Mode de règlement
+                                </label>
 
-                                    <option value="cash">Espèces</option>
-                                    <option value="bank">Virement bancaire</option>
-                                    <option value="cheque">Chèque</option>
-                                    <option value="mobile">Mobile Money</option>
+                                <select name="payment_method" id="operationPaymentMethod" class="form-control">
+                                    <option value="cash">
+                                        Espèces
+                                    </option>
 
+                                    <option value="bank">
+                                        Virement bancaire
+                                    </option>
+
+                                    <option value="cheque">
+                                        Chèque
+                                    </option>
+
+                                    <option value="mobile">
+                                        Mobile Money
+                                    </option>
                                 </select>
+
                             </div>
+
                         </div>
 
+                        <!-- Numéro de pièce -->
                         <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Numéro de pièce</label>
 
-                                <input type="text" name="document_number" class="form-control"
-                                    placeholder="Facture, reçu, bon...">
+                            <div class="form-group">
+
+                                <label for="operationDocumentNumber">
+                                    Numéro de pièce
+                                </label>
+
+                                <input type="text" name="document_number" id="operationDocumentNumber"
+                                    class="form-control" placeholder="Facture, reçu, bon...">
+
                             </div>
+
                         </div>
 
+                        <!-- Pièce justificative -->
                         <div class="col-md-4">
+
                             <div class="form-group">
-                                <label>Pièce justificative</label>
+
+                                <label for="operationAttachment">
+                                    Pièce justificative
+                                </label>
 
                                 <div class="custom-file">
-                                    <input type="file" name="attachment" class="custom-file-input"
-                                        id="operationAttachment">
+
+                                    <input type="file" name="attachment" id="operationAttachment"
+                                        class="custom-file-input" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx,.xls,.xlsx">
 
                                     <label class="custom-file-label" for="operationAttachment">
                                         Choisir un fichier
                                     </label>
+
                                 </div>
+
+                                <small class="text-muted">
+                                    PDF, image, Word ou Excel — maximum 5 Mo.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Justification -->
+                        <div class="col-md-12" id="expenseJustificationField" style="display: none;">
+                            <div class="form-group">
+
+                                <label for="expenseJustification">
+                                    Justification de la dépense
+                                    <span class="required-star">*</span>
+                                </label>
+
+                                <textarea name="expense_justification" id="expenseJustification" class="form-control"
+                                    rows="3" placeholder="Synthèse de la demande d’achat..." readonly
+                                    disabled></textarea>
+
+                                <small class="text-muted">
+                                    Cette justification provient automatiquement
+                                    du bon de paiement ou de la demande d’achat.
+                                </small>
+
                             </div>
                         </div>
 
-                        <div class="col-md-12 mt-3">
+                        <!-- Observation -->
+                        <div class="col-md-12 mt-2">
 
                             <div class="form-group mb-0">
 
-                                <label>
+                                <label for="operationObservation">
                                     Observation
                                 </label>
 
-                                <textarea name="observation" class="form-control"
+                                <textarea name="observation" id="operationObservation" class="form-control" rows="3"
                                     placeholder="Informations complémentaires sur l’opération..."></textarea>
 
                             </div>
@@ -5014,16 +5595,17 @@ $disbursementBadgeClass =
 
                 </div>
 
+                <!-- =================================================
+                     PIED
+                ================================================== -->
                 <div class="modal-footer">
 
                     <button type="button" class="btn btn-caisse-outline" data-dismiss="modal">
-
                         <i class="fas fa-times mr-1"></i>
                         Annuler
                     </button>
 
-                    <button type="submit" class="btn btn-caisse-primary">
-
+                    <button type="submit" class="btn btn-caisse-primary" id="submitCashboxOperation">
                         <i class="fas fa-check-circle mr-1"></i>
                         Enregistrer l’opération
                     </button>
@@ -5037,464 +5619,1214 @@ $disbursementBadgeClass =
     </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const form =
+        document.getElementById('cashboxOperationForm');
+
+    const operationType =
+        document.getElementById('operationType');
+
+    const modalTitle =
+        document.getElementById('operationModalTitle');
+
+    const cashboxLabel =
+        document.getElementById('operationCashboxLabel');
+
+    const cashboxSelect =
+        document.getElementById('operationCashboxId');
+
+    const destinationField =
+        document.getElementById('destinationCashboxField');
+
+    const destinationSelect =
+        document.getElementById('destinationCashboxId');
+
+    const purchaseRequestField =
+        document.getElementById('purchaseRequestField');
+
+    const purchaseRequestSelect =
+        document.getElementById('purchaseRequestId');
+
+    const justificationField =
+        document.getElementById('expenseJustificationField');
+
+    const justificationInput =
+        document.getElementById('expenseJustification');
+
+    const amountInput =
+        document.getElementById('operationAmount');
+
+    const currencyLabel =
+        document.getElementById('operationCurrencyLabel');
+
+    const categorySelect =
+        document.getElementById('operationCategory');
+
+    const thirdPartyInput =
+        document.getElementById('operationThirdParty');
+
+    const paymentMethodSelect =
+        document.getElementById('operationPaymentMethod');
+
+    const documentNumberInput =
+        document.getElementById('operationDocumentNumber');
+
+    const observationInput =
+        document.getElementById('operationObservation');
+
+    const balanceBox =
+        document.getElementById('selectedCashboxBalance');
+
+    const balanceValue =
+        document.getElementById('selectedCashboxBalanceValue');
+
+    const amountError =
+        document.getElementById('amountError');
+
+    const submitButton =
+        document.getElementById('submitCashboxOperation');
+
+    /*
+     * =====================================================
+     * FORMAT MONTANT
+     * =====================================================
+     */
+    function formatMoney(amount, currency) {
+        return new Intl.NumberFormat(
+            'fr-FR', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            }
+        ).format(amount) + ' ' + currency;
+    }
+
+    /*
+     * =====================================================
+     * CONVERSION DU MODE DE PAIEMENT
+     * =====================================================
+     */
+    function normalizePaymentMode(mode) {
+        const normalized =
+            String(mode || '')
+            .trim()
+            .toLowerCase();
+
+        if (
+            normalized === 'especes' ||
+            normalized === 'espèces' ||
+            normalized === 'cash'
+        ) {
+            return 'cash';
+        }
+
+        if (
+            normalized === 'virement' ||
+            normalized === 'virement bancaire' ||
+            normalized === 'bank'
+        ) {
+            return 'bank';
+        }
+
+        if (
+            normalized === 'cheque' ||
+            normalized === 'chèque'
+        ) {
+            return 'cheque';
+        }
+
+        if (
+            normalized === 'mobile money' ||
+            normalized === 'mobile'
+        ) {
+            return 'mobile';
+        }
+
+        return 'cash';
+    }
+
+    /*
+     * =====================================================
+     * RÉINITIALISER LES CHAMPS DU BON
+     * =====================================================
+     */
+    function resetPurchaseRequestFields() {
+        purchaseRequestSelect.value = '';
+
+        document.getElementById(
+            'paymentVoucherId'
+        ).value = '';
+
+        document.getElementById(
+            'purchaseRequestReference'
+        ).value = '';
+
+        document.getElementById(
+            'paymentVoucherReference'
+        ).value = '';
+
+        justificationInput.value = '';
+
+        amountInput.readOnly = false;
+    }
+
+    /*
+     * =====================================================
+     * PRÉPARER L'OPÉRATION
+     * =====================================================
+     */
+    window.prepareOperation = function(type) {
+
+        operationType.value = type;
+
+        /*
+         * Réinitialisation.
+         */
+        destinationField.style.display = 'none';
+        destinationSelect.disabled = true;
+        destinationSelect.required = false;
+        destinationSelect.value = '';
+
+        purchaseRequestField.style.display = 'none';
+        purchaseRequestSelect.disabled = true;
+        purchaseRequestSelect.required = false;
+
+        justificationField.style.display = 'none';
+        justificationInput.disabled = true;
+        justificationInput.required = false;
+
+        amountInput.value = '';
+        amountInput.readOnly = false;
+
+        categorySelect.value = '';
+        thirdPartyInput.value = '';
+        documentNumberInput.value = '';
+        observationInput.value = '';
+
+        resetPurchaseRequestFields();
+
+        /*
+         * Approvisionnement.
+         */
+        if (type === 'approvisionnement') {
+
+            modalTitle.textContent =
+                'Approvisionner une caisse';
+
+            cashboxLabel.innerHTML =
+                'Caisse source ' +
+                '<span class="required-star">*</span>';
+
+            destinationField.style.display =
+                'block';
+
+            destinationSelect.disabled = false;
+            destinationSelect.required = true;
+
+            categorySelect.value =
+                'Approvisionnement';
+        }
+
+        /*
+         * Encaissement.
+         */
+        if (type === 'encaissement') {
+
+            modalTitle.textContent =
+                'Enregistrer un encaissement';
+
+            cashboxLabel.innerHTML =
+                'Caisse à créditer ' +
+                '<span class="required-star">*</span>';
+        }
+
+        /*
+         * Décaissement.
+         */
+        if (type === 'decaissement') {
+
+            modalTitle.textContent =
+                'Enregistrer un décaissement';
+
+            cashboxLabel.innerHTML =
+                'Caisse à débiter ' +
+                '<span class="required-star">*</span>';
+
+            purchaseRequestField.style.display =
+                'block';
+
+            purchaseRequestSelect.disabled = false;
+            purchaseRequestSelect.required = true;
+
+            justificationField.style.display =
+                'block';
+
+            justificationInput.disabled = false;
+            justificationInput.required = true;
+
+            categorySelect.value =
+                'Paiement demande achat';
+        }
+    };
+
+    /*
+     * =====================================================
+     * AFFICHER LE SOLDE DE LA CAISSE
+     * =====================================================
+     */
+    cashboxSelect.addEventListener(
+        'change',
+        function() {
+
+            const option =
+                this.options[this.selectedIndex];
+
+            if (!this.value) {
+
+                balanceBox.style.display = 'none';
+
+                balanceValue.textContent =
+                    '0 BIF';
+
+                currencyLabel.textContent =
+                    'BIF';
+
+                return;
+            }
+
+            const balance =
+                parseFloat(
+                    option.dataset.balance || 0
+                );
+
+            const currency =
+                option.dataset.currency || 'BIF';
+
+            balanceBox.style.display = 'block';
+
+            balanceValue.textContent =
+                formatMoney(
+                    balance,
+                    currency
+                );
+
+            currencyLabel.textContent =
+                currency;
+
+            validateAmount();
+        }
+    );
+
+    /*
+     * =====================================================
+     * REMPLISSAGE AUTOMATIQUE DEPUIS LE BON
+     * =====================================================
+     */
+    purchaseRequestSelect.addEventListener(
+        'change',
+        function() {
+
+            const option =
+                this.options[this.selectedIndex];
+
+            if (!this.value) {
+                resetPurchaseRequestFields();
+                return;
+            }
+
+            const amount =
+                parseFloat(
+                    option.dataset.amount || 0
+                );
+
+            const summary =
+                option.dataset.summary || '';
+
+            const chantier =
+                option.dataset.chantier || '';
+
+            const requestReference =
+                option.dataset.requestReference || '';
+
+            const voucherReference =
+                option.dataset.voucherReference || '';
+
+            const voucherId =
+                option.dataset.paymentVoucherId || '';
+
+            const paymentReference =
+                option.dataset.paymentReference || '';
+
+            const paymentMode =
+                option.dataset.paymentMode || '';
+
+            const paymentObservation =
+                option.dataset.observation || '';
+
+            /*
+             * Champs cachés.
+             */
+            document.getElementById(
+                'paymentVoucherId'
+            ).value = voucherId;
+
+            document.getElementById(
+                'purchaseRequestReference'
+            ).value = requestReference;
+
+            document.getElementById(
+                'paymentVoucherReference'
+            ).value = voucherReference;
+
+            /*
+             * Montant.
+             */
+            amountInput.value = amount;
+            amountInput.readOnly = true;
+
+            /*
+             * Justification.
+             */
+            justificationInput.value = summary;
+
+            /*
+             * Bénéficiaire / chantier.
+             */
+            thirdPartyInput.value = chantier;
+
+            /*
+             * Numéro de pièce.
+             */
+            documentNumberInput.value =
+                voucherReference !== '' ?
+                voucherReference :
+                paymentReference;
+
+            /*
+             * Mode.
+             */
+            paymentMethodSelect.value =
+                normalizePaymentMode(
+                    paymentMode
+                );
+
+            /*
+             * Observation.
+             */
+            observationInput.value =
+                paymentObservation;
+
+            /*
+             * Catégorie.
+             */
+            categorySelect.value =
+                'Paiement demande achat';
+
+            validateAmount();
+        }
+    );
+
+    /*
+     * =====================================================
+     * EMPÊCHER UNE CAISSE SOURCE = DESTINATION
+     * =====================================================
+     */
+    destinationSelect.addEventListener(
+        'change',
+        function() {
+
+            if (
+                this.value !== '' &&
+                this.value === cashboxSelect.value
+            ) {
+                alert(
+                    'La caisse destination doit être différente ' +
+                    'de la caisse source.'
+                );
+
+                this.value = '';
+            }
+        }
+    );
+
+    /*
+     * =====================================================
+     * CONTRÔLE DU SOLDE
+     * =====================================================
+     */
+    function validateAmount() {
+
+        const selectedCashboxOption =
+            cashboxSelect.options[
+                cashboxSelect.selectedIndex
+            ];
+
+        const currentBalance =
+            parseFloat(
+                selectedCashboxOption ?
+                selectedCashboxOption.dataset.balance || 0 :
+                0
+            );
+
+        const amount =
+            parseFloat(
+                amountInput.value || 0
+            );
+
+        const type =
+            operationType.value;
+
+        const mustCheckBalance =
+            type === 'decaissement' ||
+            type === 'approvisionnement';
+
+        const insufficient =
+            mustCheckBalance &&
+            amount > currentBalance;
+
+        amountError.style.display =
+            insufficient ?
+            'block' :
+            'none';
+
+        amountInput.classList.toggle(
+            'is-invalid',
+            insufficient
+        );
+
+        submitButton.disabled =
+            insufficient;
+
+        return !insufficient;
+    }
+
+    amountInput.addEventListener(
+        'input',
+        validateAmount
+    );
+
+    /*
+     * =====================================================
+     * VALIDATION AVANT ENVOI
+     * =====================================================
+     */
+    form.addEventListener(
+        'submit',
+        function(event) {
+
+            if (!operationType.value) {
+
+                event.preventDefault();
+
+                alert(
+                    'Le type de l’opération est manquant.'
+                );
+
+                return;
+            }
+
+            if (!validateAmount()) {
+
+                event.preventDefault();
+
+                alert(
+                    'Le solde de la caisse est insuffisant.'
+                );
+
+                return;
+            }
+
+            if (
+                operationType.value ===
+                'approvisionnement' &&
+                destinationSelect.value ===
+                cashboxSelect.value
+            ) {
+                event.preventDefault();
+
+                alert(
+                    'La caisse source et la caisse destination ' +
+                    'doivent être différentes.'
+                );
+
+                return;
+            }
+
+            if (
+                operationType.value ===
+                'decaissement' &&
+                purchaseRequestSelect.value === ''
+            ) {
+                event.preventDefault();
+
+                alert(
+                    'Veuillez sélectionner une demande d’achat.'
+                );
+            }
+        }
+    );
+
+    /*
+     * =====================================================
+     * AFFICHER LE NOM DU FICHIER
+     * =====================================================
+     */
+    const attachmentInput =
+        document.getElementById(
+            'operationAttachment'
+        );
+
+    attachmentInput.addEventListener(
+        'change',
+        function() {
+
+            const fileName =
+                this.files.length > 0 ?
+                this.files[0].name :
+                'Choisir un fichier';
+
+            const label =
+                this.nextElementSibling;
+
+            if (label) {
+                label.textContent = fileName;
+            }
+        }
+    );
+
+    /*
+     * =====================================================
+     * RÉINITIALISER À LA FERMETURE
+     * =====================================================
+     */
+    $('#addOperationModal').on(
+        'hidden.bs.modal',
+        function() {
+
+            form.reset();
+
+            operationType.value = '';
+
+            destinationField.style.display =
+                'none';
+
+            destinationSelect.disabled = true;
+
+            purchaseRequestField.style.display =
+                'none';
+
+            purchaseRequestSelect.disabled = true;
+
+            justificationField.style.display =
+                'none';
+
+            justificationInput.disabled = true;
+
+            balanceBox.style.display =
+                'none';
+
+            amountError.style.display =
+                'none';
+
+            amountInput.classList.remove(
+                'is-invalid'
+            );
+
+            amountInput.readOnly = false;
+
+            submitButton.disabled = false;
+
+            currencyLabel.textContent =
+                'BIF';
+
+            attachmentInput
+                .nextElementSibling
+                .textContent =
+                'Choisir un fichier';
+        }
+    );
+});
+</script>
+
 <!-- =========================================================
      SCRIPTS
 ========================================================== -->
 
 <!-- Chart.js doit être chargé dans le header ou avant ce script -->
 <script>
-    document.addEventListener(
-        'DOMContentLoaded',
-        function() {
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
 
-            const chartElement =
-                document.getElementById(
-                    'cashFlowChart'
-                );
+        const chartElement =
+            document.getElementById(
+                'cashFlowChart'
+            );
 
-            if (
-                !chartElement ||
-                typeof Chart === 'undefined'
-            ) {
-                return;
-            }
+        if (
+            !chartElement ||
+            typeof Chart === 'undefined'
+        ) {
+            return;
+        }
 
-            const cashFlowLabels =
-                <?= json_encode(
+        const cashFlowLabels =
+            <?= json_encode(
                     $cashFlowEvolution['labels'],
                     JSON_UNESCAPED_UNICODE
                         | JSON_UNESCAPED_SLASHES
                 ) ?>;
 
-            const cashFlowIncomes =
-                <?= json_encode(
+        const cashFlowIncomes =
+            <?= json_encode(
                     array_map(
                         'floatval',
                         $cashFlowEvolution['incomes']
                     )
                 ) ?>;
 
-            const cashFlowExpenses =
-                <?= json_encode(
+        const cashFlowExpenses =
+            <?= json_encode(
                     array_map(
                         'floatval',
                         $cashFlowEvolution['expenses']
                     )
                 ) ?>;
 
-            const context =
-                chartElement.getContext('2d');
+        const context =
+            chartElement.getContext('2d');
 
-            const gradientIncome =
-                context.createLinearGradient(
-                    0,
-                    0,
-                    0,
-                    280
-                );
-
-            gradientIncome.addColorStop(
+        const gradientIncome =
+            context.createLinearGradient(
                 0,
-                'rgba(15, 118, 110, 0.30)'
-            );
-
-            gradientIncome.addColorStop(
-                1,
-                'rgba(15, 118, 110, 0.02)'
-            );
-
-            const gradientExpense =
-                context.createLinearGradient(
-                    0,
-                    0,
-                    0,
-                    280
-                );
-
-            gradientExpense.addColorStop(
                 0,
-                'rgba(220, 38, 38, 0.20)'
+                0,
+                280
             );
 
-            gradientExpense.addColorStop(
-                1,
-                'rgba(220, 38, 38, 0.01)'
+        gradientIncome.addColorStop(
+            0,
+            'rgba(15, 118, 110, 0.30)'
+        );
+
+        gradientIncome.addColorStop(
+            1,
+            'rgba(15, 118, 110, 0.02)'
+        );
+
+        const gradientExpense =
+            context.createLinearGradient(
+                0,
+                0,
+                0,
+                280
             );
 
-            new Chart(
-                context, {
-                    type: 'line',
+        gradientExpense.addColorStop(
+            0,
+            'rgba(220, 38, 38, 0.20)'
+        );
 
-                    data: {
-                        labels: cashFlowLabels,
+        gradientExpense.addColorStop(
+            1,
+            'rgba(220, 38, 38, 0.01)'
+        );
 
-                        datasets: [{
-                                label: 'Encaissements',
+        new Chart(
+            context, {
+                type: 'line',
 
-                                data: cashFlowIncomes,
+                data: {
+                    labels: cashFlowLabels,
 
-                                borderColor: '#0f766e',
+                    datasets: [{
+                            label: 'Encaissements',
 
-                                backgroundColor: gradientIncome,
+                            data: cashFlowIncomes,
 
-                                borderWidth: 2.5,
+                            borderColor: '#0f766e',
 
-                                pointRadius: 4,
+                            backgroundColor: gradientIncome,
 
-                                pointHoverRadius: 6,
+                            borderWidth: 2.5,
 
-                                pointBackgroundColor: '#ffffff',
+                            pointRadius: 4,
 
-                                pointBorderColor: '#0f766e',
+                            pointHoverRadius: 6,
 
-                                pointBorderWidth: 2,
+                            pointBackgroundColor: '#ffffff',
 
-                                fill: true,
+                            pointBorderColor: '#0f766e',
 
-                                tension: 0.35
-                            },
-                            {
-                                label: 'Décaissements',
+                            pointBorderWidth: 2,
 
-                                data: cashFlowExpenses,
+                            fill: true,
 
-                                borderColor: '#dc2626',
+                            tension: 0.35
+                        },
+                        {
+                            label: 'Décaissements',
 
-                                backgroundColor: gradientExpense,
+                            data: cashFlowExpenses,
 
-                                borderWidth: 2.5,
+                            borderColor: '#dc2626',
 
-                                pointRadius: 4,
+                            backgroundColor: gradientExpense,
 
-                                pointHoverRadius: 6,
+                            borderWidth: 2.5,
 
-                                pointBackgroundColor: '#ffffff',
+                            pointRadius: 4,
 
-                                pointBorderColor: '#dc2626',
+                            pointHoverRadius: 6,
 
-                                pointBorderWidth: 2,
+                            pointBackgroundColor: '#ffffff',
 
-                                fill: true,
+                            pointBorderColor: '#dc2626',
 
-                                tension: 0.35
-                            }
-                        ]
+                            pointBorderWidth: 2,
+
+                            fill: true,
+
+                            tension: 0.35
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     },
 
-                    options: {
-                        responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
 
-                        maintainAspectRatio: false,
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                padding: 20,
 
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        },
-
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-
-                                labels: {
-                                    usePointStyle: true,
-                                    boxWidth: 8,
-                                    padding: 20,
-
-                                    font: {
-                                        size: 11
-                                    }
-                                }
-                            },
-
-                            tooltip: {
-                                callbacks: {
-                                    label: function(
-                                        context
-                                    ) {
-                                        const amount =
-                                            context.parsed.y ||
-                                            0;
-
-                                        return (
-                                            context.dataset.label +
-                                            ' : ' +
-                                            new Intl
-                                            .NumberFormat(
-                                                'fr-FR'
-                                            )
-                                            .format(
-                                                amount
-                                            ) +
-                                            ' BIF'
-                                        );
-                                    }
+                                font: {
+                                    size: 11
                                 }
                             }
                         },
 
-                        scales: {
-                            x: {
-                                grid: {
-                                    display: false
-                                },
+                        tooltip: {
+                            callbacks: {
+                                label: function(
+                                    context
+                                ) {
+                                    const amount =
+                                        context.parsed.y ||
+                                        0;
 
-                                ticks: {
-                                    maxRotation: 0,
-                                    autoSkip: true,
-                                    maxTicksLimit: 15,
-
-                                    font: {
-                                        size: 10
-                                    }
+                                    return (
+                                        context.dataset.label +
+                                        ' : ' +
+                                        new Intl
+                                        .NumberFormat(
+                                            'fr-FR'
+                                        )
+                                        .format(
+                                            amount
+                                        ) +
+                                        ' BIF'
+                                    );
                                 }
+                            }
+                        }
+                    },
+
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
                             },
 
-                            y: {
-                                beginAtZero: true,
+                            ticks: {
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 15,
 
-                                grid: {
-                                    color: 'rgba(148, 163, 184, 0.15)'
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.15)'
+                            },
+
+                            ticks: {
+                                font: {
+                                    size: 10
                                 },
 
-                                ticks: {
-                                    font: {
-                                        size: 10
-                                    },
-
-                                    callback: function(
-                                        value
+                                callback: function(
+                                    value
+                                ) {
+                                    if (
+                                        value >=
+                                        1000000000
                                     ) {
-                                        if (
-                                            value >=
+                                        return (
+                                            value /
                                             1000000000
-                                        ) {
-                                            return (
-                                                value /
-                                                1000000000
-                                            ) + ' Md';
-                                        }
-
-                                        if (
-                                            value >=
-                                            1000000
-                                        ) {
-                                            return (
-                                                value /
-                                                1000000
-                                            ) + ' M';
-                                        }
-
-                                        if (
-                                            value >= 1000
-                                        ) {
-                                            return (
-                                                value /
-                                                1000
-                                            ) + ' K';
-                                        }
-
-                                        return value;
+                                        ) + ' Md';
                                     }
+
+                                    if (
+                                        value >=
+                                        1000000
+                                    ) {
+                                        return (
+                                            value /
+                                            1000000
+                                        ) + ' M';
+                                    }
+
+                                    if (
+                                        value >= 1000
+                                    ) {
+                                        return (
+                                            value /
+                                            1000
+                                        ) + ' K';
+                                    }
+
+                                    return value;
                                 }
                             }
                         }
                     }
                 }
-            );
-        }
-    );
+            }
+        );
+    }
+);
 </script>
 
 <script>
-    function prepareOperation(type) {
-        const title =
-            document.getElementById('operationModalTitle');
+function prepareOperation(type) {
+    const operationType =
+        document.getElementById('operationType');
 
-        const operationType =
-            document.getElementById('operationType');
+    const modalTitle =
+        document.getElementById('operationModalTitle');
 
-        const destinationField =
-            document.getElementById('destinationCashboxField');
+    const cashboxLabel =
+        document.getElementById('operationCashboxLabel');
 
-        const destinationSelect =
-            document.getElementById('destinationCashboxId');
+    const destinationField =
+        document.getElementById('destinationCashboxField');
 
-        const cashboxLabel =
-            document.getElementById('operationCashboxLabel');
+    const destinationSelect =
+        document.getElementById('destinationCashboxId');
 
-        const categorySelect =
-            document.querySelector(
-                '#cashboxOperationForm select[name="category"]'
-            );
+    const purchaseRequestField =
+        document.getElementById('purchaseRequestField');
 
-        operationType.value = type;
+    const purchaseRequestSelect =
+        document.getElementById('purchaseRequestId');
 
-        destinationField.style.display = 'none';
-        destinationSelect.disabled = true;
-        destinationSelect.required = false;
-        destinationSelect.value = '';
+    const justificationField =
+        document.getElementById(
+            'expenseJustificationField'
+        );
 
-        if (type === 'approvisionnement') {
-            title.innerHTML =
-                'Approvisionner une caisse chantier';
+    const justificationInput =
+        document.getElementById(
+            'expenseJustification'
+        );
 
-            destinationField.style.display = 'block';
+    const categorySelect =
+        document.querySelector(
+            '#cashboxOperationForm select[name="category"]'
+        );
 
-            destinationSelect.disabled = false;
-            destinationSelect.required = true;
+    const amountInput =
+        document.querySelector(
+            '#cashboxOperationForm input[name="amount"]'
+        );
 
-            if (cashboxLabel) {
-                cashboxLabel.innerHTML =
-                    'Caisse source <span class="required-star">*</span>';
-            }
+    /*
+     * Réinitialisation générale.
+     */
+    operationType.value = type;
 
-            if (categorySelect) {
-                categorySelect.value =
-                    'Approvisionnement';
-            }
-        }
+    destinationField.style.display = 'none';
+    destinationSelect.disabled = true;
+    destinationSelect.required = false;
+    destinationSelect.value = '';
 
-        if (type === 'encaissement') {
-            title.innerHTML =
-                'Enregistrer un encaissement';
+    purchaseRequestField.style.display = 'none';
+    purchaseRequestSelect.disabled = true;
+    purchaseRequestSelect.required = false;
+    purchaseRequestSelect.value = '';
 
-            if (cashboxLabel) {
-                cashboxLabel.innerHTML =
-                    'Caisse à créditer <span class="required-star">*</span>';
-            }
-        }
+    justificationField.style.display = 'none';
+    justificationInput.disabled = true;
+    justificationInput.required = false;
+    justificationInput.value = '';
 
-        if (type === 'decaissement') {
-            title.innerHTML =
-                'Enregistrer un décaissement';
+    document.getElementById(
+        'paymentVoucherId'
+    ).value = '';
 
-            if (cashboxLabel) {
-                cashboxLabel.innerHTML =
-                    'Caisse à débiter <span class="required-star">*</span>';
-            }
+    document.getElementById(
+        'purchaseRequestReference'
+    ).value = '';
+
+    document.getElementById(
+        'paymentVoucherReference'
+    ).value = '';
+
+    amountInput.readOnly = false;
+    amountInput.value = '';
+
+    /*
+     * Approvisionnement.
+     */
+    if (type === 'approvisionnement') {
+        modalTitle.textContent =
+            'Approvisionner une caisse chantier';
+
+        cashboxLabel.innerHTML =
+            'Caisse source ' +
+            '<span class="required-star">*</span>';
+
+        destinationField.style.display = 'block';
+
+        destinationSelect.disabled = false;
+        destinationSelect.required = true;
+
+        if (categorySelect) {
+            categorySelect.value =
+                'Approvisionnement';
         }
     }
 
-    document.addEventListener(
-        'DOMContentLoaded',
-        function() {
-            const sourceSelect =
-                document.getElementById(
-                    'operationCashboxId'
-                );
+    /*
+     * Encaissement.
+     */
+    if (type === 'encaissement') {
+        modalTitle.textContent =
+            'Enregistrer un encaissement';
 
-            const destinationSelect =
-                document.getElementById(
-                    'destinationCashboxId'
-                );
+        cashboxLabel.innerHTML =
+            'Caisse à créditer ' +
+            '<span class="required-star">*</span>';
+    }
 
-            const balanceBox =
-                document.getElementById(
-                    'selectedCashboxBalance'
-                );
+    /*
+     * Décaissement.
+     */
+    if (type === 'decaissement') {
+        modalTitle.textContent =
+            'Enregistrer un décaissement';
 
-            const balanceValue =
-                document.getElementById(
-                    'selectedCashboxBalanceValue'
-                );
+        cashboxLabel.innerHTML =
+            'Caisse à débiter ' +
+            '<span class="required-star">*</span>';
 
-            sourceSelect.addEventListener(
-                'change',
-                function() {
-                    const selectedOption =
-                        this.options[this.selectedIndex];
+        purchaseRequestField.style.display =
+            'block';
 
-                    const balance =
-                        selectedOption.dataset.balance || 0;
+        purchaseRequestSelect.disabled = false;
+        purchaseRequestSelect.required = true;
 
-                    const devise =
-                        selectedOption.dataset.devise || 'BIF';
+        justificationField.style.display =
+            'block';
 
-                    if (!this.value) {
-                        balanceBox.style.display = 'none';
-                        return;
-                    }
-
-                    balanceValue.innerHTML =
-                        new Intl.NumberFormat(
-                            'fr-FR'
-                        ).format(balance) +
-                        ' ' +
-                        devise;
-
-                    balanceBox.style.display = 'block';
-
-                    /*
-                     * Masquer la caisse source dans la destination.
-                     */
-                    Array.from(
-                        destinationSelect.options
-                    ).forEach(function(option) {
-                        if (!option.value) {
-                            return;
-                        }
-
-                        option.disabled =
-                            option.value === sourceSelect.value;
-                    });
-
-                    if (
-                        destinationSelect.value ===
-                        sourceSelect.value
-                    ) {
-                        destinationSelect.value = '';
-                    }
-                }
-            );
-        }
-    );
+        justificationInput.disabled = false;
+        justificationInput.required = true;
+    }
+}
 </script>
 
+
+<script>
+document.addEventListener(
+    'DOMContentLoaded',
+    function() {
+        const requestSelect =
+            document.getElementById(
+                'purchaseRequestId'
+            );
+
+        if (!requestSelect) {
+            return;
+        }
+
+        requestSelect.addEventListener(
+            'change',
+            function() {
+                const option =
+                    this.options[this.selectedIndex];
+
+                const amountInput =
+                    document.querySelector(
+                        '#cashboxOperationForm ' +
+                        'input[name="amount"]'
+                    );
+
+                const categorySelect =
+                    document.querySelector(
+                        '#cashboxOperationForm ' +
+                        'select[name="category"]'
+                    );
+
+                const documentNumberInput =
+                    document.querySelector(
+                        '#cashboxOperationForm ' +
+                        'input[name="document_number"]'
+                    );
+
+                const thirdPartyInput =
+                    document.querySelector(
+                        '#cashboxOperationForm ' +
+                        'input[name="third_party"]'
+                    );
+
+                const justificationInput =
+                    document.getElementById(
+                        'expenseJustification'
+                    );
+
+                if (!this.value) {
+                    amountInput.value = '';
+                    amountInput.readOnly = false;
+
+                    justificationInput.value = '';
+
+                    document.getElementById(
+                        'paymentVoucherId'
+                    ).value = '';
+
+                    document.getElementById(
+                        'purchaseRequestReference'
+                    ).value = '';
+
+                    document.getElementById(
+                        'paymentVoucherReference'
+                    ).value = '';
+
+                    return;
+                }
+
+                const amount =
+                    parseFloat(
+                        option.dataset.amount || 0
+                    );
+
+                const summary =
+                    option.dataset.summary || '';
+
+                const chantier =
+                    option.dataset.chantier || '';
+
+                const requestReference =
+                    option.dataset.requestReference || '';
+
+                const voucherReference =
+                    option.dataset.voucherReference || '';
+
+                const voucherId =
+                    option.dataset.paymentVoucherId || '';
+
+                amountInput.value = amount;
+                amountInput.readOnly = true;
+
+                justificationInput.value =
+                    summary;
+
+                document.getElementById(
+                    'paymentVoucherId'
+                ).value = voucherId;
+
+                document.getElementById(
+                    'purchaseRequestReference'
+                ).value = requestReference;
+
+                document.getElementById(
+                    'paymentVoucherReference'
+                ).value = voucherReference;
+
+                if (categorySelect) {
+                    categorySelect.value =
+                        'Fournitures';
+                }
+
+                if (documentNumberInput) {
+                    documentNumberInput.value =
+                        voucherReference;
+                }
+
+                if (thirdPartyInput) {
+                    thirdPartyInput.value =
+                        chantier;
+                }
+            }
+        );
+    }
+);
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php if ($this->session->flashdata('success')): ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'success',
-                title: 'Caisse créée',
-                html: <?= json_encode(
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+        icon: 'success',
+        title: 'Caisse créée',
+        html: <?= json_encode(
                             $this->session->flashdata('success')
                         ) ?>,
-                confirmButtonText: 'D’accord',
-                confirmButtonColor: '#0f766e'
-            });
-        });
-    </script>
+        confirmButtonText: 'D’accord',
+        confirmButtonColor: '#0f766e'
+    });
+});
+</script>
 
 <?php endif; ?>
 
 
 <?php if ($this->session->flashdata('error')): ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            Swal.fire({
-                icon: 'error',
-                title: 'Enregistrement impossible',
-                html: <?= json_encode(
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    Swal.fire({
+        icon: 'error',
+        title: 'Enregistrement impossible',
+        html: <?= json_encode(
                             $this->session->flashdata('error')
                         ) ?>,
-                confirmButtonText: 'Corriger',
-                confirmButtonColor: '#dc2626'
-            });
-        });
-    </script>
+        confirmButtonText: 'Corriger',
+        confirmButtonColor: '#dc2626'
+    });
+});
+</script>
 
 <?php endif; ?>
 
 <?php if ($this->session->flashdata('error')): ?>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            $('#addCaisseModal').modal('show');
-        });
-    </script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('#addCaisseModal').modal('show');
+});
+</script>
 
 <?php endif; ?>

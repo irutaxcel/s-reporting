@@ -74,6 +74,12 @@ $route['achats-materiels'] = 'TechController/achatMateriels';
 
 $route['tech/store-bon-paiement'] = 'TechController/storeBonPaiement';
 
+$route['tech/get-bon-paiement/(:num)']
+    = 'TechController/get_bon_paiement/$1';
+
+$route['tech/update-bon-paiement']
+    = 'TechController/update_bon_paiement';
+
 $route['tech/store_achat_materiel'] = 'TechController/store_achat_materiel';
 
 $route['tech/valider-achat'] = 'TechController/valider_achat';
@@ -128,6 +134,18 @@ $route['new-technique-maintenance'] = 'TechController/newTechniqueMaintenance';
 
 $route['cout-reelle-rentebilite'] = 'TechController/coutReelleRentebilite';
 
+$route['journal-production'] = 'TechController/journalProduction';
+
+$route['journalProduction-create'] = 'TechController/journalProductionCreate';
+
+$route['journalProduction-get/(:num)'] = 'TechController/getJournalProduction/$1';
+
+$route['journalProduction-update'] = 'TechController/updateJournalProduction';
+
+$route['journalProduction-delete'] = 'TechController/deleteJournalProduction';
+
+$route['journalProduction-print/(:num)'] = 'TechController/printJournalProduction/$1';
+
 
 $route['finance-dashboard'] = 'FinanceController/financeDashboard';
 
@@ -173,9 +191,17 @@ $route['cloture-comptable'] = 'FinanceController/cloture_comptable';
 
 
 $route['caisse'] = 'FinanceController/caisse';
+
+$route['finance-cashbox/(:num)'] = 'FinanceController/financeCashbox/$1';
+
+$route['caisse-journal'] = 'FinanceController/caisseJournal';
+
 $route['finance/caisse-store'] = 'FinanceController/caisseStore';
+
 $route['finance/cashbox-operation-store']
     = 'FinanceController/cashboxOperationStore';
+
+
 
 $route['cashbox-operation-store'] = 'FinanceController/cashboxOperationStore';
 
@@ -202,3 +228,25 @@ $route['finance/rapprochement/analyser'] =
 
 
 $route['prevision'] = 'FinanceController/prevision';
+
+
+$route['users'] = 'AdminController/users';
+$route['utilisateurs-store'] = 'AdminController/storeUser';
+
+$route['utilisateurs-update'] = 'AdminController/updateUser';
+
+$route['administration/utilisateurs/toggleStatus'] = 'AdminController/toggleStatus';
+
+$route['administration/utilisateurs/delete'] = 'AdminController/deleteUser';
+
+$route['matrice-access']        = 'AdminController/matriceAccess';
+$route['matrice-access/load']   = 'AdminController/matriceLoad';
+$route['matrice-access/save']   = 'AdminController/matriceSave';
+
+$route['roles-permissions']          = 'AdminController/rolesPermissions';
+$route['roles/save']                 = 'AdminController/roleSave';
+$route['roles/delete']               = 'AdminController/roleDelete';
+$route['roles/permissions/load']     = 'AdminController/rolePermissionsLoad';
+$route['roles/permissions/save']     = 'AdminController/rolePermissionsSave';
+
+$route['settings'] = 'AdminController/settings';

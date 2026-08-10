@@ -710,6 +710,212 @@ class TechController extends CI_Controller
         $this->load->view('v1/components/layout/footer-print');
     }
 
+    public function get_bon_paiement($id)
+    {
+        if (!$this->input->is_ajax_request()) {
+            show_404();
+            return;
+        }
+
+        $id = (int) $id;
+
+        $bonPaiement = $this->tech->getPaymentVoucherById($id);
+
+        if (!$bonPaiement) {
+            return $this->output
+                ->set_status_header(404)
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'status'  => false,
+                    'message' => 'Bon de paiement introuvable.'
+                ]));
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode([
+                'status' => true,
+                'bon'    => $bonPaiement
+            ]));
+    }
+
+    public function update_bon_paiement()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $id = (int) $this->input->post(
+            'payment_voucher_id',
+            true
+        );
+
+        if ($id <= 0) {
+
+            $this->session->set_flashdata(
+                'error',
+                'Bon de paiement invalide.'
+            );
+
+            redirect('achat');
+            return;
+        }
+
+        $bonPaiement = $this->tech
+            ->getPaymentVoucherById($id);
+
+        if (!$bonPaiement) {
+
+            $this->session->set_flashdata(
+                'error',
+                'Le bon de paiement est introuvable.'
+            );
+
+            redirect('achat');
+            return;
+        }
+
+        $this->form_validation->set_rules(
+            'summary',
+            'Synthèse',
+            'required|trim'
+        );
+
+        $this->form_validation->set_rules(
+            'payment_mode',
+            'Mode de paiement',
+            'required|trim'
+        );
+
+        $this->form_validation->set_rules(
+            'amount_paid',
+            'Montant payé',
+            'required|numeric|greater_than[0]'
+        );
+
+        $this->form_validation->set_rules(
+            'payment_reference',
+            'Référence du paiement',
+            'required|trim'
+        );
+
+        $this->form_validation->set_rules(
+            'payment_date',
+            'Date de paiement',
+            'required|trim'
+        );
+
+        if ($this->form_validation->run() === false) {
+
+            $this->session->set_flashdata(
+                'error',
+                strip_tags(validation_errors())
+            );
+
+            redirect('achat');
+            return;
+        }
+
+        $allowedModes = [
+            'especes',
+            'cheque',
+            'virement_bancaire',
+            'transfert_mobile',
+            'autre'
+        ];
+
+        $allowedStatuses = [
+            'en_attente',
+            'effectue',
+            'annule'
+        ];
+
+        $paymentMode = $this->input->post(
+            'payment_mode',
+            true
+        );
+
+        $paymentStatus = $this->input->post(
+            'payment_status',
+            true
+        );
+
+        if (!in_array($paymentMode, $allowedModes, true)) {
+
+            $this->session->set_flashdata(
+                'error',
+                'Mode de paiement invalide.'
+            );
+
+            redirect('achat');
+            return;
+        }
+
+        if (!in_array($paymentStatus, $allowedStatuses, true)) {
+            $paymentStatus = 'effectue';
+        }
+
+        $data = [
+
+            'summary' => trim(
+                $this->input->post('summary', true)
+            ),
+
+            'payment_mode' => $paymentMode,
+
+            'amount_paid' => (float) $this->input->post(
+                'amount_paid',
+                true
+            ),
+
+            'payment_reference' => trim(
+                $this->input->post(
+                    'payment_reference',
+                    true
+                )
+            ),
+
+            'payment_date' => $this->input->post(
+                'payment_date',
+                true
+            ),
+
+            'payment_status' => $paymentStatus,
+
+            'observation' => trim(
+                $this->input->post(
+                    'observation',
+                    true
+                )
+            ),
+
+            'updated_at' => date('Y-m-d H:i:s')
+
+        ];
+
+        $updated = $this->tech
+            ->updatePaymentVoucher($id, $data);
+
+        if (!$updated) {
+
+            $this->session->set_flashdata(
+                'error',
+                'La modification du bon a échoué.'
+            );
+
+            redirect('achat');
+            return;
+        }
+
+        $this->session->set_flashdata(
+            'success',
+            'Le bon de paiement a été modifié avec succès.'
+        );
+
+        redirect('achat');
+    }
+
     public function personeChantier()
     {
         if (!$this->session->userdata('user_id')) {
@@ -1689,6 +1895,225 @@ class TechController extends CI_Controller
         );
 
         redirect('maintenance-carburant');
+    }
+
+    public function journalProduction()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        // ----- Filtres reçus en GET -----
+        $filters = [
+            'date_debut' => $this->input->get('date_debut'),
+            'date_fin'   => $this->input->get('date_fin'),
+            'chantier'   => $this->input->get('chantier'),
+            'statut'     => $this->input->get('statut'),
+        ];
+
+        $data['title']             = 'Journal Production';
+        $data['filters']           = $filters;
+        $data['allChantiers']      = $this->tech->getAllChantier();
+        $data['allEngins']         = $this->tech->getAllEngins();
+        $data['journalProduction'] = $this->tech->getJournalProduction($filters);
+
+        // Statistiques des tuiles (globales, non filtrées)
+        $data['nbJournauxMois']    = $this->tech->countJournalProductionMois();
+        $data['nbJournauxValides'] = $this->tech->countJournalProductionByStatut('valide');
+        $data['nbJournauxAttente'] = $this->tech->countJournalProductionByStatut('en_attente');
+        $data['heuresEngins']      = $this->tech->sumHeuresEngins();
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/journalProduction', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function journalProductionCreate()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        // Validation minimale
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('jp_date', 'Date du journal', 'required');
+        $this->form_validation->set_rules('jp_chantier', 'Chantier', 'required|integer');
+
+        if ($this->form_validation->run() == FALSE) {
+            $this->session->set_flashdata('error', 'Veuillez renseigner la date et le chantier du journal.');
+            redirect('journalProduction');
+            return;
+        }
+
+        // Statut selon le bouton cliqué (brouillon ou soumission)
+        $statut = ($this->input->post('statut') === 'brouillon') ? 'brouillon' : 'en_attente';
+
+        // Données principales
+        $data = [
+            'reference'              => $this->tech->getNextJournalReference(),
+            'journal_date'           => $this->input->post('jp_date'),
+            'chantier_id'            => $this->input->post('jp_chantier'),
+            'chef_chantier'          => $this->input->post('jp_chef'),
+            'meteo'                  => $this->input->post('jp_meteo'),
+            'effectif_interne'       => (int) $this->input->post('jp_effectif_int'),
+            'effectif_sous_traitant' => (int) $this->input->post('jp_effectif_st'),
+            'heures_travaillees'     => (float) $this->input->post('jp_heures'),
+            'travaux_realises'       => $this->input->post('jp_travaux'),
+            'observations'           => $this->input->post('jp_observations'),
+            'statut'                 => $statut,
+            'created_by'             => $this->session->userdata('user_id'),
+            'created_at'             => date('Y-m-d H:i:s'),
+        ];
+
+        // Lignes d'engins (on ignore les lignes sans engin sélectionné)
+        $jp_engins = $this->input->post('jp_engin') ?? [];
+        $jp_heures = $this->input->post('jp_heures_engin') ?? [];
+        $jp_carb   = $this->input->post('jp_carburant') ?? [];
+
+        $enginRows = [];
+        foreach ($jp_engins as $i => $engin_id) {
+            if (empty($engin_id)) continue;
+            $enginRows[] = [
+                'engin_id'           => (int) $engin_id,
+                'heures_utilisation' => (float) ($jp_heures[$i] ?? 0),
+                'carburant_l'        => (float) ($jp_carb[$i] ?? 0),
+            ];
+        }
+
+        $journal_id = $this->tech->createJournalProduction($data, $enginRows);
+
+        if ($journal_id) {
+            $msg = ($statut === 'brouillon')
+                ? 'Brouillon du journal enregistré avec succès.'
+                : 'Journal de production enregistré et soumis pour validation.';
+            $this->session->set_flashdata('success', $msg);
+        } else {
+            $this->session->set_flashdata('error', "Erreur lors de l'enregistrement du journal. Veuillez réessayer.");
+        }
+
+        redirect('journal-production');
+    }
+
+    public function getJournalProduction($id = null)
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => false, 'message' => 'Non autorisé.']);
+            return;
+        }
+
+        $journal = $this->tech->getJournalProductionById((int) $id);
+
+        if (!$journal) {
+            echo json_encode(['status' => false, 'message' => 'Journal introuvable.']);
+            return;
+        }
+
+        echo json_encode([
+            'status'  => true,
+            'journal' => $journal,
+            'engins'  => $this->tech->getJournalProductionEngins($journal->id),
+        ]);
+    }
+
+    public function updateJournalProduction()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $id = (int) $this->input->post('id');
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('jp_date', 'Date du journal', 'required');
+        $this->form_validation->set_rules('jp_chantier', 'Chantier', 'required|integer');
+
+        if (!$id || $this->form_validation->run() == FALSE) {
+            $this->session->set_flashdata('error', 'Modification impossible : vérifiez la date et le chantier.');
+            redirect('journal-production');
+            return;
+        }
+
+        $data = [
+            'journal_date'           => $this->input->post('jp_date'),
+            'chantier_id'            => $this->input->post('jp_chantier'),
+            'chef_chantier'          => $this->input->post('jp_chef'),
+            'meteo'                  => $this->input->post('jp_meteo'),
+            'effectif_interne'       => (int) $this->input->post('jp_effectif_int'),
+            'effectif_sous_traitant' => (int) $this->input->post('jp_effectif_st'),
+            'heures_travaillees'     => (float) $this->input->post('jp_heures'),
+            'travaux_realises'       => $this->input->post('jp_travaux'),
+            'observations'           => $this->input->post('jp_observations'),
+            'statut'                 => $this->input->post('jp_statut'),
+            'updated_at'             => date('Y-m-d H:i:s'),
+        ];
+
+        // Lignes d'engins (on ignore les lignes sans engin)
+        $jp_engins = $this->input->post('jp_engin') ?? [];
+        $jp_heures = $this->input->post('jp_heures_engin') ?? [];
+        $jp_carb   = $this->input->post('jp_carburant') ?? [];
+
+        $enginRows = [];
+        foreach ($jp_engins as $i => $engin_id) {
+            if (empty($engin_id)) continue;
+            $enginRows[] = [
+                'engin_id'           => (int) $engin_id,
+                'heures_utilisation' => (float) ($jp_heures[$i] ?? 0),
+                'carburant_l'        => (float) ($jp_carb[$i] ?? 0),
+            ];
+        }
+
+        if ($this->tech->updateJournalProduction($id, $data, $enginRows)) {
+            $this->session->set_flashdata('success', 'Journal de production modifié avec succès.');
+        } else {
+            $this->session->set_flashdata('error', 'Erreur lors de la modification du journal.');
+        }
+
+        redirect('journal-production');
+    }
+
+    public function deleteJournalProduction()
+    {
+        if (!$this->session->userdata('user_id')) {
+            echo json_encode(['status' => false, 'message' => 'Non autorisé.']);
+            return;
+        }
+
+        $id = (int) $this->input->post('id');
+
+        if (!$id) {
+            echo json_encode(['status' => false, 'message' => 'ID invalide.']);
+            return;
+        }
+
+        if ($this->tech->deleteJournalProduction($id)) {
+            echo json_encode(['status' => true, 'message' => 'Le journal a été supprimé avec succès.']);
+        } else {
+            echo json_encode(['status' => false, 'message' => 'La suppression a échoué.']);
+        }
+    }
+
+    public function printJournalProduction($id = null)
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $data['journal'] = $this->tech->getJournalProductionById((int) $id);
+
+        if (!$data['journal']) {
+            echo 'Journal introuvable.';
+            return;
+        }
+
+        $data['engins'] = $this->tech->getJournalProductionEngins($data['journal']->id);
+
+        // Vue standalone (sans header/sidebar/footer)
+        $this->load->view('v1/components/modules/technique/printJournalProduction', $data);
     }
 
     public function coutReelleRentebilite()
