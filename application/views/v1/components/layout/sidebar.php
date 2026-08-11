@@ -421,7 +421,7 @@
                 <!-- ==========================
                         DAF / FINANCE
                     =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Journal de caisse' ||  $title == 'Livre de Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie') { ?>
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Journal de caisse' ||  $title == 'Livre de Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie' || $title == 'Factures clients' || $title == 'Factures fournisseurs' || $title == 'Paiements' || $title == 'Échéances') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -714,9 +714,16 @@
                 </li>
 
                 <!-- FACTURATION -->
-                <li class="nav-item has-treeview">
+                <?php if ($title == 'Factures clients' || $title == 'Factures fournisseurs' || $title == 'Paiements' || $title == 'Échéances') { ?>
+                <li class="nav-item has-treeview menu-open">
+
+                    <a href="#" class="nav-link active">
+                        <?php } else { ?>
+                <li class="nav-item has-treeview ">
 
                     <a href="#" class="nav-link">
+                        <?php } ?>
+
                         <i class="fas fa-file-invoice-dollar nav-icon"></i>
                         <p>Facturation</p>
                         <i class="right fas fa-angle-left"></i>
@@ -725,31 +732,59 @@
                     <ul class="nav nav-treeview">
 
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/facture-client') ?>" class="nav-link">
+                            <?php if ($title == 'Factures clients') { ?>
+                            <a href="<?= base_url('facture-client') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Factures clients</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('facture-client') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Factures clients</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/facture-fournisseur') ?>" class="nav-link">
+                            <?php if ($title == 'Factures fournisseurs') { ?>
+                            <a href="<?= base_url('facture-fournisseur') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Factures fournisseurs</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('facture-fournisseur') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Factures fournisseurs</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/paiement') ?>" class="nav-link">
+                            <?php if ($title == 'Paiements') { ?>
+                            <a href="<?= base_url('paiement') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Paiements</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('paiement') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Paiements</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                         <li class="nav-item">
-                            <a href="<?= base_url('finance/echeances') ?>" class="nav-link">
+                            <?php if ($title == 'Échéances') { ?>
+                            <a href="<?= base_url('echeances') ?>" class="nav-link active">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Échéances</p>
                             </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('echeances') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Échéances</p>
+                            </a>
+                            <?php } ?>
                         </li>
 
                     </ul>
@@ -793,32 +828,110 @@
             </ul>
             </li>
 
+
             <!-- RH -->
+            <?php if ($title == 'Tableau de bord RH' || $title == 'Employés' || $title == 'Contrats & mouvements' || $title == 'Registre d\'employeur' || $title == 'Temps & présences' || $title == 'Congés' || $title == 'Paie' || $title == 'Conformité & déclarations' || $title == 'Discipline' || $title == 'Évaluations' || $title == 'Rapports & éditions' || $title == 'Paramètres RH') { ?>
+            <li class="nav-item menu-open">
+                <a href="#" class="nav-link active">
+                    <?php } else { ?>
             <li class="nav-item">
                 <a href="#" class="nav-link">
+                    <?php } ?>
+
+
                     <i class="nav-icon fas fa-users"></i>
                     <p>
                         Ressources Humaines
                         <i class="right fas fa-angle-left"></i>
                     </p>
                 </a>
-
                 <ul class="nav nav-treeview">
-
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
+                        <?php if ($title == 'Tableau de bord RH') { ?>
+                        <a href="<?= base_url('rh-dashboard') ?>" class="nav-link active">
+                            <i class="fas fa-tachometer-alt nav-icon"></i>
+                            <p>Tableau de bord RH</p>
+                        </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-dashboard') ?>" class="nav-link">
+                            <i class="fas fa-tachometer-alt nav-icon"></i>
+                            <p>Tableau de bord RH</p>
+                        </a>
+                        <?php } ?>
+                    </li>
+                    <li class="nav-item">
+                        <?php if ($title == 'Employés') { ?>
+                        <a href="<?= base_url('rh-employes') ?>" class="nav-link active">
+                            <i class="fas fa-id-badge nav-icon"></i>
                             <p>Employés</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-employes') ?>" class="nav-link">
+                            <i class="fas fa-id-badge nav-icon"></i>
+                            <p>Employés</p>
+                        </a>
+                        <?php } ?>
                     </li>
-
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
+                        <a href="rh-contrats" class="nav-link">
+                            <i class="fas fa-file-contract nav-icon"></i>
+                            <p>Contrats & mouvements</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/registre" class="nav-link">
+                            <i class="fas fa-book nav-icon"></i>
+                            <p>Registre d'employeur</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/presences" class="nav-link">
+                            <i class="fas fa-user-clock nav-icon"></i>
+                            <p>Temps & présences</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/conges" class="nav-link">
+                            <i class="fas fa-umbrella-beach nav-icon"></i>
+                            <p>Congés</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/paie" class="nav-link">
+                            <i class="fas fa-money-bill-wave nav-icon"></i>
                             <p>Paie</p>
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a href="rh/conformite" class="nav-link">
+                            <i class="fas fa-landmark nav-icon"></i>
+                            <p>Conformité & déclarations</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/discipline" class="nav-link">
+                            <i class="fas fa-gavel nav-icon"></i>
+                            <p>Discipline</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/evaluations" class="nav-link">
+                            <i class="fas fa-clipboard-check nav-icon"></i>
+                            <p>Évaluations</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/rapports" class="nav-link">
+                            <i class="fas fa-chart-bar nav-icon"></i>
+                            <p>Rapports & éditions</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="rh/parametres" class="nav-link">
+                            <i class="fas fa-cog nav-icon"></i>
+                            <p>Paramètres RH</p>
+                        </a>
+                    </li>
                 </ul>
             </li>
 

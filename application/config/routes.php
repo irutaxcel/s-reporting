@@ -225,9 +225,17 @@ $route['finance/rapprochement/releve/import'] =
 $route['finance/rapprochement/analyser'] =
     'FinanceController/analyzeBankReconciliationStore';
 
-
+$route['rh-dashboard'] = 'RhController/index';
+$route['rh-employes'] = 'RhController/employes';
+$route['rh-employes_store'] = 'RhController/employes_store';
+$route['rh-next_matricule'] = 'RhController/next_matricule';
 
 $route['prevision'] = 'FinanceController/prevision';
+
+$route['facture-client'] = 'FinanceController/factureClient';
+$route['facture-fournisseur'] = 'FinanceController/factureFournisseur';
+$route['paiement'] = 'FinanceController/paiement';
+$route['echeances'] = 'FinanceController/echeances';
 
 
 $route['users'] = 'AdminController/users';

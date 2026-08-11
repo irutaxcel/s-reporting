@@ -6221,4 +6221,64 @@ class FinanceController extends CI_Controller
         $this->load->view('v1/components/modules/finance/prevision');
         $this->load->view('v1/components/layout/footer');
     }
+
+    public function factureClient()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Factures clients';
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/facture_client');
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function factureFournisseur()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Factures fournisseurs';
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/facture_fournisseur');
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function paiement()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Paiements';
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/paiement');
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function echeances()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $title = 'Échéances';
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/finance/echeances');
+        $this->load->view('v1/components/layout/footer');
+    }
 }
