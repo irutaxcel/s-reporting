@@ -388,8 +388,6 @@
             background: var(--primary);
         }
 
-        /* 60% Bon de paiement | 40% Rapport d'utilisation */
-
         .payment-split {
             display: grid;
             grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
@@ -507,8 +505,6 @@
             overflow-wrap: anywhere;
         }
 
-        /* Signatures du paiement : légendes DANS les rectangles */
-
         .payment-signatures {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -609,20 +605,29 @@
             font-weight: bold;
         }
 
+        /* Signatures du rapport :
+           - Ligne 1 : Rapporté par | Vérifié par (côte à côte)
+           - Ligne 2 : Approuvé par (pleine largeur)
+           Rectangles AGRANDIS */
+
         .fund-report-sign-grid {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 8px;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-top: auto;
             padding-top: 10px;
         }
 
         .fund-sign-box {
             min-width: 0;
-            min-height: 90px;
+            min-height: 95px;
             padding: 6px;
             border: 1px solid var(--border-soft);
             background: #fff;
+        }
+
+        .fund-sign-box:last-child {
+            grid-column: 1 / -1;
         }
 
         .fund-sign-box .caption {
@@ -1061,7 +1066,8 @@
                 min-height: 32px !important;
             }
 
-            /* --- Panneau rapport d'utilisation (40%) --- */
+            /* --- Panneau rapport d'utilisation (40%) :
+                   rectangles AGRANDIS --- */
 
             .fund-amount-item {
                 margin-bottom: 7px !important;
@@ -1093,15 +1099,20 @@
             }
 
             .fund-report-sign-grid {
-                gap: 5px !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 6px !important;
                 padding-top: 6px !important;
             }
 
             .fund-sign-box {
-                min-height: 60px !important;
+                min-height: 55px !important;
                 padding: 4px 5px !important;
                 border: 1.5px solid #000 !important;
                 background: #fff !important;
+            }
+
+            .fund-sign-box:last-child {
+                grid-column: 1 / -1 !important;
             }
 
             .fund-sign-box .caption {
@@ -1719,6 +1730,10 @@
                             <span class="unit">BIF</span>
 
                         </div>
+
+                        <!-- Rectangles AGRANDIS :
+                             Ligne 1 : Rapporté par | Vérifié par
+                             Ligne 2 : Approuvé par (pleine largeur) -->
 
                         <div class="fund-report-sign-grid">
 
