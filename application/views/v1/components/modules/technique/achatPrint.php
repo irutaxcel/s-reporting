@@ -529,11 +529,17 @@
             align-items: stretch;
         }
 
-        /* ----- Colonne gauche 50% : signatures du paiement ----- */
+        /* ----- Colonne gauche 50% : signatures du paiement -----
+           - Trésorerie      : haut gauche, MÊME hauteur que remise,
+                               avec espace de signature
+           - Remise de fonds : bas gauche
+           - Réception fonds : toute la hauteur à droite
+        --------------------------------------------------------- */
 
         .payment-signatures {
             display: grid;
             grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
             gap: 10px;
             min-width: 0;
         }
@@ -546,7 +552,7 @@
 
         .payment-signature-box .sign-space {
             flex: 1 1 auto;
-            min-height: 56px;
+            min-height: 60px;
             border: 1px solid var(--border);
             background: #fff;
         }
@@ -561,23 +567,53 @@
             overflow-wrap: anywhere;
         }
 
+        /* Trésorerie : même taille que remise, espace signature inclus */
+
         .payment-signature-box.treasury {
-            grid-column: 1 / -1;
+            grid-column: 1;
+            grid-row: 1;
             border: 1px solid var(--border);
-            border-bottom: 2px solid var(--primary-dark);
             background: #fff;
-            padding: 10px 12px;
+            overflow: hidden;
+        }
+
+        .payment-signature-box.treasury .box-head {
+            padding: 4px 6px;
+            border-bottom: 1px solid var(--border);
+            background: var(--background-soft);
+            color: var(--primary-dark);
+            font-size: 12.5px;
+            font-weight: bold;
+            line-height: 1.3;
             text-align: center;
         }
 
-        .payment-signature-box.treasury strong {
-            color: var(--primary-dark);
-            font-size: 13.5px;
+        .payment-signature-box.treasury .box-head .function {
+            display: block;
+            color: #444;
+            font-size: 12px;
+            font-weight: normal;
         }
 
-        .payment-signature-box.treasury .function {
-            color: #444;
-            font-size: 13px;
+        /* Espace libre pour signer au stylo */
+
+        .payment-signature-box.treasury .sign-area {
+            flex: 1 1 auto;
+            min-height: 46px;
+        }
+
+        /* Remise de fonds : en bas à gauche */
+
+        .payment-signature-box.remise {
+            grid-column: 1;
+            grid-row: 2;
+        }
+
+        /* Réception de fonds : grand rectangle pleine hauteur à droite */
+
+        .payment-signature-box.reception {
+            grid-column: 2;
+            grid-row: 1 / 3;
         }
 
         /* ----- Colonne droite 50% : rapport d'utilisation de fonds ----- */
@@ -640,19 +676,14 @@
 
         .fund-sign-box {
             min-width: 0;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .fund-sign-box .sign-space {
-            flex: 1 1 auto;
-            min-height: 48px;
+            min-height: 70px;
+            padding: 6px;
             border: 1px solid var(--border-soft);
             background: #fff;
         }
 
         .fund-sign-box .caption {
-            margin-top: 4px;
+            display: block;
             text-align: center;
             color: var(--primary-dark);
             font-size: 11.5px;
@@ -726,6 +757,25 @@
 
             .payment-bottom-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .payment-signatures {
+                grid-template-rows: none;
+            }
+
+            .payment-signature-box.treasury,
+            .payment-signature-box.remise,
+            .payment-signature-box.reception {
+                grid-column: auto;
+                grid-row: auto;
+            }
+
+            .payment-signature-box .sign-space {
+                min-height: 70px;
+            }
+
+            .payment-signature-box.treasury .sign-area {
+                min-height: 50px;
             }
         }
 
@@ -1098,11 +1148,12 @@
             .payment-signatures {
                 display: grid !important;
                 grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: 1fr 1fr !important;
                 gap: 6px !important;
             }
 
             .payment-signature-box .sign-space {
-                min-height: 42px !important;
+                min-height: 44px !important;
                 border: 1.5px solid #000 !important;
                 background: #fff !important;
             }
@@ -1114,22 +1165,44 @@
                 font-weight: 800 !important;
             }
 
+            /* Trésorerie : même hauteur que remise + espace signature */
+
             .payment-signature-box.treasury {
+                grid-column: 1 !important;
+                grid-row: 1 !important;
                 border: 1.5px solid #000 !important;
-                border-bottom: 2.5px solid #000 !important;
                 background: #fff !important;
-                padding: 6px 8px !important;
             }
 
-            .payment-signature-box.treasury strong {
+            .payment-signature-box.treasury .box-head {
+                padding: 3px 4px !important;
+                border-bottom: 1.5px solid #000 !important;
+                background: #fff !important;
                 color: #000 !important;
-                font-size: 10.5px !important;
+                font-size: 9.5px !important;
                 font-weight: 800 !important;
             }
 
-            .payment-signature-box.treasury .function {
+            .payment-signature-box.treasury .box-head .function {
                 color: #000 !important;
-                font-size: 10px !important;
+                font-size: 9px !important;
+            }
+
+            .payment-signature-box.treasury .sign-area {
+                min-height: 34px !important;
+            }
+
+            .payment-signature-box.remise {
+                grid-column: 1 !important;
+                grid-row: 2 !important;
+            }
+
+            /* Réception de fonds : pleine hauteur à droite,
+               légende toujours visible (plus de min-height 100%) */
+
+            .payment-signature-box.reception {
+                grid-column: 2 !important;
+                grid-row: 1 / 3 !important;
             }
 
             .fund-report {
@@ -1174,14 +1247,14 @@
                 padding-top: 3px !important;
             }
 
-            .fund-sign-box .sign-space {
-                min-height: 34px !important;
+            .fund-sign-box {
+                min-height: 52px !important;
+                padding: 4px 5px !important;
                 border: 1.5px solid #000 !important;
                 background: #fff !important;
             }
 
             .fund-sign-box .caption {
-                margin-top: 3px !important;
                 color: #000 !important;
                 font-size: 8.5px !important;
                 font-weight: 800 !important;
@@ -1824,14 +1897,23 @@
 
                         <div class="payment-signatures">
 
+                            <!-- Trésorerie : même taille que remise,
+                                avec espace pour signer -->
+
                             <div class="payment-signature-box treasury">
 
-                                <strong>Trésorerie</strong>
-                                <span class="function">/ AHISHAKIYE Nelly Ange</span>
+                                <div class="box-head">
+                                    Trésorerie
+                                    <span class="function">
+                                        / AHISHAKIYE Nelly Ange
+                                    </span>
+                                </div>
+
+                                <div class="sign-area"></div>
 
                             </div>
 
-                            <div class="payment-signature-box">
+                            <div class="payment-signature-box remise">
 
                                 <div class="sign-space"></div>
 
@@ -1841,7 +1923,7 @@
 
                             </div>
 
-                            <div class="payment-signature-box">
+                            <div class="payment-signature-box reception">
 
                                 <div class="sign-space"></div>
 
@@ -1885,23 +1967,17 @@
 
                                 <div class="fund-sign-box">
 
-                                    <div class="sign-space"></div>
-
                                     <div class="caption">Rapporté par :</div>
 
                                 </div>
 
                                 <div class="fund-sign-box">
 
-                                    <div class="sign-space"></div>
-
                                     <div class="caption">Vérifié par :</div>
 
                                 </div>
 
                                 <div class="fund-sign-box">
-
-                                    <div class="sign-space"></div>
 
                                     <div class="caption">Approuvé par :</div>
 
