@@ -377,7 +377,7 @@
         }
 
         /* =====================================================
-           SÉPARATEUR + DEUX PANNEAUX 50/50
+           SÉPARATEUR + DEUX PANNEAUX 60% / 40%
         ===================================================== */
 
         .payment-divider-line {
@@ -388,9 +388,11 @@
             background: var(--primary);
         }
 
+        /* 60% Bon de paiement | 40% Rapport d'utilisation */
+
         .payment-split {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 6fr) minmax(0, 4fr);
             gap: 14px;
             width: 100%;
             align-items: stretch;
@@ -423,7 +425,7 @@
             text-transform: uppercase;
         }
 
-        /* ----- Panneau BON DE PAIEMENT ----- */
+        /* ----- Panneau BON DE PAIEMENT (60%) ----- */
 
         .payment-summary-stack {
             display: grid;
@@ -505,7 +507,7 @@
             overflow-wrap: anywhere;
         }
 
-        /* ----- Signatures du paiement : légendes DANS les rectangles ----- */
+        /* Signatures du paiement : légendes DANS les rectangles */
 
         .payment-signatures {
             display: grid;
@@ -525,8 +527,6 @@
             overflow: hidden;
         }
 
-        /* Légende en haut, à l'intérieur du rectangle */
-
         .payment-signature-box .box-head {
             padding: 4px 6px;
             border-bottom: 1px solid var(--border);
@@ -545,8 +545,6 @@
             font-size: 11px;
             font-weight: normal;
         }
-
-        /* Espace libre en dessous pour signer au stylo */
 
         .payment-signature-box .sign-area {
             flex: 1 1 auto;
@@ -568,7 +566,7 @@
             grid-row: 1 / 3;
         }
 
-        /* ----- Panneau RAPPORT D'UTILISATION DES FONDS ----- */
+        /* ----- Panneau RAPPORT D'UTILISATION DES FONDS (40%) ----- */
 
         .fund-body {
             display: flex;
@@ -576,8 +574,6 @@
             flex: 1 1 auto;
             min-width: 0;
         }
-
-        /* Montant payé en tête du rapport */
 
         .fund-amount-item {
             margin-bottom: 10px;
@@ -934,7 +930,7 @@
             }
 
             /* ======================================================
-               DEUX PANNEAUX 50/50
+               DEUX PANNEAUX : 60% BON DE PAIEMENT | 40% RAPPORT
             ====================================================== */
 
             .payment-divider-line {
@@ -945,6 +941,7 @@
             }
 
             .payment-split {
+                grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) !important;
                 gap: 8px !important;
             }
 
@@ -969,7 +966,7 @@
                 letter-spacing: .5px !important;
             }
 
-            /* --- Panneau bon de paiement --- */
+            /* --- Panneau bon de paiement (60%) --- */
 
             .payment-summary-stack {
                 gap: 0 !important;
@@ -1036,8 +1033,6 @@
                 font-size: 10px !important;
             }
 
-            /* Signatures : légendes DANS les rectangles */
-
             .payment-signatures {
                 gap: 5px !important;
                 margin-top: 6px !important;
@@ -1066,7 +1061,7 @@
                 min-height: 32px !important;
             }
 
-            /* --- Panneau rapport d'utilisation des fonds --- */
+            /* --- Panneau rapport d'utilisation (40%) --- */
 
             .fund-amount-item {
                 margin-bottom: 7px !important;
@@ -1505,7 +1500,9 @@
                     </div>
 
                     <div class="function">
-                        DT. NIYIMBONA Emmanuel
+                        <?= !empty($achat->technical_approver)
+                            ? html_escape($achat->technical_approver)
+                            : 'DT. NIYIMBONA Emmanuel' ?>
                     </div>
 
                 </div>
@@ -1517,7 +1514,9 @@
                     </div>
 
                     <div class="function">
-                        DAF. NDAGIJE Mariam
+                        <?= !empty($achat->financial_approver)
+                            ? html_escape($achat->financial_approver)
+                            : 'DAF. NDAGIJE Mariam' ?>
                     </div>
 
                 </div>
@@ -1527,7 +1526,7 @@
         </section>
 
         <!-- =====================================================
-            DEUX PANNEAUX 50/50
+            DEUX PANNEAUX : 60% BON DE PAIEMENT | 40% RAPPORT
         ====================================================== -->
 
         <?php if (!empty($bonPaiement)) : ?>
@@ -1536,7 +1535,7 @@
 
             <div class="payment-split">
 
-                <!-- ===== 50% GAUCHE : BON DE PAIEMENT ===== -->
+                <!-- ===== 60% GAUCHE : BON DE PAIEMENT ===== -->
 
                 <section class="split-col">
 
@@ -1640,8 +1639,6 @@
 
                     <?php endif; ?>
 
-                    <!-- Signatures : légendes DANS les rectangles -->
-
                     <div class="payment-signatures">
 
                         <div class="payment-signature-box treasury">
@@ -1681,7 +1678,7 @@
 
                 </section>
 
-                <!-- ===== 50% DROITE : RAPPORT D'UTILISATION DES FONDS ===== -->
+                <!-- ===== 40% DROITE : RAPPORT D'UTILISATION DES FONDS ===== -->
 
                 <section class="split-col">
 
@@ -1690,8 +1687,6 @@
                     </div>
 
                     <div class="fund-body">
-
-                        <!-- Le rapport commence par le montant payé -->
 
                         <div class="fund-amount-item">
 
