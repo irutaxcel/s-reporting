@@ -280,82 +280,75 @@ class AdminController extends CI_Controller
         $userId = (int) $this->input->post('id', true);
 
         if (!$this->admin->userExists($userId)) {
-            $this->session->set_flashdata(
-                'error',
-                'L’utilisateur spécifié n’existe pas.'
-            );
-
+            $this->session->set_flashdata('error', 'L’utilisateur spécifié n’existe pas.');
             redirect('users');
             return;
         }
 
-        $firstName = trim(
-            $this->input->post('first_name', true)
-        );
+        $firstName = trim($this->input->post('first_name', true));
+        $lastName  = trim($this->input->post('last_name', true));
+        $email     = strtolower(trim($this->input->post('email', true)));
+        $roleId    = (int) $this->input->post('role_id', true);
+        $status    = trim($this->input->post('status', true));
 
-        $lastName = trim(
-            $this->input->post('last_name', true)
-        );
-
-        $email = strtolower(
-            trim($this->input->post('email', true))
-        );
-
-        $roleId = (int) $this->input->post('role_id', true);
-
-        $status = trim(
-            $this->input->post('status', true)
-        );
+        // ✔ Entreprise : chaîne vide = compte global (NULL)
+        $companyIdRaw = trim((string) $this->input->post('company_id', true));
+        $companyId    = ($companyIdRaw === '') ? null : (int) $companyIdRaw;
 
         if ($this->admin->emailExistsForOtherUser($email, $userId)) {
-            $this->session->set_flashdata(
-                'error',
-                'Cette adresse e-mail est déjà utilisée par un autre utilisateur.'
-            );
-
+            $this->session->set_flashdata('error', 'Cette adresse e-mail est déjà utilisée par un autre utilisateur.');
             redirect('users');
             return;
         }
 
         if (!$this->admin->roleExists($roleId)) {
-            $this->session->set_flashdata(
-                'error',
-                'Le rôle sélectionné est invalide.'
-            );
-
+            $this->session->set_flashdata('error', 'Le rôle sélectionné est invalide.');
             redirect('users');
             return;
         }
 
         $dataUser = [
             'first_name' => ucwords(strtolower($firstName)),
-            'last_name' => strtoupper($lastName),
-            'email' => $email,
-            'role_id' => $roleId,
-            'status' => $status,
-            // 'updated_at' => date('Y-m-d H:i:s')
+            'last_name'  => strtoupper($lastName),
+            'email'      => $email,
+            'company_id' => $companyId,
+            'role_id'    => $roleId,
+            'status'     => $status,
         ];
 
+        /* =====================================================
+        ✔ RÉINITIALISATION DU MOT DE PASSE (optionnelle)
+        Vide = on conserve l'ancien mot de passe
+        ===================================================== */
+        $password     = (string) $this->input->post('password', true);
+        $confirmation = (string) $this->input->post('password_confirmation', true);
+
+        if ($password !== '' || $confirmation !== '') {
+
+            if ($password !== $confirmation) {
+                $this->session->set_flashdata('error', 'Les deux mots de passe ne correspondent pas.');
+                redirect('users');
+                return;
+            }
+
+            if (strlen($password) < 8) {
+                $this->session->set_flashdata('error', 'Le nouveau mot de passe doit contenir au moins 8 caractères.');
+                redirect('users');
+                return;
+            }
+
+            // Même format que tes hash existants ($2y$10$… = bcrypt)
+            $dataUser['password_hash'] = password_hash($password, PASSWORD_DEFAULT);
+        }
+
         if (!$this->admin->updateUser($userId, $dataUser)) {
-            log_message(
-                'error',
-                'Erreur mise à jour utilisateur ID: ' . $userId
-            );
-
-            $this->session->set_flashdata(
-                'error',
-                'Une erreur est survenue pendant la mise à jour de l’utilisateur.'
-            );
-
+            log_message('error', 'Erreur mise à jour utilisateur ID: ' . $userId);
+            $this->session->set_flashdata('error', 'Une erreur est survenue pendant la mise à jour de l’utilisateur.');
             redirect('users');
             return;
         }
 
-        $this->session->set_flashdata(
-            'success',
-            'L’utilisateur a été mis à jour avec succès.'
-        );
-
+        $this->session->set_flashdata('success', 'L’utilisateur a été mis à jour avec succès.');
         redirect('users');
     }
 

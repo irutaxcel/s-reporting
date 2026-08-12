@@ -156,17 +156,12 @@
            TITRES DES DOCUMENTS
         ===================================================== */
 
-        .document-title,
-        .payment-document-title {
+        .document-title {
+            margin: 14px 0 16px;
             text-align: center;
         }
 
-        .document-title {
-            margin: 14px 0 16px;
-        }
-
-        .document-title h1,
-        .payment-document-title span {
+        .document-title h1 {
             display: inline-block;
             margin: 0;
             padding: 8px 30px;
@@ -382,64 +377,66 @@
         }
 
         /* =====================================================
-           SÉPARATEUR DU BON DE PAIEMENT
+           SÉPARATEUR + DEUX PANNEAUX 50/50
         ===================================================== */
-
-        .payment-divider {
-            width: 100%;
-            margin-top: 30px;
-            margin-bottom: 17px;
-            text-align: center;
-        }
 
         .payment-divider-line {
             width: 100%;
             height: 3px;
-            margin-bottom: 16px;
+            margin-top: 26px;
+            margin-bottom: 14px;
             background: var(--primary);
         }
 
-        .payment-document-title span {
-            min-width: 320px;
+        .payment-split {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 14px;
+            width: 100%;
+            align-items: stretch;
         }
 
-        /* =====================================================
-           BON DE PAIEMENT
-        ===================================================== */
-
-        .payment-voucher-section {
-            width: 100%;
-            max-width: 100%;
+        .split-col {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
             border: 1px solid var(--border);
             background: #fff;
-            overflow: hidden;
         }
 
-        .payment-voucher-body {
-            width: 100%;
-            max-width: 100%;
-            padding: 12px;
-            overflow: hidden;
+        .split-title {
+            margin-bottom: 10px;
+            text-align: center;
         }
 
-        /* Synthèse 70 % / Chantier 30 % */
+        .split-title span {
+            display: inline-block;
+            padding: 6px 12px;
+            border: 2px solid var(--primary);
+            background: #fff;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
 
-        .payment-summary-grid {
+        /* ----- Panneau BON DE PAIEMENT ----- */
+
+        .payment-summary-stack {
             display: grid;
-            grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
-            gap: 12px;
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 11px;
-            align-items: stretch;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .payment-summary {
             width: 100%;
             min-width: 0;
-            min-height: 75px;
-            margin: 0;
-            padding: 10px 12px;
+            min-height: 52px;
+            padding: 8px 10px;
             border: 1px solid var(--border-soft);
             background: var(--background-soft);
             overflow: hidden;
@@ -447,10 +444,9 @@
 
         .payment-summary-label {
             display: block;
-            max-width: 100%;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             color: var(--primary);
-            font-size: 14px;
+            font-size: 12.5px;
             font-weight: bold;
             line-height: 1.25;
             text-transform: uppercase;
@@ -459,88 +455,64 @@
 
         .payment-summary-value {
             display: block;
-            max-width: 100%;
             color: var(--text);
-            font-size: 17px;
+            font-size: 14px;
             line-height: 1.4;
             overflow-wrap: anywhere;
         }
 
-        /* Informations du bon */
-
         .payment-info-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-            gap: 8px 18px;
+            grid-template-columns: 1fr;
+            gap: 6px;
             width: 100%;
         }
 
         .payment-info-item {
             min-width: 0;
-            padding: 6px 0;
+            padding: 5px 0;
             border-bottom: 1px solid var(--border-soft);
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.35;
             overflow-wrap: anywhere;
         }
 
         .payment-info-label {
             display: inline-block;
-            width: 155px;
-            max-width: 50%;
+            width: 145px;
+            max-width: 55%;
             color: var(--primary);
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             vertical-align: top;
         }
 
         .payment-amount {
             color: var(--primary-dark);
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             white-space: nowrap;
         }
 
         .payment-observation {
             width: 100%;
-            min-height: 48px;
-            margin-top: 11px;
-            padding: 9px;
+            min-height: 40px;
+            margin-top: 9px;
+            padding: 8px;
             border: 1px solid var(--border-soft);
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
             overflow-wrap: anywhere;
         }
 
-        .payment-observation strong {
-            font-size: 14px;
-        }
-
-        /* =====================================================
-           BAS DU BON : SIGNATURES 50% + RAPPORT FONDS 50%
-        ===================================================== */
-
-        .payment-bottom-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-            gap: 14px;
-            width: 100%;
-            margin-top: 14px;
-            align-items: stretch;
-        }
-
-        /* ----- Colonne gauche 50% : signatures du paiement -----
-           - Trésorerie      : haut gauche, MÊME hauteur que remise,
-                               avec espace de signature
-           - Remise de fonds : bas gauche
-           - Réception fonds : toute la hauteur à droite
-        --------------------------------------------------------- */
+        /* ----- Signatures du paiement : légendes DANS les rectangles ----- */
 
         .payment-signatures {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: 1fr 1fr;
-            gap: 10px;
+            gap: 8px;
+            margin-top: 10px;
             min-width: 0;
         }
 
@@ -548,102 +520,77 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-        }
-
-        .payment-signature-box .sign-space {
-            flex: 1 1 auto;
-            min-height: 60px;
-            border: 1px solid var(--border);
-            background: #fff;
-        }
-
-        .payment-signature-box .caption {
-            margin-top: 5px;
-            color: var(--primary-dark);
-            font-size: 12.5px;
-            font-weight: bold;
-            line-height: 1.25;
-            text-align: center;
-            overflow-wrap: anywhere;
-        }
-
-        /* Trésorerie : même taille que remise, espace signature inclus */
-
-        .payment-signature-box.treasury {
-            grid-column: 1;
-            grid-row: 1;
             border: 1px solid var(--border);
             background: #fff;
             overflow: hidden;
         }
 
-        .payment-signature-box.treasury .box-head {
+        /* Légende en haut, à l'intérieur du rectangle */
+
+        .payment-signature-box .box-head {
             padding: 4px 6px;
             border-bottom: 1px solid var(--border);
             background: var(--background-soft);
             color: var(--primary-dark);
-            font-size: 12.5px;
+            font-size: 11.5px;
             font-weight: bold;
             line-height: 1.3;
             text-align: center;
+            overflow-wrap: anywhere;
         }
 
-        .payment-signature-box.treasury .box-head .function {
+        .payment-signature-box .box-head .function {
             display: block;
             color: #444;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: normal;
         }
 
-        /* Espace libre pour signer au stylo */
+        /* Espace libre en dessous pour signer au stylo */
 
-        .payment-signature-box.treasury .sign-area {
+        .payment-signature-box .sign-area {
             flex: 1 1 auto;
             min-height: 46px;
         }
 
-        /* Remise de fonds : en bas à gauche */
+        .payment-signature-box.treasury {
+            grid-column: 1;
+            grid-row: 1;
+        }
 
         .payment-signature-box.remise {
             grid-column: 1;
             grid-row: 2;
         }
 
-        /* Réception de fonds : grand rectangle pleine hauteur à droite */
-
         .payment-signature-box.reception {
             grid-column: 2;
             grid-row: 1 / 3;
         }
 
-        /* ----- Colonne droite 50% : rapport d'utilisation de fonds ----- */
+        /* ----- Panneau RAPPORT D'UTILISATION DES FONDS ----- */
 
-        .fund-report {
-            min-width: 0;
+        .fund-body {
             display: flex;
             flex-direction: column;
-            padding: 10px 12px 12px;
-            border: 1px solid var(--border);
-            background: var(--background-soft);
+            flex: 1 1 auto;
+            min-width: 0;
         }
 
-        .fund-report-title {
+        /* Montant payé en tête du rapport */
+
+        .fund-amount-item {
             margin-bottom: 10px;
-            padding-bottom: 6px;
-            border-bottom: 2px solid var(--primary);
-            color: var(--primary);
-            font-size: 13.5px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: .4px;
-            text-align: center;
+            padding: 5px 0;
+            border-bottom: 1px solid var(--border-soft);
+            font-size: 13px;
         }
 
         .fund-report-row {
             display: flex;
             align-items: flex-end;
             gap: 6px;
-            margin-bottom: 9px;
+            margin-bottom: 12px;
             font-size: 13px;
         }
 
@@ -671,12 +618,12 @@
             grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 8px;
             margin-top: auto;
-            padding-top: 6px;
+            padding-top: 10px;
         }
 
         .fund-sign-box {
             min-width: 0;
-            min-height: 70px;
+            min-height: 90px;
             padding: 6px;
             border: 1px solid var(--border-soft);
             background: #fff;
@@ -686,7 +633,7 @@
             display: block;
             text-align: center;
             color: var(--primary-dark);
-            font-size: 11.5px;
+            font-size: 11px;
             font-weight: bold;
             overflow-wrap: anywhere;
         }
@@ -747,35 +694,16 @@
                 grid-template-columns: 1fr;
             }
 
-            .payment-summary-grid {
-                grid-template-columns: 1fr;
-            }
-
             .signature-grid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
 
-            .payment-bottom-grid {
+            .payment-split {
                 grid-template-columns: 1fr;
             }
 
-            .payment-signatures {
-                grid-template-rows: none;
-            }
-
-            .payment-signature-box.treasury,
-            .payment-signature-box.remise,
-            .payment-signature-box.reception {
-                grid-column: auto;
-                grid-row: auto;
-            }
-
-            .payment-signature-box .sign-space {
-                min-height: 70px;
-            }
-
-            .payment-signature-box.treasury .sign-area {
-                min-height: 50px;
+            .payment-signature-box .sign-area {
+                min-height: 60px;
             }
         }
 
@@ -851,14 +779,13 @@
                 color: #000 !important;
             }
 
-            /* TITRES */
+            /* TITRE DEMANDE */
 
             .document-title {
                 margin: 10px 0 11px !important;
             }
 
-            .document-title h1,
-            .payment-document-title span {
+            .document-title h1 {
                 padding: 6px 24px !important;
                 border: 2px solid #000 !important;
                 color: #000 !important;
@@ -927,7 +854,6 @@
 
             .items-table {
                 margin-top: 6px !important;
-                border-collapse: collapse !important;
                 border: 1.5px solid #000 !important;
                 color: #000 !important;
                 font-size: 11px !important;
@@ -1007,222 +933,151 @@
                 line-height: 1.3 !important;
             }
 
-            /* SÉPARATION ET TITRE DU BON DE PAIEMENT */
-
-            .payment-divider {
-                margin-top: 12px !important;
-                margin-bottom: 10px !important;
-            }
+            /* ======================================================
+               DEUX PANNEAUX 50/50
+            ====================================================== */
 
             .payment-divider-line {
                 height: 3px !important;
-                margin-bottom: 9px !important;
+                margin-top: 12px !important;
+                margin-bottom: 8px !important;
                 background: #000 !important;
             }
 
-            .payment-document-title span {
-                min-width: 250px !important;
-                padding: 6px 22px !important;
-                border: 2px solid #000 !important;
-                color: #000 !important;
-                font-size: 17px !important;
-                font-weight: 800 !important;
+            .payment-split {
+                gap: 8px !important;
             }
 
-            /* CONTENEUR DU BON DE PAIEMENT */
-
-            .payment-voucher-section {
-                width: 100% !important;
-                max-width: 100% !important;
+            .split-col {
+                padding: 6px !important;
                 border: 1.5px solid #000 !important;
-                color: #000 !important;
                 background: #fff !important;
-                overflow: hidden !important;
-            }
-
-            .payment-voucher-body {
-                padding: 8px !important;
                 color: #000 !important;
             }
 
-            /* SYNTHÈSE 70 % / CHANTIER 30 % */
+            .split-title {
+                margin-bottom: 6px !important;
+            }
 
-            .payment-summary-grid {
-                display: grid !important;
-                grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) !important;
-                width: 100% !important;
-                gap: 0 !important;
+            .split-title span {
+                padding: 4px 10px !important;
                 border: 2px solid #000 !important;
+                color: #000 !important;
                 background: #fff !important;
-                overflow: hidden !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                font-size: 11px !important;
+                font-weight: 800 !important;
+                letter-spacing: .5px !important;
+            }
+
+            /* --- Panneau bon de paiement --- */
+
+            .payment-summary-stack {
+                gap: 0 !important;
+                margin-bottom: 6px !important;
+                border: 1.5px solid #000 !important;
             }
 
             .payment-summary {
-                width: 100% !important;
-                min-width: 0 !important;
-                min-height: 52px !important;
-                margin: 0 !important;
-                padding: 7px 8px !important;
+                min-height: 40px !important;
+                padding: 5px 7px !important;
                 border: none !important;
                 background: #fff !important;
                 color: #000 !important;
             }
 
             .payment-summary+.payment-summary {
-                border-left: 3px solid #000 !important;
+                border-top: 1.5px solid #000 !important;
             }
 
             .payment-summary-label {
                 color: #000 !important;
-                font-size: 10.5px !important;
+                font-size: 9.5px !important;
                 font-weight: 800 !important;
             }
 
             .payment-summary-value {
                 color: #000 !important;
-                font-size: 12px !important;
+                font-size: 11px !important;
             }
 
-            /* INFORMATIONS DU PAIEMENT */
-
             .payment-info-grid {
-                display: grid !important;
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-                gap: 4px 12px !important;
+                gap: 3px !important;
             }
 
             .payment-info-item {
-                padding: 4px 0 !important;
+                padding: 3px 0 !important;
                 border-bottom: 1.5px solid #000 !important;
                 color: #000 !important;
-                font-size: 11px !important;
+                font-size: 10px !important;
                 line-height: 1.3 !important;
             }
 
             .payment-info-label {
-                width: 120px !important;
-                max-width: 52% !important;
-                color: #000 !important;
-                font-size: 11px !important;
-                font-weight: 800 !important;
-            }
-
-            .payment-amount {
-                color: #000 !important;
-                font-size: 13px !important;
-                font-weight: 800 !important;
-            }
-
-            /* OBSERVATION DU PAIEMENT */
-
-            .payment-observation {
-                min-height: 36px !important;
-                margin-top: 7px !important;
-                padding: 7px !important;
-                border: 1.5px solid #000 !important;
-                color: #000 !important;
-                background: #fff !important;
-                font-size: 11px !important;
-                line-height: 1.3 !important;
-            }
-
-            .payment-observation strong {
-                color: #000 !important;
-                font-size: 11.5px !important;
-                font-weight: 800 !important;
-            }
-
-            /* ======================================================
-               BAS DU BON : 50% SIGNATURES + 50% RAPPORT DE FONDS
-            ====================================================== */
-
-            .payment-bottom-grid {
-                display: grid !important;
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
-                gap: 8px !important;
-                margin-top: 8px !important;
-            }
-
-            .payment-signatures {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                grid-template-rows: 1fr 1fr !important;
-                gap: 6px !important;
-            }
-
-            .payment-signature-box .sign-space {
-                min-height: 44px !important;
-                border: 1.5px solid #000 !important;
-                background: #fff !important;
-            }
-
-            .payment-signature-box .caption {
-                margin-top: 3px !important;
-                color: #000 !important;
-                font-size: 9.5px !important;
-                font-weight: 800 !important;
-            }
-
-            /* Trésorerie : même hauteur que remise + espace signature */
-
-            .payment-signature-box.treasury {
-                grid-column: 1 !important;
-                grid-row: 1 !important;
-                border: 1.5px solid #000 !important;
-                background: #fff !important;
-            }
-
-            .payment-signature-box.treasury .box-head {
-                padding: 3px 4px !important;
-                border-bottom: 1.5px solid #000 !important;
-                background: #fff !important;
-                color: #000 !important;
-                font-size: 9.5px !important;
-                font-weight: 800 !important;
-            }
-
-            .payment-signature-box.treasury .box-head .function {
-                color: #000 !important;
-                font-size: 9px !important;
-            }
-
-            .payment-signature-box.treasury .sign-area {
-                min-height: 34px !important;
-            }
-
-            .payment-signature-box.remise {
-                grid-column: 1 !important;
-                grid-row: 2 !important;
-            }
-
-            /* Réception de fonds : pleine hauteur à droite,
-               légende toujours visible (plus de min-height 100%) */
-
-            .payment-signature-box.reception {
-                grid-column: 2 !important;
-                grid-row: 1 / 3 !important;
-            }
-
-            .fund-report {
-                padding: 6px 8px !important;
-                border: 1.5px solid #000 !important;
-                background: #fff !important;
-                color: #000 !important;
-            }
-
-            .fund-report-title {
-                margin-bottom: 6px !important;
-                padding-bottom: 4px !important;
-                border-bottom: 2px solid #000 !important;
+                width: 115px !important;
+                max-width: 55% !important;
                 color: #000 !important;
                 font-size: 10px !important;
                 font-weight: 800 !important;
             }
 
+            .payment-amount {
+                color: #000 !important;
+                font-size: 12px !important;
+                font-weight: 800 !important;
+            }
+
+            .payment-observation {
+                min-height: 30px !important;
+                margin-top: 5px !important;
+                padding: 5px !important;
+                border: 1.5px solid #000 !important;
+                color: #000 !important;
+                background: #fff !important;
+                font-size: 10px !important;
+            }
+
+            /* Signatures : légendes DANS les rectangles */
+
+            .payment-signatures {
+                gap: 5px !important;
+                margin-top: 6px !important;
+            }
+
+            .payment-signature-box {
+                border: 1.5px solid #000 !important;
+                background: #fff !important;
+            }
+
+            .payment-signature-box .box-head {
+                padding: 3px 4px !important;
+                border-bottom: 1.5px solid #000 !important;
+                background: #fff !important;
+                color: #000 !important;
+                font-size: 9px !important;
+                font-weight: 800 !important;
+            }
+
+            .payment-signature-box .box-head .function {
+                color: #000 !important;
+                font-size: 8.5px !important;
+            }
+
+            .payment-signature-box .sign-area {
+                min-height: 32px !important;
+            }
+
+            /* --- Panneau rapport d'utilisation des fonds --- */
+
+            .fund-amount-item {
+                margin-bottom: 7px !important;
+                padding: 3px 0 !important;
+                border-bottom: 1.5px solid #000 !important;
+                color: #000 !important;
+                font-size: 10px !important;
+            }
+
             .fund-report-row {
-                margin-bottom: 6px !important;
+                margin-bottom: 8px !important;
                 font-size: 10px !important;
             }
 
@@ -1244,11 +1099,11 @@
 
             .fund-report-sign-grid {
                 gap: 5px !important;
-                padding-top: 3px !important;
+                padding-top: 6px !important;
             }
 
             .fund-sign-box {
-                min-height: 52px !important;
+                min-height: 60px !important;
                 padding: 4px 5px !important;
                 border: 1.5px solid #000 !important;
                 background: #fff !important;
@@ -1506,29 +1361,17 @@
 
                 <tr>
 
-                    <th class="col-number">
-                        N°
-                    </th>
+                    <th class="col-number">N°</th>
 
-                    <th class="col-designation">
-                        Désignation
-                    </th>
+                    <th class="col-designation">Désignation</th>
 
-                    <th class="col-quantity">
-                        Qté
-                    </th>
+                    <th class="col-quantity">Qté</th>
 
-                    <th class="col-unit-price">
-                        PU
-                    </th>
+                    <th class="col-unit-price">PU</th>
 
-                    <th class="col-total">
-                        Total
-                    </th>
+                    <th class="col-total">Total</th>
 
-                    <th class="col-observation">
-                        Observation
-                    </th>
+                    <th class="col-observation">Observation</th>
 
                 </tr>
 
@@ -1547,43 +1390,22 @@
 
                         <tr>
 
-                            <td class="text-center">
-                                <?= $index + 1 ?>
-                            </td>
+                            <td class="text-center"><?= $index + 1 ?></td>
 
-                            <td>
-                                <?= html_escape($article->designation) ?>
+                            <td><?= html_escape($article->designation) ?></td>
+
+                            <td class="text-right">
+                                <?= number_format((float) $article->quantity, 2, ',', ' ') ?>
                             </td>
 
                             <td class="text-right">
-                                <?= number_format(
-                                    (float) $article->quantity,
-                                    2,
-                                    ',',
-                                    ' '
-                                ) ?>
+                                <?= number_format((float) $article->unit_price, 0, ',', ' ') ?> BIF
                             </td>
 
                             <td class="text-right">
-                                <?= number_format(
-                                    (float) $article->unit_price,
-                                    0,
-                                    ',',
-                                    ' '
-                                ) ?> BIF
-                            </td>
-
-                            <td class="text-right">
-
                                 <strong>
-                                    <?= number_format(
-                                        $articleTotal,
-                                        0,
-                                        ',',
-                                        ' '
-                                    ) ?> BIF
+                                    <?= number_format($articleTotal, 0, ',', ' ') ?> BIF
                                 </strong>
-
                             </td>
 
                             <td>
@@ -1599,13 +1421,9 @@
                 <?php else : ?>
 
                     <tr>
-
                         <td colspan="6" class="text-center">
-
                             Aucun article trouvé.
-
                         </td>
-
                     </tr>
 
                 <?php endif; ?>
@@ -1617,20 +1435,11 @@
                 <tr class="total-row">
 
                     <td colspan="4" class="text-right">
-
                         Total général
-
                     </td>
 
                     <td class="text-right">
-
-                        <?= number_format(
-                            $total_general,
-                            0,
-                            ',',
-                            ' '
-                        ) ?> BIF
-
+                        <?= number_format($total_general, 0, ',', ' ') ?> BIF
                     </td>
 
                     <td></td>
@@ -1696,9 +1505,7 @@
                     </div>
 
                     <div class="function">
-                        <?= !empty($achat->technical_approver)
-                            ? html_escape($achat->technical_approver)
-                            : 'DT. NIYIMBONA Emmanuel' ?>
+                        DT. NIYIMBONA Emmanuel
                     </div>
 
                 </div>
@@ -1710,9 +1517,7 @@
                     </div>
 
                     <div class="function">
-                        <?= !empty($achat->financial_approver)
-                            ? html_escape($achat->financial_approver)
-                            : 'DAF. NDAGIJE Mariam' ?>
+                        DAF. NDAGIJE Mariam
                     </div>
 
                 </div>
@@ -1722,34 +1527,24 @@
         </section>
 
         <!-- =====================================================
-            BON DE PAIEMENT
+            DEUX PANNEAUX 50/50
         ====================================================== -->
 
         <?php if (!empty($bonPaiement)) : ?>
 
-            <!-- Ligne de séparation + titre encadré -->
+            <div class="payment-divider-line"></div>
 
-            <div class="payment-divider">
+            <div class="payment-split">
 
-                <div class="payment-divider-line"></div>
+                <!-- ===== 50% GAUCHE : BON DE PAIEMENT ===== -->
 
-                <div class="payment-document-title">
+                <section class="split-col">
 
-                    <span>
-                        Bon de paiement
-                    </span>
+                    <div class="split-title">
+                        <span>Bon de paiement</span>
+                    </div>
 
-                </div>
-
-            </div>
-
-            <section class="payment-voucher-section">
-
-                <div class="payment-voucher-body">
-
-                    <!-- Synthèse 70 % / Destination 30 % -->
-
-                    <div class="payment-summary-grid">
+                    <div class="payment-summary-stack">
 
                         <div class="payment-summary">
 
@@ -1758,11 +1553,7 @@
                             </span>
 
                             <div class="payment-summary-value">
-
-                                <?= nl2br(
-                                    html_escape($bonPaiement->summary)
-                                ) ?>
-
+                                <?= nl2br(html_escape($bonPaiement->summary)) ?>
                             </div>
 
                         </div>
@@ -1774,18 +1565,12 @@
                             </span>
 
                             <div class="payment-summary-value">
-
-                                <?= html_escape(
-                                    $achat->destination_chantier
-                                ) ?>
-
+                                <?= html_escape($achat->destination_chantier) ?>
                             </div>
 
                         </div>
 
                     </div>
-
-                    <!-- Informations du paiement -->
 
                     <div class="payment-info-grid">
 
@@ -1805,9 +1590,7 @@
                                 Numéro du bon :
                             </span>
 
-                            <?= html_escape(
-                                $bonPaiement->payment_number
-                            ) ?>
+                            <?= html_escape($bonPaiement->payment_number) ?>
 
                         </div>
 
@@ -1827,9 +1610,7 @@
                                 Référence paiement :
                             </span>
 
-                            <?= html_escape(
-                                $bonPaiement->payment_reference
-                            ) ?>
+                            <?= html_escape($bonPaiement->payment_reference) ?>
 
                         </div>
 
@@ -1840,30 +1621,8 @@
                             </span>
 
                             <?= !empty($bonPaiement->payment_date)
-                                ? date(
-                                    'd/m/Y',
-                                    strtotime($bonPaiement->payment_date)
-                                )
+                                ? date('d/m/Y', strtotime($bonPaiement->payment_date))
                                 : '-' ?>
-
-                        </div>
-
-                        <div class="payment-info-item">
-
-                            <span class="payment-info-label">
-                                Montant payé :
-                            </span>
-
-                            <span class="payment-amount">
-
-                                <?= number_format(
-                                    (float) $bonPaiement->amount_paid,
-                                    0,
-                                    ',',
-                                    ' '
-                                ) ?> BIF
-
-                            </span>
 
                         </div>
 
@@ -1873,115 +1632,116 @@
 
                         <div class="payment-observation">
 
-                            <strong>
-                                Observation :
-                            </strong>
+                            <strong>Observation :</strong><br>
 
-                            <br>
-
-                            <?= nl2br(
-                                html_escape($bonPaiement->observation)
-                            ) ?>
+                            <?= nl2br(html_escape($bonPaiement->observation)) ?>
 
                         </div>
 
                     <?php endif; ?>
 
-                    <!-- =====================================================
-                        BAS DU BON : SIGNATURES (50%) + RAPPORT FONDS (50%)
-                    ====================================================== -->
+                    <!-- Signatures : légendes DANS les rectangles -->
 
-                    <div class="payment-bottom-grid">
+                    <div class="payment-signatures">
 
-                        <!-- ===== 50% GAUCHE : SIGNATURES DU PAIEMENT ===== -->
+                        <div class="payment-signature-box treasury">
 
-                        <div class="payment-signatures">
-
-                            <!-- Trésorerie : même taille que remise,
-                                avec espace pour signer -->
-
-                            <div class="payment-signature-box treasury">
-
-                                <div class="box-head">
-                                    Trésorerie
-                                    <span class="function">
-                                        / AHISHAKIYE Nelly Ange
-                                    </span>
-                                </div>
-
-                                <div class="sign-area"></div>
-
+                            <div class="box-head">
+                                Trésorerie
+                                <span class="function">
+                                    / AHISHAKIYE Nelly Ange
+                                </span>
                             </div>
 
-                            <div class="payment-signature-box remise">
-
-                                <div class="sign-space"></div>
-
-                                <div class="caption">
-                                    Pour la remise de fonds
-                                </div>
-
-                            </div>
-
-                            <div class="payment-signature-box reception">
-
-                                <div class="sign-space"></div>
-
-                                <div class="caption">
-                                    Pour la réception de fonds
-                                </div>
-
-                            </div>
+                            <div class="sign-area"></div>
 
                         </div>
 
-                        <!-- ===== 50% DROIT : RAPPORT D'UTILISATION DE FONDS ===== -->
+                        <div class="payment-signature-box remise">
 
-                        <div class="fund-report">
-
-                            <div class="fund-report-title">
-                                Rapport d'utilisation de fonds
+                            <div class="box-head">
+                                Pour la remise de fonds
                             </div>
 
-                            <div class="fund-report-row">
+                            <div class="sign-area"></div>
 
-                                <span class="label">Retour caisse :</span>
+                        </div>
 
-                                <span class="fill"></span>
+                        <div class="payment-signature-box reception">
 
-                                <span class="unit">BIF</span>
+                            <div class="box-head">
+                                Pour la réception de fonds
+                            </div>
+
+                            <div class="sign-area"></div>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <!-- ===== 50% DROITE : RAPPORT D'UTILISATION DES FONDS ===== -->
+
+                <section class="split-col">
+
+                    <div class="split-title">
+                        <span>Rapport d'utilisation des fonds</span>
+                    </div>
+
+                    <div class="fund-body">
+
+                        <!-- Le rapport commence par le montant payé -->
+
+                        <div class="fund-amount-item">
+
+                            <span class="payment-info-label">
+                                Montant payé :
+                            </span>
+
+                            <span class="payment-amount">
+                                <?= number_format((float) $bonPaiement->amount_paid, 0, ',', ' ') ?> BIF
+                            </span>
+
+                        </div>
+
+                        <div class="fund-report-row">
+
+                            <span class="label">Retour caisse :</span>
+
+                            <span class="fill"></span>
+
+                            <span class="unit">BIF</span>
+
+                        </div>
+
+                        <div class="fund-report-row">
+
+                            <span class="label">Supplément à payer :</span>
+
+                            <span class="fill"></span>
+
+                            <span class="unit">BIF</span>
+
+                        </div>
+
+                        <div class="fund-report-sign-grid">
+
+                            <div class="fund-sign-box">
+
+                                <div class="caption">Rapporté par :</div>
 
                             </div>
 
-                            <div class="fund-report-row">
+                            <div class="fund-sign-box">
 
-                                <span class="label">Supplément à payer :</span>
-
-                                <span class="fill"></span>
-
-                                <span class="unit">BIF</span>
+                                <div class="caption">Vérifié par :</div>
 
                             </div>
 
-                            <div class="fund-report-sign-grid">
+                            <div class="fund-sign-box">
 
-                                <div class="fund-sign-box">
-
-                                    <div class="caption">Rapporté par :</div>
-
-                                </div>
-
-                                <div class="fund-sign-box">
-
-                                    <div class="caption">Vérifié par :</div>
-
-                                </div>
-
-                                <div class="fund-sign-box">
-
-                                    <div class="caption">Approuvé par :</div>
-
-                                </div>
+                                <div class="caption">Approuvé par :</div>
 
                             </div>
 
@@ -1989,9 +1749,9 @@
 
                     </div>
 
-                </div>
+                </section>
 
-            </section>
+            </div>
 
         <?php endif; ?>
 
