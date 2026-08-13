@@ -606,28 +606,24 @@
         }
 
         /* Signatures du rapport :
-           - Ligne 1 : Rapporté par | Vérifié par (côte à côte)
-           - Ligne 2 : Approuvé par (pleine largeur)
-           Rectangles AGRANDIS */
+           3 rectangles PLEINE LARGEUR, empilés,
+           qui remplissent TOUT l'espace vide du panneau */
 
         .fund-report-sign-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(3, 1fr);
             gap: 10px;
-            margin-top: auto;
+            flex: 1 1 auto;
             padding-top: 10px;
         }
 
         .fund-sign-box {
             min-width: 0;
-            min-height: 95px;
+            min-height: 48px;
             padding: 6px;
             border: 1px solid var(--border-soft);
             background: #fff;
-        }
-
-        .fund-sign-box:last-child {
-            grid-column: 1 / -1;
         }
 
         .fund-sign-box .caption {
@@ -705,6 +701,10 @@
 
             .payment-signature-box .sign-area {
                 min-height: 60px;
+            }
+
+            .fund-sign-box {
+                min-height: 70px;
             }
         }
 
@@ -1066,8 +1066,8 @@
                 min-height: 32px !important;
             }
 
-            /* --- Panneau rapport d'utilisation (40%) :
-                   rectangles AGRANDIS --- */
+            /* --- Panneau rapport (40%) :
+                   3 rectangles pleine largeur qui remplissent l'espace --- */
 
             .fund-amount-item {
                 margin-bottom: 7px !important;
@@ -1099,20 +1099,17 @@
             }
 
             .fund-report-sign-grid {
-                grid-template-columns: 1fr 1fr !important;
+                grid-template-columns: 1fr !important;
+                grid-template-rows: repeat(3, 1fr) !important;
                 gap: 6px !important;
                 padding-top: 6px !important;
             }
 
             .fund-sign-box {
-                min-height: 55px !important;
+                min-height: 34px !important;
                 padding: 4px 5px !important;
                 border: 1.5px solid #000 !important;
                 background: #fff !important;
-            }
-
-            .fund-sign-box:last-child {
-                grid-column: 1 / -1 !important;
             }
 
             .fund-sign-box .caption {
@@ -1511,9 +1508,7 @@
                     </div>
 
                     <div class="function">
-                        <?= !empty($achat->technical_approver)
-                            ? html_escape($achat->technical_approver)
-                            : 'DT. NIYIMBONA Emmanuel' ?>
+                        DT. NIYIMBONA Emmanuel
                     </div>
 
                 </div>
@@ -1525,9 +1520,7 @@
                     </div>
 
                     <div class="function">
-                        <?= !empty($achat->financial_approver)
-                            ? html_escape($achat->financial_approver)
-                            : 'DAF. NDAGIJE Mariam' ?>
+                        DAF. NDAGIJE Mariam
                     </div>
 
                 </div>
@@ -1699,7 +1692,7 @@
 
                     <div class="fund-body">
 
-                        <div class="fund-amount-item">
+                        <!-- <div class="fund-amount-item">
 
                             <span class="payment-info-label">
                                 Montant payé :
@@ -1708,6 +1701,16 @@
                             <span class="payment-amount">
                                 <?= number_format((float) $bonPaiement->amount_paid, 0, ',', ' ') ?> BIF
                             </span>
+
+                        </div> -->
+
+                        <div class="fund-report-row">
+
+                            <span class="label">Montant payé :</span>
+
+                            <span class="fill"></span>
+
+                            <span class="unit">BIF</span>
 
                         </div>
 
@@ -1731,9 +1734,8 @@
 
                         </div>
 
-                        <!-- Rectangles AGRANDIS :
-                             Ligne 1 : Rapporté par | Vérifié par
-                             Ligne 2 : Approuvé par (pleine largeur) -->
+                        <!-- 3 rectangles pleine largeur,
+                             empilés, qui remplissent tout l'espace vide -->
 
                         <div class="fund-report-sign-grid">
 
