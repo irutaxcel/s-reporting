@@ -26,53 +26,53 @@
 
             <!-- ============ STYLE LOCAL (page employés) ============ -->
             <style>
-            .avatar-initials {
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                width: 34px;
-                height: 34px;
-                border-radius: 50%;
-                color: #fff;
-                font-weight: 600;
-                font-size: .78rem;
-                flex-shrink: 0;
-            }
+                .avatar-initials {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 50%;
+                    color: #fff;
+                    font-weight: 600;
+                    font-size: .78rem;
+                    flex-shrink: 0;
+                }
 
-            .avatar-lg {
-                width: 90px;
-                height: 90px;
-                font-size: 2rem;
-                margin: 0 auto;
-            }
+                .avatar-lg {
+                    width: 90px;
+                    height: 90px;
+                    font-size: 2rem;
+                    margin: 0 auto;
+                }
 
-            .table td {
-                vertical-align: middle;
-            }
+                .table td {
+                    vertical-align: middle;
+                }
 
-            .section-title {
-                color: #1f7a5c;
-                font-weight: 700;
-                border-bottom: 2px solid #e9ecef;
-                padding-bottom: .4rem;
-            }
+                .section-title {
+                    color: #1f7a5c;
+                    font-weight: 700;
+                    border-bottom: 2px solid #e9ecef;
+                    padding-bottom: .4rem;
+                }
 
-            .custom-file-label {
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
+                .custom-file-label {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
 
-            .custom-file-label::after {
-                content: "Parcourir";
-                /* remplace "Browse" */
-            }
+                .custom-file-label::after {
+                    content: "Parcourir";
+                    /* remplace "Browse" */
+                }
 
-            .custom-file-label.has-file {
-                color: #1f7a5c;
-                /* met en évidence qu'un fichier est choisi */
-                font-weight: 600;
-            }
+                .custom-file-label.has-file {
+                    color: #1f7a5c;
+                    /* met en évidence qu'un fichier est choisi */
+                    font-weight: 600;
+                }
             </style>
 
             <!-- ============ 1. INDICATEURS ============ -->
@@ -210,261 +210,93 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0001</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#1f7a5c">JN</span>
-                                        <div>
-                                            <div class="font-weight-bold">Jean-Marie NDAYIZEYE</div>
-                                            <small class="text-muted">j.ndayizeye@satraco.bi · +257 79 100 001</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Responsable RH &amp; Suivi-Évaluation</td>
-                                <td><i class="fas fa-building mr-1 text-muted"></i>Ressources Humaines</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>02/03/2020 <small class="text-muted d-block">6 ans</small></td>
-                                <td><span class="badge badge-success">Actif</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" title="Profil" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default" title="Modifier"><i
-                                            class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger" title="Désactiver"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0007</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#2c8a69">EI</span>
-                                        <div>
-                                            <div class="font-weight-bold">Espérance INGABIRE</div>
-                                            <small class="text-muted">e.ingabire@satraco.bi · +257 79 100 007</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Secrétaire de direction</td>
-                                <td><i class="fas fa-building mr-1 text-muted"></i>Direction Générale</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>03/02/2023 <small class="text-muted d-block">3 ans</small></td>
-                                <td><span class="badge badge-info">En congé</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0014</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#34608c">AN</span>
-                                        <div>
-                                            <div class="font-weight-bold">Alice NIYONZIMA</div>
-                                            <small class="text-muted">a.niyonzima@satraco.bi · +257 79 100 014</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Comptable senior</td>
-                                <td><i class="fas fa-building mr-1 text-muted"></i>DAF / Finance</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>15/06/2021 <small class="text-muted d-block">5 ans</small></td>
-                                <td><span class="badge badge-success">Actif</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0021</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#7a4f1f">PH</span>
-                                        <div>
-                                            <div class="font-weight-bold">Patrick HAKIZIMANA</div>
-                                            <small class="text-muted">p.hakizimana@satraco.bi · +257 79 100 021</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Conducteur de travaux</td>
-                                <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>10/01/2022 <small class="text-muted d-block">4 ans</small></td>
-                                <td><span class="badge badge-success">Actif</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0029</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#1f7a5c">CU</span>
-                                        <div>
-                                            <div class="font-weight-bold">Chantal UWIMANA</div>
-                                            <small class="text-muted">c.uwimana@satraco.bi · +257 79 100 029</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Officier HSE</td>
-                                <td><i class="fas fa-building mr-1 text-muted"></i>Direction Technique</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>12/11/2021 <small class="text-muted d-block">4 ans</small></td>
-                                <td><span class="badge badge-success">Actif</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0033</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#2c8a69">DI</span>
-                                        <div>
-                                            <div class="font-weight-bold">Divine IRAKOZE</div>
-                                            <small class="text-muted">d.irakoze@satraco.bi · +257 79 100 033</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Assistant RH</td>
-                                <td><i class="fas fa-building mr-1 text-muted"></i>Ressources Humaines</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>05/09/2024 <small class="text-muted d-block">2 ans</small></td>
-                                <td><span class="badge badge-success">Actif</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0041</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#34608c">EN</span>
-                                        <div>
-                                            <div class="font-weight-bold">Emmanuel NSHIMIRIMANA</div>
-                                            <small class="text-muted">+257 79 100 041</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Chef d'équipe maçonnerie</td>
-                                <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Gitega</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>20/03/2025 <small class="text-muted d-block">1 an</small></td>
-                                <td><span class="badge badge-info">En congé</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0048</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#7a4f1f">DB</span>
-                                        <div>
-                                            <div class="font-weight-bold">David BIZIMANA</div>
-                                            <small class="text-muted">+257 79 100 048</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Électricien bâtiment</td>
-                                <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>08/04/2025 <small class="text-muted d-block">1 an</small></td>
-                                <td><span class="badge badge-warning">Suspendu</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0056</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#1f7a5c">EN</span>
-                                        <div>
-                                            <div class="font-weight-bold">Eric NDAYISHIMIYE</div>
-                                            <small class="text-muted">+257 79 100 056</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Topographe</td>
-                                <td><i class="fas fa-building mr-1 text-muted"></i>Direction Technique</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>17/07/2025 <small class="text-muted d-block">1 an</small></td>
-                                <td><span class="badge badge-success">Actif</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong class="text-muted">SAT-0062</strong></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="avatar-initials mr-2" style="background:#6c757d">CM</span>
-                                        <div>
-                                            <div class="font-weight-bold">Claudine MUKAMANA</div>
-                                            <small class="text-muted">+257 79 100 062</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>Magasinière de chantier</td>
-                                <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Gitega</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>02/06/2025 <small class="text-muted d-block">1 an</small></td>
-                                <td><span class="badge badge-secondary">Fin de contrat</span></td>
-                                <td class="text-right">
-                                    <button class="btn btn-sm btn-default" data-toggle="modal"
-                                        data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-default"><i class="fas fa-edit"></i></button>
-                                    <button class="btn btn-sm btn-default text-danger"><i
-                                            class="fas fa-user-slash"></i></button>
-                                </td>
-                            </tr>
+                            <?php
+                            $couleurs      = ['#1f7a5c', '#2c8a69', '#34608c', '#7a4f1f', '#8a3033', '#6c757d'];
+                            $badge_contrat = ['CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info'];
+                            $badge_statut  = ['Actif' => 'success', 'En congé' => 'info', 'Suspendu' => 'warning', 'Fin de contrat' => 'secondary'];
+
+                            if (!empty($employes)):
+                                foreach ($employes as $emp):
+                                    // Initiales + couleur stable par employé
+                                    $initiales = strtoupper(mb_substr($emp->prenoms, 0, 1) . mb_substr($emp->nom, 0, 1));
+                                    $couleur   = $couleurs[$emp->employe_id % count($couleurs)];
+
+                                    // Ligne de contact (email · téléphone), gère les NULL
+                                    $contact = trim((!empty($emp->email) ? $emp->email . ' · ' : '') . (!empty($emp->telephone) ? $emp->telephone : ''));
+
+                                    // Affectation : chantier (site) ou bureau (département)
+                                    $icone = ($emp->categorie === 'Chantier') ? 'fa-hard-hat' : 'fa-building';
+                                    $lieu  = ($emp->categorie === 'Chantier') ? $emp->site_affectation : $emp->departement;
+
+                                    // Ancienneté
+                                    $diff = (new DateTime($emp->date_embauche))->diff(new DateTime());
+                                    $anciennete = $diff->y >= 1
+                                        ? $diff->y . ' an' . ($diff->y > 1 ? 's' : '')
+                                        : $diff->m . ' mois';
+                            ?>
+                                    <tr>
+                                        <td><strong class="text-muted"><?= html_escape($emp->matricule) ?></strong></td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials mr-2"
+                                                    style="background:<?= $couleur ?>"><?= $initiales ?></span>
+                                                <div>
+                                                    <div class="font-weight-bold">
+                                                        <?= html_escape($emp->prenoms . ' ' . mb_strtoupper($emp->nom)) ?></div>
+                                                    <?php if ($contact !== ''): ?>
+                                                        <small class="text-muted"><?= html_escape($contact) ?></small>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><?= html_escape($emp->fonction) ?></td>
+                                        <td><i class="fas <?= $icone ?> mr-1 text-muted"></i><?= html_escape($lieu) ?></td>
+                                        <td><span
+                                                class="badge badge-<?= $badge_contrat[$emp->type_contrat] ?? 'secondary' ?>"><?= $emp->type_contrat ?></span>
+                                        </td>
+                                        <td><?= date('d/m/Y', strtotime($emp->date_embauche)) ?>
+                                            <small class="text-muted d-block"><?= $anciennete ?></small>
+                                        </td>
+                                        <td><span
+                                                class="badge badge-<?= $badge_statut[$emp->statut] ?? 'secondary' ?>"><?= $emp->statut ?></span>
+                                        </td>
+                                        <td class="text-right">
+                                            <button class="btn btn-sm btn-default" title="Profil" data-toggle="modal"
+                                                data-target="#modalProfilEmploye"><i class="fas fa-eye"></i></button>
+
+                                            <button type="button" class="btn btn-sm btn-default" title="Modifier"
+                                                onclick="ouvrirModalModification(<?= $emp->employe_id ?>)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+
+                                            <button class="btn btn-sm btn-default text-danger" title="Désactiver"><i
+                                                    class="fas fa-user-slash"></i></button>
+                                        </td>
+                                    </tr>
+                                <?php
+                                endforeach;
+                            else:
+                                ?>
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        <i class="fas fa-inbox fa-2x mb-2 d-block"></i>
+                                        Aucun employé trouvé.
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="card-footer clearfix">
-                    <small class="text-muted float-left mt-2">Affichage de 1 à 10 sur 128 employés</small>
+                    <small class="text-muted float-left mt-2">
+                        Affichage de <?= count($employes) > 0 ? '1 à ' . count($employes) : '0' ?>
+                        sur <?= count($employes) ?> employé<?= count($employes) > 1 ? 's' : '' ?>
+                    </small>
                     <ul class="pagination pagination-sm float-right mb-0">
                         <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
                         <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">3</a></li>
-                        <li class="page-item disabled"><a class="page-link" href="#">…</a></li>
-                        <li class="page-item"><a class="page-link" href="#">13</a></li>
-                        <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
                     </ul>
                 </div>
             </div>
@@ -656,71 +488,71 @@
             </div>
 
             <script>
-            document.addEventListener('DOMContentLoaded', function() {
+                document.addEventListener('DOMContentLoaded', function() {
 
-                /* ---------- 1. Afficher le nom du fichier choisi (vanilla JS) ---------- */
-                document.querySelectorAll('.custom-file-input').forEach(function(input) {
-                    input.addEventListener('change', function() {
-                        var label = this.closest('.custom-file').querySelector(
-                            '.custom-file-label');
-                        if (this.files && this.files.length > 0) {
-                            var noms = Array.prototype.map.call(this.files, function(f) {
-                                return f.name;
-                            }).join(', ');
-                            label.textContent = noms;
-                            label.classList.add('has-file');
-                        } else {
-                            label.textContent = 'Choisir…';
-                            label.classList.remove('has-file');
-                        }
-                    });
-                });
-
-                /* ---------- 2. Matricule auto à l'ouverture de la modale ---------- */
-                $('#modalNouvelEmploye').on('show.bs.modal', function() {
-                    $.getJSON('<?= base_url("rh/next_matricule") ?>', function(res) {
-                        $('#inputMatricule').val(res.matricule + ' (généré automatiquement)');
-                    });
-                });
-
-                /* ---------- 3. Soumission AJAX du formulaire ---------- */
-                $('#formNouvelEmploye').on('submit', function(e) {
-                    e.preventDefault();
-                    var btn = $('#btnEnregistrerEmploye').prop('disabled', true)
-                        .html('<i class="fas fa-spinner fa-spin mr-1"></i> Enregistrement…');
-
-                    $.ajax({
-                        url: '<?= base_url("rh/employes_store") ?>',
-                        method: 'POST',
-                        data: new FormData(this),
-                        processData: false,
-                        contentType: false,
-                        dataType: 'json',
-                        success: function(res) {
-                            if (res.status === 'success') {
-                                $('#modalNouvelEmploye').modal('hide');
-                                (typeof toastr !== 'undefined') ? toastr.success(res
-                                    .message): alert(res.message);
-                                setTimeout(function() {
-                                    location.reload();
-                                }, 900);
+                    /* ---------- 1. Afficher le nom du fichier choisi (vanilla JS) ---------- */
+                    document.querySelectorAll('.custom-file-input').forEach(function(input) {
+                        input.addEventListener('change', function() {
+                            var label = this.closest('.custom-file').querySelector(
+                                '.custom-file-label');
+                            if (this.files && this.files.length > 0) {
+                                var noms = Array.prototype.map.call(this.files, function(f) {
+                                    return f.name;
+                                }).join(', ');
+                                label.textContent = noms;
+                                label.classList.add('has-file');
                             } else {
-                                (typeof toastr !== 'undefined') ? toastr.error(res.message):
-                                    alert(res.message);
+                                label.textContent = 'Choisir…';
+                                label.classList.remove('has-file');
                             }
-                        },
-                        error: function() {
-                            (typeof toastr !== 'undefined') ? toastr.error(
-                                'Erreur serveur.'): alert('Erreur serveur.');
-                        },
-                        complete: function() {
-                            btn.prop('disabled', false).html(
-                                '<i class="fas fa-save mr-1"></i> Enregistrer l\'employé'
-                            );
-                        }
+                        });
+                    });
+
+                    /* ---------- 2. Matricule auto à l'ouverture de la modale ---------- */
+                    $('#modalNouvelEmploye').on('show.bs.modal', function() {
+                        $.getJSON('<?= base_url("rh/next_matricule") ?>', function(res) {
+                            $('#inputMatricule').val(res.matricule + ' (généré automatiquement)');
+                        });
+                    });
+
+                    /* ---------- 3. Soumission AJAX du formulaire ---------- */
+                    $('#formNouvelEmploye').on('submit', function(e) {
+                        e.preventDefault();
+                        var btn = $('#btnEnregistrerEmploye').prop('disabled', true)
+                            .html('<i class="fas fa-spinner fa-spin mr-1"></i> Enregistrement…');
+
+                        $.ajax({
+                            url: '<?= base_url("rh/employes_store") ?>',
+                            method: 'POST',
+                            data: new FormData(this),
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                            success: function(res) {
+                                if (res.status === 'success') {
+                                    $('#modalNouvelEmploye').modal('hide');
+                                    (typeof toastr !== 'undefined') ? toastr.success(res
+                                        .message): alert(res.message);
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 900);
+                                } else {
+                                    (typeof toastr !== 'undefined') ? toastr.error(res.message):
+                                        alert(res.message);
+                                }
+                            },
+                            error: function() {
+                                (typeof toastr !== 'undefined') ? toastr.error(
+                                    'Erreur serveur.'): alert('Erreur serveur.');
+                            },
+                            complete: function() {
+                                btn.prop('disabled', false).html(
+                                    '<i class="fas fa-save mr-1"></i> Enregistrer l\'employé'
+                                );
+                            }
+                        });
                     });
                 });
-            });
             </script>
 
             <!-- ============ 4. MODALE : PROFIL 360° ============ -->
@@ -952,6 +784,361 @@
                     </div>
                 </div>
             </div>
+
+            <!-- ============ MODALE : MODIFIER EMPLOYÉ ============ -->
+            <div class="modal fade" id="modalModifierEmploye">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <form id="formModifierEmploye" enctype="multipart/form-data">
+                            <input type="hidden" name="employe_id" id="editEmployeId">
+
+                            <div class="modal-header bg-success text-white">
+                                <h4 class="modal-title"><i class="fas fa-user-edit mr-2"></i>Modifier l'employé <span
+                                        id="editMatriculeTitre"></span></h4>
+                                <button type="button" class="close text-white"
+                                    data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <h6 class="section-title">1. Informations personnelles</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Nom *</label><input type="text" name="nom"
+                                                class="form-control" required></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Prénoms *</label><input type="text"
+                                                name="prenoms" class="form-control" required></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Sexe</label><select name="sexe"
+                                                class="form-control">
+                                                <option>Masculin</option>
+                                                <option>Féminin</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Date de naissance</label><input type="date"
+                                                name="date_naissance" class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>État civil</label><select name="etat_civil"
+                                                class="form-control">
+                                                <option>Célibataire</option>
+                                                <option>Marié(e)</option>
+                                                <option>Divorcé(e)</option>
+                                                <option>Veuf(ve)</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>N° CNID / NIN</label><input type="text"
+                                                name="cnid" class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Téléphone</label><input type="text"
+                                                name="telephone" class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Email</label><input type="email" name="email"
+                                                class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Adresse</label><input type="text" name="adresse"
+                                                class="form-control"></div>
+                                    </div>
+                                </div>
+
+                                <h6 class="section-title mt-3">2. Informations administratives &amp; contractuelles</h6>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Matricule</label><input type="text"
+                                                id="inputMatriculeEdit" class="form-control" disabled></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Catégorie</label><select name="categorie"
+                                                class="form-control">
+                                                <option value="Bureau">Personnel de bureau</option>
+                                                <option value="Chantier">Ouvrier de chantier</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Fonction *</label><input type="text"
+                                                name="fonction" class="form-control" required></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Département</label><select name="departement"
+                                                class="form-control">
+                                                <option>Direction Générale</option>
+                                                <option>DAF / Finance</option>
+                                                <option>Direction Technique</option>
+                                                <option>Ressources Humaines</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Site d'affectation</label><select
+                                                name="site_affectation" class="form-control">
+                                                <option>Siège (Bujumbura)</option>
+                                                <option>Chantier Ngagara II</option>
+                                                <option>Chantier Gitega</option>
+                                                <option>Chantier Ngozi</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Date d'embauche *</label><input type="date"
+                                                name="date_embauche" class="form-control" required></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Type de contrat</label><select
+                                                name="type_contrat" class="form-control">
+                                                <option>CDI</option>
+                                                <option>CDD</option>
+                                                <option>Stage</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Fin de contrat (si CDD)</label><input type="date"
+                                                name="date_fin_contrat" class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Période d'essai</label><select
+                                                name="periode_essai" class="form-control">
+                                                <option>3 mois</option>
+                                                <option>6 mois</option>
+                                                <option>Aucune</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Salaire de base (BIF) *</label><input
+                                                type="number" name="salaire_base" class="form-control" required></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Mode de paiement</label><select
+                                                name="mode_paiement" class="form-control">
+                                                <option>Virement bancaire</option>
+                                                <option>Espèces</option>
+                                                <option>Mobile money</option>
+                                            </select></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>N° matricule INSS</label><input type="text"
+                                                name="matricule_inss" class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>N° contribuable (OBR)</label><input type="text"
+                                                name="numero_contribuable" class="form-control"></div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Statut</label><select name="statut"
+                                                class="form-control">
+                                                <option>Actif</option>
+                                                <option>En congé</option>
+                                                <option>Suspendu</option>
+                                                <option>Fin de contrat</option>
+                                            </select></div>
+                                    </div>
+                                </div>
+
+                                <h6 class="section-title mt-3">3. Documents <small class="text-muted">(laisser vide pour
+                                        conserver l'actuel)</small></h6>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group"><label>Copie CNID</label><small
+                                                class="d-block text-muted mb-1" id="docActuel_doc_cnid">Aucun
+                                                fichier</small>
+                                            <div class="custom-file"><input type="file" name="doc_cnid"
+                                                    class="custom-file-input" id="editDocCnid"><label
+                                                    class="custom-file-label" for="editDocCnid">Remplacer…</label></div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group"><label>Photo d'identité</label><small
+                                                class="d-block text-muted mb-1" id="docActuel_doc_photo">Aucun
+                                                fichier</small>
+                                            <div class="custom-file"><input type="file" name="doc_photo"
+                                                    class="custom-file-input" id="editDocPhoto"><label
+                                                    class="custom-file-label" for="editDocPhoto">Remplacer…</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group"><label>Contrat signé</label><small
+                                                class="d-block text-muted mb-1" id="docActuel_doc_contrat">Aucun
+                                                fichier</small>
+                                            <div class="custom-file"><input type="file" name="doc_contrat"
+                                                    class="custom-file-input" id="editDocContrat"><label
+                                                    class="custom-file-label" for="editDocContrat">Remplacer…</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group"><label>CV / Diplômes</label><small
+                                                class="d-block text-muted mb-1" id="docActuel_doc_cv">Aucun
+                                                fichier</small>
+                                            <div class="custom-file"><input type="file" name="doc_cv"
+                                                    class="custom-file-input" id="editDocCv"><label
+                                                    class="custom-file-label" for="editDocCv">Remplacer…</label></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success" id="btnModifierEmploye"><i
+                                        class="fas fa-save mr-1"></i> Enregistrer les modifications</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                /* =====================================================
+   VARIABLES & FONCTIONS GLOBALES (accessibles depuis onclick)
+   Définies en scope global : aucune dépendance jQuery au parse,
+   jQuery n'est utilisé qu'AU CLIC (donc après chargement du footer).
+   ===================================================== */
+                var RH_BASE = '<?= base_url("/") ?>';
+
+                function rhNotify(type, msg) {
+                    if (typeof toastr !== 'undefined') {
+                        toastr[type](msg);
+                    } else {
+                        alert(msg);
+                    }
+                }
+
+                /* ---------- Bouton MODIFIER (onclick) ---------- */
+                function ouvrirModalModification(id) {
+                    $.getJSON(RH_BASE + 'rh-employe_get/' + id, function(res) {
+                        if (res.status !== 'success') {
+                            rhNotify('error', res.message);
+                            return;
+                        }
+
+                        var emp = res.employe;
+                        var $form = $('#formModifierEmploye');
+                        $form[0].reset();
+
+                        // Pré-remplit chaque champ (name = colonne SQL)
+                        $.each(emp, function(cle, valeur) {
+                            var $el = $form.find('[name="' + cle + '"]').not('input[type="file"]');
+                            if ($el.length && valeur !== null) {
+                                $el.val(cle === 'salaire_base' ? parseFloat(valeur) : valeur);
+                            }
+                        });
+
+                        $('#editMatriculeTitre').text('(' + emp.matricule + ')');
+                        $('#inputMatriculeEdit').val(emp.matricule);
+
+                        // Documents actuels (lien de consultation)
+                        ['doc_cnid', 'doc_photo', 'doc_contrat', 'doc_cv'].forEach(function(champ) {
+                            var $cible = $('#docActuel_' + champ);
+                            if (emp[champ]) {
+                                var nomFichier = emp[champ].split('/').pop();
+                                $cible.html('<a href="<?= base_url() ?>' + emp[champ] +
+                                    '" target="_blank"><i class="fas fa-paperclip mr-1"></i>' +
+                                    nomFichier + '</a>');
+                            } else {
+                                $cible.text('Aucun fichier');
+                            }
+                        });
+
+                        $('#modalModifierEmploye').modal('show');
+                    }).fail(function() {
+                        rhNotify('error', 'Erreur serveur lors du chargement de la fiche.');
+                    });
+                }
+
+                /* =====================================================
+                   ATTACHES APRÈS CHARGEMENT COMPLET (jQuery garanti)
+                   ===================================================== */
+                document.addEventListener('DOMContentLoaded', function() {
+
+                    /* Affichage du nom de fichier choisi (toutes les modales) */
+                    document.querySelectorAll('.custom-file-input').forEach(function(input) {
+                        input.addEventListener('change', function() {
+                            var label = this.closest('.custom-file').querySelector(
+                                '.custom-file-label');
+                            label.textContent = (this.files && this.files.length) ? this.files[0]
+                                .name : 'Choisir…';
+                        });
+                    });
+
+                    /* ---------- CRÉATION : matricule auto à l'ouverture ---------- */
+                    $('#modalNouvelEmploye').on('show.bs.modal', function() {
+                        $.getJSON(RH_BASE + 'next_matricule', function(res) {
+                            $('#inputMatricule').val(res.matricule + ' (généré automatiquement)');
+                        });
+                    });
+
+                    /* ---------- CRÉATION : soumission ---------- */
+                    $('#formNouvelEmploye').on('submit', function(e) {
+                        e.preventDefault();
+                        var btn = $('#btnEnregistrerEmploye').prop('disabled', true)
+                            .html('<i class="fas fa-spinner fa-spin mr-1"></i> Enregistrement…');
+                        $.ajax({
+                            url: RH_BASE + 'employes_store',
+                            method: 'POST',
+                            data: new FormData(this),
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                            success: function(res) {
+                                if (res.status === 'success') {
+                                    $('#modalNouvelEmploye').modal('hide');
+                                    rhNotify('success', res.message);
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 900);
+                                } else {
+                                    rhNotify('error', res.message);
+                                }
+                            },
+                            error: function() {
+                                rhNotify('error', 'Erreur serveur.');
+                            },
+                            complete: function() {
+                                btn.prop('disabled', false).html(
+                                    '<i class="fas fa-save mr-1"></i> Enregistrer l\'employé'
+                                );
+                            }
+                        });
+                    });
+
+                    /* ---------- MODIFICATION : soumission ---------- */
+                    $('#formModifierEmploye').on('submit', function(e) {
+                        e.preventDefault();
+                        var btn = $('#btnModifierEmploye').prop('disabled', true)
+                            .html('<i class="fas fa-spinner fa-spin mr-1"></i> Enregistrement…');
+                        $.ajax({
+                            url: RH_BASE + 'employes_update',
+                            method: 'POST',
+                            data: new FormData(this),
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                            success: function(res) {
+                                if (res.status === 'success') {
+                                    $('#modalModifierEmploye').modal('hide');
+                                    rhNotify('success', res.message);
+                                    setTimeout(function() {
+                                        location.reload();
+                                    }, 900);
+                                } else {
+                                    rhNotify('error', res.message);
+                                }
+                            },
+                            error: function() {
+                                rhNotify('error', 'Erreur serveur.');
+                            },
+                            complete: function() {
+                                btn.prop('disabled', false).html(
+                                    '<i class="fas fa-save mr-1"></i> Enregistrer les modifications'
+                                );
+                            }
+                        });
+                    });
+                });
+            </script>
 
         </div><!-- /.container-fluid -->
     </section>

@@ -421,7 +421,7 @@
                 <!-- ==========================
                         DAF / FINANCE
                     =========================== -->
-                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Journal de caisse' ||  $title == 'Livre de Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie' || $title == 'Factures clients' || $title == 'Factures fournisseurs' || $title == 'Paiements' || $title == 'Échéances') { ?>
+                <?php if ($title == 'Tableau de Bord DAF'  || $title == 'Exercices Comptables' || $title == 'Classes de Comptes' || $title == 'Plan Comptable' || $title == 'Codes journaux' || $title == 'Écritures Comptables' || $title == 'Journal Comptable' || $title == 'Grand Livre Comptable' || $title == 'Balance Générale' || $title == 'Clôture Comptable' || $title == 'Caisse' || $title == 'Journal de caisse' ||  $title == 'Livre de Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie' || $title == 'Factures clients' || $title == 'Factures fournisseurs' || $title == 'Paiements' || $title == 'Échéances' || $title == 'Rapport Financier') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -597,7 +597,7 @@
                 </li>
 
                 <!-- TRESORERIE -->
-                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie' || $title == 'Journal de caisse' || $title == 'Livre de Caisse') { ?>
+                <?php if ($title == 'Caisse' || $title == 'Encaissements' || $title == 'Décaissements' || $title == 'Comptes bancaires' || $title == 'Rapprochement bancaire' || $title == 'Prévisions de trésorerie' || $title == 'Journal de caisse' || $title == 'Livre de Caisse' || $title == 'Rapport Financier') { ?>
                 <li class="nav-item has-treeview menu-open">
 
                     <a href="#" class="nav-link active">
@@ -630,6 +630,21 @@
                             <?php } ?>
                         </li>
 
+                        <!-- Rapport Financier -->
+                        <li class="nav-item">
+                            <?php if ($title == 'Rapport Financier') { ?>
+                            <a href="<?= base_url('rapport-financier') ?>" class="nav-link active">
+                                <i class="fas fa-file-invoice-dollar nav-icon text-info"></i>
+                                <p>Rapport Financier</p>
+                            </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('rapport-financier') ?>" class="nav-link">
+                                <i class="fas fa-file-invoice-dollar nav-icon text-info"></i>
+                                <p>Rapport Financier</p>
+                            </a>
+                            <?php } ?>
+                        </li>
+
                         <!-- Comptes bancaires -->
                         <li class="nav-item">
                             <?php if ($title == 'Comptes bancaires') { ?>
@@ -647,7 +662,7 @@
                         </li>
 
                         <!-- Encaissements -->
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <?php if ($title == 'Encaissements') { ?>
                             <a href="<?= base_url('encaissements') ?>" class="nav-link active">
                                 <i class="fas fa-arrow-circle-down nav-icon text-success"></i>
@@ -659,10 +674,10 @@
                                 <p>Encaissements</p>
                             </a>
                             <?php } ?>
-                        </li>
+                        </li> -->
 
                         <!-- Décaissements -->
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <?php if ($title == 'Décaissements') { ?>
                             <a href="<?= base_url('decaissements') ?>" class="nav-link active">
                                 <i class="fas fa-arrow-circle-up nav-icon text-danger"></i>
@@ -674,7 +689,7 @@
                                 <p>Décaissements</p>
                             </a>
                             <?php } ?>
-                        </li>
+                        </li> -->
 
                         <!-- Rapprochement bancaire -->
                         <li class="nav-item">

@@ -1824,242 +1824,242 @@ class FinanceModel extends CI_Model
      * - month
      * - year
      */
-    public function getCashFlowEvolution(string $period = '7days'): array
-    {
-        $today = date('Y-m-d');
+    // public function getCashFlowEvolution(string $period = '7days'): array
+    // {
+    //     $today = date('Y-m-d');
 
-        switch ($period) {
-            case '30days':
-                $startDate = date(
-                    'Y-m-d',
-                    strtotime('-29 days')
-                );
+    //     switch ($period) {
+    //         case '30days':
+    //             $startDate = date(
+    //                 'Y-m-d',
+    //                 strtotime('-29 days')
+    //             );
 
-                $endDate = $today;
-                $groupFormat = '%Y-%m-%d';
-                break;
+    //             $endDate = $today;
+    //             $groupFormat = '%Y-%m-%d';
+    //             break;
 
-            case 'month':
-                $startDate = date('Y-m-01');
-                $endDate = date('Y-m-t');
-                $groupFormat = '%Y-%m-%d';
-                break;
+    //         case 'month':
+    //             $startDate = date('Y-m-01');
+    //             $endDate = date('Y-m-t');
+    //             $groupFormat = '%Y-%m-%d';
+    //             break;
 
-            case 'year':
-                $startDate = date('Y-01-01');
-                $endDate = date('Y-12-31');
-                $groupFormat = '%Y-%m';
-                break;
+    //         case 'year':
+    //             $startDate = date('Y-01-01');
+    //             $endDate = date('Y-12-31');
+    //             $groupFormat = '%Y-%m';
+    //             break;
 
-            case '7days':
-            default:
-                $period = '7days';
+    //         case '7days':
+    //         default:
+    //             $period = '7days';
 
-                $startDate = date(
-                    'Y-m-d',
-                    strtotime('-6 days')
-                );
+    //             $startDate = date(
+    //                 'Y-m-d',
+    //                 strtotime('-6 days')
+    //             );
 
-                $endDate = $today;
-                $groupFormat = '%Y-%m-%d';
-                break;
-        }
+    //             $endDate = $today;
+    //             $groupFormat = '%Y-%m-%d';
+    //             break;
+    //     }
 
-        /*
-     * =========================================================
-     * RÉCUPÉRATION DES MOUVEMENTS AGRÉGÉS
-     * =========================================================
-     */
+    //     /*
+    //     * =========================================================
+    //     * RÉCUPÉRATION DES MOUVEMENTS AGRÉGÉS
+    //     * =========================================================
+    //     */
 
-        $sql = "
-        SELECT
-            DATE_FORMAT(
-                operation_date,
-                ?
-            ) AS period_key,
+    //     $sql = "
+    //         SELECT
+    //             DATE_FORMAT(
+    //                 operation_date,
+    //                 ?
+    //             ) AS period_key,
 
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN operation_type = 'encaissement'
-                        THEN amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS total_income,
+    //             COALESCE(
+    //                 SUM(
+    //                     CASE
+    //                         WHEN operation_type = 'encaissement'
+    //                         THEN amount
+    //                         ELSE 0
+    //                     END
+    //                 ),
+    //                 0
+    //             ) AS total_income,
 
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN operation_type = 'decaissement'
-                        THEN amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS total_expense
+    //             COALESCE(
+    //                 SUM(
+    //                     CASE
+    //                         WHEN operation_type = 'decaissement'
+    //                         THEN amount
+    //                         ELSE 0
+    //                     END
+    //                 ),
+    //                 0
+    //             ) AS total_expense
 
-        FROM tbl_finance_cashbox_operation
+    //         FROM tbl_finance_cashbox_operation
 
-        WHERE status = 'validated'
+    //         WHERE status = 'validated'
 
-        AND operation_type IN (
-            'encaissement',
-            'decaissement'
-        )
+    //         AND operation_type IN (
+    //             'encaissement',
+    //             'decaissement'
+    //         )
 
-        AND operation_date BETWEEN ? AND ?
+    //         AND operation_date BETWEEN ? AND ?
 
-        GROUP BY
-            DATE_FORMAT(
-                operation_date,
-                ?
-            )
+    //         GROUP BY
+    //             DATE_FORMAT(
+    //                 operation_date,
+    //                 ?
+    //             )
 
-        ORDER BY period_key ASC
-    ";
+    //         ORDER BY period_key ASC
+    //     ";          
 
-        $queryResults = $this->db
-            ->query(
-                $sql,
-                [
-                    $groupFormat,
-                    $startDate,
-                    $endDate,
-                    $groupFormat,
-                ]
-            )
-            ->result();
+    //     $queryResults = $this->db
+    //         ->query(
+    //             $sql,
+    //             [
+    //                 $groupFormat,
+    //                 $startDate,
+    //                 $endDate,
+    //                 $groupFormat,
+    //             ]
+    //         )
+    //         ->result();
 
-        /*
-     * Indexer les résultats par date ou par mois.
-     */
-        $indexedResults = [];
+    //     /*
+    //  * Indexer les résultats par date ou par mois.
+    //  */
+    //     $indexedResults = [];
 
-        foreach ($queryResults as $row) {
-            $indexedResults[$row->period_key] = [
-                'income'  => (float) $row->total_income,
-                'expense' => (float) $row->total_expense,
-            ];
-        }
+    //     foreach ($queryResults as $row) {
+    //         $indexedResults[$row->period_key] = [
+    //             'income'  => (float) $row->total_income,
+    //             'expense' => (float) $row->total_expense,
+    //         ];
+    //     }
 
-        $labels = [];
-        $incomes = [];
-        $expenses = [];
+    //     $labels = [];
+    //     $incomes = [];
+    //     $expenses = [];
 
-        /*
-     * =========================================================
-     * PÉRIODE ANNUELLE : UN POINT PAR MOIS
-     * =========================================================
-     */
-        if ($period === 'year') {
-            $monthNames = [
-                1  => 'Janv.',
-                2  => 'Févr.',
-                3  => 'Mars',
-                4  => 'Avr.',
-                5  => 'Mai',
-                6  => 'Juin',
-                7  => 'Juil.',
-                8  => 'Août',
-                9  => 'Sept.',
-                10 => 'Oct.',
-                11 => 'Nov.',
-                12 => 'Déc.',
-            ];
+    //     /*
+    //     * =========================================================
+    //     * PÉRIODE ANNUELLE : UN POINT PAR MOIS
+    //     * =========================================================
+    //     */
+    //     if ($period === 'year') {
+    //         $monthNames = [
+    //             1  => 'Janv.',
+    //             2  => 'Févr.',
+    //             3  => 'Mars',
+    //             4  => 'Avr.',
+    //             5  => 'Mai',
+    //             6  => 'Juin',
+    //             7  => 'Juil.',
+    //             8  => 'Août',
+    //             9  => 'Sept.',
+    //             10 => 'Oct.',
+    //             11 => 'Nov.',
+    //             12 => 'Déc.',
+    //         ];
 
-            for ($month = 1; $month <= 12; $month++) {
-                $key = date('Y')
-                    . '-'
-                    . str_pad(
-                        (string) $month,
-                        2,
-                        '0',
-                        STR_PAD_LEFT
-                    );
+    //         for ($month = 1; $month <= 12; $month++) {
+    //             $key = date('Y')
+    //                 . '-'
+    //                 . str_pad(
+    //                     (string) $month,
+    //                     2,
+    //                     '0',
+    //                     STR_PAD_LEFT
+    //                 );
 
-                $labels[] = $monthNames[$month];
+    //             $labels[] = $monthNames[$month];
 
-                $incomes[] = isset($indexedResults[$key])
-                    ? $indexedResults[$key]['income']
-                    : 0;
+    //             $incomes[] = isset($indexedResults[$key])
+    //                 ? $indexedResults[$key]['income']
+    //                 : 0;
 
-                $expenses[] = isset($indexedResults[$key])
-                    ? $indexedResults[$key]['expense']
-                    : 0;
-            }
-        }
+    //             $expenses[] = isset($indexedResults[$key])
+    //                 ? $indexedResults[$key]['expense']
+    //                 : 0;
+    //         }
+    //     }
 
-        /*
-     * =========================================================
-     * AUTRES PÉRIODES : UN POINT PAR JOUR
-     * =========================================================
-     */ else {
-            $startTimestamp = strtotime($startDate);
-            $endTimestamp = strtotime($endDate);
+    //     /*
+    //  * =========================================================
+    //  * AUTRES PÉRIODES : UN POINT PAR JOUR
+    //  * =========================================================
+    //  */ else {
+    //         $startTimestamp = strtotime($startDate);
+    //         $endTimestamp = strtotime($endDate);
 
-            $monthNames = [
-                1  => 'Janv.',
-                2  => 'Févr.',
-                3  => 'Mars',
-                4  => 'Avr.',
-                5  => 'Mai',
-                6  => 'Juin',
-                7  => 'Juil.',
-                8  => 'Août',
-                9  => 'Sept.',
-                10 => 'Oct.',
-                11 => 'Nov.',
-                12 => 'Déc.',
-            ];
+    //         $monthNames = [
+    //             1  => 'Janv.',
+    //             2  => 'Févr.',
+    //             3  => 'Mars',
+    //             4  => 'Avr.',
+    //             5  => 'Mai',
+    //             6  => 'Juin',
+    //             7  => 'Juil.',
+    //             8  => 'Août',
+    //             9  => 'Sept.',
+    //             10 => 'Oct.',
+    //             11 => 'Nov.',
+    //             12 => 'Déc.',
+    //         ];
 
-            for (
-                $timestamp = $startTimestamp;
-                $timestamp <= $endTimestamp;
-                $timestamp = strtotime(
-                    '+1 day',
-                    $timestamp
-                )
-            ) {
-                $key = date(
-                    'Y-m-d',
-                    $timestamp
-                );
+    //         for (
+    //             $timestamp = $startTimestamp;
+    //             $timestamp <= $endTimestamp;
+    //             $timestamp = strtotime(
+    //                 '+1 day',
+    //                 $timestamp
+    //             )
+    //         ) {
+    //             $key = date(
+    //                 'Y-m-d',
+    //                 $timestamp
+    //             );
 
-                $day = date(
-                    'd',
-                    $timestamp
-                );
+    //             $day = date(
+    //                 'd',
+    //                 $timestamp
+    //             );
 
-                $monthNumber = (int) date(
-                    'n',
-                    $timestamp
-                );
+    //             $monthNumber = (int) date(
+    //                 'n',
+    //                 $timestamp
+    //             );
 
-                $labels[] = $day
-                    . ' '
-                    . $monthNames[$monthNumber];
+    //             $labels[] = $day
+    //                 . ' '
+    //                 . $monthNames[$monthNumber];
 
-                $incomes[] = isset($indexedResults[$key])
-                    ? $indexedResults[$key]['income']
-                    : 0;
+    //             $incomes[] = isset($indexedResults[$key])
+    //                 ? $indexedResults[$key]['income']
+    //                 : 0;
 
-                $expenses[] = isset($indexedResults[$key])
-                    ? $indexedResults[$key]['expense']
-                    : 0;
-            }
-        }
+    //             $expenses[] = isset($indexedResults[$key])
+    //                 ? $indexedResults[$key]['expense']
+    //                 : 0;
+    //         }
+    //     }
 
-        return [
-            'period'     => $period,
-            'start_date' => $startDate,
-            'end_date'   => $endDate,
-            'labels'     => $labels,
-            'incomes'    => $incomes,
-            'expenses'   => $expenses,
-        ];
-    }
+    //     return [
+    //         'period'     => $period,
+    //         'start_date' => $startDate,
+    //         'end_date'   => $endDate,
+    //         'labels'     => $labels,
+    //         'incomes'    => $incomes,
+    //         'expenses'   => $expenses,
+    //     ];
+    // }
 
     /**
      * Retourne les alertes dynamiques de trésorerie.
@@ -2069,276 +2069,276 @@ class FinanceModel extends CI_Model
      * - opération en attente ;
      * - justificatif manquant.
      */
-    public function getTreasuryAlerts(int $limit = 8): array
-    {
-        $limit = max(
-            1,
-            min(
-                $limit,
-                30
-            )
-        );
+    // public function getTreasuryAlerts(int $limit = 8): array
+    // {
+    //     $limit = max(
+    //         1,
+    //         min(
+    //             $limit,
+    //             30
+    //         )
+    //     );
 
-        $alerts = [];
+    //     $alerts = [];
 
-        /*
-     * =========================================================
-     * 1. CAISSES AVEC SOLDE CRITIQUE
-     * =========================================================
-     */
+    //     /*
+    //  * =========================================================
+    //  * 1. CAISSES AVEC SOLDE CRITIQUE
+    //  * =========================================================
+    //  */
 
-        $criticalCashboxes = $this->db
-            ->select([
-                'c.id',
-                'c.code',
-                'c.name',
-                'c.type',
-                'c.devise',
-                'c.current_balance',
-                'c.alert_threshold',
-                'ch.name AS chantier_name',
-            ])
-            ->from('tbl_finance_cashbox c')
-            ->join(
-                'chantiers ch',
-                'ch.id = c.chantier_id',
-                'left'
-            )
-            ->where('c.status', 'active')
-            ->where('c.alert_threshold >', 0)
-            ->where(
-                'c.current_balance <= c.alert_threshold',
-                null,
-                false
-            )
-            ->order_by('c.current_balance', 'ASC')
-            ->get()
-            ->result();
+    //     $criticalCashboxes = $this->db
+    //         ->select([
+    //             'c.id',
+    //             'c.code',
+    //             'c.name',
+    //             'c.type',
+    //             'c.devise',
+    //             'c.current_balance',
+    //             'c.alert_threshold',
+    //             'ch.name AS chantier_name',
+    //         ])
+    //         ->from('tbl_finance_cashbox c')
+    //         ->join(
+    //             'chantiers ch',
+    //             'ch.id = c.chantier_id',
+    //             'left'
+    //         )
+    //         ->where('c.status', 'active')
+    //         ->where('c.alert_threshold >', 0)
+    //         ->where(
+    //             'c.current_balance <= c.alert_threshold',
+    //             null,
+    //             false
+    //         )
+    //         ->order_by('c.current_balance', 'ASC')
+    //         ->get()
+    //         ->result();
 
-        foreach ($criticalCashboxes as $cashbox) {
-            $displayName = !empty($cashbox->chantier_name)
-                ? $cashbox->chantier_name
-                : $cashbox->name;
+    //     foreach ($criticalCashboxes as $cashbox) {
+    //         $displayName = !empty($cashbox->chantier_name)
+    //             ? $cashbox->chantier_name
+    //             : $cashbox->name;
 
-            $alerts[] = [
-                'type'       => 'danger',
-                'icon'       => 'fas fa-wallet',
-                'title'      => 'Solde critique — ' . $displayName,
-                'message'    =>
-                'Le solde disponible de '
-                    . number_format(
-                        (float) $cashbox->current_balance,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $cashbox->devise
-                    . ' est inférieur ou égal au seuil de '
-                    . number_format(
-                        (float) $cashbox->alert_threshold,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $cashbox->devise
-                    . '.',
+    //         $alerts[] = [
+    //             'type'       => 'danger',
+    //             'icon'       => 'fas fa-wallet',
+    //             'title'      => 'Solde critique — ' . $displayName,
+    //             'message'    =>
+    //             'Le solde disponible de '
+    //                 . number_format(
+    //                     (float) $cashbox->current_balance,
+    //                     0,
+    //                     ',',
+    //                     ' '
+    //                 )
+    //                 . ' '
+    //                 . $cashbox->devise
+    //                 . ' est inférieur ou égal au seuil de '
+    //                 . number_format(
+    //                     (float) $cashbox->alert_threshold,
+    //                     0,
+    //                     ',',
+    //                     ' '
+    //                 )
+    //                 . ' '
+    //                 . $cashbox->devise
+    //                 . '.',
 
-                'priority'   => 1,
-                'created_at' => null,
-            ];
-        }
+    //             'priority'   => 1,
+    //             'created_at' => null,
+    //         ];
+    //     }
 
-        /*
-     * =========================================================
-     * 2. OPÉRATIONS EN ATTENTE
-     * =========================================================
-     */
+    //     /*
+    //  * =========================================================
+    //  * 2. OPÉRATIONS EN ATTENTE
+    //  * =========================================================
+    //  */
 
-        $pendingOperations = $this->db
-            ->select([
-                'op.id',
-                'op.reference',
-                'op.operation_type',
-                'op.amount',
-                'op.currency',
-                'op.label',
-                'op.created_at',
-                'source.name AS source_name',
-                'destination.name AS destination_name',
-            ])
-            ->from('tbl_finance_cashbox_operation op')
-            ->join(
-                'tbl_finance_cashbox source',
-                'source.id = op.source_cashbox_id',
-                'left'
-            )
-            ->join(
-                'tbl_finance_cashbox destination',
-                'destination.id = op.destination_cashbox_id',
-                'left'
-            )
-            ->where('op.status', 'pending')
-            ->order_by('op.created_at', 'ASC')
-            ->limit(5)
-            ->get()
-            ->result();
+    //     $pendingOperations = $this->db
+    //         ->select([
+    //             'op.id',
+    //             'op.reference',
+    //             'op.operation_type',
+    //             'op.amount',
+    //             'op.currency',
+    //             'op.label',
+    //             'op.created_at',
+    //             'source.name AS source_name',
+    //             'destination.name AS destination_name',
+    //         ])
+    //         ->from('tbl_finance_cashbox_operation op')
+    //         ->join(
+    //             'tbl_finance_cashbox source',
+    //             'source.id = op.source_cashbox_id',
+    //             'left'
+    //         )
+    //         ->join(
+    //             'tbl_finance_cashbox destination',
+    //             'destination.id = op.destination_cashbox_id',
+    //             'left'
+    //         )
+    //         ->where('op.status', 'pending')
+    //         ->order_by('op.created_at', 'ASC')
+    //         ->limit(5)
+    //         ->get()
+    //         ->result();
 
-        foreach ($pendingOperations as $operation) {
-            $operationLabel = 'Opération en attente';
+    //     foreach ($pendingOperations as $operation) {
+    //         $operationLabel = 'Opération en attente';
 
-            if (
-                $operation->operation_type
-                === 'approvisionnement'
-            ) {
-                $operationLabel =
-                    'Approvisionnement en attente';
-            } elseif (
-                $operation->operation_type
-                === 'encaissement'
-            ) {
-                $operationLabel =
-                    'Encaissement en attente';
-            } elseif (
-                $operation->operation_type
-                === 'decaissement'
-            ) {
-                $operationLabel =
-                    'Décaissement en attente';
-            }
+    //         if (
+    //             $operation->operation_type
+    //             === 'approvisionnement'
+    //         ) {
+    //             $operationLabel =
+    //                 'Approvisionnement en attente';
+    //         } elseif (
+    //             $operation->operation_type
+    //             === 'encaissement'
+    //         ) {
+    //             $operationLabel =
+    //                 'Encaissement en attente';
+    //         } elseif (
+    //             $operation->operation_type
+    //             === 'decaissement'
+    //         ) {
+    //             $operationLabel =
+    //                 'Décaissement en attente';
+    //         }
 
-            $message = $operation->reference
-                . ' — '
-                . number_format(
-                    (float) $operation->amount,
-                    0,
-                    ',',
-                    ' '
-                )
-                . ' '
-                . $operation->currency;
+    //         $message = $operation->reference
+    //             . ' — '
+    //             . number_format(
+    //                 (float) $operation->amount,
+    //                 0,
+    //                 ',',
+    //                 ' '
+    //             )
+    //             . ' '
+    //             . $operation->currency;
 
-            if (
-                $operation->operation_type
-                === 'approvisionnement'
-                && !empty($operation->destination_name)
-            ) {
-                $message .=
-                    ' vers '
-                    . $operation->destination_name;
-            }
+    //         if (
+    //             $operation->operation_type
+    //             === 'approvisionnement'
+    //             && !empty($operation->destination_name)
+    //         ) {
+    //             $message .=
+    //                 ' vers '
+    //                 . $operation->destination_name;
+    //         }
 
-            $alerts[] = [
-                'type'       => 'warning',
-                'icon'       => 'fas fa-clock',
-                'title'      => $operationLabel,
-                'message'    => $message
-                    . ' attend une validation.',
+    //         $alerts[] = [
+    //             'type'       => 'warning',
+    //             'icon'       => 'fas fa-clock',
+    //             'title'      => $operationLabel,
+    //             'message'    => $message
+    //                 . ' attend une validation.',
 
-                'priority'   => 2,
-                'created_at' => $operation->created_at,
-            ];
-        }
+    //             'priority'   => 2,
+    //             'created_at' => $operation->created_at,
+    //         ];
+    //     }
 
-        /*
-     * =========================================================
-     * 3. DÉCAISSEMENTS SANS JUSTIFICATIF
-     * =========================================================
-     */
+    //     /*
+    //  * =========================================================
+    //  * 3. DÉCAISSEMENTS SANS JUSTIFICATIF
+    //  * =========================================================
+    //  */
 
-        $missingAttachments = $this->db
-            ->select([
-                'op.id',
-                'op.reference',
-                'op.amount',
-                'op.currency',
-                'op.category',
-                'op.third_party',
-                'op.created_at',
-                'c.name AS cashbox_name',
-            ])
-            ->from('tbl_finance_cashbox_operation op')
-            ->join(
-                'tbl_finance_cashbox c',
-                'c.id = op.source_cashbox_id',
-                'left'
-            )
-            ->where(
-                'op.operation_type',
-                'decaissement'
-            )
-            ->where(
-                'op.status',
-                'validated'
-            )
-            ->group_start()
-            ->where(
-                'op.attachment IS NULL',
-                null,
-                false
-            )
-            ->or_where(
-                'op.attachment',
-                ''
-            )
-            ->group_end()
-            ->order_by('op.amount', 'DESC')
-            ->limit(5)
-            ->get()
-            ->result();
+    //     $missingAttachments = $this->db
+    //         ->select([
+    //             'op.id',
+    //             'op.reference',
+    //             'op.amount',
+    //             'op.currency',
+    //             'op.category',
+    //             'op.third_party',
+    //             'op.created_at',
+    //             'c.name AS cashbox_name',
+    //         ])
+    //         ->from('tbl_finance_cashbox_operation op')
+    //         ->join(
+    //             'tbl_finance_cashbox c',
+    //             'c.id = op.source_cashbox_id',
+    //             'left'
+    //         )
+    //         ->where(
+    //             'op.operation_type',
+    //             'decaissement'
+    //         )
+    //         ->where(
+    //             'op.status',
+    //             'validated'
+    //         )
+    //         ->group_start()
+    //         ->where(
+    //             'op.attachment IS NULL',
+    //             null,
+    //             false
+    //         )
+    //         ->or_where(
+    //             'op.attachment',
+    //             ''
+    //         )
+    //         ->group_end()
+    //         ->order_by('op.amount', 'DESC')
+    //         ->limit(5)
+    //         ->get()
+    //         ->result();
 
-        foreach ($missingAttachments as $operation) {
-            $alerts[] = [
-                'type'  => 'info',
-                'icon'  => 'fas fa-file-alt',
-                'title' => 'Justificatif manquant',
+    //     foreach ($missingAttachments as $operation) {
+    //         $alerts[] = [
+    //             'type'  => 'info',
+    //             'icon'  => 'fas fa-file-alt',
+    //             'title' => 'Justificatif manquant',
 
-                'message' =>
-                'Le décaissement '
-                    . $operation->reference
-                    . ' de '
-                    . number_format(
-                        (float) $operation->amount,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $operation->currency
-                    . ' dans '
-                    . (
-                        $operation->cashbox_name
-                        ?: 'une caisse'
-                    )
-                    . ' ne possède pas de pièce justificative.',
+    //             'message' =>
+    //             'Le décaissement '
+    //                 . $operation->reference
+    //                 . ' de '
+    //                 . number_format(
+    //                     (float) $operation->amount,
+    //                     0,
+    //                     ',',
+    //                     ' '
+    //                 )
+    //                 . ' '
+    //                 . $operation->currency
+    //                 . ' dans '
+    //                 . (
+    //                     $operation->cashbox_name
+    //                     ?: 'une caisse'
+    //                 )
+    //                 . ' ne possède pas de pièce justificative.',
 
-                'priority'   => 3,
-                'created_at' => $operation->created_at,
-            ];
-        }
+    //             'priority'   => 3,
+    //             'created_at' => $operation->created_at,
+    //         ];
+    //     }
 
-        /*
-     * Trier les alertes :
-     * danger, warning, puis information.
-     */
-        usort(
-            $alerts,
-            function (
-                array $firstAlert,
-                array $secondAlert
-            ): int {
-                return $firstAlert['priority']
-                    <=> $secondAlert['priority'];
-            }
-        );
+    //     /*
+    //  * Trier les alertes :
+    //  * danger, warning, puis information.
+    //  */
+    //     usort(
+    //         $alerts,
+    //         function (
+    //             array $firstAlert,
+    //             array $secondAlert
+    //         ): int {
+    //             return $firstAlert['priority']
+    //                 <=> $secondAlert['priority'];
+    //         }
+    //     );
 
-        return array_slice(
-            $alerts,
-            0,
-            $limit
-        );
-    }
+    //     return array_slice(
+    //         $alerts,
+    //         0,
+    //         $limit
+    //     );
+    // }
 
     public function countTreasuryAlerts(): int
     {
@@ -2414,10 +2414,10 @@ class FinanceModel extends CI_Model
         $monthStart = date('Y-m-01');
 
         /*
-     * =========================================================
-     * 1. SOLDE GLOBAL DES CAISSES ACTIVES
-     * =========================================================
-     */
+        * =========================================================
+        * 1. SOLDE GLOBAL DES CAISSES ACTIVES
+        * =========================================================
+        */
 
         $globalRow = $this->db
             ->select("
@@ -2443,10 +2443,10 @@ class FinanceModel extends CI_Model
             : 0;
 
         /*
-     * =========================================================
-     * 2. CAISSES SIÈGE
-     * =========================================================
-     */
+        * =========================================================
+        * 2. CAISSES SIÈGE
+        * =========================================================
+        */
 
         $headOfficeRow = $this->db
             ->select("
@@ -4719,41 +4719,56 @@ class FinanceModel extends CI_Model
      *
      * @return array
      */
-    public function getAllActiveCashboxes(): array
+    // public function getAllActiveCashboxes(): array
+    // {
+    //     return $this->db
+    //         ->select([
+    //             'id',
+    //             'code',
+    //             'name',
+    //             'type',
+    //             'chantier_id',
+    //             'responsable',
+    //             'devise',
+    //             'opening_balance',
+    //             'current_balance',
+    //             'alert_threshold',
+    //             'observation',
+    //             'status',
+    //             'created_by',
+    //             'created_at',
+    //             'updated_at',
+    //         ])
+    //         ->from('tbl_finance_cashbox')
+    //         ->where('status', 'active')
+    //         ->order_by(
+    //             "
+    //         CASE
+    //             WHEN type = 'siege' THEN 0
+    //             WHEN type = 'chantier' THEN 1
+    //             ELSE 2
+    //         END
+    //         ",
+    //             '',
+    //             false
+    //         )
+    //         ->order_by('name', 'ASC')
+    //         ->get()
+    //         ->result();
+    // }
+
+    /**
+     * =====================================================
+     * TOUTES LES CAISSES ACTIVES (avec rôle + solde)
+     * =====================================================
+     */
+    public function getAllActiveCashboxes()
     {
-        return $this->db
-            ->select([
-                'id',
-                'code',
-                'name',
-                'type',
-                'chantier_id',
-                'responsable',
-                'devise',
-                'opening_balance',
-                'current_balance',
-                'alert_threshold',
-                'observation',
-                'status',
-                'created_by',
-                'created_at',
-                'updated_at',
-            ])
-            ->from('tbl_finance_cashbox')
+        return $this->db->select('id, code, name, role, devise, current_balance')
             ->where('status', 'active')
-            ->order_by(
-                "
-            CASE
-                WHEN type = 'siege' THEN 0
-                WHEN type = 'chantier' THEN 1
-                ELSE 2
-            END
-            ",
-                '',
-                false
-            )
-            ->order_by('name', 'ASC')
-            ->get()
+            ->order_by('role', 'ASC')   /* principale d'abord */
+            ->order_by('id', 'ASC')
+            ->get('tbl_finance_cashbox')
             ->result();
     }
 
@@ -8551,113 +8566,160 @@ class FinanceModel extends CI_Model
             );
     }
 
-    public function getPayablePurchaseRequests(): array
+    // public function getPayablePurchaseRequests(): array
+    // {
+    //     $this->db->select(
+    //         "
+    //     prf.id,
+
+    //     CONCAT(
+    //         'DA-',
+    //         YEAR(prf.created_at),
+    //         '-',
+    //         LPAD(prf.id, 3, '0')
+    //     ) AS request_reference,
+
+    //     prf.chantier_id,
+    //     prf.destination_chantier,
+    //     prf.created_at AS request_created_at,
+
+    //     p.name AS chantier_name,
+
+    //     ppv.id AS payment_voucher_id,
+    //     ppv.payment_number,
+    //     ppv.summary AS payment_summary,
+    //     ppv.payment_mode,
+    //     ppv.amount_paid,
+    //     ppv.payment_reference,
+    //     ppv.payment_date,
+    //     ppv.observation AS payment_observation,
+    //     ppv.payment_status,
+
+    //     GROUP_CONCAT(
+    //         DISTINCT pri.designation
+    //         ORDER BY pri.id ASC
+    //         SEPARATOR ', '
+    //     ) AS purchase_items_summary
+    //     ",
+    //         false
+    //     );
+
+    //     $this->db->from(
+    //         'purchase_request_forms prf'
+    //     );
+
+    //     $this->db->join(
+    //         'purchase_request_items pri',
+    //         'pri.request_id = prf.id',
+    //         'left'
+    //     );
+
+    //     $this->db->join(
+    //         'projects p',
+    //         'p.id = prf.chantier_id',
+    //         'left'
+    //     );
+
+    //     $this->db->join(
+    //         'purchase_payment_vouchers ppv',
+    //         'ppv.request_id = prf.id',
+    //         'inner'
+    //     );
+
+    //     /*
+    //     * Pour commencer, vérifier uniquement
+    //     * que le bon de paiement est effectué.
+    //     */
+    //     $this->db->where(
+    //         'ppv.payment_status',
+    //         'effectue'
+    //     );
+
+    //     $this->db->where("
+    //     NOT EXISTS (
+    //         SELECT 1
+    //         FROM tbl_finance_cashbox_operation cfo
+    //         WHERE cfo.payment_voucher_id = ppv.id
+    //         AND cfo.operation_type = 'decaissement'
+    //     )", NULL, FALSE);
+
+    //     $this->db->group_by([
+    //         'prf.id',
+    //         'prf.created_at',
+    //         'prf.chantier_id',
+    //         'prf.destination_chantier',
+    //         'p.name',
+    //         'ppv.id',
+    //         'ppv.payment_number',
+    //         'ppv.summary',
+    //         'ppv.payment_mode',
+    //         'ppv.amount_paid',
+    //         'ppv.payment_reference',
+    //         'ppv.payment_date',
+    //         'ppv.observation',
+    //         'ppv.payment_status',
+    //     ]);
+
+    //     $this->db->order_by(
+    //         'ppv.payment_date',
+    //         'DESC'
+    //     );
+
+    //     $this->db->order_by(
+    //         'ppv.id',
+    //         'DESC'
+    //     );
+
+    //     return $this->db
+    //         ->get()
+    //         ->result();
+    // }
+
+    /**
+     * =====================================================
+     * DA PAYABLES PAR LA CAISSE SECONDAIRE
+     * = attachées à un bon de paiement (INNER JOIN)
+     * + pas encore payées (payment_status = 'en_attente')
+     * =====================================================
+     */
+    public function getPayablePurchaseRequests()
     {
-        $this->db->select(
-            "
-        prf.id,
+        $this->db->select("
+            prf.id,
+            prf.request_date,
+            prf.created_at,
+            prf.chantier_id,
+            prf.destination_chantier,
+            prf.payment_status,
+            ch.name AS chantier_name,
+            pv.id AS voucher_id,
+            pv.payment_number,
+            pv.summary,
+            pv.payment_mode,
+            pv.amount_paid,
+            pv.payment_reference,
+            pv.payment_date,
+            pv.observation AS payment_observation,
+            pv.payment_status AS voucher_payment_status
+        ", false);
+        $this->db->from('purchase_request_forms prf');
 
-        CONCAT(
-            'DA-',
-            YEAR(prf.created_at),
-            '-',
-            LPAD(prf.id, 3, '0')
-        ) AS request_reference,
+        /* ✅ Le lien est côté BON : pv.request_id (et non prf.payment_voucher_id, toujours NULL) */
+        $this->db->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'inner');
+        $this->db->join('chantiers ch', 'ch.id = prf.chantier_id', 'left');
 
-        prf.chantier_id,
-        prf.destination_chantier,
-        prf.created_at AS request_created_at,
+        /* ✅ Enum réel de la DA : non_paye / partiel / paye */
+        $this->db->where('prf.payment_status !=', 'paye');
 
-        p.name AS chantier_name,
+        /* ✅ Uniquement les bons EN ATTENTE de paiement */
+        $this->db->where('pv.payment_status', 'en_attente');
 
-        ppv.id AS payment_voucher_id,
-        ppv.payment_number,
-        ppv.summary AS payment_summary,
-        ppv.payment_mode,
-        ppv.amount_paid,
-        ppv.payment_reference,
-        ppv.payment_date,
-        ppv.observation AS payment_observation,
-        ppv.payment_status,
+        /* Une seule ligne par DA si plusieurs bons */
+        $this->db->group_by('prf.id');
 
-        GROUP_CONCAT(
-            DISTINCT pri.designation
-            ORDER BY pri.id ASC
-            SEPARATOR ', '
-        ) AS purchase_items_summary
-        ",
-            false
-        );
+        $this->db->order_by('prf.id', 'DESC');
 
-        $this->db->from(
-            'purchase_request_forms prf'
-        );
-
-        $this->db->join(
-            'purchase_request_items pri',
-            'pri.request_id = prf.id',
-            'left'
-        );
-
-        $this->db->join(
-            'projects p',
-            'p.id = prf.chantier_id',
-            'left'
-        );
-
-        $this->db->join(
-            'purchase_payment_vouchers ppv',
-            'ppv.request_id = prf.id',
-            'inner'
-        );
-
-        /*
-        * Pour commencer, vérifier uniquement
-        * que le bon de paiement est effectué.
-        */
-        $this->db->where(
-            'ppv.payment_status',
-            'effectue'
-        );
-
-        $this->db->where("
-        NOT EXISTS (
-            SELECT 1
-            FROM tbl_finance_cashbox_operation cfo
-            WHERE cfo.payment_voucher_id = ppv.id
-            AND cfo.operation_type = 'decaissement'
-        )", NULL, FALSE);
-
-        $this->db->group_by([
-            'prf.id',
-            'prf.created_at',
-            'prf.chantier_id',
-            'prf.destination_chantier',
-            'p.name',
-            'ppv.id',
-            'ppv.payment_number',
-            'ppv.summary',
-            'ppv.payment_mode',
-            'ppv.amount_paid',
-            'ppv.payment_reference',
-            'ppv.payment_date',
-            'ppv.observation',
-            'ppv.payment_status',
-        ]);
-
-        $this->db->order_by(
-            'ppv.payment_date',
-            'DESC'
-        );
-
-        $this->db->order_by(
-            'ppv.id',
-            'DESC'
-        );
-
-        return $this->db
-            ->get()
-            ->result();
+        return $this->db->get()->result();
     }
 
     /**
@@ -9304,5 +9366,1235 @@ class FinanceModel extends CI_Model
         }
 
         return $rows;
+    }
+
+    /**
+     * =====================================================
+     * PROCHAIN CODE CAISSE : CAI-AAAA-XXX
+     * Calculé depuis les codes existants de la table.
+     * =====================================================
+     */
+    public function generateCashboxCode()
+    {
+        $year   = date('Y');
+        $prefix = 'CAI-' . $year . '-';
+
+        /* Dernier code de l'année en cours */
+        $row = $this->db->select('code')
+            ->like('code', $prefix, 'after')
+            ->order_by('code', 'DESC')
+            ->limit(1)
+            ->get('tbl_finance_cashbox')
+            ->row();
+
+        $next = 1;
+        if ($row) {
+            $next = ((int) substr($row->code, strlen($prefix))) + 1;
+        }
+
+        return $prefix . str_pad($next, 3, '0', STR_PAD_LEFT);
+    }
+
+    /** Prochaine référence de mouvement d'un livre */
+    public function nextMovementReference($table, $prefix)
+    {
+        $year = date('Y');
+
+        $row = $this->db->select('reference')
+            ->like('reference', $prefix . '-' . $year . '-', 'after')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get($table)
+            ->row();
+
+        $next = $row ? ((int) substr($row->reference, -4)) + 1 : 1;
+
+        return $prefix . '-' . $year . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+    }
+
+    /** Une caisse avec ce rôle existe-t-elle déjà ? */
+    public function cashboxRoleExists($role)
+    {
+        return $this->db->where('role', $role)
+            ->count_all_results('tbl_finance_cashbox') > 0;
+    }
+
+    /**
+     * =====================================================
+     * CRÉATION D'UNE CAISSE (PRINCIPALE OU SECONDAIRE)
+     * + mouvement « solde initial » dans son livre
+     * =====================================================
+     */
+    public function createCashboxWithRole($data)
+    {
+        $role = $data['role'];
+
+        if (!in_array($role, ['principale', 'secondaire'], true)) {
+            return ['success' => false, 'message' => 'Rôle de caisse invalide.'];
+        }
+
+        if ($this->cashboxRoleExists($role)) {
+            return [
+                'success' => false,
+                'message' => ($role === 'principale')
+                    ? 'Une caisse principale existe déjà — elle est unique.'
+                    : 'Une caisse secondaire existe déjà — elle est unique.',
+            ];
+        }
+
+        $opening = (float) $data['opening_balance'];
+        $code    = $this->generateCashboxCode();
+        $now     = date('Y-m-d H:i:s');
+
+        $this->db->trans_start();
+
+        /* ---------- 1) Insertion de la caisse ---------- */
+        $this->db->insert('tbl_finance_cashbox', [
+            'code'            => $code,
+            'name'            => $data['name'],
+            'role'            => $role,
+            'responsable'     => !empty($data['responsable']) ? $data['responsable'] : null,
+            'devise'          => $data['devise'],
+            'opening_balance' => $opening,
+            'current_balance' => $opening,
+            'alert_threshold' => (float) $data['alert_threshold'],
+            'observation'     => !empty($data['observation']) ? $data['observation'] : null,
+            'status'          => 'active',
+            'created_by'      => $data['created_by'] ?? null,
+            'created_at'      => $now,
+        ]);
+        $cashboxId = $this->db->insert_id();
+
+        /* ---------- 2) Solde initial > 0 → 1er mouvement du livre ---------- */
+        if ($opening > 0) {
+            $isPrincipal = ($role === 'principale');
+
+            $this->db->insert(
+                $isPrincipal ? 'tbl_finance_mouvement_principale' : 'tbl_finance_mouvement_secondaire',
+                [
+                    'reference'      => $this->nextMovementReference(
+                        $isPrincipal ? 'tbl_finance_mouvement_principale' : 'tbl_finance_mouvement_secondaire',
+                        $isPrincipal ? 'MVP' : 'MVS'
+                    ),
+                    'sens'           => 'entree',
+                    'nature'         => 'solde_initial',
+                    'movement_date'  => date('Y-m-d'),
+                    'amount'         => $opening,
+                    'balance_before' => 0,
+                    'balance_after'  => $opening,
+                    'devise'         => $data['devise'],
+                    'label'          => 'Solde initial à la création de la caisse',
+                    'observation'    => !empty($data['observation']) ? $data['observation'] : null,
+                    'status'         => 'validated',
+                    'created_by'     => $data['created_by'] ?? null,
+                    'created_at'     => $now,
+                ]
+            );
+        }
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === false) {
+            return ['success' => false, 'message' => 'Erreur pendant l’enregistrement de la caisse.'];
+        }
+
+        return ['success' => true, 'id' => $cashboxId, 'code' => $code];
+    }
+
+    /** Aiguillage selon le type d'opération */
+    public function recordCashboxOperation($type, $data)
+    {
+        switch ($type) {
+            case 'encaissement':
+                return $this->recordEncaissement($data);
+            case 'approvisionnement':
+                return $this->recordApprovisionnement($data);
+            case 'decaissement':
+                return $this->recordPaiementDa($data);
+            default:
+                return ['success' => false, 'message' => 'Type d’opération invalide.'];
+        }
+    }
+
+    /* =====================================================
+ * 1) ENCAISSEMENT → livre PRINCIPALE (entrée)
+ * ===================================================== */
+    public function recordEncaissement($data)
+    {
+        $cashbox = $this->getCashboxById($data['cashbox_id']);
+        if (!$cashbox) {
+            return ['success' => false, 'message' => 'Caisse introuvable.'];
+        }
+        if ($cashbox->role !== 'principale') {
+            return ['success' => false, 'message' => 'Les encaissements sont enregistrés uniquement dans la caisse principale.'];
+        }
+
+        $before = (float) $cashbox->current_balance;
+        $after  = $before + $data['amount'];
+
+        $this->db->trans_start();
+
+        $this->db->insert('tbl_finance_mouvement_principale', [
+            'reference'       => $this->nextMovementReference('tbl_finance_mouvement_principale', 'MVP'),
+            'sens'            => 'entree',
+            'nature'          => 'encaissement',
+            'movement_date'   => $data['operation_date'],
+            'amount'          => $data['amount'],
+            'balance_before'  => $before,
+            'balance_after'   => $after,
+            'devise'          => $cashbox->devise,
+            'third_party'     => $data['third_party'],
+            'category'        => $data['category'],
+            'payment_method'  => $data['payment_method'],
+            'document_number' => $data['document_number'],
+            'label'           => 'Encaissement' . (!empty($data['third_party']) ? ' — ' . $data['third_party'] : ''),
+            'observation'     => $data['observation'],
+            'status'          => 'validated',
+            'created_by'      => $data['created_by'],
+        ]);
+
+        $this->db->where('id', $cashbox->id)
+            ->update('tbl_finance_cashbox', ['current_balance' => $after]);
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status()
+            ? ['success' => true, 'message' => 'Encaissement enregistré dans la caisse principale.']
+            : ['success' => false, 'message' => 'Erreur pendant l’enregistrement de l’encaissement.'];
+    }
+
+    /* =====================================================
+ * 2) APPROVISIONNEMENT → sortie PRINCIPALE + entrée SECONDAIRE
+ * ===================================================== */
+    public function recordApprovisionnement($data)
+    {
+        $source      = $this->getCashboxById($data['cashbox_id']);
+        $destination = $this->getCashboxById($data['destination_cashbox_id']);
+
+        if (!$source || !$destination) {
+            return ['success' => false, 'message' => 'Caisse source ou destination introuvable.'];
+        }
+        if ($source->role !== 'principale') {
+            return ['success' => false, 'message' => 'Seule la caisse principale peut approvisionner.'];
+        }
+        if ($destination->role !== 'secondaire') {
+            return ['success' => false, 'message' => 'La destination doit être la caisse secondaire.'];
+        }
+        if ((int) $source->id === (int) $destination->id) {
+            return ['success' => false, 'message' => 'La source et la destination doivent être différentes.'];
+        }
+        if ($data['amount'] > (float) $source->current_balance) {
+            return ['success' => false, 'message' => 'Solde de la caisse principale insuffisant.'];
+        }
+
+        $transferRef = 'TRF-' . date('Y') . '-' . str_pad(random_int(1, 9999), 4, '0', STR_PAD_LEFT);
+
+        $sBefore = (float) $source->current_balance;
+        $sAfter  = $sBefore - $data['amount'];
+        $dBefore = (float) $destination->current_balance;
+        $dAfter  = $dBefore + $data['amount'];
+
+        $this->db->trans_start();
+
+        /* Livre PRINCIPALE : sortie */
+        $this->db->insert('tbl_finance_mouvement_principale', [
+            'reference'          => $this->nextMovementReference('tbl_finance_mouvement_principale', 'MVP'),
+            'sens'               => 'sortie',
+            'nature'             => 'approvisionnement',
+            'movement_date'      => $data['operation_date'],
+            'amount'             => $data['amount'],
+            'balance_before'     => $sBefore,
+            'balance_after'      => $sAfter,
+            'devise'             => $source->devise,
+            'transfer_reference' => $transferRef,
+            'category'           => $data['category'] ?: 'Approvisionnement',
+            'payment_method'     => $data['payment_method'],
+            'document_number'    => $data['document_number'],
+            'label'              => 'Approvisionnement de la caisse secondaire',
+            'observation'        => $data['observation'],
+            'status'             => 'validated',
+            'created_by'         => $data['created_by'],
+        ]);
+
+        /* Livre SECONDAIRE : entrée */
+        $this->db->insert('tbl_finance_mouvement_secondaire', [
+            'reference'          => $this->nextMovementReference('tbl_finance_mouvement_secondaire', 'MVS'),
+            'sens'               => 'entree',
+            'nature'             => 'approvisionnement_recu',
+            'movement_date'      => $data['operation_date'],
+            'amount'             => $data['amount'],
+            'balance_before'     => $dBefore,
+            'balance_after'      => $dAfter,
+            'devise'             => $destination->devise,
+            'transfer_reference' => $transferRef,
+            'category'           => $data['category'] ?: 'Approvisionnement',
+            'payment_method'     => $data['payment_method'],
+            'label'              => 'Approvisionnement reçu de la caisse principale',
+            'observation'        => $data['observation'],
+            'status'             => 'validated',
+            'created_by'         => $data['created_by'],
+        ]);
+
+        /* Soldes des deux caisses */
+        $this->db->where('id', $source->id)
+            ->update('tbl_finance_cashbox', ['current_balance' => $sAfter]);
+        $this->db->where('id', $destination->id)
+            ->update('tbl_finance_cashbox', ['current_balance' => $dAfter]);
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status()
+            ? ['success' => true, 'message' => 'Approvisionnement effectué (' . $transferRef . ').']
+            : ['success' => false, 'message' => 'Erreur pendant l’approvisionnement.'];
+    }
+
+    /* =====================================================
+ * 3) DÉCAISSEMENT (paiement DA) → livre SECONDAIRE (sortie)
+ * ===================================================== */
+    public function recordPaiementDa($data)
+    {
+        $cashbox = $this->getCashboxById($data['cashbox_id']);
+        if (!$cashbox) {
+            return ['success' => false, 'message' => 'Caisse introuvable.'];
+        }
+        if ($cashbox->role !== 'secondaire') {
+            return ['success' => false, 'message' => 'Les paiements de demandes d’achat sont effectués uniquement par la caisse secondaire.'];
+        }
+        if (empty($data['purchase_request_id'])) {
+            return ['success' => false, 'message' => 'Veuillez sélectionner une demande d’achat.'];
+        }
+        if ($data['amount'] > (float) $cashbox->current_balance) {
+            return ['success' => false, 'message' => 'Solde de la caisse secondaire insuffisant.'];
+        }
+
+        $before = (float) $cashbox->current_balance;
+        $after  = $before - $data['amount'];
+
+        $this->db->trans_start();
+
+        $this->db->insert('tbl_finance_mouvement_secondaire', [
+            'reference'                  => $this->nextMovementReference('tbl_finance_mouvement_secondaire', 'MVS'),
+            'sens'                       => 'sortie',
+            'nature'                     => 'paiement_da',
+            'movement_date'              => $data['operation_date'],
+            'amount'                     => $data['amount'],
+            'balance_before'             => $before,
+            'balance_after'              => $after,
+            'devise'                     => $cashbox->devise,
+            'purchase_request_id'        => $data['purchase_request_id'],
+            'purchase_request_reference' => $data['purchase_request_reference'],
+            'third_party'                => $data['third_party'],
+            'category'                   => $data['category'] ?: 'Paiement demande achat',
+            'payment_method'             => $data['payment_method'],
+            'document_number'            => $data['document_number'] ?: $data['payment_voucher_reference'],
+            'label'                      => 'Paiement ' . (!empty($data['purchase_request_reference']) ? $data['purchase_request_reference'] : 'demande d’achat'),
+            'observation'                => $data['expense_justification']
+                ? ($data['observation'] ? $data['observation'] . ' | ' . $data['expense_justification'] : $data['expense_justification'])
+                : $data['observation'],
+            'status'                     => 'validated',
+            'created_by'                 => $data['created_by'],
+        ]);
+
+        $this->db->where('id', $cashbox->id)
+            ->update('tbl_finance_cashbox', ['current_balance' => $after]);
+
+        $this->db->where('request_id', $data['purchase_request_id'])
+            ->update('purchase_payment_vouchers', ['payment_status' => 'effectue']);
+
+        $this->db->trans_complete();
+
+        return $this->db->trans_status()
+            ? ['success' => true, 'message' => 'Paiement de la demande d’achat enregistré.']
+            : ['success' => false, 'message' => 'Erreur pendant l’enregistrement du paiement.'];
+    }
+
+    /**
+     * =====================================================
+     * CAISSE PRINCIPALE (unique)
+     * =====================================================
+     */
+    public function getPrincipalCashbox()
+    {
+        return $this->db->select('id, code, name, role, responsable, devise,
+            opening_balance, current_balance, alert_threshold, status')
+            ->where('role', 'principale')
+            ->where('status', 'active')
+            ->get('tbl_finance_cashbox')
+            ->row();
+    }
+
+    /**
+     * =====================================================
+     * CAISSE SECONDAIRE (unique)
+     * =====================================================
+     */
+    public function getSecondaryCashbox()
+    {
+        return $this->db->select('id, code, name, role, responsable, devise,
+            opening_balance, current_balance, alert_threshold, status')
+            ->where('role', 'secondaire')
+            ->where('status', 'active')
+            ->get('tbl_finance_cashbox')
+            ->row();
+    }
+
+    /**
+     * =====================================================
+     * STATISTIQUES DE LA PAGE CAISSE (2 CAISSES UNIQUES)
+     * =====================================================
+     */
+    public function getTwoCashboxStatistics()
+    {
+        $today      = date('Y-m-d');
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        $principal = $this->getPrincipalCashbox();
+        $secondary = $this->getSecondaryCashbox();
+
+        $pBalance   = $principal ? (float) $principal->current_balance : 0;
+        $sBalance   = $secondary ? (float) $secondary->current_balance : 0;
+        $sThreshold = $secondary ? (float) $secondary->alert_threshold : 0;
+        $global     = $pBalance + $sBalance;
+
+        /* ---------- Livre PRINCIPALE : agrégats ---------- */
+        $pRow = $this->db->select("
+        SUM(CASE WHEN nature = 'encaissement' AND sens = 'entree'
+                  AND status = 'validated'
+                  AND movement_date BETWEEN '{$monthStart}' AND '{$monthEnd}'
+                 THEN amount ELSE 0 END) AS month_entries,
+        SUM(CASE WHEN nature = 'approvisionnement' AND sens = 'sortie'
+                  AND status = 'validated'
+                  AND movement_date BETWEEN '{$monthStart}' AND '{$monthEnd}'
+                 THEN amount ELSE 0 END) AS month_approvisionnements,
+        SUM(CASE WHEN nature = 'encaissement' AND sens = 'entree'
+                  AND status = 'validated'
+                  AND movement_date = '{$today}'
+                 THEN amount ELSE 0 END) AS today_entries,
+        SUM(CASE WHEN status = 'validated'
+                  AND movement_date BETWEEN '{$monthStart}' AND '{$monthEnd}'
+                 THEN 1 ELSE 0 END) AS month_operations
+    ", false)->get('tbl_finance_mouvement_principale')->row();
+
+        /* ---------- Livre SECONDAIRE : agrégats ---------- */
+        $sRow = $this->db->select("
+        SUM(CASE WHEN nature = 'approvisionnement_recu' AND sens = 'entree'
+                  AND status = 'validated'
+                  AND movement_date BETWEEN '{$monthStart}' AND '{$monthEnd}'
+                 THEN amount ELSE 0 END) AS month_received,
+        SUM(CASE WHEN nature = 'paiement_da' AND sens = 'sortie'
+                  AND status = 'validated'
+                  AND movement_date BETWEEN '{$monthStart}' AND '{$monthEnd}'
+                 THEN amount ELSE 0 END) AS month_payments,
+        SUM(CASE WHEN nature = 'paiement_da' AND status = 'validated'
+                  AND movement_date BETWEEN '{$monthStart}' AND '{$monthEnd}'
+                 THEN 1 ELSE 0 END) AS month_paid_count,
+        SUM(CASE WHEN nature = 'paiement_da' AND sens = 'sortie'
+                  AND status = 'validated'
+                  AND movement_date = '{$today}'
+                 THEN amount ELSE 0 END) AS today_payments,
+        SUM(CASE WHEN nature = 'paiement_da' AND sens = 'sortie'
+                  AND status = 'validated'
+                  AND movement_date = '{$today}'
+                 THEN 1 ELSE 0 END) AS today_payments_count
+    ", false)->get('tbl_finance_mouvement_secondaire')->row();
+
+        $pMonthEntries = $pRow ? (float) $pRow->month_entries : 0;
+        $pMonthAppro   = $pRow ? (float) $pRow->month_approvisionnements : 0;
+        $pTodayEntries = $pRow ? (float) $pRow->today_entries : 0;
+        $pMonthOps     = $pRow ? (int) $pRow->month_operations : 0;
+
+        $sMonthReceived   = $sRow ? (float) $sRow->month_received : 0;
+        $sMonthPayments   = $sRow ? (float) $sRow->month_payments : 0;
+        $sMonthPaidCount  = $sRow ? (int) $sRow->month_paid_count : 0;
+        $sTodayPayments   = $sRow ? (float) $sRow->today_payments : 0;
+        $sTodayPayCount   = $sRow ? (int) $sRow->today_payments_count : 0;
+
+        /* ---------- Variation du solde global depuis le 1er du mois ----------
+       Flux externes uniquement : encaissements (principale) − paiements DA (secondaire).
+       Les approvisionnements s'annulent en interne. */
+        $netFlow     = $pMonthEntries - $sMonthPayments;
+        $startGlobal = $global - $netFlow;
+        $globalVariation = $startGlobal > 0 ? ($netFlow / $startGlobal) * 100 : 0;
+
+        /* ---------- Statut du solde secondaire ---------- */
+        $secondaryStatus = 'normal';
+        if ($sThreshold > 0 && $sBalance <= $sThreshold) {
+            $secondaryStatus = 'critique';
+        } elseif ($sThreshold > 0 && $sBalance <= ($sThreshold * 2)) {
+            $secondaryStatus = 'faible';
+        }
+
+        return [
+            'global_balance'            => $global,
+            'global_variation_percentage' => $globalVariation,
+            'principal_balance'         => $pBalance,
+            'principal_percentage'      => $global > 0 ? ($pBalance / $global) * 100 : 0,
+            'secondary_balance'         => $sBalance,
+            'secondary_percentage'      => $global > 0 ? ($sBalance / $global) * 100 : 0,
+            'secondary_status'          => $secondaryStatus,
+            'secondary_threshold'       => $sThreshold,
+            'month_entries'             => $pMonthEntries,
+            'month_approvisionnements'  => $pMonthAppro,
+            'today_entries'             => $pTodayEntries,
+            'month_operations'          => $pMonthOps,
+            'month_received'            => $sMonthReceived,
+            'month_payments'            => $sMonthPayments,
+            'month_paid_count'          => $sMonthPaidCount,
+            'today_payments'            => $sTodayPayments,
+            'today_payments_count'      => $sTodayPayCount,
+        ];
+    }
+
+    /**
+     * =====================================================
+     * ÉVOLUTION DE LA TRÉSORERIE (principale vs secondaire)
+     * Encaissements = livre principale (nature encaissement)
+     * Décaissements = livre secondaire (nature paiement_da)
+     * =====================================================
+     */
+    public function getCashflowEvolution($period = '7days')
+    {
+        switch ($period) {
+            case '30days':
+                $start = date('Y-m-d', strtotime('-29 days'));
+                break;
+            case 'month':
+                $start = date('Y-m-01');
+                break;
+            default:
+                $start = date('Y-m-d', strtotime('-6 days'));
+                break;
+        }
+        $end = date('Y-m-d');
+
+        /* Liste complète des jours (trous = 0) */
+        $dates  = [];
+        $labels = [];
+        $cursor = $start;
+        while ($cursor <= $end) {
+            $dates[]  = $cursor;
+            $labels[] = date('d/m', strtotime($cursor));
+            $cursor   = date('Y-m-d', strtotime($cursor . ' +1 day'));
+        }
+
+        $incomes   = array_fill(0, count($dates), 0);
+        $expenses  = array_fill(0, count($dates), 0);
+        $dateIndex = array_flip($dates);
+
+        /* Encaissements — livre PRINCIPALE */
+        $rowsIn = $this->db->select('movement_date, SUM(amount) AS total')
+            ->where('nature', 'encaissement')
+            ->where('sens', 'entree')
+            ->where('status', 'validated')
+            ->where('movement_date >=', $start)
+            ->where('movement_date <=', $end)
+            ->group_by('movement_date')
+            ->get('tbl_finance_mouvement_principale')->result();
+
+        foreach ($rowsIn as $row) {
+            if (isset($dateIndex[$row->movement_date])) {
+                $incomes[$dateIndex[$row->movement_date]] = (float) $row->total;
+            }
+        }
+
+        /* Décaissements — livre SECONDAIRE */
+        $rowsOut = $this->db->select('movement_date, SUM(amount) AS total')
+            ->where('nature', 'paiement_da')
+            ->where('sens', 'sortie')
+            ->where('status', 'validated')
+            ->where('movement_date >=', $start)
+            ->where('movement_date <=', $end)
+            ->group_by('movement_date')
+            ->get('tbl_finance_mouvement_secondaire')->result();
+
+        foreach ($rowsOut as $row) {
+            if (isset($dateIndex[$row->movement_date])) {
+                $expenses[$dateIndex[$row->movement_date]] = (float) $row->total;
+            }
+        }
+
+        return [
+            'labels'        => $labels,
+            'incomes'       => $incomes,
+            'expenses'      => $expenses,
+            'total_income'  => array_sum($incomes),
+            'total_expense' => array_sum($expenses),
+            'net'           => array_sum($incomes) - array_sum($expenses),
+        ];
+    }
+
+    /**
+     * =====================================================
+     * ALERTES DE TRÉSORERIE
+     * 1) Solde critique / faible de la caisse secondaire
+     * 2) Demandes d'achat en attente de paiement
+     * =====================================================
+     */
+    public function getTreasuryAlerts()
+    {
+        $alerts = [];
+
+        /* --- Solde de la caisse secondaire vs seuil --- */
+        $secondary = $this->getSecondaryCashbox();
+        if ($secondary) {
+            $balance   = (float) $secondary->current_balance;
+            $threshold = (float) $secondary->alert_threshold;
+
+            if ($threshold > 0 && $balance <= $threshold) {
+                $alerts[] = [
+                    'type'    => 'danger',
+                    'icon'    => 'fas fa-exclamation-circle',
+                    'title'   => 'Solde critique — ' . $secondary->name,
+                    'message' => number_format((float) $balance, 0, ',', ' ') . ' BIF ≤ seuil '
+                        . number_format((float) $threshold, 0, ',', ' ')
+                        . ' — approvisionnement requis depuis la caisse principale.',
+                ];
+            } elseif ($threshold > 0 && $balance <= ($threshold * 2)) {
+                $alerts[] = [
+                    'type'    => 'warning',
+                    'icon'    => 'fas fa-exclamation-triangle',
+                    'title'   => 'Solde faible — ' . $secondary->name,
+                    'message' => number_format((float) $balance, 0, ',', ' ')
+                        . ' BIF restants — planifiez un approvisionnement.',
+                ];
+            }
+        }
+
+        /* --- DA attachées à un bon, non payées --- */
+        $payable = $this->getPayablePurchaseRequests();
+        if (!empty($payable)) {
+            $total = 0;
+            foreach ($payable as $request) {
+                $total += (float) $request->amount_paid;
+            }
+            $count = count($payable);
+            $alerts[] = [
+                'type'    => 'warning',
+                'icon'    => 'fas fa-file-invoice',
+                'title'   => $count . ' demande' . ($count > 1 ? 's' : '') . ' d’achat à payer',
+                'message' => number_format((float) $total, 0, ',', ' ')
+                    . ' BIF à décaisser par la caisse secondaire après approvisionnement.',
+            ];
+        }
+
+        return ['alerts' => $alerts, 'count' => count($alerts)];
+    }
+
+    /**
+     * =====================================================
+     * MOUVEMENTS RÉCENTS (fusion des 2 livres)
+     * Principale : encaissements + approvisionnements
+     * Secondaire : paiements DA (l'approvisionnement reçu
+     * n'est pas dupliqué : il apparaît en Transfert)
+     * =====================================================
+     */
+    public function getRecentMovements($limit = 6)
+    {
+        $principal = $this->getPrincipalCashbox();
+        $secondary = $this->getSecondaryCashbox();
+
+        $movements = [];
+
+        /* ---------- Livre PRINCIPALE ---------- */
+        if ($principal) {
+            $rows = $this->db->select('*')
+                ->where('nature !=', 'solde_initial')
+                ->order_by('movement_date', 'DESC')
+                ->order_by('id', 'DESC')
+                ->limit($limit)
+                ->get('tbl_finance_mouvement_principale')
+                ->result();
+
+            foreach ($rows as $row) {
+                $isEntry    = ($row->nature === 'encaissement');
+                $isTransfer = ($row->nature === 'approvisionnement');
+
+                $secondaryLabel = '';
+                if ($isEntry && !empty($row->third_party)) {
+                    $secondaryLabel = 'Provenance : ' . $row->third_party;
+                } elseif ($isTransfer) {
+                    $secondaryLabel = 'Destination : '
+                        . ($secondary ? $secondary->code : 'Caisse secondaire');
+                }
+
+                $movements[] = [
+                    'created_at'      => $row->created_at,
+                    'sort_id'         => (int) $row->id,
+                    'reference'       => $row->reference,
+                    'movement_date'   => $row->movement_date,
+                    'cashbox_name'    => $principal->name,
+                    'cashbox_code'    => $principal->code,
+                    'type'            => $isTransfer ? 'transfert' : 'entree',
+                    'label'           => $row->label,
+                    'secondary_label' => $secondaryLabel,
+                    'category'        => $row->category,
+                    'entry_amount'    => $isEntry ? (float) $row->amount : null,
+                    'output_amount'   => !$isEntry ? (float) $row->amount : null,
+                    'balance_after'   => (float) $row->balance_after,
+                    'currency'        => $row->devise,
+                    'status'          => $row->status,
+                ];
+            }
+        }
+
+        /* ---------- Livre SECONDAIRE (paiements DA) ---------- */
+        if ($secondary) {
+            $rows = $this->db->select('*')
+                ->where('nature', 'paiement_da')
+                ->order_by('movement_date', 'DESC')
+                ->order_by('id', 'DESC')
+                ->limit($limit)
+                ->get('tbl_finance_mouvement_secondaire')
+                ->result();
+
+            foreach ($rows as $row) {
+                $movements[] = [
+                    'created_at'      => $row->created_at,
+                    'sort_id'         => (int) $row->id,
+                    'reference'       => $row->reference,
+                    'movement_date'   => $row->movement_date,
+                    'cashbox_name'    => $secondary->name,
+                    'cashbox_code'    => $secondary->code,
+                    'type'            => 'sortie',
+                    'label'           => $row->label,
+                    'secondary_label' => !empty($row->third_party)
+                        ? 'Bénéficiaire : ' . $row->third_party
+                        : '',
+                    'category'        => $row->category,
+                    'entry_amount'    => null,
+                    'output_amount'   => (float) $row->amount,
+                    'balance_after'   => (float) $row->balance_after,
+                    'currency'        => $row->devise,
+                    'status'          => $row->status,
+                ];
+            }
+        }
+
+        /* ---------- Tri fusionné : plus récent d'abord ---------- */
+        usort($movements, function ($a, $b) {
+            $ta = strtotime(!empty($a['created_at']) ? $a['created_at'] : $a['movement_date']);
+            $tb = strtotime(!empty($b['created_at']) ? $b['created_at'] : $b['movement_date']);
+            if ($ta !== $tb) {
+                return $tb - $ta;
+            }
+            return $b['sort_id'] - $a['sort_id'];
+        });
+
+        return array_slice($movements, 0, $limit);
+    }
+
+    /**
+     * =====================================================
+     * NOMBRE TOTAL DE MOUVEMENTS (2 livres)
+     * =====================================================
+     */
+    public function countAllMovements()
+    {
+        $this->db->where('nature !=', 'solde_initial');
+        $principalCount = $this->db->count_all_results('tbl_finance_mouvement_principale');
+
+        $this->db->where('nature', 'paiement_da');
+        $secondaryCount = $this->db->count_all_results('tbl_finance_mouvement_secondaire');
+
+        return $principalCount + $secondaryCount;
+    }
+
+    /**
+     * =====================================================
+     * DÉPENSES DE LA SECONDAIRE PAR CATÉGORIE (mois en cours)
+     * =====================================================
+     */
+    public function getSecondaryExpensesByCategory()
+    {
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        $rows = $this->db->select("
+        category,
+        SUM(amount) AS total_amount,
+        COUNT(*)    AS total_operations
+    ")
+            ->where('nature', 'paiement_da')
+            ->where('sens', 'sortie')
+            ->where('status', 'validated')
+            ->where('movement_date >=', $monthStart)
+            ->where('movement_date <=', $monthEnd)
+            ->group_by('category')
+            ->order_by('total_amount', 'DESC')
+            ->get('tbl_finance_mouvement_secondaire')
+            ->result();
+
+        /* Pourcentage relatif à la plus grosse catégorie */
+        $max = 0;
+        foreach ($rows as $row) {
+            $max = max($max, (float) $row->total_amount);
+        }
+
+        foreach ($rows as $row) {
+            $row->total_amount     = (float) $row->total_amount;
+            $row->total_operations = (int) $row->total_operations;
+            $row->category_name    = !empty($row->category) ? trim($row->category) : 'Autre';
+            $row->percentage       = $max > 0 ? ($row->total_amount / $max) * 100 : 0;
+        }
+
+        return $rows;
+    }
+
+    /**
+     * =====================================================
+     * CONSOMMATION PAR CHANTIER (DA payées par la secondaire)
+     * =====================================================
+     */
+    public function getSecondaryConsumptionByChantier()
+    {
+        $monthStart = date('Y-m-01');
+        $monthEnd   = date('Y-m-t');
+
+        $rows = $this->db->select("
+        ch.id   AS chantier_id,
+        ch.name AS chantier_name,
+        prf.destination_chantier,
+        SUM(m.amount)                        AS total_consumed,
+        COUNT(DISTINCT m.purchase_request_id) AS da_count
+    ")
+            ->from('tbl_finance_mouvement_secondaire m')
+            ->join('purchase_request_forms prf', 'prf.id = m.purchase_request_id', 'inner')
+            ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            ->where('m.nature', 'paiement_da')
+            ->where('m.sens', 'sortie')
+            ->where('m.status', 'validated')
+            ->where('m.movement_date >=', $monthStart)
+            ->where('m.movement_date <=', $monthEnd)
+            ->group_by('ch.id')
+            ->order_by('total_consumed', 'DESC')
+            ->get()
+            ->result();
+
+        /* Pourcentage relatif au chantier le plus consommateur */
+        $max = 0;
+        foreach ($rows as $row) {
+            $max = max($max, (float) $row->total_consumed);
+        }
+
+        foreach ($rows as $row) {
+            $row->total_consumed = (float) $row->total_consumed;
+            $row->da_count       = (int) $row->da_count;
+            $row->display_name   = !empty($row->chantier_name)
+                ? $row->chantier_name
+                : (!empty($row->destination_chantier) ? $row->destination_chantier : 'Non affecté');
+            $row->percentage     = $max > 0 ? ($row->total_consumed / $max) * 100 : 0;
+        }
+
+        return $rows;
+    }
+
+    /** Filtres communs du livre (rôle + période + recherche) */
+    protected function applyLivreWhere($role, $dateFrom = null, $dateTo = null, $search = '')
+    {
+        $table = ($role === 'principale')
+            ? 'tbl_finance_mouvement_principale'
+            : 'tbl_finance_mouvement_secondaire';
+
+        $this->db->from($table);
+
+        if (!empty($dateFrom)) {
+            $this->db->where('movement_date >=', $dateFrom);
+        }
+        if (!empty($dateTo)) {
+            $this->db->where('movement_date <=', $dateTo);
+        }
+
+        if ($search !== '') {
+            $this->db->group_start();
+            $this->db->like('reference', $search);
+            $this->db->or_like('label', $search);
+            $this->db->or_like('third_party', $search);
+            $this->db->or_like('category', $search);
+            $this->db->or_like('transfer_reference', $search);
+            if ($role === 'secondaire') {
+                $this->db->or_like('purchase_request_reference', $search);
+            }
+            $this->db->group_end();
+        }
+
+        return $table;
+    }
+
+    /** Mouvements paginés du livre */
+    public function getLivreMovements($role, $dateFrom = null, $dateTo = null, $search = '', $limit = 15, $offset = 0)
+    {
+        $this->db->select('*');
+        $this->applyLivreWhere($role, $dateFrom, $dateTo, $search);
+        $this->db->order_by('movement_date', 'DESC');
+        $this->db->order_by('id', 'DESC');
+        $this->db->limit($limit, $offset);
+
+        return $this->db->get()->result();
+    }
+
+    /** Nombre total de mouvements du livre */
+    public function countLivreMovements($role, $dateFrom = null, $dateTo = null, $search = '')
+    {
+        $this->applyLivreWhere($role, $dateFrom, $dateTo, $search);
+        return (int) $this->db->count_all_results();
+    }
+
+    /** Statistiques du livre sur la période filtrée */
+    public function getLivreStatistics($role, $dateFrom = null, $dateTo = null, $search = '')
+    {
+        $this->db->select("
+        SUM(CASE WHEN sens = 'entree'  AND status = 'validated' THEN amount ELSE 0 END) AS total_in,
+        SUM(CASE WHEN sens = 'sortie'  AND status = 'validated' THEN amount ELSE 0 END) AS total_out,
+        SUM(CASE WHEN sens = 'entree'  AND status = 'validated' THEN 1 ELSE 0 END) AS count_in,
+        SUM(CASE WHEN sens = 'sortie'  AND status = 'validated' THEN 1 ELSE 0 END) AS count_out,
+        COUNT(*) AS total_count
+    ", false);
+        $this->applyLivreWhere($role, $dateFrom, $dateTo, $search);
+
+        $row = $this->db->get()->row();
+
+        return [
+            'total_in'    => $row ? (float) $row->total_in    : 0,
+            'total_out'   => $row ? (float) $row->total_out   : 0,
+            'count_in'    => $row ? (int) $row->count_in      : 0,
+            'count_out'   => $row ? (int) $row->count_out     : 0,
+            'total_count' => $row ? (int) $row->total_count   : 0,
+        ];
+    }
+
+    /**
+     * =====================================================
+     * TOUS LES MOUVEMENTS D'UN LIVRE (pour impression)
+     * Secondaire : jointure DA + chantier pour la colonne
+     * « Catégorie / intitulé du chantier »
+     * =====================================================
+     */
+    public function getAllLivreMovements($role)
+    {
+        if ($role === 'principale') {
+            return $this->db->select('*')
+                ->from('tbl_finance_mouvement_principale')
+                ->order_by('movement_date', 'ASC')
+                ->order_by('id', 'ASC')
+                ->get()->result();
+        }
+
+        return $this->db->select('m.*, prf.destination_chantier AS da_destination, ch.name AS da_chantier_name')
+            ->from('tbl_finance_mouvement_secondaire m')
+            ->join('purchase_request_forms prf', 'prf.id = m.purchase_request_id', 'left')
+            ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            ->order_by('m.movement_date', 'ASC')
+            ->order_by('m.id', 'ASC')
+            ->get()->result();
+    }
+
+    /**
+     * =====================================================
+     * DA DONT LE BON DE PAIEMENT EST DÉJÀ EFFECTUÉ
+     * ET QUI N'A PAS ENCORE DE RÉGULARISATION
+     * (retour / supplément / exact)
+     * =====================================================
+     */
+    public function getRegularizablePurchaseRequests()
+    {
+        /* ---------- 1) DA déjà régularisées (non annulées) ---------- */
+        $regularized = $this->db->select('purchase_request_id')
+            ->from('tbl_finance_regularisations')
+            ->where('status !=', 'cancelled')
+            ->get()->result();
+
+        $regularizedIds = [];
+        foreach ($regularized as $row) {
+            $regularizedIds[] = (int) $row->purchase_request_id;
+        }
+
+        /* ---------- 2) DA avec bon effectué, non encore régularisées ---------- */
+        $this->db->select("
+            prf.id,
+            prf.request_date,
+            prf.created_at,
+            prf.chantier_id,
+            prf.destination_chantier,
+            prf.total_amount,
+            ch.name AS chantier_name,
+            pv.id AS voucher_id,
+            pv.payment_number,
+            pv.summary,
+            pv.payment_mode,
+            pv.amount_paid,
+            pv.payment_reference,
+            pv.payment_date,
+            pv.observation AS payment_observation
+        ")
+            ->from('purchase_request_forms prf')
+            /* Le lien est côté BON : pv.request_id */
+            ->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'inner')
+            ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            /* Uniquement les bons déjà effectués */
+            ->where('pv.payment_status', 'effectue');
+
+        /* ✅ Exclure les DA déjà régularisées */
+        if (!empty($regularizedIds)) {
+            $this->db->where_not_in('prf.id', $regularizedIds);
+        }
+
+        return $this->db->order_by('prf.id', 'DESC')->get()->result();
+    }
+
+
+    /** Prochaine référence : REG-AAAA-XXXX */
+    public function generateRegularisationReference()
+    {
+        $year = date('Y');
+
+        $row = $this->db->select('reference')
+            ->like('reference', 'REG-' . $year . '-', 'after')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get('tbl_finance_regularisations')
+            ->row();
+
+        $next = $row ? ((int) substr($row->reference, -4)) + 1 : 1;
+
+        return 'REG-' . $year . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+    }
+
+    /** DA + son bon de paiement (pour contrôle) */
+    public function getRequestWithVoucher($id)
+    {
+        return $this->db->select('prf.id, prf.destination_chantier, ch.name AS chantier_name,
+            pv.id AS voucher_id, pv.payment_number, pv.amount_paid, pv.payment_status')
+            ->from('purchase_request_forms prf')
+            ->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'left')
+            ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            ->where('prf.id', (int) $id)
+            ->get()->row();
+    }
+
+    /**
+     * =====================================================
+     * ENREGISTRER UNE RÉGULARISATION (retour / supplément / exact)
+     * =====================================================
+     */
+    public function storeRegularisation($data)
+    {
+        $this->db->trans_start();
+
+        $this->db->insert('tbl_finance_regularisations', [
+            'company_id'          => 2,
+            'reference'           => $this->generateRegularisationReference(),
+            'purchase_request_id' => $data['purchase_request_id'],
+            'payment_voucher_id'  => $data['payment_voucher_id'],
+            'regularisation_type' => $data['regularisation_type'],
+            'amount'              => $data['amount'],
+            'regularisation_date' => $data['regularisation_date'],
+            'concerned'           => $data['concerned'],
+            'receipt_number'      => $data['receipt_number'],
+            'justification'       => $data['justification'],
+            'observation'         => $data['observation'],
+            'status'              => 'validated',
+            'created_by'          => $data['created_by'],
+        ]);
+        $insertId = $this->db->insert_id();
+
+        /* ---------- OPTIONNEL : répercuter dans le livre secondaire ---------- */
+        if (
+            in_array($data['regularisation_type'], ['retour', 'supplement'], true)
+            && (float) $data['amount'] > 0
+            && !empty($data['secondary_cashbox'])
+        ) {
+            $cashbox  = $data['secondary_cashbox'];
+            $isRetour = ($data['regularisation_type'] === 'retour');
+            $before   = (float) $cashbox->current_balance;
+            $after    = $isRetour ? $before + $data['amount'] : $before - $data['amount'];
+
+            $this->db->insert('tbl_finance_mouvement_secondaire', [
+                'reference'      => $this->nextMovementReference('tbl_finance_mouvement_secondaire', 'MVS'),
+                'sens'           => $isRetour ? 'entree' : 'sortie',
+                'nature'         => $isRetour ? 'retour_caisse' : 'supplement',
+                'movement_date'  => $data['regularisation_date'],
+                'amount'         => $data['amount'],
+                'balance_before' => $before,
+                'balance_after'  => $after,
+                'devise'         => $cashbox->devise,
+                'purchase_request_id'        => $data['purchase_request_id'],
+                'purchase_request_reference' => $data['purchase_request_reference'],
+                'third_party'    => $data['concerned'],
+                'category'       => $isRetour ? 'Retour à la caisse' : 'Supplément',
+                'payment_method' => 'cash',
+                'label'          => $isRetour
+                    ? 'Retour à la caisse — ' . $data['justification']
+                    : 'Supplément payé — ' . $data['justification'],
+                'observation'    => $data['observation'],
+                'status'         => 'validated',
+                'created_by'     => $data['created_by'],
+            ]);
+
+            $this->db->where('id', $cashbox->id)
+                ->update('tbl_finance_cashbox', ['current_balance' => $after]);
+        }
+        /* ---------------------------------------------------------------------- */
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === false) {
+            return ['success' => false, 'message' => 'Erreur pendant l’enregistrement de la régularisation.'];
+        }
+
+        return ['success' => true, 'id' => $insertId];
+    }
+
+    /**
+     * =====================================================
+     * STATISTIQUES GLOBALES DU RAPPORT FINANCIER
+     * =====================================================
+     */
+    public function getFinancialReportStatistics()
+    {
+        /* Total payé (bons effectués) */
+        $paid = $this->db->select("SUM(amount_paid) AS total, COUNT(*) AS cnt")
+            ->where('payment_status', 'effectue')
+            ->get('purchase_payment_vouchers')->row();
+
+        /* Retours à la caisse */
+        $retours = $this->db->select("SUM(amount) AS total, COUNT(*) AS cnt")
+            ->where('regularisation_type', 'retour')
+            ->where('status', 'validated')
+            ->get('tbl_finance_regularisations')->row();
+
+        /* Suppléments payés */
+        $supplements = $this->db->select("SUM(amount) AS total, COUNT(*) AS cnt")
+            ->where('regularisation_type', 'supplement')
+            ->where('status', 'validated')
+            ->get('tbl_finance_regularisations')->row();
+
+        $totalPaid      = $paid ? (float) $paid->total : 0;
+        $totalRetours   = $retours ? (float) $retours->total : 0;
+        $totalSupplem   = $supplements ? (float) $supplements->total : 0;
+
+        return [
+            'total_paid'        => $totalPaid,
+            'paid_count'        => $paid ? (int) $paid->cnt : 0,
+            'total_retours'     => $totalRetours,
+            'retours_count'     => $retours ? (int) $retours->cnt : 0,
+            'total_supplements' => $totalSupplem,
+            'supplements_count' => $supplements ? (int) $supplements->cnt : 0,
+            'adjusted'          => $totalPaid - $totalRetours + $totalSupplem,
+        ];
+    }
+
+    /**
+     * =====================================================
+     * LIGNES DU RAPPROCHEMENT (bon payé vs dépense réelle)
+     * =====================================================
+     */
+    public function getFinancialReportRows($filters = [])
+    {
+        $this->db->select("
+        prf.id,
+        prf.request_date,
+        prf.created_at,
+        prf.destination_chantier,
+        prf.requested_by,
+        prf.buyer_name,
+        ch.name AS chantier_name,
+        pv.id AS voucher_id,
+        pv.payment_number,
+        pv.summary,
+        pv.amount_paid,
+        pv.payment_date,
+        (SELECT COALESCE(SUM(r.amount),0) FROM tbl_finance_regularisations r
+          WHERE r.purchase_request_id = prf.id
+            AND r.regularisation_type = 'retour'
+            AND r.status = 'validated') AS total_retour,
+        (SELECT COALESCE(SUM(r.amount),0) FROM tbl_finance_regularisations r
+          WHERE r.purchase_request_id = prf.id
+            AND r.regularisation_type = 'supplement'
+            AND r.status = 'validated') AS total_supplement,
+        (SELECT r2.regularisation_type FROM tbl_finance_regularisations r2
+          WHERE r2.purchase_request_id = prf.id AND r2.status = 'validated'
+          ORDER BY r2.id DESC LIMIT 1) AS last_type
+    ")
+            ->from('purchase_request_forms prf')
+            ->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'inner')
+            ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            ->where('pv.payment_status', 'effectue');
+
+        /* Période (date du bon) */
+        if (!empty($filters['date_from'])) {
+            $this->db->where('pv.payment_date >=', $filters['date_from']);
+        }
+        if (!empty($filters['date_to'])) {
+            $this->db->where('pv.payment_date <=', $filters['date_to']);
+        }
+
+        /* Recherche */
+        if (!empty($filters['search'])) {
+            $s = $filters['search'];
+            $this->db->group_start();
+            $this->db->like('pv.payment_number', $s);
+            $this->db->or_like('pv.summary', $s);
+            $this->db->or_like('ch.name', $s);
+            $this->db->or_like('prf.destination_chantier', $s);
+            $this->db->or_like('prf.buyer_name', $s);
+            $this->db->or_like('prf.requested_by', $s);
+            $this->db->group_end();
+        }
+
+        $rows = $this->db->order_by('pv.payment_date', 'DESC')
+            ->order_by('prf.id', 'DESC')
+            ->get()->result();
+
+        /* Calculs : dépense réelle, écart, situation */
+        foreach ($rows as $row) {
+            $row->amount_paid      = (float) $row->amount_paid;
+            $row->total_retour     = (float) $row->total_retour;
+            $row->total_supplement = (float) $row->total_supplement;
+            $row->real_expense     = $row->amount_paid - $row->total_retour + $row->total_supplement;
+            $row->ecart            = $row->total_retour - $row->total_supplement;
+
+            if ($row->last_type === 'exact') {
+                $row->situation = 'soldee';
+            } elseif ($row->total_retour > 0) {
+                $row->situation = 'retour';
+            } elseif ($row->total_supplement > 0) {
+                $row->situation = 'supplement';
+            } else {
+                $row->situation = 'attente';
+            }
+        }
+
+        /* Filtre situation */
+        if (!empty($filters['situation'])) {
+            $rows = array_values(array_filter($rows, function ($r) use ($filters) {
+                return $r->situation === $filters['situation'];
+            }));
+        }
+
+        return $rows;
+    }
+
+    /**
+     * =====================================================
+     * DERNIÈRES RÉGULARISATIONS (historique)
+     * =====================================================
+     */
+    public function getRecentRegularisations($limit = 6)
+    {
+        return $this->db->select("
+        r.*,
+        pv.payment_number,
+        prf.destination_chantier,
+        ch.name AS chantier_name
+    ")
+            ->from('tbl_finance_regularisations r')
+            ->join('purchase_request_forms prf', 'prf.id = r.purchase_request_id', 'left')
+            ->join('purchase_payment_vouchers pv', 'pv.id = r.payment_voucher_id', 'left')
+            ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            ->where('r.status', 'validated')
+            ->order_by('r.id', 'DESC')
+            ->limit($limit)
+            ->get()->result();
     }
 }

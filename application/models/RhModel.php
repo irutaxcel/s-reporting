@@ -20,8 +20,27 @@ class RhModel extends CI_Model
         return $this->db->insert_id();
     }
 
-    public function get_all()
+    // public function get_all()
+    // {
+    //     return $this->db->order_by('nom ASC')->get($this->table)->result();
+    // }
+
+    /** Liste de tous les employés, par ordre décroissant (plus récents d'abord) */
+    public function get_all($ordre = 'DESC')
     {
-        return $this->db->order_by('nom ASC')->get($this->table)->result();
+        return $this->db->order_by('employe_id', $ordre)
+            ->get($this->table)
+            ->result();
+    }
+
+    public function get_by_id($id)
+    {
+        return $this->db->get_where($this->table, ['employe_id' => (int) $id])->row();
+    }
+
+    public function update($id, $data)
+    {
+        $this->db->where('employe_id', (int) $id);
+        return $this->db->update($this->table, $data);
     }
 }

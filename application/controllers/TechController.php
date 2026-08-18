@@ -666,7 +666,7 @@ class TechController extends CI_Controller
 
             'observation'        => $this->input->post('observation'),
 
-            'payment_status'     => 'effectue',
+            'payment_status'     => 'en_attente',
 
             'created_by'         => $this->session->userdata('user_id')
 

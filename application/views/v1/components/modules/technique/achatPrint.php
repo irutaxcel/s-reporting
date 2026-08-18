@@ -1706,7 +1706,7 @@
 
                         <div class="fund-report-row">
 
-                            <span class="label">Montant payé :</span>
+                            <span class="label">Montant dépensé :</span>
 
                             <span class="fill"></span>
 
@@ -1753,7 +1753,7 @@
 
                             <div class="fund-sign-box">
 
-                                <div class="caption">Approuvé par :</div>
+                                <div class="caption">Validé par :</div>
 
                             </div>
 

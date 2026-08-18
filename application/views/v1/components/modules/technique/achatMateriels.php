@@ -673,7 +673,7 @@
                                                             '-' .
                                                             str_pad($achat->id, 3, '0', STR_PAD_LEFT)
                                                     ) ?>
-            )'>
+                                                    )'>
 
                                             <i class="fas fa-file-invoice-dollar"></i>
 

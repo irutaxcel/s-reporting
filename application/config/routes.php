@@ -198,12 +198,23 @@ $route['caisse-journal'] = 'FinanceController/caisseJournal';
 
 $route['finance/caisse-store'] = 'FinanceController/caisseStore';
 
+$route['finance-caisse-store'] = 'FinanceController/caisseStore';
+
 $route['finance/cashbox-operation-store']
     = 'FinanceController/cashboxOperationStore';
 
+$route['finance-cashbox-operation-store']
+    = 'FinanceController/cashboxOperationStore';
 
+$route['finance-cashbox-print/(:num)'] = 'FinanceController/financeCashboxPrint/$1';
+
+$route['finance-rapport-financier-print'] = 'FinanceController/rapportFinancierPrint';
 
 $route['cashbox-operation-store'] = 'FinanceController/cashboxOperationStore';
+
+$route['rapport-financier'] = 'FinanceController/rapportFinancier';
+
+$route['finance-retour_caisse'] = 'FinanceController/retourCaisseStore';
 
 $route['compte-banques'] = 'FinanceController/banques';
 $route['bank-account-store']
@@ -229,6 +240,8 @@ $route['rh-dashboard'] = 'RhController/index';
 $route['rh-employes'] = 'RhController/employes';
 $route['rh-employes_store'] = 'RhController/employes_store';
 $route['rh-next_matricule'] = 'RhController/next_matricule';
+
+$route['rh-employe_get/(:num)'] = 'RhController/employe_get/$1';
 
 $route['prevision'] = 'FinanceController/prevision';
 

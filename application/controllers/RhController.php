@@ -40,10 +40,11 @@ class RhController extends CI_Controller
         }
 
         $title = 'Employés';
+        $data['employes'] = $this->Employe_model->get_all('DESC');
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/rh/rh-employes');
+        $this->load->view('v1/components/modules/rh/rh-employes', $data);
         $this->load->view('v1/components/layout/footer');
     }
 
@@ -146,5 +147,94 @@ class RhController extends CI_Controller
             return ['error' => $champ . ' : ' . $this->upload->display_errors('', '')];
         }
         return 'uploads/rh/employes/' . $this->upload->data('file_name');
+    }
+
+
+    /** AJAX : récupère un employé pour la modale de modification */
+    public function employe_get($id = NULL)
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $emp = $this->Employe_model->get_by_id($id);
+        if (!$emp) {
+            echo json_encode(['status' => 'error', 'message' => 'Employé introuvable.']);
+            return;
+        }
+        echo json_encode(['status' => 'success', 'employe' => $emp]);
+    }
+
+
+    /** AJAX : mise à jour d'un employé */
+    public function employes_update()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $id     = (int) $this->input->post('employe_id');
+        $ancien = $this->Employe_model->get_by_id($id);
+        if (!$ancien) {
+            echo json_encode(['status' => 'error', 'message' => 'Employé introuvable.']);
+            return;
+        }
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('nom', 'Nom', 'required|trim');
+        $this->form_validation->set_rules('prenoms', 'Prénoms', 'required|trim');
+        $this->form_validation->set_rules('fonction', 'Fonction', 'required|trim');
+        $this->form_validation->set_rules('date_embauche', "Date d'embauche", 'required');
+        $this->form_validation->set_rules('salaire_base', 'Salaire de base', 'required|numeric');
+        $this->form_validation->set_rules('email', 'Email', 'valid_email');
+
+        if ($this->form_validation->run() === FALSE) {
+            echo json_encode(['status' => 'error', 'message' => strip_tags(validation_errors('• ', ' '))]);
+            return;
+        }
+
+        // Documents de remplacement (optionnels) : upload + suppression de l'ancien
+        $docs = [];
+        foreach (['doc_cnid', 'doc_photo', 'doc_contrat', 'doc_cv'] as $champ) {
+            if (!empty($_FILES[$champ]['name'])) {
+                $res = $this->_upload_doc($champ);
+                if (is_array($res)) {
+                    echo json_encode(['status' => 'error', 'message' => $res['error']]);
+                    return;
+                }
+                if (!empty($ancien->$champ) && file_exists(FCPATH . $ancien->$champ)) {
+                    unlink(FCPATH . $ancien->$champ);
+                }
+                $docs[$champ] = $res;
+            }
+        }
+
+        $data = array_merge([
+            'nom'                 => $this->input->post('nom'),
+            'prenoms'             => $this->input->post('prenoms'),
+            'sexe'                => $this->input->post('sexe'),
+            'date_naissance'      => $this->input->post('date_naissance') ?: NULL,
+            'etat_civil'          => $this->input->post('etat_civil'),
+            'cnid'                => $this->input->post('cnid'),
+            'telephone'           => $this->input->post('telephone'),
+            'email'               => $this->input->post('email'),
+            'adresse'             => $this->input->post('adresse'),
+            'categorie'           => $this->input->post('categorie'),
+            'fonction'            => $this->input->post('fonction'),
+            'departement'         => $this->input->post('departement'),
+            'site_affectation'    => $this->input->post('site_affectation'),
+            'date_embauche'       => $this->input->post('date_embauche'),
+            'type_contrat'        => $this->input->post('type_contrat'),
+            'date_fin_contrat'    => $this->input->post('date_fin_contrat') ?: NULL,
+            'periode_essai'       => $this->input->post('periode_essai'),
+            'salaire_base'        => $this->input->post('salaire_base'),
+            'mode_paiement'       => $this->input->post('mode_paiement'),
+            'matricule_inss'      => $this->input->post('matricule_inss'),
+            'numero_contribuable' => $this->input->post('numero_contribuable'),
+            'statut'              => $this->input->post('statut'),
+        ], $docs);
+
+        $this->Employe_model->update($id, $data);
+        echo json_encode(['status' => 'success', 'message' => 'Fiche ' . $ancien->matricule . ' mise à jour avec succès.']);
     }
 }
