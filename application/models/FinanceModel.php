@@ -10280,10 +10280,18 @@ class FinanceModel extends CI_Model
                 ->get()->result();
         }
 
-        return $this->db->select('m.*, prf.destination_chantier AS da_destination, ch.name AS da_chantier_name')
+        return $this->db->select("
+            m.*,
+            prf.destination_chantier AS da_destination,
+            ch.name AS da_chantier_name,
+            prf.requested_by AS da_requested_by,
+            pv.summary AS voucher_summary          /* ✅ contenu de la colonne summary */
+        ")
             ->from('tbl_finance_mouvement_secondaire m')
             ->join('purchase_request_forms prf', 'prf.id = m.purchase_request_id', 'left')
             ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
+            /* ✅ Le bon de paiement via la demande d'achat */
+            ->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'left')
             ->order_by('m.movement_date', 'ASC')
             ->order_by('m.id', 'ASC')
             ->get()->result();

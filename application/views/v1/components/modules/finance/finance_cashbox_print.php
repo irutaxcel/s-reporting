@@ -188,7 +188,9 @@ foreach ($movements as $m) {
         <div class="meta">
             <strong>Caisse :</strong> <?= html_escape($cashbox->name) ?> (<?= html_escape($cashbox->code) ?>)
             · <strong>Responsable :</strong>
-            <?= html_escape(!empty($cashbox->responsable) ? $cashbox->responsable : '—') ?>
+            <?= html_escape($isPrincipal
+                ? 'Trésorerie'
+                : (!empty($cashbox->responsable) ? $cashbox->responsable : '—')) ?>
             · <strong>Devise :</strong> <?= html_escape($cashbox->devise) ?>
             · <strong>Édité le :</strong> <?= date('d/m/Y H:i') ?>
         </div>
@@ -285,8 +287,8 @@ foreach ($movements as $m) {
                 <th style="width:11%;">Source de fonds</th>
                 <th style="width:8%;" class="num">Sorties de la caisse</th>
                 <th style="width:8%;" class="num">Solde restant dans la caisse</th>
-                <th style="width:17%;">Justification de la dépense</th>
-                <th style="width:14%;">Catégorie fonctionnement ou intitulé du chantier / projet</th>
+                <th style="width:17%;">Nature de la dépense (libellé / nature)</th>
+                <th style="width:14%;">Destination — nom du chantier / projet</th>
                 <th style="width:10%;">N° de réf. de demande d'achat des biens et services</th>
                 <th style="width:14%;">Nom, prénom et signature pour réception des fonds</th>
             </tr>
@@ -308,15 +310,37 @@ foreach ($movements as $m) {
                             $source = '—';
                         }
 
-                        /* Justification + catégorie + réf DA + signature */
+                        /* ✅ Nature de la dépense : libellé + nature */
+                        $natureLabels = [
+                            'approvisionnement_recu' => 'Approvisionnement reçu',
+                            'paiement_da'            => 'Paiement demande d’achat',
+                            'retour_caisse'          => 'Retour à la caisse',
+                            'supplement'             => 'Supplément',
+                            'solde_initial'          => 'Solde initial',
+                        ];
+                        $natureLabel   = isset($natureLabels[$m->nature]) ? $natureLabels[$m->nature] : $m->nature;
                         $justification = $m->label;
-                        $categorie     = !empty($m->category) ? $m->category
-                            : (!empty($m->da_chantier_name) ? $m->da_chantier_name
-                                : (!empty($m->da_destination) ? $m->da_destination : '—'));
-                        $refDa         = !empty($m->purchase_request_reference) ? $m->purchase_request_reference
+
+                        /* ✅ DESTINATION : nom du chantier / projet */
+                        $destinationChantier = !empty($m->da_chantier_name) ? $m->da_chantier_name
+                            : (!empty($m->da_destination) ? $m->da_destination
+                                : (!empty($m->category) ? $m->category : '—'));
+
+                        /* ✅ Réception des fonds : la PERSONNE (demandeur DA), pas le chantier */
+                        if ($m->nature === 'paiement_da') {
+                            $signature = !empty($m->da_requested_by) ? $m->da_requested_by
+                                : (!empty($m->third_party) ? $m->third_party : '');
+                        } else {
+                            $signature = !empty($m->third_party) ? $m->third_party
+                                : (!empty($cashbox->responsable) ? $cashbox->responsable : '');
+                        }
+
+                        $refDa = !empty($m->purchase_request_reference) ? $m->purchase_request_reference
                             : (!empty($m->transfer_reference) ? $m->transfer_reference : '—');
-                        $signature     = !empty($m->third_party) ? $m->third_party
-                            : (!empty($cashbox->responsable) ? $cashbox->responsable : '');
+
+                        /* ✅ Libellé de la dépense = summary du bon de paiement (sinon label du mouvement) */
+                        $natureText = !empty($m->voucher_summary) ? $m->voucher_summary : $m->label;
+
                         ?>
             <tr>
                 <td class="ctr"><?= $i + 1 ?></td>
@@ -325,8 +349,11 @@ foreach ($movements as $m) {
                 <td><?= html_escape($source) ?></td>
                 <td class="num"><?= !$isIn ? $fmt($m->amount) : '' ?></td>
                 <td class="num"><?= $fmt($m->balance_after) ?></td>
-                <td><?= html_escape($justification) ?></td>
-                <td><?= html_escape($categorie) ?></td>
+                <td>
+                    <?= html_escape($natureText) ?>
+                    <small class="d-block" style="color:#555;">Nature : <?= html_escape($natureLabel) ?></small>
+                </td>
+                <td><?= html_escape($destinationChantier) ?></td>
                 <td><?= html_escape($refDa) ?></td>
                 <td><?= html_escape($signature) ?><span class="sig"></span></td>
             </tr>
@@ -351,12 +378,12 @@ foreach ($movements as $m) {
     </table>
     <?php endif; ?>
 
-    <div class="foot-note">
+    <!-- <div class="foot-note">
         Catégorie de fonctionnement : 1. Carburant et lubrifiants ; 2. Entretien/réparation des véhicules, motos ;
         3. Entretien/réparation des équipements informatiques, de bureau ; 4. Fourniture/équipement de bureau,
         d'hygiène, de nettoyage, d'informatique ; 5. Entretien des locaux/bâtiments ; 6. Entretien des jardins ;
         7. Restauration du personnel ; etc.
-    </div>
+    </div> -->
 
     <script>
     /* Ouvre directement la boîte d'impression à l'arrivée

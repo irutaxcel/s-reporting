@@ -238,10 +238,12 @@ $route['finance/rapprochement/analyser'] =
 
 $route['rh-dashboard'] = 'RhController/index';
 $route['rh-employes'] = 'RhController/employes';
-$route['rh-employes_store'] = 'RhController/employes_store';
+$route['rh-employes-store'] = 'RhController/employes_store';
 $route['rh-next_matricule'] = 'RhController/next_matricule';
 
 $route['rh-employe_get/(:num)'] = 'RhController/employe_get/$1';
+
+$route['rh-employes-update'] = 'RhController/employes_update';
 
 $route['prevision'] = 'FinanceController/prevision';
 

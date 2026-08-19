@@ -1281,4 +1281,10 @@ class TechModel extends CI_Model
         $this->db->order_by('jp.id', 'DESC');
         return $this->db->get()->result();
     }
+
+    public function update($id, $data)
+    {
+        $this->db->where('employe_id', (int) $id);
+        return $this->db->update($this->table, $data);
+    }
 }

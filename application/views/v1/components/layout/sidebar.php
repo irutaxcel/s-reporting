@@ -805,12 +805,12 @@
                     </ul>
                 </li>
 
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a href="<?= base_url('finance/rh') ?>" class="nav-link">
                         <i class="fas fa-users nav-icon"></i>
                         <p>Ressources Humaines</p>
                     </a>
-                </li>
+                </li> -->
 
                 <li class="nav-item">
                     <a href="<?= base_url('finance/controle') ?>" class="nav-link">
