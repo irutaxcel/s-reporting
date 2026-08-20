@@ -59,6 +59,14 @@ $route['auth-logout'] = 'Authentication/logout';
 
 $route['main-dashboard'] = 'DashboardController/mainDashboard';
 
+$route['synthese-demandes'] = 'Dgcontroller/syntheseDemandes';
+
+// Route pour mettre à jour le montant autorisé
+$route['direction/update-montant-autorise'] = 'Dgcontroller/updateMontantAutorise';
+
+// Route pour l'impression
+$route['direction/imprimer-synthese'] = 'Dgcontroller/imprimerSynthese';
+
 $route['personnel-chantier'] = 'TechController/personeChantier';
 $route['personnel-chantier/store'] = 'TechController/storePersonnelChantier';
 

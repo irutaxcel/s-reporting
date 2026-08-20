@@ -173,8 +173,15 @@
                 </li>
 
                 <!-- DIRECTION GENERALE -->
+                <?php if ($title == 'Synthèse des demandes' || $title == 'Tableau de bord' || $title == 'Indicateurs de performance' || $title == 'Reporting général' || $title == 'Analytique' || $title == 'Statistiques' || $title == 'Validations & Approbations' || $title == 'Suivi des projets' || $title == 'Notifications & Alertes' || $title == 'Messagerie interne' || $title == 'Gestion des utilisateurs' || $title == 'Paramètres' || $title == 'Archives') { ?>
+                <li class="nav-item menu-open">
+                    <a href="#" class="nav-link active">
+                        <?php } else { ?>
                 <li class="nav-item">
                     <a href="#" class="nav-link">
+                        <?php } ?>
+
+
                         <i class="nav-icon fas fa-building"></i>
                         <p>
                             Direction Générale
@@ -183,35 +190,144 @@
                     </a>
 
                     <ul class="nav nav-treeview">
-
+                        <!-- Tableau de bord principal -->
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Reporting</p>
+                            <a href="<?= base_url('direction/dashboard') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Tableau de bord</p>
                             </a>
                         </li>
 
+                        <!-- Indicateurs et Performance -->
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Validations</p>
+                            <a href="<?= base_url('direction/indicateurs') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-chart-line"></i>
+                                <p>Indicateurs de performance</p>
                             </a>
                         </li>
 
+                        <!-- Reporting et Analyses -->
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Notifications & Alertes</p>
+                                <i class="nav-icon fas fa-file-alt"></i>
+                                <p>Reporting
+                                    <i class="right fas fa-angle-left"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="<?= base_url('direction/reporting/general') ?>" class="nav-link">
+                                        <i class="nav-icon far fa-file-alt"></i>
+                                        <p>Reporting général</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('direction/reporting/analytique') ?>" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-pie"></i>
+                                        <p>Analytique</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('direction/statistiques') ?>" class="nav-link">
+                                        <i class="nav-icon fas fa-chart-bar"></i>
+                                        <p>Statistiques</p>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <!-- Validations et Approbations -->
+                        <li class="nav-item">
+                            <a href="<?= base_url('direction/validations') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-check-double"></i>
+                                <p>Validations & Approbations</p>
                             </a>
                         </li>
 
+                        <!-- Suivi des projets -->
                         <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="far fa-circle nav-icon"></i>
-                                <p>Messagerie interne</p>
+                            <a href="<?= base_url('direction/projets') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-tasks"></i>
+                                <p>Suivi des projets</p>
                             </a>
                         </li>
 
+                        <!-- Notifications et Alertes -->
+                        <li class="nav-item">
+                            <a href="<?= base_url('direction/notifications') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-bell"></i>
+                                <p>Notifications & Alertes
+                                    <!-- <?php if ($nb_notifications > 0): ?>
+                                    <span class="badge badge-danger right"><?= $nb_notifications ?></span>
+                                    <?php endif; ?> -->
+                                </p>
+                            </a>
+                        </li>
+
+                        <!-- Messagerie interne -->
+                        <li class="nav-item">
+                            <a href="<?= base_url('direction/messagerie') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-envelope"></i>
+                                <p>Messagerie interne
+                                    <!-- <?php if ($nb_messages > 0): ?>
+                                    <span class="badge badge-info right"><?= $nb_messages ?></span>
+                                    <?php endif; ?> -->
+                                </p>
+                            </a>
+                        </li>
+
+                        <!-- Synthèse des demandes -->
+                        <li class="nav-item">
+                            <?php if ($title == 'Synthèse des demandes'): ?>
+                            <a href="<?= base_url('synthese-demandes') ?>" class="nav-link active">
+                                <?php else: ?>
+                                <a href="<?= base_url('synthese-demandes') ?>" class="nav-link">
+                                    <?php endif; ?>
+                                    <i class="nav-icon fas fa-clipboard-list"></i>
+                                    <p>Synthèse des demandes</p>
+                                </a>
+                        </li>
+
+                        <!-- Séparateur -->
+                        <li class="nav-item mt-2">
+                            <a href="#" class="nav-link disabled">
+                                <p>--- Administration ---</p>
+                                <a href="<?= base_url('synthese-demandes') ?>" class="nav-link">
+                                    <i class="nav-icon fas fa-clipboard-list"></i>
+                                    <p>Synthèse des demandes</p>
+                                </a>
+                        </li>
+
+                        <!-- Séparateur -->
+                        <li class="nav-item mt-2">
+                            <a href="#" class="nav-link disabled">
+                                <p>--- Administration ---</p>
+                            </a>
+                        </li>
+
+                        <!-- Gestion des utilisateurs -->
+                        <li class="nav-item">
+                            <a href="<?= base_url('direction/utilisateurs') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Gestion des utilisateurs</p>
+                            </a>
+                        </li>
+
+                        <!-- Paramètres -->
+                        <li class="nav-item">
+                            <a href="<?= base_url('direction/parametres') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-cog"></i>
+                                <p>Paramètres</p>
+                            </a>
+                        </li>
+
+                        <!-- Archives -->
+                        <li class="nav-item">
+                            <a href="<?= base_url('direction/archives') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-archive"></i>
+                                <p>Archives</p>
+                            </a>
+                        </li>
                     </ul>
                 </li>
 
@@ -304,7 +420,7 @@
                                 <p>Sous Traitant</p>
                             </a>
                             <?php }
-                                ?>
+                                    ?>
 
                         </li>
 
