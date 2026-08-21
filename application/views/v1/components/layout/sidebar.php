@@ -289,21 +289,21 @@
                         </li>
 
                         <!-- Séparateur -->
-                        <li class="nav-item mt-2">
+                        <!-- <li class="nav-item mt-2">
                             <a href="#" class="nav-link disabled">
                                 <p>--- Administration ---</p>
                                 <a href="<?= base_url('synthese-demandes') ?>" class="nav-link">
                                     <i class="nav-icon fas fa-clipboard-list"></i>
                                     <p>Synthèse des demandes</p>
                                 </a>
-                        </li>
+                        </li> -->
 
                         <!-- Séparateur -->
-                        <li class="nav-item mt-2">
+                        <!-- <li class="nav-item mt-2">
                             <a href="#" class="nav-link disabled">
                                 <p>--- Administration ---</p>
                             </a>
-                        </li>
+                        </li> -->
 
                         <!-- Gestion des utilisateurs -->
                         <li class="nav-item">
@@ -1004,37 +1004,77 @@
                         <?php } ?>
                     </li>
                     <li class="nav-item">
-                        <a href="rh-contrats" class="nav-link">
+                        <?php if ($title == 'Contrats & mouvements') { ?>
+                        <a href="<?= base_url('rh-contrats') ?>" class="nav-link active">
                             <i class="fas fa-file-contract nav-icon"></i>
                             <p>Contrats & mouvements</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-contrats') ?>" class="nav-link">
+                            <i class="fas fa-file-contract nav-icon"></i>
+                            <p>Contrats & mouvements</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/registre" class="nav-link">
+                        <?php if ($title == "Registre d'employeur") { ?>
+                        <a href="<?= base_url('rh-registre') ?>" class="nav-link active">
                             <i class="fas fa-book nav-icon"></i>
                             <p>Registre d'employeur</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-registre') ?>" class="nav-link">
+                            <i class="fas fa-book nav-icon"></i>
+                            <p>Registre d'employeur</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/presences" class="nav-link">
+                        <?php if ($title == 'Temps & présences') { ?>
+                        <a href="<?= base_url('rh-presences') ?>?>" class="nav-link active">
                             <i class="fas fa-user-clock nav-icon"></i>
                             <p>Temps & présences</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-presences') ?>?>" class="nav-link">
+                            <i class="fas fa-user-clock nav-icon"></i>
+                            <p>Temps & présences</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/conges" class="nav-link">
+                        <?php if ($title == 'Congés') { ?>
+                        <a href="<?= base_url('rh-conges') ?>" class="nav-link active">
                             <i class="fas fa-umbrella-beach nav-icon"></i>
                             <p>Congés</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-conges') ?>" class="nav-link">
+                            <i class="fas fa-umbrella-beach nav-icon"></i>
+                            <p>Congés</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/paie" class="nav-link">
+                        <?php if ($title == 'Paie') { ?>
+                        <a href="<?= base_url('rh-paie') ?>" class="nav-link active">
                             <i class="fas fa-money-bill-wave nav-icon"></i>
                             <p>Paie</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-paie') ?>" class="nav-link">
+                            <i class="fas fa-money-bill-wave nav-icon"></i>
+                            <p>Paie</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/conformite" class="nav-link">
+                        <a href="<?= base_url('rh-conformite') ?>" class="nav-link">
                             <i class="fas fa-landmark nav-icon"></i>
                             <p>Conformité & déclarations</p>
                         </a>

@@ -253,6 +253,18 @@ $route['rh-employe_get/(:num)'] = 'RhController/employe_get/$1';
 
 $route['rh-employes-update'] = 'RhController/employes_update';
 
+$route['rh-contrats'] = 'RhController/rhContrats';
+
+$route['rh-registre'] = 'RhController/rhRegistre';
+
+$route['rh-presences'] = 'RhController/rhPresences';
+
+$route['rh-conges'] = 'RhController/rhConges';
+
+$route['rh-paie'] = 'RhController/rhPaie';
+
+$route['rh-conformite'] = 'RhController/rhConfirmite';
+
 $route['prevision'] = 'FinanceController/prevision';
 
 $route['facture-client'] = 'FinanceController/factureClient';

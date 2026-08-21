@@ -26,7 +26,7 @@ class Dgcontroller extends CI_Controller
 
     public function syntheseDemandes()
     {
-        $data['title'] = 'Synthèse des demandes d\'achat';
+        $data['title'] = 'Synthèse des demandes';
 
         // ============================================
         // GESTION DES FILTRES

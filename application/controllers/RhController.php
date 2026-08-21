@@ -388,4 +388,100 @@ class RhController extends CI_Controller
         $this->session->set_flashdata('success', 'Fiche ' . $ancien->matricule . ' mise à jour avec succès.');
         redirect('rh-employes');
     }
+
+    public function rhContrats()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = 'Contrats & mouvements';
+        $data = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-contrats', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhRegistre()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = "Registre d'employeur";
+        $data = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-registre', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhPresences()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = "Temps & présences";
+        $data = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-presences', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhConges()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = "Congés";
+        $data = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-conges', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhPaie()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = "Paie";
+        $data = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-paie', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhConfirmite()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = "Conformité & déclarations";
+        $data = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-conformite', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
 }

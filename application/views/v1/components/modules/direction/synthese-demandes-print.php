@@ -19,35 +19,50 @@
 
     body {
         font-family: 'Arial', sans-serif;
-        font-size: 11px;
-        line-height: 1.4;
+        font-size: 13px;
+        /* ✅ Agrandi */
+        line-height: 1.5;
         color: #000;
         background: #fff;
     }
 
+    /* ✅ En-tête avec logo à gauche */
     .print-header {
-        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 20px;
         margin-bottom: 20px;
         border-bottom: 3px solid #28a745;
-        padding-bottom: 10px;
+        padding-bottom: 15px;
     }
 
-    .print-header h1 {
+    .print-header .logo-container img {
+        max-width: 100px;
+        max-height: 100px;
+        object-fit: contain;
+    }
+
+    .print-header .header-text h1 {
         margin: 0;
         color: #28a745;
-        font-size: 20px;
+        font-size: 24px;
+        /* ✅ Agrandi */
         text-transform: uppercase;
+        text-align: left;
     }
 
-    .print-header .company-info {
+    .print-header .header-text .company-info {
         margin-top: 5px;
-        font-size: 10px;
+        font-size: 12px;
+        /* ✅ Agrandi */
         color: #666;
+        text-align: left;
     }
 
     .periode-info {
         background: #f8f9fa;
-        padding: 10px;
+        padding: 12px;
         border-radius: 5px;
         margin-bottom: 15px;
         border-left: 4px solid #28a745;
@@ -55,13 +70,16 @@
 
     .periode-info h5 {
         margin: 0 0 5px 0;
-        font-size: 12px;
+        font-size: 14px;
+        /* ✅ Agrandi */
         color: #28a745;
+        font-weight: bold;
     }
 
     .periode-info p {
         margin: 0;
-        font-size: 10px;
+        font-size: 12px;
+        /* ✅ Agrandi */
     }
 
     .chantier-section {
@@ -72,9 +90,11 @@
     .chantier-header {
         background: #28a745;
         color: white;
-        padding: 8px 12px;
+        padding: 10px 12px;
+        /* ✅ Agrandi */
         font-weight: bold;
-        font-size: 12px;
+        font-size: 14px;
+        /* ✅ Agrandi */
         border-radius: 3px;
         margin-bottom: 10px;
     }
@@ -88,16 +108,21 @@
     .table th {
         background: #f8f9fa;
         border: 1px solid #dee2e6;
-        padding: 8px;
+        padding: 10px;
+        /* ✅ Agrandi */
         text-align: left;
         font-weight: bold;
-        font-size: 10px;
+        font-size: 12px;
+        /* ✅ Agrandi */
     }
 
     .table td {
         border: 1px solid #dee2e6;
-        padding: 6px 8px;
-        font-size: 10px;
+        padding: 8px 10px;
+        /* ✅ Agrandi */
+        font-size: 12px;
+        /* ✅ Agrandi */
+        vertical-align: middle;
     }
 
     .table tr:nth-child(even) {
@@ -112,11 +137,16 @@
         text-align: center;
     }
 
+    .text-left {
+        text-align: left;
+    }
+
     .badge {
         display: inline-block;
-        padding: 3px 8px;
+        padding: 4px 8px;
         border-radius: 3px;
-        font-size: 9px;
+        font-size: 10px;
+        /* ✅ Agrandi */
         font-weight: bold;
     }
 
@@ -135,17 +165,21 @@
     .sous-total {
         background: #d4edda;
         font-weight: bold;
+        font-size: 13px;
     }
 
     .total-general {
         background: #dc3545;
         color: white;
         font-weight: bold;
-        font-size: 12px;
+        font-size: 14px;
+        /* ✅ Agrandi */
     }
 
+    .total-general th,
     .total-general td {
         border-color: #dc3545;
+        padding: 12px 10px;
     }
 
     .statistics-box {
@@ -157,7 +191,7 @@
 
     .stat-item {
         flex: 1;
-        padding: 10px;
+        padding: 12px;
         margin: 0 5px;
         border-radius: 5px;
         text-align: center;
@@ -173,13 +207,16 @@
 
     .stat-item h3 {
         margin: 0;
-        font-size: 16px;
+        font-size: 18px;
+        /* ✅ Agrandi */
         font-weight: bold;
     }
 
     .stat-item p {
         margin: 5px 0 0 0;
-        font-size: 9px;
+        font-size: 11px;
+        /* ✅ Agrandi */
+        text-transform: uppercase;
     }
 
     .bg-primary {
@@ -211,23 +248,33 @@
 
     .signature-box {
         width: 45%;
-        border-top: 1px solid #000;
-        padding-top: 5px;
+        border-top: 2px solid #000;
+        padding-top: 10px;
         text-align: center;
     }
 
     .signature-box p {
         margin: 5px 0;
-        font-size: 10px;
+        font-size: 12px;
+        /* ✅ Agrandi */
     }
 
     .footer-print {
         margin-top: 30px;
         text-align: center;
-        font-size: 9px;
+        font-size: 11px;
+        /* ✅ Agrandi */
         color: #666;
         border-top: 1px solid #dee2e6;
         padding-top: 10px;
+    }
+
+    /* Ligne pointillée pour guider la saisie manuelle */
+    .manual-input-line {
+        display: block;
+        height: 20px;
+        border-bottom: 1px dotted #999;
+        margin: 0 10px;
     }
 
     @media print {
@@ -248,17 +295,6 @@
             margin: 10mm;
         }
     }
-
-    .print-header {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .print-header .logo-container img {
-        max-width: 100px;
-    }
     </style>
 </head>
 
@@ -278,17 +314,16 @@
         <!-- En-tête avec logo à gauche -->
         <div class="print-header">
             <div class="logo-container">
-                <!-- ✅ Remplacez le chemin par le vrai chemin de votre logo -->
                 <img src="<?= base_url('assets/v1/dist/img/logoUpdate.png') ?>" alt="SATRACO Construction Logo"
                     onerror="this.style.display='none'">
             </div>
-            <!-- <div class="header-text">
+            <div class="header-text">
                 <h1>SATRACO CONSTRUCTION</h1>
                 <div class="company-info">
                     Construction Management System (CMS)<br>
                     Synthèse des demandes d'achat
                 </div>
-            </div> -->
+            </div>
         </div>
 
         <!-- Période -->
@@ -305,15 +340,15 @@
                 <p>Total Demandé</p>
             </div>
             <div class="stat-item bg-success">
-                <!-- <h3><?= number_format($statistics['total_autorise'], 0, ',', ' ') ?> BIF</h3> -->
+                <h3><?= number_format($statistics['total_autorise'], 0, ',', ' ') ?> BIF</h3>
                 <p>Total Autorisé</p>
             </div>
             <div class="stat-item bg-warning">
-                <!-- <h3><?= number_format($statistics['ecart'], 0, ',', ' ') ?> BIF</h3> -->
+                <h3><?= number_format($statistics['ecart'], 0, ',', ' ') ?> BIF</h3>
                 <p>Écart</p>
             </div>
             <div class="stat-item bg-info">
-                <!-- <h3><?= $statistics['taux_autorisation'] ?>%</h3> -->
+                <h3><?= $statistics['taux_autorisation'] ?>%</h3>
                 <p>Taux d'autorisation</p>
             </div>
         </div>
@@ -323,12 +358,12 @@
         $chantier_number = 1;
         foreach ($demandes_by_chantier as $chantier_name => $demandes):
             $subtotal_demande = 0;
-            $subtotal_autorise = 0;
         ?>
         <div class="chantier-section">
             <div class="chantier-header">
                 <i class="fas fa-hard-hat"></i> <?= $chantier_number ?>. <?= strtoupper($chantier_name) ?>
-                <span style="float: right; font-weight: normal;">(<?= count($demandes) ?> demande(s))</span>
+                <span style="float: right; font-weight: normal; font-size: 12px;">(<?= count($demandes) ?>
+                    demande(s))</span>
             </div>
 
             <table class="table">
@@ -336,11 +371,11 @@
                     <tr>
                         <th style="width: 5%" class="text-center">N°</th>
                         <th style="width: 12%">N° DA</th>
-                        <th style="width: 40%">Désignation</th>
+                        <th style="width: 30%">Désignation</th> <!-- ✅ Agrandie -->
                         <th style="width: 15%" class="text-right">Montant demandé</th>
                         <th style="width: 15%" class="text-right">Montant Autorisé</th>
-                        <th style="width: 8%" class="text-center">Statut</th>
-                        <th style="width: 5%">Obs.</th>
+                        <!-- ✅ Colonne Statut supprimée -->
+                        <th style="width: 25%">Obs.</th> <!-- ✅ Agrandie pour notes manuelles -->
                     </tr>
                 </thead>
                 <tbody>
@@ -361,31 +396,21 @@
                             }
 
                             $subtotal_demande += $total_items;
-                            $montant_autorise = $demande->montant_autorise ?? 0;
-                            $subtotal_autorise += $montant_autorise;
                         ?>
                     <tr>
                         <td class="text-center"><strong><?= $item_number++ ?></strong></td>
-                        <td><span
-                                class="badge badge-<?= $chantier_number % 2 == 0 ? 'success' : 'warning' ?>">DA-2026-<?= str_pad($demande->request_id, 4, '0', STR_PAD_LEFT) ?></span>
+                        <td>
+                            <span class="badge badge-<?= $chantier_number % 2 == 0 ? 'success' : 'warning' ?>">
+                                DA-2026-<?= str_pad($demande->request_id, 4, '0', STR_PAD_LEFT) ?>
+                            </span>
                         </td>
                         <td><?= implode(', ', $designations) ?></td>
                         <td class="text-right"><strong><?= number_format($total_items, 0, ',', ' ') ?></strong></td>
-                        <!-- <td class="text-right">
-                            <strong><?= $montant_autorise > 0 ? number_format($montant_autorise, 0, ',', ' ') : '-' ?></strong>
-                        </td> -->
-                        <td class="text-right">
-                            <!-- ✅ LAISSER VIDE pour saisie manuelle -->
-                            <strong style="color: #999;">-</strong>
-                        </td>
                         <td class="text-center">
-                            <?php if ($demande->payment_status == 'effectue'): ?>
-                            <span class="badge badge-success"><i class="fas fa-check"></i> Effectué</span>
-                            <?php else: ?>
-                            <span class="badge badge-warning"><i class="fas fa-clock"></i> En attente</span>
-                            <?php endif; ?>
+                            <!-- ✅ LAISSÉ VIDE pour saisie manuelle au stylo -->
+                            <span class="manual-input-line"></span>
                         </td>
-                        <td>-</td>
+                        <td></td> <!-- Espace vide pour observations manuelles -->
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -393,25 +418,26 @@
                     <tr class="sous-total">
                         <td colspan="3" class="text-right">Sous-Total (<?= ucfirst($chantier_name) ?>)</td>
                         <td class="text-right"><?= number_format($subtotal_demande, 0, ',', ' ') ?> BIF</td>
-                        <!-- <td class="text-right"><?= number_format($subtotal_autorise, 0, ',', ' ') ?> BIF</td> -->
-                        <td class="text-right">
-                            <!-- ✅ LAISSER VIDE pour saisie manuelle -->
-                            <strong style="color: #999;">-</strong>
+                        <td class="text-center">
+                            <!-- ✅ LAISSÉ VIDE pour saisie manuelle -->
+                            <span class="manual-input-line"></span>
                         </td>
-                        <td colspan="2"></td>
+                        <td></td>
                     </tr>
                 </tfoot>
             </table>
         </div>
-        <?php $chantier_number++;
-        endforeach; ?>
+        <?php
+            $chantier_number++;
+        endforeach;
+        ?>
 
         <!-- Total Général -->
         <div class="chantier-section">
             <table class="table total-general">
                 <thead>
                     <tr>
-                        <th style="width: 50%" class="text-center">SYNTHÈSE GLOBALE</th>
+                        <th style="width: 45%" class="text-center">SYNTHÈSE GLOBALE</th>
                         <th class="text-center">Total Demandé</th>
                         <th class="text-center">Total Autorisé</th>
                         <th class="text-center">Écart</th>
@@ -426,9 +452,16 @@
                                 demandes</strong>
                         </td>
                         <td class="text-right"><?= number_format($statistics['total_demande'], 0, ',', ' ') ?> BIF</td>
-                        <td class="text-right"><?= number_format($statistics['total_autorise'], 0, ',', ' ') ?> BIF</td>
-                        <td class="text-right"><?= number_format($statistics['ecart'], 0, ',', ' ') ?> BIF</td>
-                        <td class="text-center"><?= $statistics['taux_autorisation'] ?>%</td>
+                        <td class="text-center">
+                            <!-- ✅ LAISSÉ VIDE pour saisie manuelle -->
+                            <span style="color: #ffcccc; font-size: 12px;">(À compléter)</span>
+                        </td>
+                        <td class="text-center">
+                            <span style="color: #ffcccc; font-size: 12px;">-</span>
+                        </td>
+                        <td class="text-center">
+                            <span style="color: #ffcccc; font-size: 12px;">-%</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -455,17 +488,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script>
-    // Auto-impression au chargement (optionnel)
-    // setTimeout(function() { window.print(); }, 500);
-
-    // Fermeture automatique après impression
-    window.onafterprint = function() {
-        // Optionnel: fermer la fenêtre après impression
-        // window.close();
-    };
-    </script>
 </body>
 
 </html>
