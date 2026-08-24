@@ -13,187 +13,86 @@
 
     <style>
     @page {
-        size: A4 landscape;
-        margin: 10mm;
+        size: A4 portrait;
+        margin: 5mm 8mm;
     }
 
     body {
         font-family: 'Arial', sans-serif;
-        font-size: 13px;
-        /* ✅ Agrandi */
-        line-height: 1.5;
+        font-size: 10px;
+        line-height: 1.3;
         color: #000;
         background: #fff;
     }
 
-    /* ✅ En-tête avec logo à gauche */
+    /* ✅ En-tête ultra-compact */
     .print-header {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        gap: 20px;
-        margin-bottom: 20px;
-        border-bottom: 3px solid #28a745;
-        padding-bottom: 15px;
+        gap: 10px;
+        margin-bottom: 5px;
+        border-bottom: 2px solid #28a745;
+        padding-bottom: 4px;
+        page-break-after: avoid;
     }
 
     .print-header .logo-container img {
-        max-width: 100px;
-        max-height: 100px;
+        max-width: 50px;
+        max-height: 50px;
         object-fit: contain;
     }
 
     .print-header .header-text h1 {
         margin: 0;
         color: #28a745;
-        font-size: 24px;
-        /* ✅ Agrandi */
+        font-size: 14px;
         text-transform: uppercase;
         text-align: left;
     }
 
     .print-header .header-text .company-info {
-        margin-top: 5px;
-        font-size: 12px;
-        /* ✅ Agrandi */
+        margin-top: 1px;
+        font-size: 8px;
         color: #666;
         text-align: left;
     }
 
+    /* ✅ Section période ultra-compacte */
     .periode-info {
         background: #f8f9fa;
-        padding: 12px;
-        border-radius: 5px;
-        margin-bottom: 15px;
-        border-left: 4px solid #28a745;
+        padding: 4px 8px;
+        border-radius: 2px;
+        margin-bottom: 5px;
+        border-left: 3px solid #28a745;
+        page-break-after: avoid;
     }
 
     .periode-info h5 {
-        margin: 0 0 5px 0;
-        font-size: 14px;
-        /* ✅ Agrandi */
+        margin: 0 0 1px 0;
+        font-size: 10px;
         color: #28a745;
         font-weight: bold;
     }
 
     .periode-info p {
         margin: 0;
-        font-size: 12px;
-        /* ✅ Agrandi */
+        font-size: 8px;
     }
 
-    .chantier-section {
-        margin-bottom: 25px;
-        page-break-inside: avoid;
-    }
-
-    .chantier-header {
-        background: #28a745;
-        color: white;
-        padding: 10px 12px;
-        /* ✅ Agrandi */
-        font-weight: bold;
-        font-size: 14px;
-        /* ✅ Agrandi */
-        border-radius: 3px;
-        margin-bottom: 10px;
-    }
-
-    .table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 15px;
-    }
-
-    .table th {
-        background: #f8f9fa;
-        border: 1px solid #dee2e6;
-        padding: 10px;
-        /* ✅ Agrandi */
-        text-align: left;
-        font-weight: bold;
-        font-size: 12px;
-        /* ✅ Agrandi */
-    }
-
-    .table td {
-        border: 1px solid #dee2e6;
-        padding: 8px 10px;
-        /* ✅ Agrandi */
-        font-size: 12px;
-        /* ✅ Agrandi */
-        vertical-align: middle;
-    }
-
-    .table tr:nth-child(even) {
-        background: #f8f9fa;
-    }
-
-    .text-right {
-        text-align: right;
-    }
-
-    .text-center {
-        text-align: center;
-    }
-
-    .text-left {
-        text-align: left;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 3px;
-        font-size: 10px;
-        /* ✅ Agrandi */
-        font-weight: bold;
-    }
-
-    .badge-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-
-    .badge-warning {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-
-    .sous-total {
-        background: #d4edda;
-        font-weight: bold;
-        font-size: 13px;
-    }
-
-    .total-general {
-        background: #dc3545;
-        color: white;
-        font-weight: bold;
-        font-size: 14px;
-        /* ✅ Agrandi */
-    }
-
-    .total-general th,
-    .total-general td {
-        border-color: #dc3545;
-        padding: 12px 10px;
-    }
-
+    /* ✅ Statistiques masquées à l'impression */
     .statistics-box {
         display: flex;
         justify-content: space-between;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
         page-break-inside: avoid;
     }
 
     .stat-item {
         flex: 1;
-        padding: 12px;
-        margin: 0 5px;
-        border-radius: 5px;
+        padding: 6px;
+        margin: 0 2px;
+        border-radius: 3px;
         text-align: center;
     }
 
@@ -207,15 +106,13 @@
 
     .stat-item h3 {
         margin: 0;
-        font-size: 18px;
-        /* ✅ Agrandi */
+        font-size: 12px;
         font-weight: bold;
     }
 
     .stat-item p {
-        margin: 5px 0 0 0;
-        font-size: 11px;
-        /* ✅ Agrandi */
+        margin: 2px 0 0 0;
+        font-size: 8px;
         text-transform: uppercase;
     }
 
@@ -239,8 +136,110 @@
         color: white;
     }
 
+    /* ✅ Sections de chantier - SANS page-break-inside: avoid */
+    .chantier-section {
+        margin-bottom: 10px;
+    }
+
+    .chantier-header {
+        background: #28a745;
+        color: white;
+        padding: 4px 8px;
+        font-weight: bold;
+        font-size: 10px;
+        border-radius: 2px;
+        margin-bottom: 3px;
+        page-break-after: avoid;
+    }
+
+    /* ✅ Tableaux très compacts */
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 5px;
+        font-size: 9px;
+        page-break-inside: auto;
+    }
+
+    .table th {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 3px 4px;
+        text-align: left;
+        font-weight: bold;
+        font-size: 9px;
+    }
+
+    .table td {
+        border: 1px solid #dee2e6;
+        padding: 2px 4px;
+        font-size: 9px;
+        vertical-align: middle;
+    }
+
+    .table tr {
+        page-break-inside: avoid;
+    }
+
+    .table tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    .text-left {
+        text-align: left;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 2px 5px;
+        border-radius: 2px;
+        font-size: 8px;
+        font-weight: bold;
+    }
+
+    .badge-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .badge-warning {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .sous-total {
+        background: #d4edda;
+        font-weight: bold;
+        font-size: 10px;
+    }
+
+    .total-general {
+        background: #dc3545;
+        color: white;
+        font-weight: bold;
+        font-size: 11px;
+        page-break-inside: avoid;
+    }
+
+    .total-general th,
+    .total-general td {
+        border-color: #dc3545;
+        padding: 5px 4px;
+    }
+
+    /* ✅ Signatures compactes */
     .signatures {
-        margin-top: 40px;
+        margin-top: 15px;
         display: flex;
         justify-content: space-between;
         page-break-inside: avoid;
@@ -249,32 +248,36 @@
     .signature-box {
         width: 45%;
         border-top: 2px solid #000;
-        padding-top: 10px;
+        padding-top: 5px;
         text-align: center;
     }
 
     .signature-box p {
-        margin: 5px 0;
-        font-size: 12px;
-        /* ✅ Agrandi */
+        margin: 2px 0;
+        font-size: 9px;
     }
 
+    /* ✅ Footer compact */
     .footer-print {
-        margin-top: 30px;
+        margin-top: 10px;
         text-align: center;
-        font-size: 11px;
-        /* ✅ Agrandi */
+        font-size: 8px;
         color: #666;
         border-top: 1px solid #dee2e6;
-        padding-top: 10px;
+        padding-top: 5px;
     }
 
-    /* Ligne pointillée pour guider la saisie manuelle */
+    /* Ligne pointillée pour saisie manuelle */
     .manual-input-line {
         display: block;
-        height: 20px;
+        height: 10px;
         border-bottom: 1px dotted #999;
-        margin: 0 10px;
+        margin: 0 3px;
+    }
+
+    /* ✅ Masquer les boutons à l'impression */
+    .no-print {
+        display: none !important;
     }
 
     @media print {
@@ -285,14 +288,6 @@
 
         .no-print {
             display: none !important;
-        }
-
-        .chantier-section {
-            page-break-inside: avoid;
-        }
-
-        @page {
-            margin: 10mm;
         }
     }
     </style>
@@ -333,8 +328,8 @@
                 <?= date('d/m/Y', strtotime($filtre_date_fin)) ?></p>
         </div>
 
-        <!-- Statistiques globales -->
-        <div class="statistics-box">
+        <!-- Statistiques globales (masquées à l'impression) -->
+        <div class="statistics-box no-print">
             <div class="stat-item bg-primary">
                 <h3><?= number_format($statistics['total_demande'], 0, ',', ' ') ?> BIF</h3>
                 <p>Total Demandé</p>
@@ -362,7 +357,7 @@
         <div class="chantier-section">
             <div class="chantier-header">
                 <i class="fas fa-hard-hat"></i> <?= $chantier_number ?>. <?= strtoupper($chantier_name) ?>
-                <span style="float: right; font-weight: normal; font-size: 12px;">(<?= count($demandes) ?>
+                <span style="float: right; font-weight: normal; font-size: 9px;">(<?= count($demandes) ?>
                     demande(s))</span>
             </div>
 
@@ -371,11 +366,10 @@
                     <tr>
                         <th style="width: 5%" class="text-center">N°</th>
                         <th style="width: 12%">N° DA</th>
-                        <th style="width: 30%">Désignation</th> <!-- ✅ Agrandie -->
+                        <th style="width: 45%">Désignation</th>
                         <th style="width: 15%" class="text-right">Montant demandé</th>
                         <th style="width: 15%" class="text-right">Montant Autorisé</th>
-                        <!-- ✅ Colonne Statut supprimée -->
-                        <th style="width: 25%">Obs.</th> <!-- ✅ Agrandie pour notes manuelles -->
+                        <th style="width: 8%">Obs.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -407,10 +401,9 @@
                         <td><?= implode(', ', $designations) ?></td>
                         <td class="text-right"><strong><?= number_format($total_items, 0, ',', ' ') ?></strong></td>
                         <td class="text-center">
-                            <!-- ✅ LAISSÉ VIDE pour saisie manuelle au stylo -->
                             <span class="manual-input-line"></span>
                         </td>
-                        <td></td> <!-- Espace vide pour observations manuelles -->
+                        <td></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -419,7 +412,6 @@
                         <td colspan="3" class="text-right">Sous-Total (<?= ucfirst($chantier_name) ?>)</td>
                         <td class="text-right"><?= number_format($subtotal_demande, 0, ',', ' ') ?> BIF</td>
                         <td class="text-center">
-                            <!-- ✅ LAISSÉ VIDE pour saisie manuelle -->
                             <span class="manual-input-line"></span>
                         </td>
                         <td></td>
@@ -453,14 +445,13 @@
                         </td>
                         <td class="text-right"><?= number_format($statistics['total_demande'], 0, ',', ' ') ?> BIF</td>
                         <td class="text-center">
-                            <!-- ✅ LAISSÉ VIDE pour saisie manuelle -->
-                            <span style="color: #ffcccc; font-size: 12px;">(À compléter)</span>
+                            <span style="color: #ffcccc; font-size: 9px;">(À compléter)</span>
                         </td>
                         <td class="text-center">
-                            <span style="color: #ffcccc; font-size: 12px;">-</span>
+                            <span style="color: #ffcccc; font-size: 9px;">-</span>
                         </td>
                         <td class="text-center">
-                            <span style="color: #ffcccc; font-size: 12px;">-%</span>
+                            <span style="color: #ffcccc; font-size: 9px;">-%</span>
                         </td>
                     </tr>
                 </tbody>
