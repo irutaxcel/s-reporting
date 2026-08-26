@@ -301,13 +301,17 @@ class DgModel extends CI_Model
     public function getDemandesByChantier($user_id = null, $date_debut = null, $date_fin = null, $chantier_filtre = null): array
     {
         $this->db->select('pf.*, 
-                    pv.id as voucher_id, 
-                    pv.request_id, 
-                    pv.payment_number, 
-                    pv.payment_status, 
-                    pv.amount_paid as montant_autorise');
+                       pv.id as voucher_id, 
+                       pv.request_id, 
+                       pv.payment_number, 
+                       pv.payment_status, 
+                       pv.amount_paid as montant_autorise,
+                       u.first_name,
+                       u.last_name,
+                       CONCAT(u.first_name, " ", u.last_name) as demandeur_nom');
         $this->db->from($this->table_forms . ' pf');
         $this->db->join($this->table_vouchers . ' pv', 'pf.id = pv.request_id', 'left');
+        $this->db->join('users u', 'pf.created_by = u.id', 'left'); // ✅ JOIN avec users
         $this->db->where('pf.company_id', 2);
 
         // Filtre par date

@@ -332,7 +332,7 @@
                 </li>
 
                 <!-- DIRECTION TECHNIQUE -->
-                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel' || $title == 'Maintenance & Carburant' || $title == 'Coût Réel & Rentabilité' || $title == 'Journal Production') { ?>
+                <?php if ($title == 'Personnel Chantier' || $title == 'Achats & Approvisionnement' || $title == 'Projets' || $title == 'Chantiers & exécution' || $title == 'Sous-traitants' || $title == 'Stocks' || $title == 'Engin & Materiel' || $title == 'Maintenance & Carburant' || $title == 'Coût Réel & Rentabilité' || $title == 'Journal Production' || $title == 'Suivie Paie Chantier') { ?>
                 <li class="nav-item menu-open">
                     <a href="#" class="nav-link active">
                         <?php } else { ?>
@@ -512,6 +512,21 @@
                             <a href="<?= base_url('personnel-chantier') ?>" class="nav-link">
                                 <i class="far fa-circle nav-icon"></i>
                                 <p>Personnel Chantier</p>
+                            </a>
+                            <?php } ?>
+
+                        </li>
+
+                        <li class="nav-item">
+                            <?php if ($title == 'Suivie Paie Chantier') { ?>
+                            <a href="<?= base_url('suivie-paie-chantier') ?>" class="nav-link active">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Suivie Paie Chantier</p>
+                            </a>
+                            <?php } else { ?>
+                            <a href="<?= base_url('suivie-paie-chantier') ?>" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Suivie Paie Chantier</p>
                             </a>
                             <?php } ?>
 

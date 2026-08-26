@@ -25,7 +25,55 @@
         background: #fff;
     }
 
-    /* ✅ En-tête ultra-compact */
+    /* ✅ Boutons fixes en haut à droite */
+    .print-actions {
+        position: fixed;
+        top: 15px;
+        right: 20px;
+        z-index: 9999;
+        display: flex;
+        gap: 8px;
+    }
+
+    .print-actions .btn-action {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .print-actions .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .print-actions .btn-print {
+        background: #28a745;
+        color: white;
+    }
+
+    .print-actions .btn-print:hover {
+        background: #218838;
+    }
+
+    .print-actions .btn-close {
+        background: #dc3545;
+        color: white;
+    }
+
+    .print-actions .btn-close:hover {
+        background: #c82333;
+    }
+
+    /* ✅ En-tête compact */
     .print-header {
         display: flex;
         align-items: center;
@@ -136,7 +184,7 @@
         color: white;
     }
 
-    /* ✅ Sections de chantier - SANS page-break-inside: avoid */
+    /* ✅ Sections de chantier */
     .chantier-section {
         margin-bottom: 10px;
     }
@@ -237,6 +285,50 @@
         padding: 5px 4px;
     }
 
+    /* ✅ Tableau récapitulatif */
+    .recap-section {
+        margin-top: 20px;
+        page-break-inside: avoid;
+    }
+
+    .recap-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 15px;
+        font-size: 10px;
+    }
+
+    .recap-table th {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 6px 8px;
+        text-align: left;
+        font-weight: bold;
+        font-size: 10px;
+    }
+
+    .recap-table td {
+        border: 1px solid #dee2e6;
+        padding: 5px 8px;
+        font-size: 10px;
+        vertical-align: middle;
+    }
+
+    .recap-table tbody tr:nth-child(even) {
+        background: #f8f9fa;
+    }
+
+    .recap-total {
+        background: #d4edda;
+        font-weight: bold;
+        font-size: 11px;
+    }
+
+    .recap-total td {
+        border: 2px solid #28a745;
+        padding: 8px;
+    }
+
     /* ✅ Signatures compactes */
     .signatures {
         margin-top: 15px;
@@ -286,8 +378,17 @@
             print-color-adjust: exact;
         }
 
-        .no-print {
+        .no-print,
+        .print-actions {
             display: none !important;
+        }
+
+        .chantier-section {
+            page-break-inside: avoid;
+        }
+
+        @page {
+            margin: 5mm 8mm;
         }
     }
     </style>
@@ -295,7 +396,16 @@
 
 <body onload="window.print()">
 
-    <!-- Bouton retour (caché à l'impression) -->
+    <!-- ✅ Boutons fixes en haut à droite -->
+    <div class="print-actions">
+        <button onclick="window.print();" class="btn-action btn-print" title="Imprimer">
+            <i class="fas fa-print"></i> Imprimer
+        </button>
+        <button onclick="window.close();" class="btn-action btn-close" title="Fermer">
+            <i class="fas fa-times"></i> Fermer
+        </button>
+    </div>
+
     <div class="no-print" style="position: fixed; top: 10px; right: 10px; z-index: 9999;">
         <button onclick="window.close(); return false;" class="btn btn-danger btn-sm">
             <i class="fas fa-times"></i> Fermer
@@ -306,7 +416,7 @@
     </div>
 
     <div class="container-fluid">
-        <!-- En-tête avec logo à gauche -->
+        <!-- En-tête -->
         <div class="print-header">
             <div class="logo-container">
                 <img src="<?= base_url('assets/v1/dist/img/logoUpdate.png') ?>" alt="SATRACO Construction Logo"
@@ -328,7 +438,7 @@
                 <?= date('d/m/Y', strtotime($filtre_date_fin)) ?></p>
         </div>
 
-        <!-- Statistiques globales (masquées à l'impression) -->
+        <!-- Statistiques (masquées à l'impression) -->
         <div class="statistics-box no-print">
             <div class="stat-item bg-primary">
                 <h3><?= number_format($statistics['total_demande'], 0, ',', ' ') ?> BIF</h3>
@@ -348,6 +458,35 @@
             </div>
         </div>
 
+        <!-- Calcul des totaux par chantier -->
+        <?php
+        $recap_chantiers = [];
+        $total_general_demande = 0;
+        $total_general_autorise = 0;
+
+        foreach ($demandes_by_chantier as $chantier_name => $demandes) {
+            $total_chantier_demande = 0;
+            $total_chantier_autorise = 0;
+
+            foreach ($demandes as $demande) {
+                $items = $this->dg->getRequestItems($demande->request_id);
+                foreach ($items as $item) {
+                    $total_chantier_demande += $item->total_price;
+                }
+                $total_chantier_autorise += ($demande->montant_autorise ?? 0);
+            }
+
+            $recap_chantiers[] = [
+                'name' => $chantier_name,
+                'total_demande' => $total_chantier_demande,
+                'total_autorise' => $total_chantier_autorise
+            ];
+
+            $total_general_demande += $total_chantier_demande;
+            $total_general_autorise += $total_chantier_autorise;
+        }
+        ?>
+
         <!-- Tableaux par chantier -->
         <?php
         $chantier_number = 1;
@@ -364,12 +503,13 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th style="width: 5%" class="text-center">N°</th>
-                        <th style="width: 12%">N° DA</th>
-                        <th style="width: 45%">Désignation</th>
-                        <th style="width: 15%" class="text-right">Montant demandé</th>
-                        <th style="width: 15%" class="text-right">Montant Autorisé</th>
-                        <th style="width: 8%">Obs.</th>
+                        <th style="width: 4%" class="text-center">N°</th>
+                        <th style="width: 10%">N° DA</th>
+                        <th style="width: 30%">Désignation</th>
+                        <th style="width: 15%">Demandé Par</th>
+                        <th style="width: 12%" class="text-right">Montant demandé</th>
+                        <th style="width: 12%" class="text-right">Montant Autorisé</th>
+                        <th style="width: 17%">Obs.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -399,6 +539,9 @@
                             </span>
                         </td>
                         <td><?= implode(', ', $designations) ?></td>
+                        <td>
+                            <strong><?= !empty($demande->demandeur_nom) ? $demande->demandeur_nom : ($demande->requested_by ?? $demande->buyer_name ?? '-') ?></strong>
+                        </td>
                         <td class="text-right"><strong><?= number_format($total_items, 0, ',', ' ') ?></strong></td>
                         <td class="text-center">
                             <span class="manual-input-line"></span>
@@ -409,7 +552,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="sous-total">
-                        <td colspan="3" class="text-right">Sous-Total (<?= ucfirst($chantier_name) ?>)</td>
+                        <td colspan="4" class="text-right">Sous-Total (<?= ucfirst($chantier_name) ?>)</td>
                         <td class="text-right"><?= number_format($subtotal_demande, 0, ',', ' ') ?> BIF</td>
                         <td class="text-center">
                             <span class="manual-input-line"></span>
@@ -424,37 +567,50 @@
         endforeach;
         ?>
 
-        <!-- Total Général -->
-        <div class="chantier-section">
-            <table class="table total-general">
+        <!-- ============================================== -->
+        <!-- TABLEAU RÉCAPITULATIF PAR CHANTIER             -->
+        <!-- ============================================== -->
+        <div class="recap-section">
+            <div class="chantier-header" style="background: #007bff; margin-bottom: 10px;">
+                <i class="fas fa-table"></i> TABLEAU RÉCAPITULATIF PAR CHANTIER
+            </div>
+
+            <table class="table recap-table">
                 <thead>
                     <tr>
-                        <th style="width: 45%" class="text-center">SYNTHÈSE GLOBALE</th>
-                        <th class="text-center">Total Demandé</th>
-                        <th class="text-center">Total Autorisé</th>
-                        <th class="text-center">Écart</th>
-                        <th class="text-center">Taux</th>
+                        <th style="width: 5%" class="text-center">N°</th>
+                        <th style="width: 50%">Désignation / Chantier</th>
+                        <th style="width: 20%" class="text-right">Montant demandé (BIF)</th>
+                        <th style="width: 20%" class="text-right">Montant Autorisé (BIF)</th>
+                        <th style="width: 5%">Observation</th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php foreach ($recap_chantiers as $index => $chantier): ?>
                     <tr>
-                        <td class="text-left pl-4">
-                            <i class="fas fa-chart-pie"></i>
-                            <strong><?= count($demandes_by_chantier) ?> chantiers / <?= count($demandes) ?>
-                                demandes</strong>
+                        <td class="text-center"><strong><?= $index + 1 ?></strong></td>
+                        <td><strong><?= strtoupper($chantier['name']) ?></strong></td>
+                        <td class="text-right">
+                            <strong><?= number_format($chantier['total_demande'], 0, ',', ' ') ?></strong>
                         </td>
-                        <td class="text-right"><?= number_format($statistics['total_demande'], 0, ',', ' ') ?> BIF</td>
-                        <td class="text-center">
-                            <span style="color: #ffcccc; font-size: 9px;">(À compléter)</span>
+                        <td class="text-right">
+                            <span class="manual-input-line"></span>
                         </td>
-                        <td class="text-center">
-                            <span style="color: #ffcccc; font-size: 9px;">-</span>
-                        </td>
-                        <td class="text-center">
-                            <span style="color: #ffcccc; font-size: 9px;">-%</span>
-                        </td>
+                        <td></td>
                     </tr>
+                    <?php endforeach; ?>
                 </tbody>
+                <tfoot>
+                    <tr class="recap-total">
+                        <td colspan="2" class="text-right"><strong>TOTAL GÉNÉRAL</strong></td>
+                        <td class="text-right"><strong><?= number_format($total_general_demande, 0, ',', ' ') ?>
+                                BIF</strong></td>
+                        <td class="text-right">
+                            <span class="manual-input-line"></span>
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
 

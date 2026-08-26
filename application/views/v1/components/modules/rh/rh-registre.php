@@ -6,17 +6,16 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0"><?= $title ?></h1>
-                </div><!-- /.col -->
+                </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active"><?= $title ?></li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /.content-header -->
 
     <!-- Main content -->
     <section class="content">
@@ -64,8 +63,43 @@
                     border: 1px solid #000 !important;
                     box-shadow: none !important;
                 }
+
+                .info-box {
+                    break-inside: avoid;
+                }
+
+                .registre-table tbody tr {
+                    break-inside: avoid;
+                }
             }
             </style>
+
+            <?php
+            /* ----- Dernière sortie par employé (démission, licenciement, fin de contrat, retraite) ----- */
+            $sorties = [];
+            foreach ($mouvements as $m) {
+                if (
+                    in_array($m->type_mouvement, ['Démission', 'Licenciement', 'Fin de contrat', 'Retraite'])
+                    && !isset($sorties[$m->employe_id])
+                ) {
+                    $sorties[$m->employe_id] = $m;   // mouvements triés DESC → 1er rencontré = le plus récent
+                }
+            }
+
+            $badge_type = ['CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info'];
+
+            /* ----- Indicateurs ----- */
+            $total = count($employes);
+            $en_service = $nb_actifs = $nb_conge = $nb_sortis = 0;
+            foreach ($employes as $e) {
+                if ($e->statut === 'Fin de contrat') {
+                    $nb_sortis++;
+                    continue;
+                }
+                $en_service++;
+                ($e->statut === 'En congé') ? $nb_conge++ : $nb_actifs++;
+            }
+            ?>
 
             <!-- ============ 1. INDICATEURS DU REGISTRE ============ -->
             <div class="row">
@@ -74,7 +108,7 @@
                         <span class="info-box-icon bg-success"><i class="fas fa-book"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Inscrits au registre</span>
-                            <span class="info-box-number">60</span>
+                            <span class="info-box-number"><?= $total ?></span>
                             <span class="progress-description">Depuis la création de l'entreprise</span>
                         </div>
                     </div>
@@ -84,8 +118,9 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-user-check"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">En service</span>
-                            <span class="info-box-number">57</span>
-                            <span class="progress-description">55 actifs · 2 en congé</span>
+                            <span class="info-box-number"><?= $en_service ?></span>
+                            <span class="progress-description"><?= $nb_actifs ?> actifs · <?= $nb_conge ?> en
+                                congé</span>
                         </div>
                     </div>
                 </div>
@@ -94,7 +129,7 @@
                         <span class="info-box-icon bg-secondary"><i class="fas fa-user-minus"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Sortis</span>
-                            <span class="info-box-number">3</span>
+                            <span class="info-box-number"><?= $nb_sortis ?></span>
                             <span class="progress-description">Démission · retraite · fin de contrat</span>
                         </div>
                     </div>
@@ -140,12 +175,9 @@
                                 Obligation légale</h6>
                             <p class="mb-2 text-justify" style="font-size:.88rem">
                                 Conformément au <strong>Code du travail de la République du Burundi</strong> et à ses
-                                mesures
-                                d'application, tout employeur est tenu de tenir un <strong>registre du
-                                    personnel</strong>
-                                à jour, à présenter à toute réquisition de l'<strong>Inspection Générale du
-                                    Travail</strong>
-                                et de l'<strong>OBEM</strong>.
+                                mesures d'application, tout employeur est tenu de tenir un <strong>registre du
+                                    personnel</strong> à jour, à présenter à toute réquisition de l'<strong>Inspection
+                                    Générale du Travail</strong> et de l'<strong>OBEM</strong>.
                             </p>
                             <ul class="mb-0 pl-3" style="font-size:.85rem">
                                 <li>Inscrire tout travailleur dès son embauche ;</li>
@@ -186,15 +218,15 @@
                     <div class="row mt-3 no-print">
                         <div class="col-md-5 mb-2">
                             <div class="input-group">
-                                <input type="search" class="form-control"
+                                <input type="search" id="searchRegistre" class="form-control"
                                     placeholder="Rechercher (nom, matricule, CNID…)">
                                 <div class="input-group-append"><span class="input-group-text"><i
                                             class="fas fa-search"></i></span></div>
                             </div>
                         </div>
                         <div class="col-md-3 mb-2">
-                            <select class="form-control">
-                                <option>Site : tous</option>
+                            <select id="filterSite" class="form-control">
+                                <option value="">Site : tous</option>
                                 <option>Siège (Bujumbura)</option>
                                 <option>Chantier Ngagara II</option>
                                 <option>Chantier Gitega</option>
@@ -202,15 +234,16 @@
                             </select>
                         </div>
                         <div class="col-md-2 mb-2">
-                            <select class="form-control">
-                                <option>Situation : tous</option>
+                            <select id="filterSituation" class="form-control">
+                                <option value="">Situation : tous</option>
                                 <option>En service</option>
+                                <option>En congé</option>
                                 <option>Sorti</option>
                             </select>
                         </div>
                         <div class="col-md-2 mb-2">
-                            <select class="form-control">
-                                <option>Catégorie : tous</option>
+                            <select id="filterCategorie" class="form-control">
+                                <option value="">Catégorie : tous</option>
                                 <option>Bureau</option>
                                 <option>Chantier</option>
                             </select>
@@ -238,223 +271,66 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td><strong>SAT-0001</strong></td>
-                                <td>NDAYIZEYE Jean-Marie</td>
-                                <td>M</td>
-                                <td>01/01/1985</td>
-                                <td>1985010112345</td>
-                                <td>Responsable RH &amp; Suivi-Évaluation</td>
-                                <td>Bureau</td>
-                                <td>Ressources Humaines</td>
-                                <td>02/03/2020</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>102456</td>
-                                <td><span class="badge badge-success">En service</span></td>
+                            <?php $n = 0;
+                            foreach ($employes as $e): $n++;
+                                $sexe   = ($e->sexe === 'Féminin') ? 'F' : 'M';
+                                $sorti  = isset($sorties[$e->employe_id]) ? $sorties[$e->employe_id] : NULL;
+                                $affect = ($e->categorie === 'Chantier') ? $e->site_affectation : $e->departement;
+                            ?>
+                            <tr data-site="<?= html_escape($affect) ?>"
+                                data-categorie="<?= html_escape($e->categorie) ?>"
+                                data-situation="<?= $sorti ? 'Sorti' : ($e->statut === 'Fin de contrat' ? 'Sorti' : ($e->statut === 'En congé' ? 'En congé' : 'En service')) ?>">
+                                <td><?= $n ?></td>
+                                <td><strong><?= html_escape($e->matricule) ?></strong></td>
+                                <td><?= html_escape(mb_strtoupper($e->nom) . ' ' . $e->prenoms) ?></td>
+                                <td><?= $sexe ?></td>
+                                <td><?= $e->date_naissance ? date('d/m/Y', strtotime($e->date_naissance)) : '—' ?></td>
+                                <td><?= html_escape($e->cnid ?: '—') ?></td>
+                                <td><?= html_escape($e->fonction) ?></td>
+                                <td><?= html_escape($e->categorie) ?></td>
+                                <td><?= html_escape($affect) ?></td>
+                                <td><?= date('d/m/Y', strtotime($e->date_embauche)) ?></td>
+                                <td><span
+                                        class="badge badge-<?= $badge_type[$e->type_contrat] ?? 'secondary' ?>"><?= $e->type_contrat ?></span>
+                                </td>
+                                <td><?= html_escape($e->matricule_inss ?: '—') ?></td>
+                                <td>
+                                    <?php if ($sorti): ?>
+                                    <span class="badge badge-secondary">Sorti —
+                                        <?= strtolower($sorti->type_mouvement) ?>
+                                        <?= date('d/m/Y', strtotime($sorti->date_effet)) ?></span>
+                                    <?php elseif ($e->statut === 'Fin de contrat'): ?>
+                                    <span class="badge badge-secondary">Sorti</span>
+                                    <?php elseif ($e->statut === 'En congé'): ?>
+                                    <span class="badge badge-info">En congé</span>
+                                    <?php elseif ($e->statut === 'Suspendu'): ?>
+                                    <span class="badge badge-warning">Suspendu</span>
+                                    <?php else: ?>
+                                    <span class="badge badge-success">En service</span>
+                                    <?php endif; ?>
+                                </td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td><strong>SAT-0002</strong></td>
-                                <td>NTEREKA Gaspard</td>
-                                <td>M</td>
-                                <td>10/05/1966</td>
-                                <td>1966051012201</td>
-                                <td>Ingénieur génie civil</td>
-                                <td>Bureau</td>
-                                <td>Direction Technique</td>
-                                <td>15/03/2019</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>100112</td>
-                                <td><span class="badge badge-secondary">Sorti — retraite 31/01/2026</span></td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td><strong>SAT-0005</strong></td>
-                                <td>NTAKARUTIMANA Innocent</td>
-                                <td>M</td>
-                                <td>22/09/1991</td>
-                                <td>1991092212205</td>
-                                <td>Assistant comptable</td>
-                                <td>Bureau</td>
-                                <td>DAF / Finance</td>
-                                <td>07/10/2019</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>100145</td>
-                                <td><span class="badge badge-secondary">Sorti — démission 28/02/2026</span></td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td><strong>SAT-0007</strong></td>
-                                <td>INGABIRE Espérance</td>
-                                <td>F</td>
-                                <td>14/05/1990</td>
-                                <td>1990051412346</td>
-                                <td>Secrétaire de direction</td>
-                                <td>Bureau</td>
-                                <td>Direction Générale</td>
-                                <td>03/02/2023</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>102890</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td><strong>SAT-0008</strong></td>
-                                <td>KIGABIRO Aymar</td>
-                                <td>M</td>
-                                <td>03/07/1998</td>
-                                <td>1998070312357</td>
-                                <td>Designer</td>
-                                <td>Bureau</td>
-                                <td>Direction Générale</td>
-                                <td>01/08/2026</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>103210</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>6</td>
-                                <td><strong>SAT-0014</strong></td>
-                                <td>NIYONZIMA Alice</td>
-                                <td>F</td>
-                                <td>30/11/1992</td>
-                                <td>1992113012214</td>
-                                <td>Comptable senior</td>
-                                <td>Bureau</td>
-                                <td>DAF / Finance</td>
-                                <td>15/06/2021</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>101780</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>7</td>
-                                <td><strong>SAT-0021</strong></td>
-                                <td>HAKIZIMANA Patrick</td>
-                                <td>M</td>
-                                <td>08/03/1986</td>
-                                <td>1986030812221</td>
-                                <td>Conducteur de travaux</td>
-                                <td>Chantier</td>
-                                <td>Chantier Ngagara II</td>
-                                <td>10/01/2022</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>102034</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>8</td>
-                                <td><strong>SAT-0029</strong></td>
-                                <td>UWIMANA Chantal</td>
-                                <td>F</td>
-                                <td>25/06/1993</td>
-                                <td>1993062512229</td>
-                                <td>Officier HSE</td>
-                                <td>Bureau</td>
-                                <td>Direction Technique</td>
-                                <td>12/11/2021</td>
-                                <td><span class="badge badge-success">CDI</span></td>
-                                <td>101950</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>9</td>
-                                <td><strong>SAT-0032</strong></td>
-                                <td>MBONIMPA Justine</td>
-                                <td>F</td>
-                                <td>05/05/1996</td>
-                                <td>1996050512324</td>
-                                <td>Peintre</td>
-                                <td>Chantier</td>
-                                <td>Chantier Ngagara II</td>
-                                <td>19/02/2024</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>102660</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>10</td>
-                                <td><strong>SAT-0041</strong></td>
-                                <td>NIYONGABO Cédric</td>
-                                <td>M</td>
-                                <td>15/01/1997</td>
-                                <td>1997011512333</td>
-                                <td>Manœuvre</td>
-                                <td>Chantier</td>
-                                <td>Chantier Gitega</td>
-                                <td>01/09/2025</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>103005</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>11</td>
-                                <td><strong>SAT-0059</strong></td>
-                                <td>IRAKOZE Nadia</td>
-                                <td>F</td>
-                                <td>09/09/1999</td>
-                                <td>1999090912351</td>
-                                <td>Stagiaire RH</td>
-                                <td>Bureau</td>
-                                <td>Ressources Humaines</td>
-                                <td>02/02/2026</td>
-                                <td><span class="badge badge-info">Stage</span></td>
-                                <td>—</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
-                            <tr>
-                                <td>12</td>
-                                <td><strong>SAT-0061</strong></td>
-                                <td>MUGISHA Robert</td>
-                                <td>M</td>
-                                <td>04/04/1992</td>
-                                <td>1992040412353</td>
-                                <td>Maçon</td>
-                                <td>Chantier</td>
-                                <td>Chantier Ngozi</td>
-                                <td>13/03/2023</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>102553</td>
-                                <td><span class="badge badge-secondary">Sorti — fin de contrat 10/08/2026</span></td>
-                            </tr>
-                            <tr>
-                                <td>13</td>
-                                <td><strong>SAT-0062</strong></td>
-                                <td>NDABASHIMANA Prisca</td>
-                                <td>F</td>
-                                <td>21/10/1995</td>
-                                <td>1995102112354</td>
-                                <td>Secrétaire de chantier</td>
-                                <td>Bureau</td>
-                                <td>Chantier Ngozi</td>
-                                <td>09/09/2024</td>
-                                <td><span class="badge badge-warning">CDD</span></td>
-                                <td>102774</td>
-                                <td><span class="badge badge-success">En service</span></td>
-                            </tr>
+                            <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="card-footer clearfix">
                     <small class="text-muted float-left mt-2">
-                        Registre mis à jour le 21/08/2026 · Affichage de 1 à 13 sur 60 inscrits
+                        Registre mis à jour le <?= date('d/m/Y') ?> · Affichage de <?= $total ?>
+                        inscrit<?= $total > 1 ? 's' : '' ?>
                     </small>
                     <ul class="pagination pagination-sm float-right mb-0 no-print">
                         <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
                         <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">…</a></li>
-                        <li class="page-item"><a class="page-link" href="#">5</a></li>
-                        <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                        <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
                     </ul>
                 </div>
             </div>
 
             <!-- ============ 4. BLOC DE SIGNATURES (visible uniquement à l'impression) ============ -->
             <div class="print-only mt-4">
-                <p class="mb-4">Fait à Bujumbura, le 21/08/2026</p>
+                <p class="mb-4">Fait à Bujumbura, le <?= date('d/m/Y') ?></p>
                 <div class="row text-center">
                     <div class="col-6">
                         <strong>Le Responsable RH</strong><br><br><br>
@@ -467,8 +343,43 @@
                 </div>
             </div>
 
-        </div><!-- /.container-fluid -->
+        </div>
     </section>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    /* ===== Recherche textuelle ===== */
+    var s = document.getElementById('searchRegistre');
+    if (s) {
+        s.addEventListener('keyup', filtrer);
+    }
+
+    /* ===== Filtres par select (site, situation, catégorie) ===== */
+    ['filterSite', 'filterSituation', 'filterCategorie'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('change', filtrer);
+    });
+
+    function filtrer() {
+        var q = (s ? s.value : '').toLowerCase();
+        var sit = document.getElementById('filterSite');
+        var sts = document.getElementById('filterSituation');
+        var cat = document.getElementById('filterCategorie');
+
+        var fSite = sit ? sit.value : '';
+        var fStat = sts ? sts.value : '';
+        var fCat = cat ? cat.value : '';
+
+        document.querySelectorAll('.registre-table tbody tr').forEach(function(tr) {
+            var txt = tr.textContent.toLowerCase();
+            var txtOk = !q || txt.indexOf(q) !== -1;
+            var siteOk = !fSite || tr.dataset.site === fSite;
+            var catOk = !fCat || tr.dataset.categorie === fCat;
+            var statOk = !fStat || tr.dataset.situation === fStat;
+            tr.style.display = (txtOk && siteOk && catOk && statOk) ? '' : 'none';
+        });
+    }
+});
+</script>

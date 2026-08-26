@@ -1287,4 +1287,102 @@ class TechModel extends CI_Model
         $this->db->where('employe_id', (int) $id);
         return $this->db->update($this->table, $data);
     }
+
+    // =====================================================
+    // SUIVIE PAIE CHANTIER (table : workforce_contracts)
+    // Semaines déterminées par created_at
+    // =====================================================
+
+    private function _selectWeeks()
+    {
+        $this->db->select("YEARWEEK(created_at, 3) AS yw,
+                       MIN(start_date)  AS week_start,
+                       MAX(end_date)    AS week_end,
+                       MIN(created_at)  AS first_date");
+    }
+
+    // ---------- Semaines du mois en cours (par défaut) ----------
+    public function getPaieWeeksOfMonth($year, $month)
+    {
+        $this->_selectWeeks();
+        $this->db->where('YEAR(created_at)', $year);
+        $this->db->where('MONTH(created_at)', $month);
+        $this->db->group_by('yw');
+        $this->db->order_by('first_date', 'DESC');
+        return $this->db->get('workforce_contracts')->result();
+    }
+
+    // ---------- Une semaine précise (quand on filtre) ----------
+    public function getPaieWeekByYw($yw)
+    {
+        $this->_selectWeeks();
+        // CORRECTION : condition complète + (int) + false (pas d'échappement auto)
+        $this->db->where('YEARWEEK(created_at, 3) = ' . (int) $yw, null, false);
+        $this->db->group_by('yw');
+        return $this->db->get('workforce_contracts')->result();
+    }
+
+    // ---------- Toutes les semaines (select du filtre) ----------
+    public function getAllPaieWeeks($limit = 24)
+    {
+        $this->_selectWeeks();
+        $this->db->group_by('yw');
+        $this->db->order_by('first_date', 'DESC');
+        $this->db->limit($limit);
+        return $this->db->get('workforce_contracts')->result();
+    }
+
+    // ---------- Contrats d'une semaine (avec nom du chantier) ----------
+    public function getPaieContracts($yw, $chantier_id = null)
+    {
+        $this->db->select('wc.*, c.name AS chantier_name');
+        $this->db->from('workforce_contracts wc');
+        $this->db->join('chantiers c', 'c.id = wc.chantier_id', 'left');
+
+        // CORRECTION : condition complète + (int) + false
+        $this->db->where('YEARWEEK(wc.created_at, 3) = ' . (int) $yw, null, false);
+
+        if (!empty($chantier_id)) {
+            $this->db->where('wc.chantier_id', (int) $chantier_id);
+        }
+
+        $this->db->order_by('wc.chantier_id', 'ASC');
+        $this->db->order_by('wc.worker_name', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    // ---------- Statistiques des tuiles ----------
+    public function sumPaieAll()
+    {
+        $this->db->select('IFNULL(SUM(unit_rate), 0) AS total');
+        return $this->db->get('workforce_contracts')->row()->total;
+    }
+
+    public function sumPaieMonth($year, $month)
+    {
+        $this->db->select('IFNULL(SUM(unit_rate), 0) AS total');
+        $this->db->where('YEAR(created_at)', $year);
+        $this->db->where('MONTH(created_at)', $month);
+        return $this->db->get('workforce_contracts')->row()->total;
+    }
+
+    public function countPaieEnAttente($year = null, $month = null)
+    {
+        $this->db->where('(approved_by_dt = 0 OR approved_by_daf = 0)', null, false);
+
+        if ($year && $month) {
+            $this->db->where('YEAR(created_at)', $year);
+            $this->db->where('MONTH(created_at)', $month);
+        }
+
+        return $this->db->count_all_results('workforce_contracts');
+    }
+
+    public function countChantiersPaieMonth($year, $month)
+    {
+        $this->db->select('COUNT(DISTINCT chantier_id) AS nb');
+        $this->db->where('YEAR(created_at)', $year);
+        $this->db->where('MONTH(created_at)', $month);
+        return $this->db->get('workforce_contracts')->row()->nb;
+    }
 }

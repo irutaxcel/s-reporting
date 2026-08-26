@@ -516,82 +516,141 @@
             <div class="modal fade" id="modalDemandeConge">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header bg-success text-white">
-                            <h4 class="modal-title"><i class="fas fa-umbrella-beach mr-2"></i>Nouvelle demande de congé
-                            </h4>
-                            <button type="button" class="close text-white"
-                                data-dismiss="modal"><span>&times;</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Employé *</label>
-                                        <select class="form-control">
-                                            <option>— Sélectionner —</option>
-                                            <option>SAT-0014 · Alice NIYONZIMA (solde : 11 j)</option>
-                                            <option>SAT-0021 · Patrick HAKIZIMANA (solde : 16 j)</option>
-                                            <option>SAT-0032 · Justine MBONIMPA (solde : 20 j)</option>
-                                            <option>SAT-0033 · Divine IRAKOZE (solde : 12 j)</option>
-                                        </select>
+                        <form id="formDemandeConge" method="post" action="<?= base_url('rh-conges-store') ?>"
+                            enctype="multipart/form-data">
+                            <div class="modal-header bg-success text-white">
+                                <h4 class="modal-title"><i class="fas fa-umbrella-beach mr-2"></i>Nouvelle demande de
+                                    congé</h4>
+                                <button type="button" class="close text-white"
+                                    data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Employé *</label>
+                                            <select name="employe_id" class="form-control" required>
+                                                <option value="">— Sélectionner —</option>
+                                                <?php foreach ($employes as $e):
+                                                    if ($e->statut === 'Fin de contrat') continue; ?>
+                                                <option value="<?= $e->employe_id ?>">
+                                                    <?= html_escape($e->matricule . ' · ' . $e->prenoms . ' ' . mb_strtoupper($e->nom)) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Type de congé *</label>
-                                        <select class="form-control">
-                                            <option>Congé annuel</option>
-                                            <option>Maladie (certificat requis)</option>
-                                            <option>Maternité</option>
-                                            <option>Circonstance (mariage, naissance, décès)</option>
-                                            <option>Sans solde</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Type de congé *</label>
+                                            <select name="type_conge" class="form-control" required>
+                                                <option>Congé annuel</option>
+                                                <option>Maladie (certificat requis)</option>
+                                                <option>Maternité</option>
+                                                <option>Circonstance (mariage, naissance, décès)</option>
+                                                <option>Sans solde</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Date de début *</label><input type="date"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Date de fin *</label><input type="date"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Jours ouvrés calculés</label>
-                                        <input type="text" class="form-control" value="—" disabled>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Date de début *</label>
+                                            <input type="date" name="date_debut" id="congeDebut" class="form-control"
+                                                required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Remplaçant proposé</label>
-                                        <select class="form-control">
-                                            <option>— Aucun —</option>
-                                            <option>SAT-0016 · Josiane UMUGWANEZA</option>
-                                            <option>SAT-0053 · Divine NUNUBAHA</option>
-                                        </select>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Date de fin *</label>
+                                            <input type="date" name="date_fin" id="congeFin" class="form-control"
+                                                required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Pièce justificative</label>
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="fileJustifConge">
-                                            <label class="custom-file-label" for="fileJustifConge">Choisir…</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Jours ouvrés calculés</label>
+                                            <input type="text" id="congeJours" name="jours_apercu" class="form-control"
+                                                value="—" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Remplaçant proposé</label>
+                                            <select name="remplacant_id" class="form-control">
+                                                <option value="">— Aucun —</option>
+                                                <?php foreach ($employes as $r):
+                                                    if ($r->statut === 'Fin de contrat') continue; ?>
+                                                <option value="<?= $r->employe_id ?>">
+                                                    <?= html_escape($r->matricule . ' · ' . $r->prenoms . ' ' . mb_strtoupper($r->nom)) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Pièce justificative</label>
+                                            <div class="custom-file">
+                                                <input type="file" name="justificatif" class="custom-file-input"
+                                                    id="fileJustifConge">
+                                                <label class="custom-file-label" for="fileJustifConge">Choisir…</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group"><label>Observation</label>
+                                            <textarea name="observation" class="form-control" rows="2"
+                                                placeholder="Précisions éventuelles (fractionnement, urgence…)"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="form-group"><label>Observation</label>
-                                        <textarea class="form-control" rows="2"
-                                            placeholder="Précisions éventuelles (fractionnement, urgence…)"></textarea>
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                            <button type="button" class="btn btn-success"><i class="fas fa-paper-plane mr-1"></i>
-                                Soumettre la demande</button>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-paper-plane mr-1"></i>
+                                    Soumettre la demande</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var form = document.getElementById('formDemandeConge');
+                if (!form) return;
+
+                /* ----- Calcul des jours ouvrés (lun → ven) en temps réel ----- */
+                function joursOuvres(debut, fin) {
+                    var d = new Date(debut),
+                        f = new Date(fin),
+                        n = 0;
+                    while (d <= f) {
+                        var wd = d.getDay();
+                        if (wd !== 0 && wd !== 6) n++;
+                        d.setDate(d.getDate() + 1);
+                    }
+                    return n;
+                }
+
+                function majJours() {
+                    var deb = form.querySelector('[name="date_debut"]').value;
+                    var fin = form.querySelector('[name="date_fin"]').value;
+                    var out = form.querySelector('#congeJours');
+                    if (deb && fin && fin >= deb) {
+                        out.value = joursOuvres(deb, fin) + ' jour(s)';
+                    } else {
+                        out.value = '—';
+                    }
+                }
+                form.querySelector('[name="date_debut"]').addEventListener('change', majJours);
+                form.querySelector('[name="date_fin"]').addEventListener('change', majJours);
+
+                /* ----- Nom du fichier choisi ----- */
+                form.querySelectorAll('.custom-file-input').forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        var label = this.closest('.custom-file').querySelector(
+                            '.custom-file-label');
+                        label.textContent = (this.files && this.files.length) ? this.files[0]
+                            .name : 'Choisir…';
+                        label.classList.toggle('has-file', this.files.length > 0);
+                    });
+                });
+            });
+            </script>
 
         </div><!-- /.container-fluid -->
     </section>

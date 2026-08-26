@@ -154,6 +154,8 @@ $route['journalProduction-delete'] = 'TechController/deleteJournalProduction';
 
 $route['journalProduction-print/(:num)'] = 'TechController/printJournalProduction/$1';
 
+$route['suivie-paie-chantier'] = 'TechController/chantierPaie';
+
 
 $route['finance-dashboard'] = 'FinanceController/financeDashboard';
 
@@ -253,13 +255,19 @@ $route['rh-employe_get/(:num)'] = 'RhController/employe_get/$1';
 
 $route['rh-employes-update'] = 'RhController/employes_update';
 
-$route['rh-contrats'] = 'RhController/rhContrats';
+// $route['rh-contrats'] = 'RhController/rhContrats';
+
+$route['rh-contrats']       = 'RhController/rhContrats';
+$route['rh-contrats-store'] = 'RhController/contrats_store';
+
+$route['rh-mouvements-store'] = 'RhController/mouvements_store';
 
 $route['rh-registre'] = 'RhController/rhRegistre';
 
 $route['rh-presences'] = 'RhController/rhPresences';
 
-$route['rh-conges'] = 'RhController/rhConges';
+$route['rh-conges']       = 'RhController/rhConges';
+$route['rh-conges-store'] = 'RhController/conges_store';
 
 $route['rh-paie'] = 'RhController/rhPaie';
 

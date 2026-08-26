@@ -396,13 +396,152 @@ class RhController extends CI_Controller
         }
 
         $title = 'Contrats & mouvements';
-        $data = [];
+        $data  = [];
 
+        $data['employes'] = $this->Employe_model->get_all('DESC');   // ← ligne 401 complétée
+        $data['contrats'] = $this->Employe_model->get_with_employes();
+
+        $data['mouvements'] = $this->Employe_model->get_mouvements_with_employes();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
         $this->load->view('v1/components/modules/rh/rh-contrats', $data);
         $this->load->view('v1/components/layout/footer');
+    }
+
+    public function contrats_store()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('employe_id', 'Employé', 'required|integer');
+        $this->form_validation->set_rules('date_debut', 'Date de début', 'required');
+        $this->form_validation->set_rules('fonction', 'Fonction', 'required|trim');
+        $this->form_validation->set_rules('salaire_base', 'Salaire de base', 'required|numeric');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+            redirect('rh-contrats');
+            return;
+        }
+
+        // Upload du contrat signé (optionnel)
+        $doc = NULL;
+        if (!empty($_FILES['document']['name'])) {
+            $config = [
+                'upload_path'   => FCPATH . 'uploads/rh/contrats/',
+                'allowed_types' => 'pdf|jpg|jpeg|png',
+                'max_size'      => 2048,
+                'file_name'     => 'contrat_' . time() . '_' . uniqid(),
+            ];
+            if (!is_dir($config['upload_path'])) {
+                mkdir($config['upload_path'], 0777, TRUE);
+            }
+            $this->load->library('upload');
+            $this->upload->initialize($config);
+            if (!$this->upload->do_upload('document')) {
+                $this->session->set_flashdata('error', 'Document : ' . $this->upload->display_errors('', ''));
+                redirect('rh-contrats');
+                return;
+            }
+            $doc = 'uploads/rh/contrats/' . $this->upload->data('file_name');
+        }
+
+        // Règle métier : un CDI n'a pas de date de fin
+        $type = $this->input->post('type_contrat');
+
+        $this->Employe_model->insertContract([
+            'employe_id'       => $this->input->post('employe_id'),
+            'operation'        => $this->input->post('operation'),
+            'type_contrat'     => $type,
+            'date_debut'       => $this->input->post('date_debut'),
+            'date_fin'         => ($type !== 'CDI' && $this->input->post('date_fin')) ? $this->input->post('date_fin') : NULL,
+            'periode_essai'    => $this->input->post('periode_essai'),
+            'fonction'         => $this->input->post('fonction'),
+            'salaire_base'     => $this->input->post('salaire_base'),
+            'site_affectation' => $this->input->post('site_affectation'),
+            'document'         => $doc,
+            'observations'     => $this->input->post('observations'),
+        ]);
+
+        $this->session->set_flashdata('success', 'Contrat enregistré avec succès.');
+        redirect('rh-contrats');
+    }
+
+    public function mouvements_store()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('employe_id', 'Employé', 'required|integer');
+        $this->form_validation->set_rules('type_mouvement', 'Type de mouvement', 'required');
+        $this->form_validation->set_rules('date_effet', "Date d'effet", 'required');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+            redirect('rh-contrats');
+            return;
+        }
+
+        $id_emp = (int) $this->input->post('employe_id');
+        $emp    = $this->Employe_model->get_by_id($id_emp);
+        if (!$emp) {
+            $this->session->set_flashdata('error', 'Employé introuvable.');
+            redirect('rh-contrats');
+            return;
+        }
+
+        // Upload du justificatif (optionnel)
+        $justif = NULL;
+        if (!empty($_FILES['justificatif']['name'])) {
+            $config = [
+                'upload_path'   => FCPATH . 'uploads/rh/mouvements/',
+                'allowed_types' => 'pdf|jpg|jpeg|png',
+                'max_size'      => 2048,
+                'file_name'     => 'mouvement_' . time() . '_' . uniqid(),
+            ];
+            if (!is_dir($config['upload_path'])) {
+                mkdir($config['upload_path'], 0777, TRUE);
+            }
+            $this->load->library('upload');
+            $this->upload->initialize($config);
+            if (!$this->upload->do_upload('justificatif')) {
+                $this->session->set_flashdata('error', 'Justificatif : ' . $this->upload->display_errors('', ''));
+                redirect('rh-contrats');
+                return;
+            }
+            $justif = 'uploads/rh/mouvements/' . $this->upload->data('file_name');
+        }
+
+        $type          = $this->input->post('type_mouvement');
+        $affectation   = $this->input->post('nouvelle_affectation');
+
+        // 1. Enregistrement du mouvement
+        $this->Employe_model->insert_mouvement([
+            'employe_id'           => $id_emp,
+            'type_mouvement'       => $type,
+            'date_effet'           => $this->input->post('date_effet'),
+            'nouvelle_affectation' => $affectation ?: NULL,
+            'justificatif'         => $justif,
+            'motif'                => $this->input->post('motif'),
+            'encode_par'           => $this->session->userdata('nom') ?: $this->session->userdata('username'),
+        ]);
+
+        // 2. Effets automatiques sur la fiche employé
+        if (in_array($type, ['Démission', 'Licenciement', 'Fin de contrat', 'Retraite'])) {
+            // Sortie → l'employé passe en "Fin de contrat"
+            $this->Employe_model->update($id_emp, ['statut' => 'Fin de contrat']);
+        } elseif (in_array($type, ['Transfert', 'Promotion']) && $affectation !== '') {
+            // Transfert / promotion → mise à jour de l'affectation
+            $this->Employe_model->update($id_emp, ['site_affectation' => $affectation]);
+        }
+
+        $this->session->set_flashdata('success', 'Mouvement « ' . $type . ' » enregistré pour ' . $emp->matricule . '.');
+        redirect('rh-contrats');
     }
 
     public function rhRegistre()
@@ -412,8 +551,11 @@ class RhController extends CI_Controller
         }
 
         $title = "Registre d'employeur";
-        $data = [];
+        $data  = [];
 
+        // Registre : ordre croissant du matricule (comme un vrai registre papier)
+        $data['employes']   = $this->Employe_model->get_all('ASC');
+        $data['mouvements'] = $this->Employe_model->get_mouvements_with_employes();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
@@ -443,14 +585,95 @@ class RhController extends CI_Controller
             redirect('sign-in');
         }
 
-        $title = "Congés";
-        $data = [];
+        $title = 'Congés';
+        $data  = [];
 
+        $data['employes'] = $this->Employe_model->get_all('DESC');
+        $data['conges']   = $this->Employe_model->get_conges_with_employes();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
         $this->load->view('v1/components/modules/rh/rh-conges', $data);
         $this->load->view('v1/components/layout/footer');
+    }
+
+    public function conges_store()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('employe_id', 'Employé', 'required|integer');
+        $this->form_validation->set_rules('date_debut', 'Date de début', 'required');
+        $this->form_validation->set_rules('date_fin', 'Date de fin', 'required|callback_verif_periode');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+            redirect('rh-conges');
+            return;
+        }
+
+        // Upload du justificatif (optionnel)
+        $justif = NULL;
+        if (!empty($_FILES['justificatif']['name'])) {
+            $config = [
+                'upload_path'   => FCPATH . 'uploads/rh/conges/',
+                'allowed_types' => 'pdf|jpg|jpeg|png',
+                'max_size'      => 2048,
+                'file_name'     => 'conge_' . time() . '_' . uniqid(),
+            ];
+            if (!is_dir($config['upload_path'])) {
+                mkdir($config['upload_path'], 0777, TRUE);
+            }
+            $this->load->library('upload');
+            $this->upload->initialize($config);
+            if (!$this->upload->do_upload('justificatif')) {
+                $this->session->set_flashdata('error', 'Justificatif : ' . $this->upload->display_errors('', ''));
+                redirect('rh-conges');
+                return;
+            }
+            $justif = 'uploads/rh/conges/' . $this->upload->data('file_name');
+        }
+
+        $this->Employe_model->insert_conge([
+            'employe_id'    => $this->input->post('employe_id'),
+            'type_conge'    => $this->input->post('type_conge'),
+            'date_debut'    => $this->input->post('date_debut'),
+            'date_fin'      => $this->input->post('date_fin'),
+            'jours_ouvres'  => $this->_compter_jours_ouvres($this->input->post('date_debut'), $this->input->post('date_fin')),
+            'remplacant_id' => $this->input->post('remplacant_id') ?: NULL,
+            'justificatif'  => $justif,
+            'observation'   => $this->input->post('observation'),
+            'statut'        => 'En attente',
+            'encode_par'    => $this->session->userdata('nom') ?: $this->session->userdata('username'),
+        ]);
+
+        $this->session->set_flashdata('success', 'Demande de congé soumise avec succès.');
+        redirect('rh-conges');
+    }
+
+    /** Validation : la fin doit être >= au début */
+    public function verif_periode($date_fin)
+    {
+        if ($date_fin < $this->input->post('date_debut')) {
+            $this->form_validation->set_message('verif_periode', 'La date de fin doit être postérieure ou égale à la date de début.');
+            return FALSE;
+        }
+        return TRUE;
+    }
+
+    /** Jours ouvrés (lun → ven) entre deux dates */
+    private function _compter_jours_ouvres($debut, $fin)
+    {
+        $jours = 0;
+        $d = new DateTime($debut);
+        $f = new DateTime($fin);
+        while ($d <= $f) {
+            if ((int) $d->format('N') <= 5) $jours++;   // 1=lun … 5=ven
+            $d->modify('+1 day');
+        }
+        return $jours;
     }
 
     public function rhPaie()

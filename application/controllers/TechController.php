@@ -955,6 +955,113 @@ class TechController extends CI_Controller
         $this->load->view('v1/components/layout/footer', $data);
     }
 
+    public function chantierPaie()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        // ----- Filtres GET -----
+        $filters = [
+            'semaine'  => $this->input->get('semaine'),   // valeur = YEARWEEK (ex : 202629)
+            'chantier' => $this->input->get('chantier'),
+        ];
+
+        $year  = (int) date('Y');
+        $month = (int) date('n');
+
+        // ----- Semaines du mois en cours + drapeau mois vide -----
+        $weeksMois        = $this->tech->getPaieWeeksOfMonth($year, $month);
+        $data['moisVide'] = empty($weeksMois);
+
+        // ----- Semaines à afficher -----
+        if (!empty($filters['semaine'])) {
+            // Semaine choisie dans le filtre
+            $weeks = $this->tech->getPaieWeekByYw($filters['semaine']);
+        } elseif (!$data['moisVide']) {
+            // Par défaut : semaines du mois en cours
+            $weeks = $weeksMois;
+        } else {
+            // CORRECTION : aucun paiement ce mois-ci → 4 dernières semaines existantes
+            $weeks = $this->tech->getAllPaieWeeks(4);
+        }
+
+        // ----- Construction : semaine → chantiers → personnel -----
+        $paieSemaines = [];
+        $totalGeneral = 0;
+
+        foreach ($weeks as $w) {
+            $contracts = $this->tech->getPaieContracts($w->yw, $filters['chantier']);
+            if (empty($contracts)) continue;
+
+            $byChantier   = [];
+            $totalSemaine = 0;
+
+            foreach ($contracts as $ct) {
+                $key = $ct->chantier_id ?: 0;
+                $byChantier[$key]['name']   = $ct->chantier_name ?: 'Sans chantier';
+                $byChantier[$key]['rows'][] = $ct;
+                $byChantier[$key]['total']  = ($byChantier[$key]['total'] ?? 0) + (float) $ct->unit_rate;
+                $totalSemaine += (float) $ct->unit_rate;
+            }
+
+            $paieSemaines[] = [
+                'yw'         => $w->yw,
+                'week_start' => $w->week_start,
+                'week_end'   => $w->week_end,
+                'chantiers'  => $byChantier,
+                'total'      => $totalSemaine,
+            ];
+            $totalGeneral += $totalSemaine;
+        }
+
+        // ----- Options du select "Semaine" (optgroup par mois, selon created_at) -----
+        $moisFr = [
+            1 => 'Janvier',
+            2 => 'Février',
+            3 => 'Mars',
+            4 => 'Avril',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juillet',
+            8 => 'Août',
+            9 => 'Septembre',
+            10 => 'Octobre',
+            11 => 'Novembre',
+            12 => 'Décembre'
+        ];
+
+        $weekOptions = [];
+        foreach ($this->tech->getAllPaieWeeks(24) as $w) {
+            $m = (int) date('n', strtotime($w->first_date));
+            $weekOptions[$moisFr[$m]][] = [
+                'yw'    => $w->yw,
+                'label' => 'Semaine du ' . date('d/m', strtotime($w->week_start))
+                    . ' au ' . date('d/m/Y', strtotime($w->week_end)),
+            ];
+        }
+
+        // ----- Données pour la vue -----
+        $data['title']         = 'Suivie Paie Chantier';
+        $data['filters']       = $filters;
+        $data['allChantiers']  = $this->tech->getAllChantier();
+        $data['weekOptions']   = $weekOptions;
+        $data['paieSemaines']  = $paieSemaines;
+        $data['totalGeneral']  = $totalGeneral;
+
+        // Tuiles
+        $data['totalCumul']      = $this->tech->sumPaieAll();
+        $data['totalMois']       = $this->tech->sumPaieMonth($year, $month);
+        $data['nbEnAttente']     = $this->tech->countPaieEnAttente();
+        $data['nbChantiersMois'] = $this->tech->countChantiersPaieMonth($year, $month);
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/chantierPaie', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
 
 
     public function storePersonnelChantier()

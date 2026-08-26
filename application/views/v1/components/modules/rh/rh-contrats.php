@@ -22,36 +22,117 @@
     <section class="content">
         <div class="container-fluid">
 
+            <!-- ============ MESSAGES FLASHDATA (SweetAlert2) ============ -->
+            <?php if ($msg = $this->session->flashdata('success')): ?>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Enregistrement réussi',
+                        text: '<?= addslashes($msg) ?>',
+                        confirmButtonColor: '#1f7a5c',
+                        confirmButtonText: 'Parfait !',
+                        timer: 4000,
+                        timerProgressBar: true
+                    });
+                }
+            });
+            </script>
+            <?php endif; ?>
+            <?php if ($msg = $this->session->flashdata('error')): ?>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                rhNotify('error', '<?= addslashes($msg) ?>');
+            });
+            </script>
+            <?php endif; ?>
+
             <!-- ============ STYLE LOCAL (page contrats) ============ -->
             <style>
-                .avatar-initials {
-                    display: inline-flex;
-                    align-items: center;
-                    justify-content: center;
-                    width: 34px;
-                    height: 34px;
-                    border-radius: 50%;
-                    color: #fff;
-                    font-weight: 600;
-                    font-size: .78rem;
-                    flex-shrink: 0;
-                }
+            .avatar-initials {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                color: #fff;
+                font-weight: 600;
+                font-size: .78rem;
+                flex-shrink: 0;
+            }
 
-                .table td {
-                    vertical-align: middle;
-                }
+            .table td {
+                vertical-align: middle;
+            }
 
-                .section-title {
-                    color: #1f7a5c;
-                    font-weight: 700;
-                    border-bottom: 2px solid #e9ecef;
-                    padding-bottom: .4rem;
-                }
-
-                .mini-stat {
-                    border-left: 4px solid #1f7a5c;
-                }
+            .section-title {
+                color: #1f7a5c;
+                font-weight: 700;
+                border-bottom: 2px solid #e9ecef;
+                padding-bottom: .4rem;
+            }
             </style>
+
+            <!-- ============ CALCULS (contrats, alertes, essais, mouvements) ============ -->
+            <?php
+            $aujourd_hui = new DateTime();
+            $plus_30    = (new DateTime())->modify('+30 days');
+            $mois_crt   = $aujourd_hui->format('Y-m');
+
+            $couleurs   = ['#1f7a5c', '#2c8a69', '#34608c', '#7a4f1f', '#8a3033', '#6c757d'];
+            $badge_type = ['CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info'];
+            $badge_mouv = [
+                'Entrée' => 'success',
+                'Démission' => 'warning',
+                'Licenciement' => 'danger',
+                'Fin de contrat' => 'secondary',
+                'Retraite' => 'info',
+                'Transfert' => 'primary',
+                'Promotion' => 'info'
+            ];
+
+            $nb_actifs = $nb_cdi = $nb_cdd = $nb_stage = $nb_expire_30 = $nb_essai = 0;
+            $alertes = [];
+            $essais = [];
+
+            foreach ($contrats as $c) {
+                $fin        = !empty($c->date_fin) ? new DateTime($c->date_fin) : NULL;
+                $c->_expire = ($fin && $fin < $aujourd_hui) || $c->statut === 'Expiré';
+                $c->_expire_bientot = FALSE;
+
+                if ($fin && !$c->_expire && $fin <= $plus_30) {
+                    $c->_expire_bientot = TRUE;
+                    $c->_jours = (int) $aujourd_hui->diff($fin)->days;
+                    $nb_expire_30++;
+                    $alertes[] = $c;
+                }
+                if (!$c->_expire && $c->statut === 'Actif') {
+                    $nb_actifs++;
+                    if ($c->type_contrat === 'CDI') $nb_cdi++;
+                    elseif ($c->type_contrat === 'CDD') $nb_cdd++;
+                    else $nb_stage++;
+                }
+                if (!empty($c->periode_essai) && $c->periode_essai !== 'Aucune') {
+                    $fin_essai = (new DateTime($c->date_debut))->modify('+' . (int) $c->periode_essai . ' months');
+                    if ($fin_essai > $aujourd_hui && !$c->_expire) {
+                        $c->_fin_essai = $fin_essai;
+                        $nb_essai++;
+                        $essais[] = $c;
+                    }
+                }
+            }
+
+            $entrees_mois = $sorties_mois = $internes_mois = 0;
+            foreach ($mouvements as $m) {
+                if (substr($m->date_effet, 0, 7) === $mois_crt) {
+                    if ($m->type_mouvement === 'Entrée') $entrees_mois++;
+                    elseif (in_array($m->type_mouvement, ['Démission', 'Licenciement', 'Fin de contrat', 'Retraite'])) $sorties_mois++;
+                    else $internes_mois++;
+                }
+            }
+            ?>
 
             <!-- ============ 1. INDICATEURS ============ -->
             <div class="row">
@@ -60,8 +141,9 @@
                         <span class="info-box-icon bg-success"><i class="fas fa-file-contract"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Contrats actifs</span>
-                            <span class="info-box-number">55</span>
-                            <span class="progress-description">31 CDI · 22 CDD · 2 stages</span>
+                            <span class="info-box-number"><?= $nb_actifs ?></span>
+                            <span class="progress-description"><?= $nb_cdi ?> CDI · <?= $nb_cdd ?> CDD ·
+                                <?= $nb_stage ?> stage(s)</span>
                         </div>
                     </div>
                 </div>
@@ -70,7 +152,7 @@
                         <span class="info-box-icon bg-warning"><i class="fas fa-hourglass-half"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Expirent sous 30 jours</span>
-                            <span class="info-box-number">5</span>
+                            <span class="info-box-number"><?= $nb_expire_30 ?></span>
                             <span class="progress-description">À renouveler ou clôturer</span>
                         </div>
                     </div>
@@ -80,8 +162,8 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-user-check"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Périodes d'essai en cours</span>
-                            <span class="info-box-number">3</span>
-                            <span class="progress-description">Dont 1 se termine sous 60 j</span>
+                            <span class="info-box-number"><?= $nb_essai ?></span>
+                            <span class="progress-description">À suivre avant confirmation</span>
                         </div>
                     </div>
                 </div>
@@ -89,9 +171,10 @@
                     <div class="info-box">
                         <span class="info-box-icon bg-danger"><i class="fas fa-exchange-alt"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Mouvements (août 2026)</span>
-                            <span class="info-box-number">+1 / −1</span>
-                            <span class="progress-description">1 entrée · 1 sortie</span>
+                            <span class="info-box-text">Mouvements (<?= $aujourd_hui->format('m/Y') ?>)</span>
+                            <span class="info-box-number">+<?= $entrees_mois ?> / −<?= $sorties_mois ?></span>
+                            <span class="progress-description"><?= $entrees_mois ?> entrée(s) · <?= $sorties_mois ?>
+                                sortie(s) · <?= $internes_mois ?> interne(s)</span>
                         </div>
                     </div>
                 </div>
@@ -107,7 +190,7 @@
                                     class="fas fa-exchange-alt mr-1"></i> Mouvements</a></li>
                         <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabAlertes"><i
                                     class="fas fa-bell mr-1"></i> Alertes &amp; échéances <span
-                                    class="badge badge-warning ml-1">5</span></a></li>
+                                    class="badge badge-warning ml-1"><?= count($alertes) ?></span></a></li>
                     </ul>
                 </div>
 
@@ -119,7 +202,7 @@
                             <div class="d-flex justify-content-between align-items-center flex-wrap p-3 pb-0">
                                 <div class="col-md-4 p-0">
                                     <div class="input-group">
-                                        <input type="search" class="form-control"
+                                        <input type="search" id="searchContrats" class="form-control"
                                             placeholder="Rechercher (employé, matricule, fonction…)">
                                         <div class="input-group-append"><span class="input-group-text"><i
                                                     class="fas fa-search"></i></span></div>
@@ -159,238 +242,76 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <?php if (!empty($contrats)): foreach ($contrats as $c):
+                                                $initiales = strtoupper(mb_substr($c->prenoms, 0, 1) . mb_substr($c->nom, 0, 1));
+                                                $couleur   = $couleurs[$c->employe_id % count($couleurs)];
+                                                $icone     = (stripos($c->site_affectation, 'chantier') !== FALSE) ? 'fa-hard-hat' : 'fa-building';
+
+                                                if ($c->_expire)                     $badge_stat = '<span class="badge badge-secondary">Expiré</span>';
+                                                elseif ($c->statut === 'Renouvelé')  $badge_stat = '<span class="badge badge-info">Renouvelé</span>';
+                                                elseif ($c->_expire_bientot)         $badge_stat = '<span class="badge badge-warning">Expire J-' . $c->_jours . '</span>';
+                                                else                                 $badge_stat = '<span class="badge badge-success">Actif</span>';
+
+                                                if (isset($c->_fin_essai))               $essai_html = '<span class="badge badge-info">' . $c->periode_essai . ' (en cours)</span>';
+                                                elseif ($c->periode_essai !== 'Aucune')  $essai_html = '<small class="text-muted">Validée</small>';
+                                                else                                     $essai_html = '<small class="text-muted">Aucune</small>';
+                                        ?>
+                                        <tr class="<?= $c->_expire_bientot ? 'table-warning' : '' ?>">
                                             <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#7a4f1f">AK</span>
+                                                <div class="d-flex align-items-center">
+                                                    <span class="avatar-initials mr-2"
+                                                        style="background:<?= $couleur ?>"><?= $initiales ?></span>
                                                     <div>
-                                                        <div class="font-weight-bold">Aymar KIGABIRO</div><small
-                                                            class="text-muted">SAT-0008</small>
+                                                        <div class="font-weight-bold">
+                                                            <?= html_escape($c->prenoms . ' ' . mb_strtoupper($c->nom)) ?>
+                                                        </div>
+                                                        <small
+                                                            class="text-muted"><?= html_escape($c->matricule) ?></small>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td><span class="badge badge-success">CDI</span></td>
-                                            <td>Designer</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Direction Générale</td>
-                                            <td>01/08/2026 <small class="text-muted d-block">→ sans échéance</small>
+                                            <td><span
+                                                    class="badge badge-<?= $badge_type[$c->type_contrat] ?? 'secondary' ?>"><?= $c->type_contrat ?></span>
                                             </td>
-                                            <td><span class="badge badge-info">3 mois (en cours)</span></td>
-                                            <td><span class="badge badge-success">Actif</span></td>
+                                            <td><?= html_escape($c->fonction) ?></td>
+                                            <td><i
+                                                    class="fas <?= $icone ?> mr-1 text-muted"></i><?= html_escape($c->site_affectation) ?>
+                                            </td>
+                                            <td><?= date('d/m/Y', strtotime($c->date_debut)) ?>
+                                                <small
+                                                    class="text-muted d-block"><?= $c->date_fin ? '→ ' . date('d/m/Y', strtotime($c->date_fin)) : '→ sans échéance' ?></small>
+                                            </td>
+                                            <td><?= $essai_html ?></td>
+                                            <td><?= $badge_stat ?></td>
                                             <td class="text-right">
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Avenant"><i
-                                                        class="fas fa-edit"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#1f7a5c">JN</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Jean-Marie NDAYIZEYE</div><small
-                                                            class="text-muted">SAT-0001</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-success">CDI</span></td>
-                                            <td>Responsable RH &amp; Suivi-Évaluation</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Ressources Humaines</td>
-                                            <td>02/03/2020 <small class="text-muted d-block">→ sans échéance</small>
-                                            </td>
-                                            <td><small class="text-muted">Validée (2020)</small></td>
-                                            <td><span class="badge badge-success">Actif</span></td>
-                                            <td class="text-right">
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Avenant"><i
-                                                        class="fas fa-edit"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#34608c">PH</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Patrick HAKIZIMANA</div><small
-                                                            class="text-muted">SAT-0021</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-success">CDI</span></td>
-                                            <td>Conducteur de travaux</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                            <td>10/01/2022 <small class="text-muted d-block">→ sans échéance</small>
-                                            </td>
-                                            <td><small class="text-muted">Validée (2022)</small></td>
-                                            <td><span class="badge badge-success">Actif</span></td>
-                                            <td class="text-right">
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Avenant"><i
-                                                        class="fas fa-edit"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-warning">
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#6c757d">JM</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Justine MBONIMPA</div><small
-                                                            class="text-muted">SAT-0032</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>Peintre</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                            <td>19/02/2024 <small class="text-muted d-block">→ 20/08/2026</small></td>
-                                            <td><small class="text-muted">Validée</small></td>
-                                            <td><span class="badge badge-warning">Expire <strong>J-7</strong></span>
-                                            </td>
-                                            <td class="text-right">
+                                                <?php if ($c->_expire_bientot): ?>
                                                 <button class="btn btn-sm btn-success" title="Renouveler"><i
                                                         class="fas fa-redo"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-warning">
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#2c8a69">EN</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Egide NDUWIMANA</div><small
-                                                            class="text-muted">SAT-0017</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>Dessinateur projeteur</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Direction Technique</td>
-                                            <td>02/05/2023 <small class="text-muted d-block">→ 31/08/2026</small></td>
-                                            <td><small class="text-muted">Validée</small></td>
-                                            <td><span class="badge badge-warning">Expire <strong>J-18</strong></span>
-                                            </td>
-                                            <td class="text-right">
-                                                <button class="btn btn-sm btn-success" title="Renouveler"><i
-                                                        class="fas fa-redo"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-warning">
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#34608c">CN</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Cédric NIYONGABO</div><small
-                                                            class="text-muted">SAT-0041</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>Manœuvre</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Gitega</td>
-                                            <td>01/09/2025 <small class="text-muted d-block">→ 31/08/2026</small></td>
-                                            <td><small class="text-muted">Validée</small></td>
-                                            <td><span class="badge badge-warning">Expire <strong>J-18</strong></span>
-                                            </td>
-                                            <td class="text-right">
-                                                <button class="btn btn-sm btn-success" title="Renouveler"><i
-                                                        class="fas fa-redo"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr class="table-warning">
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#8a3033">NI</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Nadia IRAKOZE</div><small
-                                                            class="text-muted">SAT-0059</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-info">Stage</span></td>
-                                            <td>Stagiaire RH</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Ressources Humaines</td>
-                                            <td>02/02/2026 <small class="text-muted d-block">→ 31/08/2026</small></td>
-                                            <td><small class="text-muted">Aucune</small></td>
-                                            <td><span class="badge badge-warning">Expire <strong>J-18</strong></span>
-                                            </td>
-                                            <td class="text-right">
-                                                <button class="btn btn-sm btn-success" title="Renouveler / embaucher"><i
-                                                        class="fas fa-redo"></i></button>
-                                                <button class="btn btn-sm btn-default" title="Voir"><i
-                                                        class="fas fa-eye"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#6c757d">PN</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Prisca NDABASHIMANA</div><small
-                                                            class="text-muted">SAT-0062</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>Secrétaire de chantier</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngozi</td>
-                                            <td>09/09/2024 <small class="text-muted d-block">→ 08/09/2027</small></td>
-                                            <td><small class="text-muted">Validée</small></td>
-                                            <td><span class="badge badge-success">Actif</span></td>
-                                            <td class="text-right">
+                                                <?php elseif (!$c->_expire): ?>
                                                 <button class="btn btn-sm btn-default" title="Voir"><i
                                                         class="fas fa-eye"></i></button>
                                                 <button class="btn btn-sm btn-default" title="Avenant"><i
                                                         class="fas fa-edit"></i></button>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center"><span
-                                                        class="avatar-initials mr-2"
-                                                        style="background:#6c757d">RM</span>
-                                                    <div>
-                                                        <div class="font-weight-bold">Robert MUGISHA</div><small
-                                                            class="text-muted">SAT-0061</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>Maçon</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngozi</td>
-                                            <td>13/03/2023 <small class="text-muted d-block">→ 10/08/2026</small></td>
-                                            <td><small class="text-muted">Validée</small></td>
-                                            <td><span class="badge badge-secondary">Expiré</span></td>
-                                            <td class="text-right">
+                                                <?php else: ?>
                                                 <button class="btn btn-sm btn-default" title="Voir"><i
                                                         class="fas fa-eye"></i></button>
+                                                <?php endif; ?>
                                             </td>
                                         </tr>
+                                        <?php endforeach;
+                                        else: ?>
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4"><i
+                                                    class="fas fa-inbox fa-2x mb-2 d-block"></i>Aucun contrat
+                                                enregistré.</td>
+                                        </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
                             <div class="card-footer clearfix">
-                                <small class="text-muted float-left mt-2">Affichage de 1 à 9 sur 57 contrats</small>
-                                <ul class="pagination pagination-sm float-right mb-0">
-                                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
-                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                    <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
-                                </ul>
+                                <small class="text-muted float-left mt-2">Affichage de <?= count($contrats) ?>
+                                    contrat(s)</small>
                             </div>
                         </div>
                     </div>
@@ -401,11 +322,12 @@
                             <div class="d-flex justify-content-between align-items-center flex-wrap p-3 pb-0">
                                 <div>
                                     <span class="badge badge-success p-2 mr-1"><i class="fas fa-sign-in-alt mr-1"></i>
-                                        Entrées (30 j) : 1</span>
+                                        Entrées (30 j) : <?= $entrees_mois ?></span>
                                     <span class="badge badge-secondary p-2 mr-1"><i
-                                            class="fas fa-sign-out-alt mr-1"></i> Sorties (30 j) : 1</span>
+                                            class="fas fa-sign-out-alt mr-1"></i> Sorties (30 j) :
+                                        <?= $sorties_mois ?></span>
                                     <span class="badge badge-info p-2"><i class="fas fa-random mr-1"></i> Internes (30
-                                        j) : 1</span>
+                                        j) : <?= $internes_mois ?></span>
                                 </div>
                                 <div>
                                     <div class="btn-group mr-2">
@@ -441,72 +363,34 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php if (!empty($mouvements)): foreach ($mouvements as $m):
+                                                $lieu  = !empty($m->nouvelle_affectation) ? $m->nouvelle_affectation : (isset($m->site_affectation) ? $m->site_affectation : '—');
+                                                $icone = (stripos($lieu, 'chantier') !== FALSE) ? 'fa-hard-hat' : 'fa-building';
+                                        ?>
                                         <tr>
-                                            <td><strong>10/08/2026</strong></td>
+                                            <td><strong><?= date('d/m/Y', strtotime($m->date_effet)) ?></strong></td>
                                             <td>
-                                                <div class="font-weight-bold">Robert MUGISHA</div><small
-                                                    class="text-muted">SAT-0061</small>
+                                                <div class="font-weight-bold">
+                                                    <?= html_escape($m->prenoms . ' ' . mb_strtoupper($m->nom)) ?></div>
+                                                <small class="text-muted"><?= html_escape($m->matricule) ?></small>
                                             </td>
-                                            <td><span class="badge badge-secondary">Fin de contrat</span></td>
-                                            <td>CDD arrivé à échéance — non renouvelé</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngozi</td>
-                                            <td><small>J.-M. NDAYIZEYE</small></td>
+                                            <td><span
+                                                    class="badge badge-<?= $badge_mouv[$m->type_mouvement] ?? 'secondary' ?>"><?= $m->type_mouvement ?></span>
+                                            </td>
+                                            <td><?= html_escape($m->motif ?: '—') ?></td>
+                                            <td><i
+                                                    class="fas <?= $icone ?> mr-1 text-muted"></i><?= html_escape($lieu) ?>
+                                            </td>
+                                            <td><small><?= html_escape($m->encode_par ?: '—') ?></small></td>
                                         </tr>
+                                        <?php endforeach;
+                                        else: ?>
                                         <tr>
-                                            <td><strong>01/08/2026</strong></td>
-                                            <td>
-                                                <div class="font-weight-bold">Aymar KIGABIRO</div><small
-                                                    class="text-muted">SAT-0008</small>
-                                            </td>
-                                            <td><span class="badge badge-success">Entrée</span></td>
-                                            <td>Embauche CDI — Designer</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Direction Générale</td>
-                                            <td><small>J.-M. NDAYIZEYE</small></td>
+                                            <td colspan="6" class="text-center text-muted py-4"><i
+                                                    class="fas fa-inbox fa-2x mb-2 d-block"></i>Aucun mouvement
+                                                enregistré.</td>
                                         </tr>
-                                        <tr>
-                                            <td><strong>01/06/2026</strong></td>
-                                            <td>
-                                                <div class="font-weight-bold">Patrick HAKIZIMANA</div><small
-                                                    class="text-muted">SAT-0021</small>
-                                            </td>
-                                            <td><span class="badge badge-info">Promotion</span></td>
-                                            <td>Chef d'équipe → Conducteur de travaux</td>
-                                            <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                            <td><small>J.-M. NDAYIZEYE</small></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>01/03/2026</strong></td>
-                                            <td>
-                                                <div class="font-weight-bold">Chantal UWIMANA</div><small
-                                                    class="text-muted">SAT-0029</small>
-                                            </td>
-                                            <td><span class="badge badge-primary">Transfert</span></td>
-                                            <td>Chantier Ngagara II → Direction Technique (HSE)</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Direction Technique</td>
-                                            <td><small>J.-M. NDAYIZEYE</small></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>28/02/2026</strong></td>
-                                            <td>
-                                                <div class="font-weight-bold">Innocent NTAKARUTIMANA</div><small
-                                                    class="text-muted">SAT-0005</small>
-                                            </td>
-                                            <td><span class="badge badge-warning">Démission</span></td>
-                                            <td>Préavis presté du 01/01 au 28/02/2026</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>DAF / Finance</td>
-                                            <td><small>J.-M. NDAYIZEYE</small></td>
-                                        </tr>
-                                        <tr>
-                                            <td><strong>31/01/2026</strong></td>
-                                            <td>
-                                                <div class="font-weight-bold">Gaspard NTEREKA</div><small
-                                                    class="text-muted">SAT-0002</small>
-                                            </td>
-                                            <td><span class="badge badge-info">Retraite</span></td>
-                                            <td>Départ à la retraite (60 ans) — solde de tout compte réglé</td>
-                                            <td><i class="fas fa-building mr-1 text-muted"></i>Direction Technique</td>
-                                            <td><small>J.-M. NDAYIZEYE</small></td>
-                                        </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -531,51 +415,29 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php if (!empty($alertes)): foreach ($alertes as $c): ?>
                                         <tr>
-                                            <td>Justine MBONIMPA <small class="text-muted">(SAT-0032)</small></td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>20/08/2026</td>
-                                            <td><span class="badge badge-danger">J-7</span></td>
-                                            <td>Renouvellement ou clôture + solde de tout compte</td>
+                                            <td><?= html_escape($c->prenoms . ' ' . mb_strtoupper($c->nom)) ?> <small
+                                                    class="text-muted">(<?= $c->matricule ?>)</small></td>
+                                            <td><span
+                                                    class="badge badge-<?= $badge_type[$c->type_contrat] ?? 'secondary' ?>"><?= $c->type_contrat ?></span>
+                                            </td>
+                                            <td><?= date('d/m/Y', strtotime($c->date_fin)) ?></td>
+                                            <td><span
+                                                    class="badge badge-<?= $c->_jours <= 10 ? 'danger' : 'warning' ?>">J-<?= $c->_jours ?></span>
+                                            </td>
+                                            <td><?= $c->type_contrat === 'Stage' ? 'Fin de stage → évaluation + éventuelle embauche' : 'Renouvellement ou clôture' ?>
+                                            </td>
                                             <td class="text-right"><button class="btn btn-sm btn-success"><i
                                                         class="fas fa-redo mr-1"></i>Renouveler</button></td>
                                         </tr>
+                                        <?php endforeach;
+                                        else: ?>
                                         <tr>
-                                            <td>Egide NDUWIMANA <small class="text-muted">(SAT-0017)</small></td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>31/08/2026</td>
-                                            <td><span class="badge badge-warning">J-18</span></td>
-                                            <td>Renouvellement (profil clé bureau d'études)</td>
-                                            <td class="text-right"><button class="btn btn-sm btn-success"><i
-                                                        class="fas fa-redo mr-1"></i>Renouveler</button></td>
+                                            <td colspan="6" class="text-center text-muted py-3">Aucun contrat n'expire
+                                                sous 30 jours.</td>
                                         </tr>
-                                        <tr>
-                                            <td>Cédric NIYONGABO <small class="text-muted">(SAT-0041)</small></td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>31/08/2026</td>
-                                            <td><span class="badge badge-warning">J-18</span></td>
-                                            <td>Selon avancement du chantier Gitega</td>
-                                            <td class="text-right"><button class="btn btn-sm btn-success"><i
-                                                        class="fas fa-redo mr-1"></i>Renouveler</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Nadia IRAKOZE <small class="text-muted">(SAT-0059)</small></td>
-                                            <td><span class="badge badge-info">Stage</span></td>
-                                            <td>31/08/2026</td>
-                                            <td><span class="badge badge-warning">J-18</span></td>
-                                            <td>Fin de stage → évaluation + éventuelle embauche</td>
-                                            <td class="text-right"><button class="btn btn-sm btn-success"><i
-                                                        class="fas fa-user-plus mr-1"></i>Embaucher</button></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Didier SABUSHIMIKE <small class="text-muted">(SAT-0051)</small></td>
-                                            <td><span class="badge badge-warning">CDD</span></td>
-                                            <td>09/09/2026</td>
-                                            <td><span class="badge badge-warning">J-27</span></td>
-                                            <td>Renouvellement ou clôture</td>
-                                            <td class="text-right"><button class="btn btn-sm btn-success"><i
-                                                        class="fas fa-redo mr-1"></i>Renouveler</button></td>
-                                        </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -594,14 +456,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php if (!empty($essais)): foreach ($essais as $c): ?>
                                         <tr>
-                                            <td>Aymar KIGABIRO <small class="text-muted">(SAT-0008)</small></td>
-                                            <td>01/08/2026</td>
-                                            <td>01/11/2026</td>
+                                            <td><?= html_escape($c->prenoms . ' ' . mb_strtoupper($c->nom)) ?> <small
+                                                    class="text-muted">(<?= $c->matricule ?>)</small></td>
+                                            <td><?= date('d/m/Y', strtotime($c->date_debut)) ?></td>
+                                            <td><?= date('d/m/Y', $c->_fin_essai->getTimestamp()) ?></td>
                                             <td>Confirmation ou rupture de la période d'essai</td>
                                             <td class="text-right"><button class="btn btn-sm btn-default"><i
                                                         class="fas fa-clipboard-check mr-1"></i>Évaluer</button></td>
                                         </tr>
+                                        <?php endforeach;
+                                        else: ?>
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-3">Aucune période d'essai
+                                                en cours.</td>
+                                        </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -615,102 +486,109 @@
             <div class="modal fade" id="modalNouveauContrat">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header bg-success text-white">
-                            <h4 class="modal-title"><i class="fas fa-file-signature mr-2"></i>Nouveau contrat /
-                                renouvellement</h4>
-                            <button type="button" class="close text-white"
-                                data-dismiss="modal"><span>&times;</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Employé *</label>
-                                        <select class="form-control">
-                                            <option>— Sélectionner —</option>
-                                            <option>SAT-0008 · Aymar KIGABIRO</option>
-                                            <option>SAT-0017 · Egide NDUWIMANA</option>
-                                            <option>SAT-0032 · Justine MBONIMPA</option>
-                                            <option>SAT-0041 · Cédric NIYONGABO</option>
-                                            <option>SAT-0051 · Didier SABUSHIMIKE</option>
-                                            <option>SAT-0059 · Nadia IRAKOZE</option>
-                                        </select>
+                        <form id="formNouveauContrat" method="post" action="<?= base_url('rh-contrats-store') ?>"
+                            enctype="multipart/form-data">
+                            <div class="modal-header bg-success text-white">
+                                <h4 class="modal-title"><i class="fas fa-file-signature mr-2"></i>Nouveau contrat /
+                                    renouvellement</h4>
+                                <button type="button" class="close text-white"
+                                    data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Employé *</label>
+                                            <select name="employe_id" class="form-control" required>
+                                                <option value="">— Sélectionner —</option>
+                                                <?php foreach ($employes as $e): ?>
+                                                <option value="<?= $e->employe_id ?>">
+                                                    <?= html_escape($e->matricule . ' · ' . $e->prenoms . ' ' . mb_strtoupper($e->nom)) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Opération *</label>
-                                        <select class="form-control">
-                                            <option>Nouveau contrat</option>
-                                            <option>Renouvellement</option>
-                                            <option>Avenant (modification)</option>
-                                            <option>Transformation CDD → CDI</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Opération *</label>
+                                            <select name="operation" class="form-control">
+                                                <option>Nouveau contrat</option>
+                                                <option>Renouvellement</option>
+                                                <option>Avenant (modification)</option>
+                                                <option>Transformation CDD → CDI</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Type de contrat *</label>
-                                        <select class="form-control">
-                                            <option>CDI</option>
-                                            <option>CDD</option>
-                                            <option>Stage</option>
-                                        </select>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Type de contrat *</label>
+                                            <select name="type_contrat" class="form-control">
+                                                <option>CDI</option>
+                                                <option>CDD</option>
+                                                <option>Stage</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Date de début *</label><input type="date"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Date de fin (si CDD/Stage)</label><input type="date"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Période d'essai</label>
-                                        <select class="form-control">
-                                            <option>Aucune</option>
-                                            <option>3 mois</option>
-                                            <option>6 mois</option>
-                                        </select>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Date de début *</label>
+                                            <input type="date" name="date_debut" class="form-control" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Fonction *</label><input type="text"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Salaire de base (BIF) *</label><input type="number"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Affectation *</label>
-                                        <select class="form-control">
-                                            <option>Siège (Bujumbura)</option>
-                                            <option>Chantier Ngagara II</option>
-                                            <option>Chantier Gitega</option>
-                                            <option>Chantier Ngozi</option>
-                                        </select>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Date de fin (si CDD/Stage)</label>
+                                            <input type="date" name="date_fin" class="form-control">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Contrat signé (PDF)</label>
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="fileContratSigne">
-                                            <label class="custom-file-label" for="fileContratSigne">Choisir…</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Période d'essai</label>
+                                            <select name="periode_essai" class="form-control">
+                                                <option>Aucune</option>
+                                                <option>3 mois</option>
+                                                <option>6 mois</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Fonction *</label>
+                                            <input type="text" name="fonction" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Salaire de base (BIF) *</label>
+                                            <input type="number" name="salaire_base" class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Affectation *</label>
+                                            <select name="site_affectation" class="form-control">
+                                                <option>Siège (Bujumbura)</option>
+                                                <option>Chantier Ngagara II</option>
+                                                <option>Chantier Gitega</option>
+                                                <option>Chantier Ngozi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Contrat signé (PDF)</label>
+                                            <div class="custom-file">
+                                                <input type="file" name="document" class="custom-file-input"
+                                                    id="fileContratSigne">
+                                                <label class="custom-file-label" for="fileContratSigne">Choisir…</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group"><label>Observations</label>
+                                            <textarea name="observations" class="form-control" rows="2"
+                                                placeholder="Motif du renouvellement, conditions particulières…"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="form-group"><label>Observations</label><textarea class="form-control"
-                                            rows="2"
-                                            placeholder="Motif du renouvellement, conditions particulières…"></textarea>
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                            <button type="button" class="btn btn-success"><i class="fas fa-save mr-1"></i> Enregistrer
-                                le contrat</button>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-save mr-1"></i>
+                                    Enregistrer le contrat</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -719,77 +597,147 @@
             <div class="modal fade" id="modalMouvement">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header bg-success text-white">
-                            <h4 class="modal-title"><i class="fas fa-exchange-alt mr-2"></i>Enregistrer un mouvement
-                            </h4>
-                            <button type="button" class="close text-white"
-                                data-dismiss="modal"><span>&times;</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Employé *</label>
-                                        <select class="form-control">
-                                            <option>— Sélectionner —</option>
-                                            <option>SAT-0008 · Aymar KIGABIRO</option>
-                                            <option>SAT-0021 · Patrick HAKIZIMANA</option>
-                                            <option>SAT-0029 · Chantal UWIMANA</option>
-                                            <option>SAT-0061 · Robert MUGISHA</option>
-                                        </select>
+                        <form id="formMouvement" method="post" action="<?= base_url('rh-mouvements-store') ?>"
+                            enctype="multipart/form-data">
+                            <div class="modal-header bg-success text-white">
+                                <h4 class="modal-title"><i class="fas fa-exchange-alt mr-2"></i>Enregistrer un mouvement
+                                </h4>
+                                <button type="button" class="close text-white"
+                                    data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Employé *</label>
+                                            <select name="employe_id" class="form-control" required>
+                                                <option value="">— Sélectionner —</option>
+                                                <?php foreach ($employes as $e): ?>
+                                                <option value="<?= $e->employe_id ?>">
+                                                    <?= html_escape($e->matricule . ' · ' . $e->prenoms . ' ' . mb_strtoupper($e->nom)) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Type de mouvement *</label>
-                                        <select class="form-control">
-                                            <option>Entrée (embauche)</option>
-                                            <option>Démission</option>
-                                            <option>Licenciement</option>
-                                            <option>Fin de contrat</option>
-                                            <option>Mise à la retraite</option>
-                                            <option>Transfert (changement de site/département)</option>
-                                            <option>Promotion</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Type de mouvement *</label>
+                                            <select name="type_mouvement" class="form-control" required>
+                                                <option value="Entrée">Entrée (embauche)</option>
+                                                <option value="Démission">Démission</option>
+                                                <option value="Licenciement">Licenciement</option>
+                                                <option value="Fin de contrat">Fin de contrat</option>
+                                                <option value="Retraite">Mise à la retraite</option>
+                                                <option value="Transfert">Transfert (changement de site/département)
+                                                </option>
+                                                <option value="Promotion">Promotion</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Date d'effet *</label><input type="date"
-                                            class="form-control"></div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Nouvelle affectation (si transfert/promotion)</label>
-                                        <select class="form-control">
-                                            <option>— Inchangée —</option>
-                                            <option>Siège (Bujumbura)</option>
-                                            <option>Chantier Ngagara II</option>
-                                            <option>Chantier Gitega</option>
-                                            <option>Chantier Ngozi</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Date d'effet *</label>
+                                            <input type="date" name="date_effet" class="form-control" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Pièce justificative (lettre, avis…)</label>
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="fileJustificatif">
-                                            <label class="custom-file-label" for="fileJustificatif">Choisir…</label>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Nouvelle affectation (si
+                                                transfert/promotion)</label>
+                                            <select name="nouvelle_affectation" class="form-control">
+                                                <option value="">— Inchangée —</option>
+                                                <option>Siège (Bujumbura)</option>
+                                                <option>Chantier Ngagara II</option>
+                                                <option>Chantier Gitega</option>
+                                                <option>Chantier Ngozi</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Pièce justificative (lettre, avis…)</label>
+                                            <div class="custom-file">
+                                                <input type="file" name="justificatif" class="custom-file-input"
+                                                    id="fileJustificatif">
+                                                <label class="custom-file-label" for="fileJustificatif">Choisir…</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group"><label>Motif / commentaire</label>
+                                            <textarea name="motif" class="form-control" rows="2"
+                                                placeholder="Ex. : lettre de démission reçue le…, fin de chantier…"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="form-group"><label>Motif / commentaire</label><textarea
-                                            class="form-control" rows="2"
-                                            placeholder="Ex. : lettre de démission reçue le…, fin de chantier…"></textarea>
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                            <button type="button" class="btn btn-success"><i class="fas fa-save mr-1"></i> Enregistrer
-                                le mouvement</button>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-save mr-1"></i>
+                                    Enregistrer le mouvement</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+
+            <!-- ============ SCRIPTS ============ -->
+            <script>
+            /* Données employés embarquées (pré-remplissage fonction & salaire) */
+            var RH_EMPLOYES = {};
+            <?php foreach ($employes as $e): ?>
+            RH_EMPLOYES[<?= (int)$e->employe_id ?>] = <?= json_encode($e) ?>;
+            <?php endforeach; ?>
+
+            function rhNotify(type, msg) {
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: (type === 'success') ? 'success' : (type === 'warning' ? 'warning' : 'error'),
+                        title: msg,
+                        showConfirmButton: false,
+                        timer: 3500,
+                        timerProgressBar: true
+                    });
+                } else {
+                    console.log('[' + type + '] ' + msg);
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+
+                /* Pré-remplissage fonction + salaire à la sélection d'un employé */
+                var formC = document.getElementById('formNouveauContrat');
+                if (formC) {
+                    formC.querySelector('[name="employe_id"]').addEventListener('change', function() {
+                        var emp = RH_EMPLOYES[this.value];
+                        if (emp) {
+                            formC.querySelector('[name="fonction"]').value = emp.fonction;
+                            formC.querySelector('[name="salaire_base"]').value = parseFloat(emp
+                                .salaire_base);
+                        }
+                    });
+                }
+
+                /* Affichage du nom du fichier choisi (toutes les modales) */
+                document.querySelectorAll('.custom-file-input').forEach(function(input) {
+                    input.addEventListener('change', function() {
+                        var label = this.closest('.custom-file').querySelector(
+                            '.custom-file-label');
+                        label.textContent = (this.files && this.files.length) ? this.files[0]
+                            .name : 'Choisir…';
+                        label.classList.toggle('has-file', this.files.length > 0);
+                    });
+                });
+
+                /* Recherche rapide dans l'onglet Contrats */
+                var sc = document.getElementById('searchContrats');
+                if (sc) sc.addEventListener('keyup', function() {
+                    var q = this.value.toLowerCase();
+                    document.querySelectorAll('#tabContrats tbody tr').forEach(function(tr) {
+                        tr.style.display = tr.textContent.toLowerCase().indexOf(q) !== -1 ? '' :
+                            'none';
+                    });
+                });
+            });
+            </script>
 
         </div><!-- /.container-fluid -->
     </section>
