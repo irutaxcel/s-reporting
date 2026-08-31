@@ -384,6 +384,75 @@ class TechController extends CI_Controller
         redirect('stock-general');
     }
 
+    // public function achatMateriels()
+    // {
+    //     if (!$this->session->userdata('user_id')) {
+    //         redirect('sign-in');
+    //         return;
+    //     }
+
+    //     $title = 'Achats & Approvisionnement';
+
+    //     /*
+    //     * Récupération des filtres envoyés par GET
+    //     */
+    //     $filters = [
+    //         'chantier_id' => trim((string) $this->input->get('chantier_id', true)),
+
+    //         'workflow_status' => trim(
+    //             (string) $this->input->get('workflow_status', true)
+    //         ),
+
+    //         'date_debut' => trim(
+    //             (string) $this->input->get('date_debut', true)
+    //         ),
+
+    //         'date_fin' => trim(
+    //             (string) $this->input->get('date_fin', true)
+    //         )
+    //     ];
+
+    //     /*
+    //     * Liste des chantiers pour le champ select
+    //     */
+    //     $allChantiers = $this->tech->getAllChantier();
+
+    //     /*
+    //     * Liste des demandes d'achat avec filtres
+    //     */
+    //     $allAchats = $this->tech->getAllAchats($filters);
+
+    //     /*
+    //     * Données envoyées à la vue
+    //     */
+    //     $data = [
+    //         'title'         => $title,
+    //         'allChantiers' => $allChantiers,
+    //         'allAchats'    => $allAchats,
+    //         'filters'      => $filters
+    //     ];
+
+    //     $this->load->view(
+    //         'v1/components/layout/header',
+    //         [
+    //             'title' => $title
+    //         ]
+    //     );
+
+    //     $this->load->view(
+    //         'v1/components/layout/sidebar'
+    //     );
+
+    //     $this->load->view(
+    //         'v1/components/modules/technique/achatMateriels',
+    //         $data
+    //     );
+
+    //     $this->load->view(
+    //         'v1/components/layout/footer'
+    //     );
+    // }
+
     public function achatMateriels()
     {
         if (!$this->session->userdata('user_id')) {
@@ -393,64 +462,56 @@ class TechController extends CI_Controller
 
         $title = 'Achats & Approvisionnement';
 
+        $user_id  = (int) $this->session->userdata('user_id');
+        $role_id  = (int) $this->session->userdata('role_id');
+
         /*
-     * Récupération des filtres envoyés par GET
-     */
+        * Récupération des filtres envoyés par GET
+        */
         $filters = [
-            'chantier_id' => trim((string) $this->input->get('chantier_id', true)),
-
-            'workflow_status' => trim(
-                (string) $this->input->get('workflow_status', true)
-            ),
-
-            'date_debut' => trim(
-                (string) $this->input->get('date_debut', true)
-            ),
-
-            'date_fin' => trim(
-                (string) $this->input->get('date_fin', true)
-            )
+            'chantier_id'     => trim((string) $this->input->get('chantier_id', true)),
+            'workflow_status' => trim((string) $this->input->get('workflow_status', true)),
+            'date_debut'      => trim((string) $this->input->get('date_debut', true)),
+            'date_fin'        => trim((string) $this->input->get('date_fin', true)),
+            'user_id'         => $user_id,
+            'role_id'         => $role_id
         ];
 
         /*
-     * Liste des chantiers pour le champ select
-     */
+        * Liste des chantiers pour le champ select
+        */
         $allChantiers = $this->tech->getAllChantier();
 
         /*
-     * Liste des demandes d'achat avec filtres
-     */
+        * Liste des demandes d'achat avec filtres
+        */
         $allAchats = $this->tech->getAllAchats($filters);
 
         /*
-     * Données envoyées à la vue
-     */
-        $data = [
-            'title'         => $title,
-            'allChantiers' => $allChantiers,
-            'allAchats'    => $allAchats,
-            'filters'      => $filters
+        * STATISTIQUES - Récupération des compteurs
+        */
+        $stats = [
+            'demandes_validées'       => $this->tech->countDemandesValidees($filters),
+            'achats_effectues'        => $this->tech->countAchatsEffectues($filters),
+            'en_approvisionnement'    => $this->tech->countEnApprovisionnement($filters),
+            'livraisons_retard'       => $this->tech->countLivraisonsRetard($filters)
         ];
 
-        $this->load->view(
-            'v1/components/layout/header',
-            [
-                'title' => $title
-            ]
-        );
+        /*
+        * Données envoyées à la vue
+        */
+        $data = [
+            'title'         => $title,
+            'allChantiers'  => $allChantiers,
+            'allAchats'     => $allAchats,
+            'filters'       => $filters,
+            'stats'         => $stats
+        ];
 
-        $this->load->view(
-            'v1/components/layout/sidebar'
-        );
-
-        $this->load->view(
-            'v1/components/modules/technique/achatMateriels',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/layout/footer'
-        );
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/technique/achatMateriels', $data);
+        $this->load->view('v1/components/layout/footer');
     }
 
     public function store_achat_materiel()

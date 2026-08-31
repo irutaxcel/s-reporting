@@ -88,6 +88,106 @@ class TechModel extends CI_Model
         return $result && $result->unit_rate ? $result->unit_rate : 0;
     }
 
+    // public function getAllAchats($filters = [])
+    // {
+    //     $this->db->select("
+    //         prf.*,
+    //         p.name AS chantier_nom,
+    //         COUNT(pri.id) AS nombre_articles,
+    //         GROUP_CONCAT(
+    //             DISTINCT pri.designation
+    //             ORDER BY pri.id ASC
+    //             SEPARATOR ', '
+    //         ) AS articles_designation,
+    //         COALESCE(SUM(pri.total_price), 0) AS montant_articles
+    //     ");
+
+    //     $this->db->from('purchase_request_forms prf');
+
+    //     $this->db->join(
+    //         'projects p',
+    //         'p.id = prf.chantier_id',
+    //         'left'
+    //     );
+
+    //     $this->db->join(
+    //         'purchase_request_items pri',
+    //         'pri.request_id = prf.id',
+    //         'left'
+    //     );
+
+    //     /*
+    //     * Filtre chantier
+    //     */
+    //     if (!empty($filters['chantier_id'])) {
+    //         $this->db->where(
+    //             'prf.chantier_id',
+    //             (int) $filters['chantier_id']
+    //         );
+    //     }
+
+    //     /*
+    //     * Filtre statut
+    //     */
+    //     if (!empty($filters['workflow_status'])) {
+    //         $this->db->where(
+    //             'prf.workflow_status',
+    //             $filters['workflow_status']
+    //         );
+    //     }
+
+    //     /*
+    //     * Filtre date début
+    //     */
+    //     if (!empty($filters['date_debut'])) {
+    //         $dateDebut = date(
+    //             'Y-m-d',
+    //             strtotime($filters['date_debut'])
+    //         );
+
+    //         $this->db->where(
+    //             "DATE(COALESCE(prf.request_date, prf.created_at)) >= " .
+    //                 $this->db->escape($dateDebut),
+    //             null,
+    //             false
+    //         );
+    //     }
+
+    //     /*
+    //     * Filtre date fin
+    //     */
+    //     if (!empty($filters['date_fin'])) {
+    //         $dateFin = date(
+    //             'Y-m-d',
+    //             strtotime($filters['date_fin'])
+    //         );
+
+    //         $this->db->where(
+    //             "DATE(COALESCE(prf.request_date, prf.created_at)) <= " .
+    //                 $this->db->escape($dateFin),
+    //             null,
+    //             false
+    //         );
+    //     }
+
+    //     $this->db->group_by('prf.id');
+
+    //     $this->db->order_by(
+    //         'COALESCE(prf.request_date, prf.created_at)',
+    //         'DESC',
+    //         false
+    //     );
+
+    //     $this->db->order_by('prf.id', 'DESC');
+
+    //     /*
+    //     * Les 100 dernières demandes
+    //     */
+    //     $this->db->limit(100);
+
+    //     return $this->db->get()->result();
+    // }
+
     public function getAllAchats($filters = [])
     {
         $this->db->select("
@@ -104,47 +204,53 @@ class TechModel extends CI_Model
 
         $this->db->from('purchase_request_forms prf');
 
-        $this->db->join(
-            'projects p',
-            'p.id = prf.chantier_id',
-            'left'
-        );
+        $this->db->join('projects p', 'p.id = prf.chantier_id', 'left');
 
-        $this->db->join(
-            'purchase_request_items pri',
-            'pri.request_id = prf.id',
-            'left'
-        );
+        $this->db->join('purchase_request_items pri', 'pri.request_id = prf.id', 'left');
 
         /*
-     * Filtre chantier
-     */
+        * ============================================================
+        * FILTRE PAR UTILISATEUR (via created_by)
+        * Rôles qui voient TOUTES les demandes :
+        *   1  = SUPER_ADMIN
+        *   2  = ADMINISTRATEUR_SYSTEM
+        *   3  = DIRECTEUR_GENERAL
+        *   4  = DIRECTEUR_TECHNIQUE
+        *   7  = RESPONSABLE_ADMIN_FINANCIER (DAF)
+        *   24 = TRESORIER
+        *   30 = ASSISTANT_TRESORERIE
+        * Tous les autres rôles ne voient que leurs propres demandes.
+        * ============================================================
+        */
+        $rolesSeeAll = [1, 2, 3, 4, 7, 24, 30];
+
+        if (!empty($filters['user_id']) && !empty($filters['role_id'])) {
+            if (!in_array((int) $filters['role_id'], $rolesSeeAll)) {
+                // Utilisateur classique : uniquement ses propres demandes
+                $this->db->where('prf.created_by', (int) $filters['user_id']);
+            }
+            // Sinon (rôle privilégié) : pas de filtre → voit tout
+        }
+
+        /*
+        * Filtre chantier
+        */
         if (!empty($filters['chantier_id'])) {
-            $this->db->where(
-                'prf.chantier_id',
-                (int) $filters['chantier_id']
-            );
+            $this->db->where('prf.chantier_id', (int) $filters['chantier_id']);
         }
 
         /*
-     * Filtre statut
-     */
+        * Filtre statut
+        */
         if (!empty($filters['workflow_status'])) {
-            $this->db->where(
-                'prf.workflow_status',
-                $filters['workflow_status']
-            );
+            $this->db->where('prf.workflow_status', $filters['workflow_status']);
         }
 
         /*
-     * Filtre date début
-     */
+        * Filtre date début
+        */
         if (!empty($filters['date_debut'])) {
-            $dateDebut = date(
-                'Y-m-d',
-                strtotime($filters['date_debut'])
-            );
-
+            $dateDebut = date('Y-m-d', strtotime($filters['date_debut']));
             $this->db->where(
                 "DATE(COALESCE(prf.request_date, prf.created_at)) >= " .
                     $this->db->escape($dateDebut),
@@ -154,14 +260,10 @@ class TechModel extends CI_Model
         }
 
         /*
-     * Filtre date fin
-     */
+        * Filtre date fin
+        */
         if (!empty($filters['date_fin'])) {
-            $dateFin = date(
-                'Y-m-d',
-                strtotime($filters['date_fin'])
-            );
-
+            $dateFin = date('Y-m-d', strtotime($filters['date_fin']));
             $this->db->where(
                 "DATE(COALESCE(prf.request_date, prf.created_at)) <= " .
                     $this->db->escape($dateFin),
@@ -172,12 +274,7 @@ class TechModel extends CI_Model
 
         $this->db->group_by('prf.id');
 
-        $this->db->order_by(
-            'COALESCE(prf.request_date, prf.created_at)',
-            'DESC',
-            false
-        );
-
+        $this->db->order_by('COALESCE(prf.request_date, prf.created_at)', 'DESC', false);
         $this->db->order_by('prf.id', 'DESC');
 
         /*
@@ -186,6 +283,67 @@ class TechModel extends CI_Model
         $this->db->limit(100);
 
         return $this->db->get()->result();
+    }
+
+    /**
+     * Compter les demandes validées
+     */
+    public function countDemandesValidees($filters = [])
+    {
+        $this->db->where('workflow_status', 'Validé');
+        $this->_applyUserFilter($filters);
+        return $this->db->count_all_results('purchase_request_forms');
+    }
+
+    /**
+     * Compter les achats effectués (livrés)
+     */
+    public function countAchatsEffectues($filters = [])
+    {
+        $this->db->where_in('workflow_status', ['livré', 'livre']);
+        $this->_applyUserFilter($filters);
+        return $this->db->count_all_results('purchase_request_forms');
+    }
+
+    /**
+     * Compter les achats en approvisionnement (commandés)
+     */
+    public function countEnApprovisionnement($filters = [])
+    {
+        $this->db->where_in('workflow_status', ['commandée', 'commandee']);
+        $this->_applyUserFilter($filters);
+        return $this->db->count_all_results('purchase_request_forms');
+    }
+
+    /**
+     * Compter les livraisons en retard
+     * (workflow_status = commandée mais date de livraison dépassée)
+     */
+    public function countLivraisonsRetard($filters = [])
+    {
+        $today = date('Y-m-d');
+
+        $this->db->where_in('workflow_status', ['commandée', 'commandee', 'En_attente']);
+        $this->db->where('request_date <', $today); // Si vous avez ce champ
+        // OU sinon basé sur created_at + délai dépassé
+        // $this->db->where('DATE(created_at) <', date('Y-m-d', strtotime('-15 days')));
+
+        $this->_applyUserFilter($filters);
+        return $this->db->count_all_results('purchase_request_forms');
+    }
+
+    /**
+     * Appliquer le filtre utilisateur (méthode helper)
+     */
+    private function _applyUserFilter($filters = [])
+    {
+        $rolesSeeAll = [1, 2, 3, 4, 7, 24, 30];
+
+        if (!empty($filters['user_id']) && !empty($filters['role_id'])) {
+            if (!in_array((int) $filters['role_id'], $rolesSeeAll)) {
+                $this->db->where('created_by', (int) $filters['user_id']);
+            }
+        }
     }
 
     public function insert_achat_materiel_form($data_form, $articles, $quantites, $prix_unitaires, $observation_line, $totaux_lignes)

@@ -24,11 +24,10 @@
 
             <!-- Small boxes -->
             <div class="row">
-
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="small-box bg-info">
                         <div class="inner">
-                            <h3>24</h3>
+                            <h3><?= isset($stats['demandes_validées']) ? $stats['demandes_validées'] : 0 ?></h3>
                             <p>Demandes validées</p>
                         </div>
                         <div class="icon">
@@ -40,7 +39,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="small-box bg-success">
                         <div class="inner">
-                            <h3>18</h3>
+                            <h3><?= isset($stats['achats_effectues']) ? $stats['achats_effectues'] : 0 ?></h3>
                             <p>Achats effectués</p>
                         </div>
                         <div class="icon">
@@ -52,7 +51,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h3>6</h3>
+                            <h3><?= isset($stats['en_approvisionnement']) ? $stats['en_approvisionnement'] : 0 ?></h3>
                             <p>En approvisionnement</p>
                         </div>
                         <div class="icon">
@@ -64,7 +63,7 @@
                 <div class="col-lg-3 col-md-6 col-sm-12">
                     <div class="small-box bg-danger">
                         <div class="inner">
-                            <h3>2</h3>
+                            <h3><?= isset($stats['livraisons_retard']) ? $stats['livraisons_retard'] : 0 ?></h3>
                             <p>Livraisons en retard</p>
                         </div>
                         <div class="icon">
@@ -72,7 +71,6 @@
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <?php if ($this->session->flashdata('error')): ?>

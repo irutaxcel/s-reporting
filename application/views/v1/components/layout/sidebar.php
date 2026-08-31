@@ -1089,35 +1089,75 @@
 
                     </li>
                     <li class="nav-item">
+                        <?php if ($title == 'Conformité & déclarations') { ?>
+                        <a href="<?= base_url('rh-conformite') ?>" class="nav-link active">
+                            <i class="fas fa-landmark nav-icon"></i>
+                            <p>Conformité & déclarations</p>
+                        </a>
+                        <?php } else { ?>
                         <a href="<?= base_url('rh-conformite') ?>" class="nav-link">
                             <i class="fas fa-landmark nav-icon"></i>
                             <p>Conformité & déclarations</p>
                         </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/discipline" class="nav-link">
+                        <?php if ($title == 'Discipline') { ?>
+                        <a href="<?= base_url('rh-discipline') ?>" class="nav-link active">
                             <i class="fas fa-gavel nav-icon"></i>
                             <p>Discipline</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-discipline') ?>" class="nav-link">
+                            <i class="fas fa-gavel nav-icon"></i>
+                            <p>Discipline</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/evaluations" class="nav-link">
+                        <?php if ($title == 'Évaluations') { ?>
+                        <a href="<?= base_url('rh-evaluations') ?>" class="nav-link active">
                             <i class="fas fa-clipboard-check nav-icon"></i>
                             <p>Évaluations</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-evaluations') ?>" class="nav-link">
+                            <i class="fas fa-clipboard-check nav-icon"></i>
+                            <p>Évaluations</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
                     <li class="nav-item">
-                        <a href="rh/rapports" class="nav-link">
+                        <?php if ($title == 'Rapports & éditions') { ?>
+                        <a href="<?= base_url('rh-rapports') ?>" class="nav-link active">
                             <i class="fas fa-chart-bar nav-icon"></i>
                             <p>Rapports & éditions</p>
                         </a>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-rapports') ?>" class="nav-link">
+                            <i class="fas fa-chart-bar nav-icon"></i>
+                            <p>Rapports & éditions</p>
+                        </a>
+                        <?php } ?>
+
                     </li>
-                    <li class="nav-item">
-                        <a href="rh/parametres" class="nav-link">
+                    <!-- <li class="nav-item">
+                        <?php if ($title == 'Paramètres RH') { ?>
+                        <a href="<?= base_url('rh-parametres') ?>" class="nav-link active">
                             <i class="fas fa-cog nav-icon"></i>
                             <p>Paramètres RH</p>
                         </a>
-                    </li>
+                        <?php } else { ?>
+                        <a href="<?= base_url('rh-parametres') ?>" class="nav-link">
+                            <i class="fas fa-cog nav-icon"></i>
+                            <p>Paramètres RH</p>
+                        </a>
+                        <?php } ?>
+
+                    </li> -->
                 </ul>
             </li>
 

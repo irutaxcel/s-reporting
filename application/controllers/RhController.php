@@ -26,10 +26,18 @@ class RhController extends CI_Controller
         }
 
         $title = 'Tableau de bord RH';
+        $data  = [];
+
+        $data['employes']    = $this->Employe_model->get_all('DESC');
+        $data['contrats']    = $this->Employe_model->get_with_employes();
+        $data['mouvements']  = $this->Employe_model->get_mouvements_with_employes();
+        $data['conges']      = $this->Employe_model->get_conges_with_employes();
+        $data['dossiers']    = $this->Employe_model->get_dossiers_with_employes();
+        $data['evaluations'] = $this->Employe_model->get_evaluations_with_employes();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/rh/rh-dashboard');
+        $this->load->view('v1/components/modules/rh/rh-dashboard', $data);
         $this->load->view('v1/components/layout/footer');
     }
 
@@ -682,9 +690,11 @@ class RhController extends CI_Controller
             redirect('sign-in');
         }
 
-        $title = "Paie";
-        $data = [];
+        $title = 'Paie';
+        $data  = [];
 
+        $data['employes'] = $this->Employe_model->get_all('ASC');
+        $data['contrats'] = $this->Employe_model->get_with_employes();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
@@ -705,6 +715,216 @@ class RhController extends CI_Controller
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
         $this->load->view('v1/components/modules/rh/rh-conformite', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhDiscipline()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = 'Discipline';
+        $data  = [];
+
+        $data['employes']         = $this->Employe_model->get_all('DESC');
+        $data['dossiers']         = $this->Employe_model->get_dossiers_with_employes();
+        $data['next_ref_dossier'] = $this->Employe_model->generer_ref_dossier();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-discipline', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function discipline_store()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('employe_id', 'Employé', 'required|integer');
+        $this->form_validation->set_rules('type_faute', 'Type de faute', 'required');
+        $this->form_validation->set_rules('date_fait', 'Date du fait', 'required');
+        $this->form_validation->set_rules('description', 'Description des faits', 'required|trim');
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+            redirect('rh-discipline');
+            return;
+        }
+
+        // Upload des pièces jointes (optionnel)
+        $pieces = NULL;
+        if (!empty($_FILES['pieces']['name'])) {
+            $config = [
+                'upload_path'   => FCPATH . 'uploads/rh/discipline/',
+                'allowed_types' => 'pdf|jpg|jpeg|png',
+                'max_size'      => 2048,
+                'file_name'     => 'dossier_' . time() . '_' . uniqid(),
+            ];
+            if (!is_dir($config['upload_path'])) {
+                mkdir($config['upload_path'], 0777, TRUE);
+            }
+            $this->load->library('upload');
+            $this->upload->initialize($config);
+            if (!$this->upload->do_upload('pieces')) {
+                $this->session->set_flashdata('error', 'Pièces jointes : ' . $this->upload->display_errors('', ''));
+                redirect('rh-discipline');
+                return;
+            }
+            $pieces = 'uploads/rh/discipline/' . $this->upload->data('file_name');
+        }
+
+        $ref = $this->Employe_model->generer_ref_dossier();
+
+        $this->Employe_model->insert_dossier([
+            'reference'         => $ref,
+            'employe_id'        => $this->input->post('employe_id'),
+            'type_faute'        => $this->input->post('type_faute'),
+            'date_fait'         => $this->input->post('date_fait'),
+            'lieu'              => $this->input->post('lieu'),
+            'signale_par'       => $this->input->post('signale_par'),
+            'description'       => $this->input->post('description'),
+            'sanction_proposee' => $this->input->post('sanction_proposee') ?: NULL,
+            'pieces'            => $pieces,
+            'statut'            => 'Ouvert',
+            'encode_par'        => $this->session->userdata('nom') ?: $this->session->userdata('username'),
+        ]);
+
+        $this->session->set_flashdata('success', 'Dossier ' . $ref . ' ouvert avec succès.');
+        redirect('rh-discipline');
+    }
+
+    public function rhEvaluations()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = 'Évaluations';
+        $data  = [];
+
+        $data['employes']    = $this->Employe_model->get_all('DESC');
+        $data['evaluations'] = $this->Employe_model->get_evaluations_with_employes();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-evaluation', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function evaluations_store()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $this->load->library('form_validation');
+        $this->form_validation->set_rules('employe_id', 'Employé', 'required|integer');
+        $this->form_validation->set_rules('evaluateur', 'Évaluateur', 'required');
+        $this->form_validation->set_rules('periode_debut', 'Début de période', 'required');
+        $this->form_validation->set_rules('periode_fin', 'Fin de période', 'required');
+        foreach (['note_performance', 'note_competences', 'note_ponctualite', 'note_esprit', 'note_initiative', 'note_securite'] as $n) {
+            $this->form_validation->set_rules(
+                $n,
+                'Note',
+                'required|integer|greater_than_equal_to[1]|less_than_equal_to[5]'
+            );
+        }
+
+        if ($this->form_validation->run() === FALSE) {
+            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+            redirect('rh-evaluations');
+            return;
+        }
+
+        if ($this->input->post('periode_fin') < $this->input->post('periode_debut')) {
+            $this->session->set_flashdata('error', 'La fin de période doit être postérieure au début.');
+            redirect('rh-evaluations');
+            return;
+        }
+
+        /* ----- Score global pondéré (côté serveur, source de vérité) ----- */
+        $notes = [
+            (int) $this->input->post('note_performance')  * 0.30,
+            (int) $this->input->post('note_competences')  * 0.20,
+            (int) $this->input->post('note_ponctualite')  * 0.15,
+            (int) $this->input->post('note_esprit')       * 0.15,
+            (int) $this->input->post('note_initiative')   * 0.10,
+            (int) $this->input->post('note_securite')     * 0.10,
+        ];
+        $score = round(array_sum($notes), 2);
+
+        if ($score >= 4.5)      $appreciation = 'Excellent';
+        elseif ($score >= 3.5)  $appreciation = 'Très bien';
+        elseif ($score >= 2.5)  $appreciation = 'Satisfaisant';
+        elseif ($score >= 1.5)  $appreciation = 'À améliorer';
+        else                    $appreciation = 'Insuffisant';
+
+        $this->Employe_model->insert_evaluation([
+            'employe_id'        => $this->input->post('employe_id'),
+            'evaluateur'        => $this->input->post('evaluateur'),
+            'type_evaluation'   => $this->input->post('type_evaluation'),
+            'periode_debut'     => $this->input->post('periode_debut'),
+            'periode_fin'       => $this->input->post('periode_fin'),
+            'note_performance'  => $this->input->post('note_performance'),
+            'note_competences'  => $this->input->post('note_competences'),
+            'note_ponctualite'  => $this->input->post('note_ponctualite'),
+            'note_esprit'       => $this->input->post('note_esprit'),
+            'note_initiative'   => $this->input->post('note_initiative'),
+            'note_securite'     => $this->input->post('note_securite'),
+            'score_global'      => $score,
+            'appreciation'      => $appreciation,
+            'points_forts'      => $this->input->post('points_forts'),
+            'axes_amelioration' => $this->input->post('axes_amelioration'),
+            'objectifs'         => $this->input->post('objectifs'),
+            'decision_proposee' => $this->input->post('decision_proposee') ?: NULL,
+            'statut'            => 'Validée',
+            'encode_par'        => $this->session->userdata('nom') ?: $this->session->userdata('username'),
+        ]);
+
+        $this->session->set_flashdata('success', 'Évaluation enregistrée — score ' . number_format($score, 2, ',', ' ') . ' / 5 (' . $appreciation . ').');
+        redirect('rh-evaluations');
+    }
+
+    public function rhRapport()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = 'Rapports & éditions';
+        $data  = [];
+
+        $data['employes']    = $this->Employe_model->get_all('DESC');
+        $data['contrats']    = $this->Employe_model->get_with_employes();
+        $data['mouvements']  = $this->Employe_model->get_mouvements_with_employes();
+        $data['conges']      = $this->Employe_model->get_conges_with_employes();
+        $data['dossiers']    = $this->Employe_model->get_dossiers_with_employes();
+        $data['evaluations'] = $this->Employe_model->get_evaluations_with_employes();
+        $data['rapports']    = $this->Employe_model->get_rapports();
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-rapports', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function rhParametres()
+    {
+        if (!$this->session->userdata('logged_in')) {
+            redirect('sign-in');
+        }
+
+        $title = 'Paramètres RH';
+        $data  = [];
+
+
+        $this->load->view('v1/components/layout/header', ['title' => $title]);
+        $this->load->view('v1/components/layout/sidebar');
+        $this->load->view('v1/components/modules/rh/rh-parametres', $data);
         $this->load->view('v1/components/layout/footer');
     }
 }

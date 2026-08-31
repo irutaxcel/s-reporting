@@ -6,15 +6,15 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0"><?= $title ?></h1>
-                </div><!-- /.col -->
+                </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active"><?= $title ?></li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
     <!-- /.content-header -->
 
@@ -64,15 +64,107 @@
             }
             </style>
 
-            <!-- ============ 1. INDICATEURS — PÉRIODE AOÛT 2026 ============ -->
+            <!-- ============ CALCULS DE LA FEUILLE DE PAIE ============ -->
+            <?php
+            /* ----- Barème IPR progressif (démo — à ajuster selon barème OBR en vigueur) ----- */
+            if (!function_exists('calcul_ipr')) {
+                function calcul_ipr($brut)
+                {
+                    $tranches = [[250000, 0], [250000, 0.15], [500000, 0.20], [1000000, 0.25], [INF, 0.30]];
+                    $impot = 0;
+                    $restant = $brut;
+                    foreach ($tranches as $t) {
+                        if ($restant <= 0) break;
+                        $base = min($restant, $t[0]);
+                        $impot += $base * $t[1];
+                        $restant -= $base;
+                    }
+                    return (int) round($impot);
+                }
+            }
+
+            $PLAFOND_INSS   = 450000;
+            $badge_paiement = ['Virement bancaire' => 'info', 'Espèces' => 'secondary', 'Mobile money' => 'warning'];
+            $couleurs       = ['#1f7a5c', '#2c8a69', '#34608c', '#7a4f1f', '#8a3033', '#6c757d'];
+
+            /* ----- Dernier contrat par employé (salaire / fonction prioritaires) ----- */
+            $dernier_contrat = [];
+            foreach ($contrats as $c) {
+                if (!isset($dernier_contrat[$c->employe_id])) $dernier_contrat[$c->employe_id] = $c;
+            }
+
+            /* ----- Calcul de la feuille du mois (employés actifs) ----- */
+            $lignes    = [];
+            $totaux    = ['brut' => 0, 'inss' => 0, 'ipr' => 0, 'net' => 0, 'charges' => 0];
+            $paiements = [];
+
+            foreach ($employes as $e) {
+                if ($e->statut === 'Fin de contrat') continue;
+
+                $ct   = isset($dernier_contrat[$e->employe_id]) ? $dernier_contrat[$e->employe_id] : NULL;
+                $base = (int) ($ct ? $ct->salaire_base : $e->salaire_base);
+                $log  = (int) round($base * 0.10);   // allocation logement 10 %
+                $tra  = 50000;                       // allocation transport fixe
+                $hs   = 0;                           // ← sera alimenté par tbl_pointages
+                $brut = $base + $log + $tra + $hs;
+
+                $assiette = min($brut, $PLAFOND_INSS);
+                $inss_s   = (int) round($assiette * 0.04);
+                $inss_p   = (int) round($assiette * 0.06);
+                $ipr      = calcul_ipr($brut);
+                $net      = $brut - $inss_s - $ipr;
+
+                $lignes[] = [
+                    'employe_id' => $e->employe_id,
+                    'matricule' => $e->matricule,
+                    'nom' => $e->nom,
+                    'prenoms' => $e->prenoms,
+                    'fonction' => $ct ? $ct->fonction : $e->fonction,
+                    'categorie' => $e->categorie,
+                    'mode' => $e->mode_paiement,
+                    'matricule_inss' => $e->matricule_inss ?: '—',
+                    'base' => $base,
+                    'log' => $log,
+                    'tra' => $tra,
+                    'hs' => $hs,
+                    'brut' => $brut,
+                    'inss' => $inss_s,
+                    'ipr' => $ipr,
+                    'net' => $net,
+                ];
+
+                $totaux['brut']    += $brut;
+                $totaux['inss']    += $inss_s;
+                $totaux['ipr']     += $ipr;
+                $totaux['net']     += $net;
+                $totaux['charges'] += $inss_p;
+
+                if (!isset($paiements[$e->mode_paiement])) $paiements[$e->mode_paiement] = ['nb' => 0, 'net' => 0];
+                $paiements[$e->mode_paiement]['nb']++;
+                $paiements[$e->mode_paiement]['net'] += $net;
+            }
+
+            $fmt        = function ($n) {
+                return number_format($n, 0, '', ' ');
+            };
+            $mois_label = (new DateTime())->format('m/Y');
+
+            $paie_json = [];
+            foreach ($lignes as $l) {
+                $paie_json[$l['employe_id']] = $l;
+            }
+            ?>
+
+            <!-- ============ 1. INDICATEURS ============ -->
             <div class="row">
                 <div class="col-lg-3 col-6">
                     <div class="info-box">
                         <span class="info-box-icon bg-success"><i class="fas fa-money-bill-wave"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Masse salariale brute</span>
-                            <span class="info-box-number">52 400 000 <small>BIF</small></span>
-                            <span class="progress-description">57 employés · août 2026</span>
+                            <span class="info-box-number"><?= $fmt($totaux['brut']) ?> <small>BIF</small></span>
+                            <span class="progress-description"><?= count($lignes) ?> employés ·
+                                <?= $mois_label ?></span>
                         </div>
                     </div>
                 </div>
@@ -81,7 +173,7 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-hand-holding-usd"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Net à payer</span>
-                            <span class="info-box-number">46 150 000 <small>BIF</small></span>
+                            <span class="info-box-number"><?= $fmt($totaux['net']) ?> <small>BIF</small></span>
                             <span class="progress-description">Virement · espèces · mobile money</span>
                         </div>
                     </div>
@@ -91,7 +183,8 @@
                         <span class="info-box-icon bg-warning"><i class="fas fa-minus-circle"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Retenues salariales</span>
-                            <span class="info-box-number">6 250 000 <small>BIF</small></span>
+                            <span class="info-box-number"><?= $fmt($totaux['inss'] + $totaux['ipr']) ?>
+                                <small>BIF</small></span>
                             <span class="progress-description">INSS 4 % + IPR (barème OBR)</span>
                         </div>
                     </div>
@@ -101,14 +194,14 @@
                         <span class="info-box-icon bg-danger"><i class="fas fa-building"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Charges patronales</span>
-                            <span class="info-box-number">3 140 000 <small>BIF</small></span>
+                            <span class="info-box-number"><?= $fmt($totaux['charges']) ?> <small>BIF</small></span>
                             <span class="progress-description">INSS 6 % + assurance maladie</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============ 2. CYCLE DE PAIE — AOÛT 2026 ============ -->
+            <!-- ============ 2. CYCLE DE PAIE ============ -->
             <div class="card">
                 <div class="card-body">
                     <div class="row text-center">
@@ -116,19 +209,19 @@
                             <span class="step-circle bg-success"><i class="fas fa-database"></i></span>
                             <div class="font-weight-bold mt-1" style="font-size:.85rem">1. Variables</div>
                             <small class="text-muted">Présences, HS, congés</small><br>
-                            <span class="badge badge-success mt-1">Collecté · 20/08</span>
+                            <span class="badge badge-success mt-1">Collecté</span>
                         </div>
                         <div class="col-6 col-md-2 mb-2">
                             <span class="step-circle bg-success"><i class="fas fa-calculator"></i></span>
                             <div class="font-weight-bold mt-1" style="font-size:.85rem">2. Calcul</div>
                             <small class="text-muted">Brut → net</small><br>
-                            <span class="badge badge-success mt-1">Terminé · 21/08</span>
+                            <span class="badge badge-success mt-1">Terminé</span>
                         </div>
                         <div class="col-6 col-md-2 mb-2">
                             <span class="step-circle bg-success"><i class="fas fa-user-check"></i></span>
                             <div class="font-weight-bold mt-1" style="font-size:.85rem">3. Contrôle RH</div>
                             <small class="text-muted">Vérification feuille</small><br>
-                            <span class="badge badge-success mt-1">Validé · 21/08</span>
+                            <span class="badge badge-success mt-1">Validé</span>
                         </div>
                         <div class="col-6 col-md-2 mb-2">
                             <span class="step-circle bg-warning"><i class="fas fa-balance-scale"></i></span>
@@ -139,7 +232,7 @@
                         <div class="col-6 col-md-2 mb-2">
                             <span class="step-circle bg-secondary"><i class="fas fa-university"></i></span>
                             <div class="font-weight-bold mt-1" style="font-size:.85rem">5. Paiement</div>
-                            <small class="text-muted">Échéance 28/08</small><br>
+                            <small class="text-muted">Échéance fin de mois</small><br>
                             <span class="badge badge-secondary mt-1">À venir</span>
                         </div>
                         <div class="col-6 col-md-2 mb-2">
@@ -158,7 +251,8 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tabPeriode"><i
-                                        class="fas fa-calculator mr-1"></i> Période Août 2026</a></li>
+                                        class="fas fa-calculator mr-1"></i> Période
+                                    <?= (new DateTime())->format('F Y') ?></a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabHistorique"><i
                                         class="fas fa-history mr-1"></i> Historique</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabDeclarations"><i
@@ -197,221 +291,59 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php if (!empty($lignes)): foreach ($lignes as $l):
+                                            $initiales = strtoupper(mb_substr($l['prenoms'], 0, 1) . mb_substr($l['nom'], 0, 1));
+                                            $couleur   = $couleurs[$l['employe_id'] % count($couleurs)];
+                                    ?>
                                     <tr>
                                         <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#1f7a5c">JN</span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials mr-2"
+                                                    style="background:<?= $couleur ?>"><?= $initiales ?></span>
                                                 <div>
-                                                    <div class="font-weight-bold">Jean-Marie NDAYIZEYE</div><small
-                                                        class="text-muted">SAT-0001</small>
+                                                    <div class="font-weight-bold">
+                                                        <?= html_escape($l['prenoms'] . ' ' . mb_strtoupper($l['nom'])) ?>
+                                                    </div>
+                                                    <small
+                                                        class="text-muted"><?= html_escape($l['matricule']) ?></small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>Bureau</td>
-                                        <td>1 850 000</td>
-                                        <td>150 000</td>
-                                        <td>—</td>
-                                        <td><strong>2 000 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>262 500</td>
-                                        <td><strong class="text-success">1 719 500</strong></td>
-                                        <td><span class="badge badge-info">Virement</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#2c8a69">TN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Thierry NIMUBONA</div><small
-                                                        class="text-muted">SAT-0009</small>
-                                                </div>
-                                            </div>
+                                        <td><?= $l['categorie'] ?></td>
+                                        <td><?= $fmt($l['base']) ?></td>
+                                        <td><?= $fmt($l['log'] + $l['tra']) ?></td>
+                                        <td><?= $l['hs'] ? $fmt($l['hs']) : '—' ?></td>
+                                        <td><strong><?= $fmt($l['brut']) ?></strong></td>
+                                        <td><?= $fmt($l['inss']) ?></td>
+                                        <td><?= $fmt($l['ipr']) ?></td>
+                                        <td><strong class="text-success"><?= $fmt($l['net']) ?></strong></td>
+                                        <td><span
+                                                class="badge badge-<?= $badge_paiement[$l['mode']] ?? 'secondary' ?>"><?= str_replace(' bancaire', '', $l['mode']) ?></span>
                                         </td>
-                                        <td>Bureau</td>
-                                        <td>2 500 000</td>
-                                        <td>200 000</td>
-                                        <td>—</td>
-                                        <td><strong>2 700 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>372 500</td>
-                                        <td><strong class="text-success">2 309 500</strong></td>
-                                        <td><span class="badge badge-info">Virement</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">PH</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Patrick HAKIZIMANA</div><small
-                                                        class="text-muted">SAT-0021</small>
-                                                </div>
-                                            </div>
+                                        <td class="text-right">
+                                            <button type="button" class="btn btn-sm btn-default" title="Bulletin"
+                                                onclick="ouvrirBulletin(<?= $l['employe_id'] ?>)">
+                                                <i class="fas fa-file-invoice"></i>
+                                            </button>
                                         </td>
-                                        <td>Chantier</td>
-                                        <td>1 400 000</td>
-                                        <td>140 000</td>
-                                        <td>45 000</td>
-                                        <td><strong>1 585 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>186 000</td>
-                                        <td><strong class="text-success">1 381 000</strong></td>
-                                        <td><span class="badge badge-info">Virement</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
                                     </tr>
+                                    <?php endforeach;
+                                    else: ?>
                                     <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">AN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Alice NIYONZIMA</div><small
-                                                        class="text-muted">SAT-0014</small>
-                                                </div>
-                                            </div>
+                                        <td colspan="11" class="text-center text-muted py-4"><i
+                                                class="fas fa-inbox fa-2x mb-2 d-block"></i>Aucun employé actif à payer.
                                         </td>
-                                        <td>Bureau</td>
-                                        <td>950 000</td>
-                                        <td>80 000</td>
-                                        <td>—</td>
-                                        <td><strong>1 030 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>92 000</td>
-                                        <td><strong class="text-success">920 000</strong></td>
-                                        <td><span class="badge badge-info">Virement</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#2c8a69">GR</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Gilbert RUKARA</div><small
-                                                        class="text-muted">SAT-0027</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Chantier</td>
-                                        <td>900 000</td>
-                                        <td>—</td>
-                                        <td>60 000</td>
-                                        <td><strong>960 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>80 000</td>
-                                        <td><strong class="text-success">862 000</strong></td>
-                                        <td><span class="badge badge-info">Virement</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#6c757d">PN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Prisca NDABASHIMANA</div><small
-                                                        class="text-muted">SAT-0062</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Bureau</td>
-                                        <td>600 000</td>
-                                        <td>—</td>
-                                        <td>—</td>
-                                        <td><strong>600 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>30 000</td>
-                                        <td><strong class="text-success">552 000</strong></td>
-                                        <td><span class="badge badge-info">Virement</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#7a4f1f">JM</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Justine MBONIMPA</div><small
-                                                        class="text-muted">SAT-0032</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Chantier</td>
-                                        <td>500 000</td>
-                                        <td>—</td>
-                                        <td>30 000</td>
-                                        <td><strong>530 000</strong></td>
-                                        <td>18 000</td>
-                                        <td>26 000</td>
-                                        <td><strong class="text-success">486 000</strong></td>
-                                        <td><span class="badge badge-warning">Mobile money</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">CN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Cédric NIYONGABO</div><small
-                                                        class="text-muted">SAT-0041</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Chantier</td>
-                                        <td>300 000</td>
-                                        <td>—</td>
-                                        <td>—</td>
-                                        <td><strong>300 000</strong></td>
-                                        <td>12 000</td>
-                                        <td>0</td>
-                                        <td><strong class="text-success">288 000</strong></td>
-                                        <td><span class="badge badge-secondary">Espèces</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#8a3033">NI</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Nadia IRAKOZE</div><small
-                                                        class="text-muted">SAT-0059</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Bureau</td>
-                                        <td>200 000</td>
-                                        <td>—</td>
-                                        <td>—</td>
-                                        <td><strong>200 000</strong></td>
-                                        <td>8 000</td>
-                                        <td>0</td>
-                                        <td><strong class="text-success">192 000</strong></td>
-                                        <td><span class="badge badge-secondary">Espèces</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                data-toggle="modal" data-target="#modalBulletin"><i
-                                                    class="fas fa-file-invoice"></i></button></td>
-                                    </tr>
+                                    <?php endif; ?>
                                 </tbody>
                                 <tfoot>
                                     <tr class="font-weight-bold" style="background:#f4f6f9">
-                                        <td colspan="5" class="text-right">TOTAUX (57 employés) —</td>
-                                        <td>52 400 000</td>
-                                        <td>980 000</td>
-                                        <td>5 270 000</td>
-                                        <td class="text-success">46 150 000</td>
+                                        <td colspan="5" class="text-right">TOTAUX (<?= count($lignes) ?> employés) —
+                                        </td>
+                                        <td><?= $fmt($totaux['brut']) ?></td>
+                                        <td><?= $fmt($totaux['inss']) ?></td>
+                                        <td><?= $fmt($totaux['ipr']) ?></td>
+                                        <td class="text-success"><?= $fmt($totaux['net']) ?></td>
                                         <td colspan="2"></td>
                                     </tr>
                                 </tfoot>
@@ -419,12 +351,17 @@
                         </div>
                         <div class="card-footer">
                             <div class="row text-center">
-                                <div class="col-4"><small class="text-muted">Virement bancaire</small><br><strong>42
-                                        employés · 41 300 000 BIF</strong></div>
-                                <div class="col-4"><small class="text-muted">Espèces (chantiers)</small><br><strong>12
-                                        employés · 3 650 000 BIF</strong></div>
-                                <div class="col-4"><small class="text-muted">Mobile money</small><br><strong>3 employés
-                                        · 1 200 000 BIF</strong></div>
+                                <?php
+                                $libelles = ['Virement bancaire' => 'Virement bancaire', 'Espèces' => 'Espèces (chantiers)', 'Mobile money' => 'Mobile money'];
+                                foreach ($libelles as $cle => $lib):
+                                    $p = isset($paiements[$cle]) ? $paiements[$cle] : ['nb' => 0, 'net' => 0];
+                                ?>
+                                <div class="col-4">
+                                    <small class="text-muted"><?= $lib ?></small><br>
+                                    <strong><?= $p['nb'] ?> employé<?= $p['nb'] > 1 ? 's' : '' ?> ·
+                                        <?= $fmt($p['net']) ?> BIF</strong>
+                                </div>
+                                <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
@@ -513,9 +450,9 @@
                                     <tr>
                                         <td><strong>OBR</strong></td>
                                         <td>IPR — retenue à la source</td>
-                                        <td>Août 2026</td>
-                                        <td>5 270 000 BIF</td>
-                                        <td>10/09/2026</td>
+                                        <td><?= (new DateTime())->format('F Y') ?></td>
+                                        <td><?= $fmt($totaux['ipr']) ?> BIF</td>
+                                        <td>10 du mois suivant</td>
                                         <td><span class="badge badge-warning">À déclarer</span></td>
                                         <td class="text-right"><button class="btn btn-sm btn-success">Générer la
                                                 déclaration</button></td>
@@ -524,7 +461,7 @@
                                         <td><strong>INSS</strong></td>
                                         <td>Cotisations (salariale 4 % + patronale 6 %)</td>
                                         <td>T3 2026 (juil–sept)</td>
-                                        <td>≈ 2 940 000 BIF</td>
+                                        <td>≈ <?= $fmt(($totaux['inss'] + $totaux['charges']) * 3) ?> BIF</td>
                                         <td>15/10/2026</td>
                                         <td><span class="badge badge-info">En cours (alimentée par la paie)</span></td>
                                         <td class="text-right"><button class="btn btn-sm btn-default">Détail</button>
@@ -543,9 +480,9 @@
                                     <tr>
                                         <td><strong>Assurance maladie</strong></td>
                                         <td>Cotisation mensuelle (2,5 %)</td>
-                                        <td>Août 2026</td>
-                                        <td>1 310 000 BIF</td>
-                                        <td>05/09/2026</td>
+                                        <td><?= (new DateTime())->format('F Y') ?></td>
+                                        <td><?= $fmt((int) round($totaux['brut'] * 0.025)) ?> BIF</td>
+                                        <td>05 du mois suivant</td>
                                         <td><span class="badge badge-warning">À payer</span></td>
                                         <td class="text-right"><button class="btn btn-sm btn-success">Générer</button>
                                         </td>
@@ -684,13 +621,13 @@
                 </div>
             </div>
 
-            <!-- ============ MODALE : BULLETIN DE PAIE ============ -->
+            <!-- ============ MODALE : BULLETIN DE PAIE (dynamique) ============ -->
             <div class="modal fade" id="modalBulletin">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header bg-success text-white">
-                            <h4 class="modal-title"><i class="fas fa-file-invoice mr-2"></i>Bulletin de paie — Août 2026
-                            </h4>
+                            <h4 class="modal-title"><i class="fas fa-file-invoice mr-2"></i>Bulletin de paie —
+                                <?= (new DateTime())->format('F Y') ?></h4>
                             <button type="button" class="close text-white"
                                 data-dismiss="modal"><span>&times;</span></button>
                         </div>
@@ -704,11 +641,11 @@
                                     </small>
                                 </div>
                                 <div class="col-md-6 text-md-right">
-                                    <strong>Jean-Marie NDAYIZEYE</strong> <span
-                                        class="badge badge-success">SAT-0001</span><br>
+                                    <strong id="bNom">—</strong> <span class="badge badge-success"
+                                        id="bMatricule">—</span><br>
                                     <small class="text-muted">
-                                        Responsable RH &amp; Suivi-Évaluation<br>
-                                        Matricule INSS : 102456 · CDI — Bureau
+                                        <span id="bFonction">—</span><br>
+                                        Matricule INSS : <span id="bInss">—</span> · <span id="bCat">—</span>
                                     </small>
                                 </div>
                             </div>
@@ -718,19 +655,19 @@
                                 <tbody>
                                     <tr>
                                         <td>Salaire de base</td>
-                                        <td class="text-right">1 850 000</td>
+                                        <td class="text-right" id="gBase">—</td>
                                     </tr>
                                     <tr>
                                         <td>Allocation logement (10 %)</td>
-                                        <td class="text-right">100 000</td>
+                                        <td class="text-right" id="gLog">—</td>
                                     </tr>
                                     <tr>
                                         <td>Allocation transport</td>
-                                        <td class="text-right">50 000</td>
+                                        <td class="text-right" id="gTra">—</td>
                                     </tr>
                                     <tr class="font-weight-bold">
                                         <td>SALAIRE BRUT</td>
-                                        <td class="text-right">2 000 000</td>
+                                        <td class="text-right" id="gBrut">—</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -740,15 +677,15 @@
                                 <tbody>
                                     <tr>
                                         <td>INSS salarié (4 % — assiette plafonnée)</td>
-                                        <td class="text-right">18 000</td>
+                                        <td class="text-right" id="rInss">—</td>
                                     </tr>
                                     <tr>
                                         <td>IPR (barème OBR)</td>
-                                        <td class="text-right">262 500</td>
+                                        <td class="text-right" id="rIpr">—</td>
                                     </tr>
                                     <tr class="font-weight-bold">
                                         <td>TOTAL RETENUES</td>
-                                        <td class="text-right">280 500</td>
+                                        <td class="text-right" id="rTotal">—</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -756,10 +693,9 @@
                             <div class="alert alert-success py-2 mb-2">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <strong>NET À PAYER</strong>
-                                    <strong class="h5 mb-0">1 719 500 BIF</strong>
+                                    <strong class="h5 mb-0"><span id="bNet">—</span> BIF</strong>
                                 </div>
-                                <small>Arrêté le présent bulletin à la somme de : <em>un million sept cent dix-neuf
-                                        mille cinq cents francs burundais</em>.</small>
+                                <small>Arrêté le présent bulletin à la somme de : <em id="bLettres">—</em>.</small>
                             </div>
 
                             <div class="row text-center mt-3">
@@ -785,3 +721,75 @@
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
+
+<!-- ============ SCRIPT : BULLETIN DYNAMIQUE ============ -->
+<script>
+var RH_PAIE = <?= json_encode($paie_json) ?>;
+
+function fmtNb(n) {
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+/* ----- Nombre en lettres (français) ----- */
+function enLettres(n) {
+    var u = ['zéro', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf', 'dix', 'onze', 'douze',
+        'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'
+    ];
+    var d = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt',
+        'quatre-vingt-dix'
+    ];
+
+    function c(n) {
+        var s = '',
+            h = Math.floor(n / 100),
+            r = n % 100;
+        if (h) {
+            s += (h > 1 ? u[h] + ' cent' : 'cent');
+            if (h > 1 && !r) s += 's';
+        }
+        if (r) {
+            if (s) s += ' ';
+            if (r < 20) s += u[r];
+            else {
+                var t = Math.floor(r / 10),
+                    o = r % 10;
+                if (t === 7 || t === 9) s += d[t - 1] + '-' + u[10 + o];
+                else {
+                    s += d[t];
+                    if (o) s += (o === 1 && t < 8) ? ' et un' : '-' + u[o];
+                }
+            }
+        }
+        return s || 'zéro';
+    }
+    var M = Math.floor(n / 1000000),
+        m = Math.floor((n % 1000000) / 1000),
+        r = n % 1000,
+        s = '';
+    if (M) s += (M > 1 ? u[M] + ' millions' : 'un million');
+    if (m) s += (s ? ' ' : '') + (m > 1 ? c(m) + ' mille' : 'mille');
+    if (r) s += (s ? ' ' : '') + c(r);
+    return s || 'zéro';
+}
+
+/* ----- Ouverture du bulletin pré-rempli ----- */
+function ouvrirBulletin(id) {
+    var p = RH_PAIE[id];
+    if (!p) return;
+    document.getElementById('bNom').textContent = p.prenoms + ' ' + p.nom.toUpperCase();
+    document.getElementById('bMatricule').textContent = p.matricule;
+    document.getElementById('bFonction').textContent = p.fonction;
+    document.getElementById('bInss').textContent = p.matricule_inss;
+    document.getElementById('bCat').textContent = p.categorie;
+    document.getElementById('gBase').textContent = fmtNb(p.base);
+    document.getElementById('gLog').textContent = fmtNb(p.log);
+    document.getElementById('gTra').textContent = fmtNb(p.tra);
+    document.getElementById('gBrut').textContent = fmtNb(p.brut);
+    document.getElementById('rInss').textContent = fmtNb(p.inss);
+    document.getElementById('rIpr').textContent = fmtNb(p.ipr);
+    document.getElementById('rTotal').textContent = fmtNb(p.inss + p.ipr);
+    document.getElementById('bNet').textContent = fmtNb(p.net);
+    document.getElementById('bLettres').textContent = enLettres(p.net) + ' francs burundais';
+    $('#modalBulletin').modal('show');
+}
+</script>

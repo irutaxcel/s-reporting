@@ -273,6 +273,16 @@ $route['rh-paie'] = 'RhController/rhPaie';
 
 $route['rh-conformite'] = 'RhController/rhConfirmite';
 
+$route['rh-discipline']       = 'RhController/rhDiscipline';
+$route['rh-discipline-store'] = 'RhController/discipline_store';
+
+$route['rh-evaluations']       = 'RhController/rhEvaluations';
+$route['rh-evaluations-store'] = 'RhController/evaluations_store';
+
+$route['rh-rapports'] = 'RhController/rhRapport';
+
+$route['rh-parametres'] = 'RhController/rhParametres';
+
 $route['prevision'] = 'FinanceController/prevision';
 
 $route['facture-client'] = 'FinanceController/factureClient';

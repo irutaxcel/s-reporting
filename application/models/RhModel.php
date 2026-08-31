@@ -102,4 +102,71 @@ class RhModel extends CI_Model
             ->order_by('cg.conge_id', 'DESC')
             ->get()->result();
     }
+
+    protected $table_discipline = 'tbl_discipline';   // ← nouvelle propriété
+
+    /** Génère la référence : DIS-2026-001, DIS-2026-002, … */
+    public function generer_ref_dossier()
+    {
+        $annee = date('Y');
+        $q = $this->db->query("SELECT MAX(CAST(SUBSTRING(reference, 10) AS UNSIGNED)) AS num
+                           FROM {$this->table_discipline}
+                           WHERE reference LIKE 'DIS-" . $annee . "-%'");
+        $num = ($q->row()->num !== NULL) ? (int) $q->row()->num : 0;
+        return 'DIS-' . $annee . '-' . str_pad($num + 1, 3, '0', STR_PAD_LEFT);
+    }
+
+    /** Insertion d'un dossier disciplinaire */
+    public function insert_dossier($data)
+    {
+        $this->db->insert($this->table_discipline, $data);
+        return $this->db->insert_id();
+    }
+
+    /** Dossiers + infos employé, du plus récent au plus ancien */
+    public function get_dossiers_with_employes()
+    {
+        return $this->db
+            ->select('d.*, e.matricule, e.nom, e.prenoms')
+            ->from($this->table_discipline . ' d')
+            ->join('tbl_employes e', 'e.employe_id = d.employe_id')
+            ->order_by('d.dossier_id', 'DESC')
+            ->get()->result();
+    }
+
+    protected $table_evaluations = 'tbl_evaluations';   // ← nouvelle propriété
+
+    /** Insertion d'une évaluation */
+    public function insert_evaluation($data)
+    {
+        $this->db->insert($this->table_evaluations, $data);
+        return $this->db->insert_id();
+    }
+
+    /** Évaluations + infos employé, des plus récentes aux plus anciennes */
+    // public function get_evaluations_with_employes()
+    // {
+    //     return $this->db
+    //         ->select('ev.*, e.matricule, e.nom, e.prenoms, e.fonction')
+    //         ->from($this->table_evaluations . ' ev')
+    //         ->join('tbl_employes e', 'e.employe_id = ev.employe_id')
+    //         ->order_by('ev.evaluation_id', 'DESC')
+    //         ->get()->result();
+    // }
+
+    public function get_evaluations_with_employes()
+    {
+        return $this->db
+            ->select('ev.*, e.matricule, e.nom, e.prenoms, e.fonction, e.categorie, e.site_affectation, e.departement')
+            ->from($this->table_evaluations . ' ev')
+            ->join('tbl_employes e', 'e.employe_id = ev.employe_id')
+            ->order_by('ev.evaluation_id', 'DESC')
+            ->get()->result();
+    }
+
+    /** Historique des rapports générés, du plus récent au plus ancien */
+    public function get_rapports()
+    {
+        return $this->db->order_by('cree_le', 'DESC')->get('tbl_rapports')->result();
+    }
 }

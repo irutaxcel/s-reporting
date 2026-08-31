@@ -1603,9 +1603,9 @@
                             Montant autorisé :
                         </span>
 
-                        <span class="payment-amount">
+                        <!-- <span class="payment-amount">
                             <?= number_format((float) $bonPaiement->amount_paid, 0, ',', ' ') ?> BIF
-                        </span>
+                        </span> -->
 
                     </div>
 
@@ -1783,7 +1783,7 @@
             PIED DE PAGE
         ====================================================== -->
 
-        <footer class="footer">
+        <!-- <footer class="footer">
 
             © <?= date('Y') ?>
             SATRACO Construction -
@@ -1797,7 +1797,7 @@
             Zone Ngagara, Quartier Industriel,
             Numéro 15
 
-        </footer>
+        </footer> -->
 
     </div>
 
