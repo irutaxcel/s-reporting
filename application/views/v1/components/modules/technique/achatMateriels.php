@@ -74,17 +74,17 @@
             </div>
 
             <?php if ($this->session->flashdata('error')): ?>
-            <div class="alert alert-danger alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <?= $this->session->flashdata('error'); ?>
-            </div>
+                <div class="alert alert-danger alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <?= $this->session->flashdata('error'); ?>
+                </div>
             <?php endif; ?>
 
             <?php if ($this->session->flashdata('success')): ?>
-            <div class="alert alert-success alert-dismissible">
-                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                <?= $this->session->flashdata('success'); ?>
-            </div>
+                <div class="alert alert-success alert-dismissible">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <?= $this->session->flashdata('success'); ?>
+                </div>
             <?php endif; ?>
 
             <!-- Card principale -->
@@ -137,7 +137,7 @@
                                                 <select name="chantier_id" class="form-control" required>
                                                     <option value="">-- Sélectionner le chantier --</option>
                                                     <?php foreach ($allChantiers as $chant) : ?>
-                                                    <option value="<?= $chant->id ?>"><?= $chant->name ?></option>
+                                                        <option value="<?= $chant->id ?>"><?= $chant->name ?></option>
                                                     <?php endforeach ?>
                                                 </select>
                                             </div>
@@ -263,12 +263,12 @@
                 </div>
 
                 <script>
-                function addArticleRow() {
-                    let tbody = document.querySelector('#articlesTable tbody');
+                    function addArticleRow() {
+                        let tbody = document.querySelector('#articlesTable tbody');
 
-                    let tr = document.createElement('tr');
+                        let tr = document.createElement('tr');
 
-                    tr.innerHTML = `
+                        tr.innerHTML = `
                         <td>
                             <input type="text" name="article[]" class="form-control" placeholder="Ex : Ciment, fer à béton..." required>
                         </td>
@@ -292,39 +292,39 @@
                         </td>
                     `;
 
-                    tbody.appendChild(tr);
-                }
+                        tbody.appendChild(tr);
+                    }
 
-                function removeArticleRow(button) {
-                    let tbody = document.querySelector('#articlesTable tbody');
+                    function removeArticleRow(button) {
+                        let tbody = document.querySelector('#articlesTable tbody');
 
-                    if (tbody.rows.length > 1) {
-                        button.closest('tr').remove();
+                        if (tbody.rows.length > 1) {
+                            button.closest('tr').remove();
+                            calculerTotalGeneral();
+                        }
+                    }
+
+                    function calculerLigne(input) {
+                        let tr = input.closest('tr');
+
+                        let quantite = parseFloat(tr.querySelector('.quantite').value) || 0;
+                        let prix = parseFloat(tr.querySelector('.prix_unitaire').value) || 0;
+                        let total = quantite * prix;
+
+                        tr.querySelector('.total_ligne').value = total;
+
                         calculerTotalGeneral();
                     }
-                }
 
-                function calculerLigne(input) {
-                    let tr = input.closest('tr');
+                    function calculerTotalGeneral() {
+                        let totalGeneral = 0;
 
-                    let quantite = parseFloat(tr.querySelector('.quantite').value) || 0;
-                    let prix = parseFloat(tr.querySelector('.prix_unitaire').value) || 0;
-                    let total = quantite * prix;
+                        document.querySelectorAll('.total_ligne').forEach(function(input) {
+                            totalGeneral += parseFloat(input.value) || 0;
+                        });
 
-                    tr.querySelector('.total_ligne').value = total;
-
-                    calculerTotalGeneral();
-                }
-
-                function calculerTotalGeneral() {
-                    let totalGeneral = 0;
-
-                    document.querySelectorAll('.total_ligne').forEach(function(input) {
-                        totalGeneral += parseFloat(input.value) || 0;
-                    });
-
-                    document.getElementById('total_general').value = totalGeneral;
-                }
+                        document.getElementById('total_general').value = totalGeneral;
+                    }
                 </script>
 
                 <div class="card-body">
@@ -346,18 +346,18 @@
 
                                         <?php if (!empty($allChantiers)) : ?>
 
-                                        <?php foreach ($allChantiers as $chantier) : ?>
+                                            <?php foreach ($allChantiers as $chantier) : ?>
 
-                                        <option value="<?= $chantier->id ?>" <?= isset($filters['chantier_id'])
+                                                <option value="<?= $chantier->id ?>" <?= isset($filters['chantier_id'])
                                                                                             && (string) $filters['chantier_id'] === (string) $chantier->id
                                                                                             ? 'selected'
                                                                                             : '' ?>>
 
-                                            <?= html_escape($chantier->name) ?>
+                                                    <?= html_escape($chantier->name) ?>
 
-                                        </option>
+                                                </option>
 
-                                        <?php endforeach; ?>
+                                            <?php endforeach; ?>
 
                                         <?php endif; ?>
 
@@ -464,47 +464,110 @@
 
                             </div>
 
+                            <?php if (!empty($canSeePaidRequests)) : ?>
+                                <!-- Option réservée SUPER_ADMIN / ADMINISTRATEUR_SYSTEM -->
+                                <div class="col-12 mt-2">
+
+                                    <div class="form-check">
+
+                                        <input class="form-check-input" type="checkbox" name="include_payes" value="1"
+                                            id="includePayes" <?= !empty($filters['include_payes']) ? 'checked' : '' ?>>
+
+                                        <label class="form-check-label" for="includePayes">
+                                            Afficher aussi les demandes déjà payées en trésorerie
+                                            <span class="badge badge-secondary ml-1">Admin</span>
+                                        </label>
+
+                                    </div>
+
+                                </div>
+                            <?php endif; ?>
+
                         </div>
 
                     </form>
 
+                    <?php
+                    $dejaPayees   = (int) ($stats['deja_payees'] ?? 0);
+                    $affichePayes = !empty($filters['include_payes']);
+
+                    /* Lien "Afficher" qui conserve les autres filtres */
+                    $queryAfficher = http_build_query(array_filter([
+                        'chantier_id'     => $filters['chantier_id'] ?? '',
+                        'workflow_status' => $filters['workflow_status'] ?? '',
+                        'date_debut'      => $filters['date_debut'] ?? '',
+                        'date_fin'        => $filters['date_fin'] ?? '',
+                        'include_payes'   => '1',
+                    ]));
+                    ?>
+
+                    <?php if (!$affichePayes && $dejaPayees > 0) : ?>
+                        <div class="alert alert-light border d-flex align-items-center py-2 mb-2">
+
+                            <i class="fas fa-info-circle text-secondary mr-2"></i>
+
+                            <small class="mr-2">
+                                <strong><?= $dejaPayees ?></strong>
+                                demande(s) déjà payée(s) en trésorerie.
+                            </small>
+
+                            <?php if (!empty($canSeePaidRequests)) : ?>
+                                <a href="<?= base_url('achats-materiels?' . $queryAfficher) ?>" class="badge badge-primary">
+                                    Afficher
+                                </a>
+                            <?php endif; ?>
+
+                        </div>
+                    <?php endif; ?>
+
                     <style>
-                    .table-achats {
-                        table-layout: fixed;
-                        width: 100%;
-                    }
+                        .table-achats {
+                            table-layout: fixed;
+                            width: 100%;
+                        }
 
-                    .table-achats td {
-                        vertical-align: middle;
-                    }
+                        .table-achats td {
+                            vertical-align: middle;
+                        }
 
-                    .table-achats th {
-                        white-space: nowrap;
-                    }
+                        .table-achats th {
+                            white-space: nowrap;
+                        }
 
-                    .col-materiel {
-                        width: 320px;
-                        white-space: nowrap;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                    }
+                        .col-materiel {
+                            width: 320px;
+                            white-space: nowrap;
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                        }
 
-                    .col-montant {
-                        width: 170px;
-                        white-space: nowrap;
-                        text-align: right;
-                        font-weight: bold;
-                    }
+                        .col-montant {
+                            width: 170px;
+                            white-space: nowrap;
+                            text-align: right;
+                            font-weight: bold;
+                        }
 
-                    .col-date {
-                        width: 130px;
-                        white-space: nowrap;
-                    }
+                        .col-date {
+                            width: 130px;
+                            white-space: nowrap;
+                        }
 
-                    .col-action {
-                        width: 140px;
-                        white-space: nowrap;
-                    }
+                        .col-action {
+                            width: 140px;
+                            white-space: nowrap;
+                        }
+
+                        /* Ligne grisée pour une demande déjà payée */
+                        .table-achats tr.row-payee,
+                        table tr.row-payee {
+                            background-color: #f1f3f5 !important;
+                        }
+
+                        .table-achats tr.row-payee td,
+                        table tr.row-payee td {
+                            color: #6c757d;
+                        }
                     </style>
 
                     <!-- Tableau -->
@@ -532,11 +595,11 @@
                                     </th>
 
                                     <?php if ($this->session->userdata('role_id') == 1 || $this->session->userdata('role_id') == 2 || $this->session->userdata('role_id') == 3 || $this->session->userdata('role_id') == 4 || $this->session->userdata('role_id') == 7 || $this->session->userdata('role_id') == 24) { ?>
-                                    <th style="width:150px">
-                                        Validation
-                                    </th>
+                                        <th style="width:150px">
+                                            Validation
+                                        </th>
                                     <?php } else { ?>
-                                    <!-- # code... -->
+                                        <!-- # code... -->
                                     <?php } ?>
 
 
@@ -555,108 +618,123 @@
 
                                 <?php if (!empty($allAchats)) : ?>
 
-                                <?php $i = 1; ?>
-                                <?php foreach ($allAchats as $achat) : ?>
-
-                                <tr>
-                                    <td><?= $i++ ?></td>
-
-                                    <td>
-                                        <strong>DA-<?= date('Y', strtotime($achat->created_at)) ?>-<?= str_pad($achat->id, 3, '0', STR_PAD_LEFT) ?></strong>
-                                    </td>
-
-                                    <td>
-                                        <?= !empty($achat->destination_chantier) ? $achat->destination_chantier : $achat->destination_chantier ?>
-                                    </td>
-
-                                    <td><?= $achat->requested_by ?></td>
-
-                                    <td style="max-width:320px;">
-                                        <?= !empty($achat->articles_designation) ? $achat->articles_designation : 'Aucun article' ?>
-                                    </td>
-
-                                    <td class="text-right text-nowrap">
-                                        <strong>
-                                            <?= number_format($achat->total_amount, 0, ',', ' ') ?> BIF
-                                        </strong>
-                                    </td>
-
-                                    <td class="text-nowrap">
-                                        <?= !empty($achat->request_date) ? date('d/m/Y', strtotime($achat->request_date)) : date('d/m/Y', strtotime($achat->created_at)) ?>
-                                    </td>
-
-                                    <?php if ($this->session->userdata('role_id') == 1 || $this->session->userdata('role_id') == 2 || $this->session->userdata('role_id') == 3 || $this->session->userdata('role_id') == 4 || $this->session->userdata('role_id') == 7 || $this->session->userdata('role_id') == 24) { ?>
-                                    <td class="text-center text-nowrap">
-
-                                        <button type="button"
-                                            class="btn btn-xs <?= ($achat->technical_status == 'valide') ? 'btn-success' : 'btn-warning' ?>"
-                                            onclick="validerAchat(<?= $achat->id ?>, 'technical_status')">
-                                            DT
-                                        </button>
-
-                                        <button type="button"
-                                            class="btn btn-xs <?= ($achat->financial_status == 'valide') ? 'btn-success' : 'btn-warning' ?>"
-                                            onclick="validerAchat(<?= $achat->id ?>, 'financial_status')">
-                                            DAF
-                                        </button>
-
-                                        <button type="button"
-                                            class="btn btn-xs <?= ($achat->treasury_status == 'valide') ? 'btn-success' : 'btn-warning' ?>"
-                                            onclick="validerAchat(<?= $achat->id ?>, 'treasury_status')">
-                                            Trésorerie
-                                        </button>
-
-                                    </td>
-                                    <?php } else { ?>
-                                    <!-- # code... -->
-                                    <?php } ?>
-
-
-                                    <td class="text-center text-nowrap">
-                                        <?php if ($achat->workflow_status == 'brouillon') : ?>
-                                        <span class="badge badge-secondary">Brouillon</span>
-                                        <?php elseif ($achat->workflow_status == 'commandee' || $achat->workflow_status == 'commandée') : ?>
-                                        <span class="badge badge-warning">En approvisionnement</span>
-                                        <?php elseif ($achat->workflow_status == 'livre' || $achat->workflow_status == 'livré') : ?>
-                                        <span class="badge badge-primary">Livré</span>
-                                        <?php elseif ($achat->workflow_status == 'Valide' || $achat->workflow_status == 'Validé') : ?>
-                                        <span class="badge badge-success">Validé</span>
-                                        <?php else : ?>
-                                        <span class="badge badge-info"><?= ucfirst($achat->workflow_status) ?></span>
-                                        <?php endif; ?>
-                                    </td>
-
-                                    <td class="text-center text-nowrap">
-
-                                        <!-- Voir -->
-                                        <button class="btn btn-sm btn-info" title="Voir détail"
-                                            onclick="voirAchat(<?= $achat->id ?>)">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
+                                    <?php $i = 1; ?>
+                                    <?php foreach ($allAchats as $achat) : ?>
 
                                         <?php
+                                        /* Demande déjà payée en trésorerie
+                                       (visible seulement si include_payes = 1,
+                                        donc uniquement pour SUPER_ADMIN / ADMIN) */
+                                        $estPaye = (isset($achat->payment_status) && $achat->payment_status === 'paye');
+                                        ?>
+
+                                        <tr class="<?= $estPaye ? 'row-payee' : '' ?>">
+                                            <td><?= $i++ ?></td>
+
+                                            <td>
+                                                <strong>DA-<?= date('Y', strtotime($achat->created_at)) ?>-<?= str_pad($achat->id, 3, '0', STR_PAD_LEFT) ?></strong>
+                                            </td>
+
+                                            <td>
+                                                <?= !empty($achat->destination_chantier) ? $achat->destination_chantier : $achat->destination_chantier ?>
+                                            </td>
+
+                                            <td><?= $achat->requested_by ?></td>
+
+                                            <td style="max-width:320px;">
+                                                <?= !empty($achat->articles_designation) ? $achat->articles_designation : 'Aucun article' ?>
+                                            </td>
+
+                                            <td class="text-right text-nowrap">
+                                                <strong>
+                                                    <?= number_format($achat->total_amount, 0, ',', ' ') ?> BIF
+                                                </strong>
+                                            </td>
+
+                                            <td class="text-nowrap">
+                                                <?= !empty($achat->request_date) ? date('d/m/Y', strtotime($achat->request_date)) : date('d/m/Y', strtotime($achat->created_at)) ?>
+                                            </td>
+
+                                            <?php if ($this->session->userdata('role_id') == 1 || $this->session->userdata('role_id') == 2 || $this->session->userdata('role_id') == 3 || $this->session->userdata('role_id') == 4 || $this->session->userdata('role_id') == 7 || $this->session->userdata('role_id') == 24) { ?>
+                                                <td class="text-center text-nowrap">
+
+                                                    <button type="button"
+                                                        class="btn btn-xs <?= ($achat->technical_status == 'valide') ? 'btn-success' : 'btn-warning' ?>"
+                                                        onclick="validerAchat(<?= $achat->id ?>, 'technical_status')"
+                                                        <?= $estPaye ? 'disabled' : '' ?>>
+                                                        DT
+                                                    </button>
+
+                                                    <button type="button"
+                                                        class="btn btn-xs <?= ($achat->financial_status == 'valide') ? 'btn-success' : 'btn-warning' ?>"
+                                                        onclick="validerAchat(<?= $achat->id ?>, 'financial_status')"
+                                                        <?= $estPaye ? 'disabled' : '' ?>>
+                                                        DAF
+                                                    </button>
+
+                                                    <button type="button"
+                                                        class="btn btn-xs <?= ($achat->treasury_status == 'valide') ? 'btn-success' : 'btn-warning' ?>"
+                                                        onclick="validerAchat(<?= $achat->id ?>, 'treasury_status')"
+                                                        <?= $estPaye ? 'disabled' : '' ?>>
+                                                        Trésorerie
+                                                    </button>
+
+                                                </td>
+                                            <?php } else { ?>
+                                                <!-- # code... -->
+                                            <?php } ?>
+
+
+                                            <td class="text-center text-nowrap">
+                                                <?php if ($estPaye) : ?>
+                                                    <span class="badge badge-secondary">
+                                                        <i class="fas fa-check-circle mr-1"></i>
+                                                        Payé — effectué
+                                                    </span>
+                                                <?php elseif ($achat->workflow_status == 'brouillon') : ?>
+                                                    <span class="badge badge-secondary">Brouillon</span>
+                                                <?php elseif ($achat->workflow_status == 'commandee' || $achat->workflow_status == 'commandée') : ?>
+                                                    <span class="badge badge-warning">En approvisionnement</span>
+                                                <?php elseif ($achat->workflow_status == 'livre' || $achat->workflow_status == 'livré') : ?>
+                                                    <span class="badge badge-primary">Livré</span>
+                                                <?php elseif ($achat->workflow_status == 'Valide' || $achat->workflow_status == 'Validé') : ?>
+                                                    <span class="badge badge-success">Validé</span>
+                                                <?php else : ?>
+                                                    <span class="badge badge-info"><?= ucfirst($achat->workflow_status) ?></span>
+                                                <?php endif; ?>
+                                            </td>
+
+                                            <td class="text-center text-nowrap">
+
+                                                <!-- Voir (toujours disponible) -->
+                                                <button class="btn btn-sm btn-info" title="Voir détail"
+                                                    onclick="voirAchat(<?= $achat->id ?>)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+
+                                                <?php
                                                 $paymentVoucher = $this->tech->getPaymentVoucherByRequestId($achat->id);
                                                 ?>
 
-                                        <?php if (!empty($paymentVoucher)) : ?>
+                                                <?php if (!$estPaye) : ?>
 
-                                        <!-- Modifier le bon de paiement existant -->
-                                        <button type="button" class="btn btn-sm btn-warning"
-                                            title="Modifier le bon de paiement"
-                                            onclick="modifierBonPaiement(<?= (int) $paymentVoucher->id ?>)">
+                                                    <?php if (!empty($paymentVoucher)) : ?>
 
-                                            <i class="fas fa-file-invoice-dollar"></i>
-                                            <i class="fas fa-pen ml-1"></i>
+                                                        <!-- Modifier le bon de paiement existant -->
+                                                        <button type="button" class="btn btn-sm btn-warning"
+                                                            title="Modifier le bon de paiement"
+                                                            onclick="modifierBonPaiement(<?= (int) $paymentVoucher->id ?>)">
+                                                            <i class="fas fa-file-invoice-dollar"></i>
+                                                            <i class="fas fa-pen ml-1"></i>
+                                                        </button>
 
-                                        </button>
+                                                    <?php else : ?>
 
-                                        <?php else : ?>
-
-                                        <!-- Créer le bon de paiement -->
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                            title="Créer un bon de paiement" onclick='creerBonPaiement(
-                                                        <?= (int) $achat->id ?>,
-                                                        <?= json_encode(
+                                                        <!-- Créer le bon de paiement -->
+                                                        <button type="button" class="btn btn-sm btn-primary"
+                                                            title="Créer un bon de paiement" onclick='creerBonPaiement(
+                                                    <?= (int) $achat->id ?>,
+                                                    <?= json_encode(
                                                             $achat->articles_designation ?? '',
                                                             JSON_HEX_TAG |
                                                                 JSON_HEX_APOS |
@@ -666,55 +744,51 @@
                                                         ) ?>,
                                                     <?= json_encode((string) $achat->total_amount) ?>,
                                                     <?= json_encode(
-                                                        'DA-' .
-                                                            date('Y', strtotime($achat->created_at)) .
-                                                            '-' .
-                                                            str_pad($achat->id, 3, '0', STR_PAD_LEFT)
-                                                    ) ?>
+                                                            'DA-' .
+                                                                date('Y', strtotime($achat->created_at)) .
+                                                                '-' .
+                                                                str_pad($achat->id, 3, '0', STR_PAD_LEFT)
+                                                        ) ?>
                                                     )'>
+                                                            <i class="fas fa-file-invoice-dollar"></i>
+                                                        </button>
 
-                                            <i class="fas fa-file-invoice-dollar"></i>
+                                                    <?php endif; ?>
 
-                                        </button>
+                                                    <!-- Modifier -->
+                                                    <button class="btn btn-sm btn-warning" title="Modifier"
+                                                        onclick="modifierAchat(<?= $achat->id ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
 
-                                        <?php endif; ?>
+                                                    <!-- Supprimer -->
+                                                    <button class="btn btn-sm btn-danger" title="Supprimer"
+                                                        onclick="supprimerAchat(<?= $achat->id ?>)">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
 
+                                                <?php endif; ?>
 
-                                        <!-- Modifier -->
-                                        <button class="btn btn-sm btn-warning" title="Modifier"
-                                            onclick="modifierAchat(<?= $achat->id ?>)">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
+                                                <?php if (!empty($paymentVoucher)) : ?>
+                                                    <!-- Imprimer (toujours disponible) -->
+                                                    <button class="btn btn-sm btn-secondary" title="Imprimer"
+                                                        onclick="window.open('<?= base_url('tech/print-achat/' . $achat->id) ?>','_blank')">
+                                                        <i class="fas fa-print"></i>
+                                                    </button>
+                                                <?php endif; ?>
 
-                                        <!-- Supprimer -->
-                                        <button class="btn btn-sm btn-danger" title="Supprimer"
-                                            onclick="supprimerAchat(<?= $achat->id ?>)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                            </td>
+                                        </tr>
 
-                                        <?php if ($this->tech->getPaymentVoucherByRequestId($achat->id)) { ?>
-                                        <!-- Imprimer -->
-                                        <button class="btn btn-sm btn-secondary" title="Imprimer"
-                                            onclick="window.open('<?= base_url('tech/print-achat/' . $achat->id) ?>','_blank')">
-                                            <i class="fas fa-print"></i>
-                                        </button>
-                                        <?php } else { ?>
-                                        <!-- # code... -->
-                                        <?php } ?>
-
-
-                                    </td>
-                                </tr>
-
-                                <?php endforeach; ?>
+                                    <?php endforeach; ?>
 
                                 <?php else : ?>
 
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted">
-                                        Aucune demande d'achat trouvée.
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted">
+                                            Aucune demande d'achat trouvée.
+                                        </td>
+                                    </tr>
 
                                 <?php endif; ?>
 
@@ -726,46 +800,46 @@
 
                 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
                 <script>
-                function validerAchat(id, champ) {
-                    Swal.fire({
-                        title: 'Confirmation',
-                        text: 'Voulez-vous valider cette étape ?',
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonText: 'Oui, valider',
-                        cancelButtonText: 'Annuler',
-                        confirmButtonColor: '#28a745'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
+                    function validerAchat(id, champ) {
+                        Swal.fire({
+                            title: 'Confirmation',
+                            text: 'Voulez-vous valider cette étape ?',
+                            icon: 'question',
+                            showCancelButton: true,
+                            confirmButtonText: 'Oui, valider',
+                            cancelButtonText: 'Annuler',
+                            confirmButtonColor: '#28a745'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
 
-                            $.ajax({
-                                url: "<?= base_url('tech/valider-achat') ?>",
-                                type: "POST",
-                                data: {
-                                    id: id,
-                                    champ: champ
-                                },
-                                success: function(response) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'Validé',
-                                        text: 'Validation effectuée avec succès',
-                                        timer: 1200,
-                                        showConfirmButton: false
-                                    });
+                                $.ajax({
+                                    url: "<?= base_url('tech/valider-achat') ?>",
+                                    type: "POST",
+                                    data: {
+                                        id: id,
+                                        champ: champ
+                                    },
+                                    success: function(response) {
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: 'Validé',
+                                            text: 'Validation effectuée avec succès',
+                                            timer: 1200,
+                                            showConfirmButton: false
+                                        });
 
-                                    setTimeout(function() {
-                                        location.reload();
-                                    }, 1200);
-                                },
-                                error: function() {
-                                    Swal.fire('Erreur', 'Impossible de valider cette demande.',
-                                        'error');
-                                }
-                            });
-                        }
-                    });
-                }
+                                        setTimeout(function() {
+                                            location.reload();
+                                        }, 1200);
+                                    },
+                                    error: function() {
+                                        Swal.fire('Erreur', 'Impossible de valider cette demande.',
+                                            'error');
+                                    }
+                                });
+                            }
+                        });
+                    }
                 </script>
 
                 <div class="modal fade" id="modalModifierBonPaiement" tabindex="-1" role="dialog"
@@ -1048,111 +1122,111 @@
                 </div>
 
                 <script>
-                function modifierBonPaiement(id) {
-                    $.ajax({
+                    function modifierBonPaiement(id) {
+                        $.ajax({
 
-                        url: "<?= base_url('tech/get-bon-paiement/') ?>" + id,
+                            url: "<?= base_url('tech/get-bon-paiement/') ?>" + id,
 
-                        type: "GET",
+                            type: "GET",
 
-                        dataType: "json",
+                            dataType: "json",
 
-                        beforeSend: function() {
+                            beforeSend: function() {
 
-                            Swal.fire({
-                                title: 'Chargement...',
-                                text: 'Récupération du bon de paiement.',
-                                allowOutsideClick: false,
-                                didOpen: function() {
-                                    Swal.showLoading();
+                                Swal.fire({
+                                    title: 'Chargement...',
+                                    text: 'Récupération du bon de paiement.',
+                                    allowOutsideClick: false,
+                                    didOpen: function() {
+                                        Swal.showLoading();
+                                    }
+                                });
+
+                            },
+
+                            success: function(response) {
+
+                                Swal.close();
+
+                                if (!response.status || !response.bon) {
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Erreur',
+                                        text: response.message || 'Bon introuvable.'
+                                    });
+
+                                    return;
                                 }
-                            });
 
-                        },
+                                const bon = response.bon;
 
-                        success: function(response) {
+                                $('#edit_payment_voucher_id').val(bon.id);
 
-                            Swal.close();
+                                $('#edit_payment_request_id').val(bon.request_id);
 
-                            if (!response.status || !response.bon) {
+                                $('#edit_payment_summary').val(bon.summary);
+
+                                $('#edit_payment_mode').val(bon.payment_mode);
+
+                                $('#edit_amount_paid').val(bon.amount_paid);
+
+                                $('#edit_payment_reference').val(
+                                    bon.payment_reference
+                                );
+
+                                $('#edit_payment_date').val(
+                                    bon.payment_date
+                                );
+
+                                $('#edit_payment_status').val(
+                                    bon.payment_status
+                                );
+
+                                $('#edit_payment_observation').val(
+                                    bon.observation || ''
+                                );
+
+                                $('#edit_payment_number_display').text(
+                                    bon.payment_number || '-'
+                                );
+
+                                let referenceDemande =
+                                    'DA-' +
+                                    new Date(bon.request_created_at).getFullYear() +
+                                    '-' +
+                                    String(bon.request_id).padStart(3, '0');
+
+                                $('#edit_request_reference_display').text(
+                                    referenceDemande
+                                );
+
+                                $('#modalModifierBonPaiement').modal('show');
+                            },
+
+                            error: function(xhr) {
+
+                                Swal.close();
+
+                                let message =
+                                    'Impossible de récupérer le bon de paiement.';
+
+                                if (
+                                    xhr.responseJSON &&
+                                    xhr.responseJSON.message
+                                ) {
+                                    message = xhr.responseJSON.message;
+                                }
 
                                 Swal.fire({
                                     icon: 'error',
                                     title: 'Erreur',
-                                    text: response.message || 'Bon introuvable.'
+                                    text: message
                                 });
-
-                                return;
                             }
 
-                            const bon = response.bon;
-
-                            $('#edit_payment_voucher_id').val(bon.id);
-
-                            $('#edit_payment_request_id').val(bon.request_id);
-
-                            $('#edit_payment_summary').val(bon.summary);
-
-                            $('#edit_payment_mode').val(bon.payment_mode);
-
-                            $('#edit_amount_paid').val(bon.amount_paid);
-
-                            $('#edit_payment_reference').val(
-                                bon.payment_reference
-                            );
-
-                            $('#edit_payment_date').val(
-                                bon.payment_date
-                            );
-
-                            $('#edit_payment_status').val(
-                                bon.payment_status
-                            );
-
-                            $('#edit_payment_observation').val(
-                                bon.observation || ''
-                            );
-
-                            $('#edit_payment_number_display').text(
-                                bon.payment_number || '-'
-                            );
-
-                            let referenceDemande =
-                                'DA-' +
-                                new Date(bon.request_created_at).getFullYear() +
-                                '-' +
-                                String(bon.request_id).padStart(3, '0');
-
-                            $('#edit_request_reference_display').text(
-                                referenceDemande
-                            );
-
-                            $('#modalModifierBonPaiement').modal('show');
-                        },
-
-                        error: function(xhr) {
-
-                            Swal.close();
-
-                            let message =
-                                'Impossible de récupérer le bon de paiement.';
-
-                            if (
-                                xhr.responseJSON &&
-                                xhr.responseJSON.message
-                            ) {
-                                message = xhr.responseJSON.message;
-                            }
-
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Erreur',
-                                text: message
-                            });
-                        }
-
-                    });
-                }
+                        });
+                    }
                 </script>
 
                 <div class="modal fade" id="modalModifierAchat" tabindex="-1" role="dialog">
@@ -1181,7 +1255,7 @@
                                                 required>
                                                 <option value="">Sélectionner...</option>
                                                 <?php foreach ($allChantiers as $c) : ?>
-                                                <option value="<?= $c->id ?>"><?= $c->name ?></option>
+                                                    <option value="<?= $c->id ?>"><?= $c->name ?></option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -1267,47 +1341,47 @@
                 </div>
 
                 <script>
-                function modifierAchat(id) {
-                    $.ajax({
-                        url: "<?= base_url('tech/get-achat-materiel/') ?>" + id,
-                        type: "GET",
-                        dataType: "json",
-                        success: function(res) {
-                            let achat = res.achat;
-                            let items = res.items;
+                    function modifierAchat(id) {
+                        $.ajax({
+                            url: "<?= base_url('tech/get-achat-materiel/') ?>" + id,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(res) {
+                                let achat = res.achat;
+                                let items = res.items;
 
-                            $('#edit_id').val(achat.id);
-                            $('#edit_chantier_id').val(achat.chantier_id);
-                            $('#edit_demande_par').val(achat.requested_by);
-                            $('#edit_charge_achat').val(achat.buyer_name);
-                            $('#edit_verifie_par').val(achat.verified_by);
-                            $('#edit_total_general').val(achat.total_amount);
+                                $('#edit_id').val(achat.id);
+                                $('#edit_chantier_id').val(achat.chantier_id);
+                                $('#edit_demande_par').val(achat.requested_by);
+                                $('#edit_charge_achat').val(achat.buyer_name);
+                                $('#edit_verifie_par').val(achat.verified_by);
+                                $('#edit_total_general').val(achat.total_amount);
 
-                            console.log(achat.chantier_id);
+                                console.log(achat.chantier_id);
 
-                            $('#editArticlesTable tbody').html('');
+                                $('#editArticlesTable tbody').html('');
 
-                            if (items.length > 0) {
-                                items.forEach(function(item) {
-                                    addEditArticleRow(
-                                        item.designation,
-                                        item.quantity,
-                                        item.unit_price,
-                                        item.total_price,
-                                        item.observations
-                                    );
-                                });
-                            } else {
-                                addEditArticleRow();
+                                if (items.length > 0) {
+                                    items.forEach(function(item) {
+                                        addEditArticleRow(
+                                            item.designation,
+                                            item.quantity,
+                                            item.unit_price,
+                                            item.total_price,
+                                            item.observations
+                                        );
+                                    });
+                                } else {
+                                    addEditArticleRow();
+                                }
+
+                                $('#modalModifierAchat').modal('show');
                             }
+                        });
+                    }
 
-                            $('#modalModifierAchat').modal('show');
-                        }
-                    });
-                }
-
-                function addEditArticleRow(article = '', quantite = 1, prix = 0, total = 0, observations = '') {
-                    let row = `
+                    function addEditArticleRow(article = '', quantite = 1, prix = 0, total = 0, observations = '') {
+                        let row = `
                         <tr>
                             <td>
                                 <input type="text" name="article[]" class="form-control" value="${article}" required>
@@ -1338,88 +1412,88 @@
                         </tr>
                     `;
 
-                    $('#editArticlesTable tbody').append(row);
-                    calculerEditTotalGeneral();
-                }
-
-                function removeEditArticleRow(btn) {
-                    if ($('#editArticlesTable tbody tr').length > 1) {
-                        $(btn).closest('tr').remove();
+                        $('#editArticlesTable tbody').append(row);
                         calculerEditTotalGeneral();
                     }
-                }
 
-                function calculerEditLigne(input) {
-                    let tr = $(input).closest('tr');
+                    function removeEditArticleRow(btn) {
+                        if ($('#editArticlesTable tbody tr').length > 1) {
+                            $(btn).closest('tr').remove();
+                            calculerEditTotalGeneral();
+                        }
+                    }
 
-                    let quantite = parseFloat(tr.find('.edit_quantite').val()) || 0;
-                    let prix = parseFloat(tr.find('.edit_prix_unitaire').val()) || 0;
-                    let total = quantite * prix;
+                    function calculerEditLigne(input) {
+                        let tr = $(input).closest('tr');
 
-                    tr.find('.edit_total_ligne').val(total);
-                    calculerEditTotalGeneral();
-                }
+                        let quantite = parseFloat(tr.find('.edit_quantite').val()) || 0;
+                        let prix = parseFloat(tr.find('.edit_prix_unitaire').val()) || 0;
+                        let total = quantite * prix;
 
-                function calculerEditTotalGeneral() {
-                    let total = 0;
+                        tr.find('.edit_total_ligne').val(total);
+                        calculerEditTotalGeneral();
+                    }
 
-                    $('.edit_total_ligne').each(function() {
-                        total += parseFloat($(this).val()) || 0;
-                    });
+                    function calculerEditTotalGeneral() {
+                        let total = 0;
 
-                    $('#edit_total_general').val(total);
-                }
+                        $('.edit_total_ligne').each(function() {
+                            total += parseFloat($(this).val()) || 0;
+                        });
+
+                        $('#edit_total_general').val(total);
+                    }
                 </script>
 
 
                 <script>
-                function supprimerAchat(id) {
-                    Swal.fire({
-                        title: 'Supprimer la demande ?',
-                        text: "Cette action va supprimer la demande et tous ses articles.",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#dc3545',
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: 'Oui, supprimer',
-                        cancelButtonText: 'Annuler'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
+                    function supprimerAchat(id) {
+                        Swal.fire({
+                            title: 'Supprimer la demande ?',
+                            text: "Cette action va supprimer la demande et tous ses articles.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#dc3545',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Oui, supprimer',
+                            cancelButtonText: 'Annuler'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
 
-                            $.ajax({
-                                url: "<?= base_url('tech/delete-achat-materiel') ?>",
-                                type: "POST",
-                                dataType: "json",
-                                data: {
-                                    id: id
-                                },
-                                success: function(response) {
+                                $.ajax({
+                                    url: "<?= base_url('tech/delete-achat-materiel') ?>",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: {
+                                        id: id
+                                    },
+                                    success: function(response) {
 
-                                    if (response.status === 'success') {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'Supprimé',
-                                            text: 'La demande a été supprimée avec succès.',
-                                            timer: 1200,
-                                            showConfirmButton: false
-                                        });
+                                        if (response.status === 'success') {
+                                            Swal.fire({
+                                                icon: 'success',
+                                                title: 'Supprimé',
+                                                text: 'La demande a été supprimée avec succès.',
+                                                timer: 1200,
+                                                showConfirmButton: false
+                                            });
 
-                                        setTimeout(function() {
-                                            location.reload();
-                                        }, 1200);
+                                            setTimeout(function() {
+                                                location.reload();
+                                            }, 1200);
 
-                                    } else {
-                                        Swal.fire('Erreur', 'La suppression a échoué.', 'error');
+                                        } else {
+                                            Swal.fire('Erreur', 'La suppression a échoué.', 'error');
+                                        }
+                                    },
+                                    error: function() {
+                                        Swal.fire('Erreur', 'Impossible de supprimer cette demande.',
+                                            'error');
                                     }
-                                },
-                                error: function() {
-                                    Swal.fire('Erreur', 'Impossible de supprimer cette demande.',
-                                        'error');
-                                }
-                            });
-                        }
-                    });
-                }
+                                });
+                            }
+                        });
+                    }
                 </script>
 
                 <div class="modal fade" id="modalVoirAchat" tabindex="-1" role="dialog">
@@ -1517,36 +1591,36 @@
                 </div>
 
                 <script>
-                function voirAchat(id) {
-                    $.ajax({
-                        url: "<?= base_url('tech/get-achat-materiel/') ?>" + id,
-                        type: "GET",
-                        dataType: "json",
-                        success: function(res) {
+                    function voirAchat(id) {
+                        $.ajax({
+                            url: "<?= base_url('tech/get-achat-materiel/') ?>" + id,
+                            type: "GET",
+                            dataType: "json",
+                            success: function(res) {
 
-                            let achat = res.achat;
-                            let items = res.items;
+                                let achat = res.achat;
+                                let items = res.items;
 
-                            $('#view_reference').text('DA-' + new Date(achat.created_at).getFullYear() +
-                                '-' + String(achat.id).padStart(3, '0'));
-                            $('#view_chantier').text(achat.destination_chantier);
-                            $('#view_demande_par').text(achat.requested_by);
-                            $('#view_charge_achat').text(achat.buyer_name);
-                            $('#view_verifie_par').text(achat.verified_by);
-                            $('#view_date').text(formatDateFr(achat.request_date ?? achat.created_at));
+                                $('#view_reference').text('DA-' + new Date(achat.created_at).getFullYear() +
+                                    '-' + String(achat.id).padStart(3, '0'));
+                                $('#view_chantier').text(achat.destination_chantier);
+                                $('#view_demande_par').text(achat.requested_by);
+                                $('#view_charge_achat').text(achat.buyer_name);
+                                $('#view_verifie_par').text(achat.verified_by);
+                                $('#view_date').text(formatDateFr(achat.request_date ?? achat.created_at));
 
-                            $('#view_articles_body').html('');
+                                $('#view_articles_body').html('');
 
-                            let totalGeneral = 0;
+                                let totalGeneral = 0;
 
-                            if (items.length > 0) {
+                                if (items.length > 0) {
 
-                                items.forEach(function(item, index) {
+                                    items.forEach(function(item, index) {
 
-                                    let total = parseFloat(item.total_price) || 0;
-                                    totalGeneral += total;
+                                        let total = parseFloat(item.total_price) || 0;
+                                        totalGeneral += total;
 
-                                    $('#view_articles_body').append(`
+                                        $('#view_articles_body').append(`
                                             <tr>
                                                 <td>${index + 1}</td>
                                                 <td>${item.designation}</td>
@@ -1557,47 +1631,47 @@
                                                 <td>${item.designation}</td>
                                             </tr>
                                         `);
-                                });
+                                    });
 
-                            } else {
+                                } else {
 
-                                $('#view_articles_body').html(`
+                                    $('#view_articles_body').html(`
                                         <tr>
                                             <td colspan="6" class="text-center text-muted">
                                                 Aucun article trouvé.
                                             </td>
                                         </tr>
                                     `);
+                                }
+
+                                $('#view_total_general').html('<strong>' + formatMontant(totalGeneral) +
+                                    ' BIF</strong>');
+
+                                $('#modalVoirAchat').modal('show');
+                            },
+                            error: function() {
+                                Swal.fire('Erreur', 'Impossible de charger le détail de cette demande.',
+                                    'error');
                             }
-
-                            $('#view_total_general').html('<strong>' + formatMontant(totalGeneral) +
-                                ' BIF</strong>');
-
-                            $('#modalVoirAchat').modal('show');
-                        },
-                        error: function() {
-                            Swal.fire('Erreur', 'Impossible de charger le détail de cette demande.',
-                                'error');
-                        }
-                    });
-                }
-
-                function formatMontant(value) {
-                    value = parseFloat(value) || 0;
-                    return value.toLocaleString('fr-FR');
-                }
-
-                function formatDateFr(dateValue) {
-                    if (!dateValue) return '-';
-
-                    let date = new Date(dateValue);
-
-                    if (isNaN(date.getTime())) {
-                        return dateValue;
+                        });
                     }
 
-                    return date.toLocaleDateString('fr-FR');
-                }
+                    function formatMontant(value) {
+                        value = parseFloat(value) || 0;
+                        return value.toLocaleString('fr-FR');
+                    }
+
+                    function formatDateFr(dateValue) {
+                        if (!dateValue) return '-';
+
+                        let date = new Date(dateValue);
+
+                        if (isNaN(date.getTime())) {
+                            return dateValue;
+                        }
+
+                        return date.toLocaleDateString('fr-FR');
+                    }
                 </script>
 
                 <!-- Modal Bon de paiement -->
@@ -1853,41 +1927,43 @@
                 </div>
 
                 <script>
-                function creerBonPaiement(id, synthese, montant, referenceDemande) {
-                    let montantNumerique = parseFloat(montant) || 0;
+                    function creerBonPaiement(id, synthese, montant, referenceDemande) {
+                        let montantNumerique = parseFloat(montant) || 0;
 
-                    $('#payment_request_id').val(id);
+                        $('#payment_request_id').val(id);
 
-                    $('#payment_summary').val(
-                        synthese && synthese.trim() !== '' ?
-                        synthese :
-                        'Paiement lié à la demande ' + referenceDemande
-                    );
+                        $('#payment_summary').val(
+                            synthese && synthese.trim() !== '' ?
+                            synthese :
+                            'Paiement lié à la demande ' + referenceDemande
+                        );
 
-                    $('#payment_amount').val(montantNumerique.toFixed(2));
+                        $('#payment_amount').val(montantNumerique.toFixed(2));
 
-                    $('#payment_request_reference').text(referenceDemande);
+                        $('#payment_request_reference').text(referenceDemande);
 
-                    $('#payment_request_amount_display').text(
-                        montantNumerique.toLocaleString('fr-FR') + ' BIF'
-                    );
+                        $('#payment_request_amount_display').text(
+                            montantNumerique.toLocaleString('fr-FR') + ' BIF'
+                        );
 
-                    /*
-                     * Réinitialiser les champs spécifiques au paiement
-                     */
-                    $('#payment_mode').val('');
-                    $('#payment_reference').val('');
-                    $('#payment_observation').val('');
-                    $('#payment_date').val('<?= date('Y-m-d') ?>');
+                        /*
+                         * Réinitialiser les champs spécifiques au paiement
+                         */
+                        $('#payment_mode').val('');
+                        $('#payment_reference').val('');
+                        $('#payment_observation').val('');
+                        $('#payment_date').val('<?= date('Y-m-d') ?>');
 
-                    $('#modalBonPaiement').modal('show');
-                }
+                        $('#modalBonPaiement').modal('show');
+                    }
                 </script>
 
-                <div class="card-footer clearfix">
+                <!-- <div class="card-footer clearfix">
                     <div class="float-left">
                         <small class="text-muted">
-                            Liste des demandes validées et prêtes pour l’achat ou l’approvisionnement.
+                            Liste des demandes validées et prêtes pour l'achat ou l'approvisionnement.
+                            Les demandes déjà payées en trésorerie sont masquées par défaut
+                            (consultation réservée au Super Admin / Administrateur).
                         </small>
                     </div>
 
@@ -1898,7 +1974,7 @@
                         <li class="page-item"><a class="page-link" href="#">3</a></li>
                         <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
                     </ul>
-                </div>
+                </div> -->
 
             </div>
 

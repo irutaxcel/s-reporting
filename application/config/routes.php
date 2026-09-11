@@ -57,9 +57,15 @@ $route['sign-in'] = 'Authentication';
 $route['auth-login'] = 'Authentication/authlogin';
 $route['auth-logout'] = 'Authentication/logout';
 
+$route['dashboard'] = 'DashboardController/mainDashboard';
+
 $route['main-dashboard'] = 'DashboardController/mainDashboard';
 
 $route['synthese-demandes'] = 'Dgcontroller/syntheseDemandes';
+$route['direction-archives'] = 'Dgcontroller/directionArchives';
+
+$route['direction-relation-publique'] = 'Dgcontroller/directionRelationPublique';
+$route['save-relations-publique'] = 'Dgcontroller/saveRelationsPublique';
 
 // Route pour mettre à jour le montant autorisé
 $route['direction/update-montant-autorise'] = 'Dgcontroller/updateMontantAutorise';
@@ -264,7 +270,8 @@ $route['rh-mouvements-store'] = 'RhController/mouvements_store';
 
 $route['rh-registre'] = 'RhController/rhRegistre';
 
-$route['rh-presences'] = 'RhController/rhPresences';
+$route['rh-presences']       = 'RhController/rhPresences';
+$route['rh-presences-store'] = 'RhController/presences_store';
 
 $route['rh-conges']       = 'RhController/rhConges';
 $route['rh-conges-store'] = 'RhController/conges_store';
@@ -289,6 +296,17 @@ $route['facture-client'] = 'FinanceController/factureClient';
 $route['facture-fournisseur'] = 'FinanceController/factureFournisseur';
 $route['paiement'] = 'FinanceController/paiement';
 $route['echeances'] = 'FinanceController/echeances';
+
+$route['crm-dashboard'] = 'CrmController/index';
+
+$route['crm-clients'] = 'CrmController/clients';
+
+
+$route['crm-projets'] = 'CrmController/projets';
+
+$route['crm-chantiers'] = 'CrmController/chantiers';
+
+$route['crm-reporting'] = 'CrmController/reporting';
 
 
 $route['users'] = 'AdminController/users';

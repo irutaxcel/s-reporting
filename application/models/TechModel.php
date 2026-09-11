@@ -188,6 +188,52 @@ class TechModel extends CI_Model
     //     return $this->db->get()->result();
     // }
 
+    /**
+     * ============================================================
+     * EXCLUSION DES DEMANDES DÉJÀ PAYÉES EN TRÉSORERIE
+     *
+     * Une demande est considérée comme "déjà effectuée" si :
+     *  - prf.payment_status = 'paye'
+     *  - OU il existe un mouvement de trésorerie validé
+     *    (tbl_finance_mouvement_secondaire :
+     *     nature = 'paiement_da', sens = 'sortie', status = 'validated')
+     * ============================================================
+     */
+    private function _excludeDejaPayees()
+    {
+        // 1) payment_status différent de 'paye' (ou NULL)
+        $this->db->where(
+            "(prf.payment_status IS NULL OR prf.payment_status <> 'paye')",
+            null,
+            false
+        );
+
+        // 2) aucun mouvement de paiement validé en trésorerie
+        $this->db->where(
+            "NOT EXISTS (
+                SELECT 1
+                FROM tbl_finance_mouvement_secondaire fms
+                WHERE fms.purchase_request_id = prf.id
+                  AND fms.nature = 'paiement_da'
+                  AND fms.sens   = 'sortie'
+                  AND fms.status = 'validated'
+            )",
+            null,
+            false
+        );
+    }
+
+    /**
+     * Applique (ou non) l'exclusion des demandes déjà payées.
+     * $filters['include_payes'] = true  => on les affiche quand même
+     */
+    private function _applyPayesFilter($filters)
+    {
+        if (empty($filters['include_payes'])) {
+            $this->_excludeDejaPayees();
+        }
+    }
+
     public function getAllAchats($filters = [])
     {
         $this->db->select("
@@ -231,6 +277,12 @@ class TechModel extends CI_Model
             }
             // Sinon (rôle privilégié) : pas de filtre → voit tout
         }
+
+        /*
+        * NOUVEAU : masquer les demandes déjà payées en trésorerie
+        * (sauf si le filtre "include_payes" est activé)
+        */
+        $this->_applyPayesFilter($filters);
 
         /*
         * Filtre chantier
@@ -286,12 +338,62 @@ class TechModel extends CI_Model
     }
 
     /**
-     * Compter les demandes validées
+     * Compteur aligné sur la liste :
+     * demandes validées NON encore payées en trésorerie
      */
     public function countDemandesValidees($filters = [])
     {
         $this->db->where('workflow_status', 'Validé');
+
+        // Exclusion des déjà payées (même logique que la liste)
+        if (empty($filters['include_payes'])) {
+            $this->db->where("(payment_status IS NULL OR payment_status <> 'paye')", null, false);
+            $this->db->where(
+                "NOT EXISTS (
+                    SELECT 1
+                    FROM tbl_finance_mouvement_secondaire fms
+                    WHERE fms.purchase_request_id = purchase_request_forms.id
+                    AND fms.nature = 'paiement_da'
+                    AND fms.sens   = 'sortie'
+                    AND fms.status = 'validated'
+                )",
+                null,
+                false
+            );
+        }
+
         $this->_applyUserFilter($filters);
+
+        return $this->db->count_all_results('purchase_request_forms');
+    }
+
+    /**
+     * NOUVEAU : nombre de demandes déjà payées (masquées par défaut).
+     * Utile pour afficher un petit badge d'information dans la vue.
+     */
+    public function countDejaPayees($filters = [])
+    {
+        $this->_applyUserFilter($filters);
+
+        $this->db->group_start();
+
+        $this->db->where('payment_status', 'paye');
+
+        $this->db->or_where(
+            "EXISTS (
+                    SELECT 1
+                    FROM tbl_finance_mouvement_secondaire fms
+                    WHERE fms.purchase_request_id = purchase_request_forms.id
+                      AND fms.nature = 'paiement_da'
+                      AND fms.sens   = 'sortie'
+                      AND fms.status = 'validated'
+                )",
+            null,
+            false
+        );
+
+        $this->db->group_end();
+
         return $this->db->count_all_results('purchase_request_forms');
     }
 

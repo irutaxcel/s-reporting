@@ -716,7 +716,7 @@
 
         @page {
             size: A4 portrait;
-            margin: 5mm;
+            margin: 6mm 7mm;
         }
 
         html,
@@ -728,70 +728,91 @@
 
         .print-actions {
             display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
         }
+
+        /* La page : les marges viennent uniquement de @page */
 
         .print-page {
             width: 100% !important;
             max-width: 100% !important;
-            min-height: auto !important;
+            min-height: 0 !important;
             margin: 0 !important;
-            padding: 5mm 7mm !important;
+            padding: 0 !important;
             border: none !important;
             color: #000 !important;
+            overflow: visible !important;
+        }
+
+        /* Tolérance aux coupures : plus jamais de grande page vide */
+
+        .payment-split,
+        .split-col,
+        .fund-body {
+            break-inside: auto !important;
+        }
+
+        tr,
+        .validation-box,
+        .signature-grid,
+        .payment-summary-stack,
+        .payment-signatures,
+        .fund-report-sign-grid {
+            break-inside: avoid;
+        }
+
+        thead {
+            display: table-header-group;
         }
 
         /* EN-TÊTE */
 
         .header {
-            margin-bottom: 10px !important;
-            padding-bottom: 8px !important;
+            margin-bottom: 8px !important;
+            padding-bottom: 6px !important;
             border-bottom: 3px solid #000 !important;
         }
 
         .logo-box {
-            width: 52px !important;
-            height: 52px !important;
-            flex-basis: 52px !important;
+            width: 48px !important;
+            height: 48px !important;
+            flex-basis: 48px !important;
             border: 1.5px solid #000 !important;
         }
 
         .logo-box img {
-            width: 47px !important;
-            height: 47px !important;
+            width: 43px !important;
+            height: 43px !important;
         }
 
         .company-title h2 {
-            font-size: 18px !important;
+            font-size: 17px !important;
             font-weight: 800 !important;
             color: #000 !important;
         }
 
         .company-title p {
-            font-size: 11px !important;
+            font-size: 10.5px !important;
             color: #000 !important;
         }
 
         .company-info {
-            font-size: 10.5px !important;
-            line-height: 1.45 !important;
+            font-size: 10px !important;
+            line-height: 1.4 !important;
             color: #000 !important;
         }
 
         /* TITRE DEMANDE */
 
         .document-title {
-            margin: 10px 0 11px !important;
+            margin: 8px 0 9px !important;
         }
 
         .document-title h1 {
-            padding: 6px 24px !important;
+            padding: 5px 20px !important;
             border: 2px solid #000 !important;
             color: #000 !important;
             background: #fff !important;
-            font-size: 18px !important;
+            font-size: 16px !important;
             font-weight: 800 !important;
             letter-spacing: 1px !important;
         }
@@ -799,48 +820,48 @@
         /* INFORMATIONS DE LA DEMANDE */
 
         .info-grid {
-            gap: 5px 16px !important;
-            margin-bottom: 9px !important;
+            gap: 4px 14px !important;
+            margin-bottom: 7px !important;
         }
 
         .info-item {
-            padding: 4px 0 !important;
+            padding: 3px 0 !important;
             border-bottom: 1.5px solid #000 !important;
             color: #000 !important;
-            font-size: 11.5px !important;
-            line-height: 1.35 !important;
+            font-size: 11px !important;
+            line-height: 1.3 !important;
         }
 
         .info-label {
-            width: 120px !important;
+            width: 110px !important;
             max-width: 48% !important;
             color: #000 !important;
-            font-size: 11.5px !important;
+            font-size: 11px !important;
             font-weight: 800 !important;
         }
 
         /* CIRCUIT DE VALIDATION */
 
         .validation-box {
-            margin: 8px 0 9px !important;
-            padding: 8px !important;
+            margin: 6px 0 8px !important;
+            padding: 6px !important;
             border: 1.5px solid #000 !important;
             background: #fff !important;
         }
 
         .validation-title {
-            margin-bottom: 6px !important;
+            margin-bottom: 5px !important;
             color: #000 !important;
-            font-size: 11.5px !important;
+            font-size: 11px !important;
             font-weight: 800 !important;
         }
 
         .validation-badge {
-            padding: 4px 7px !important;
+            padding: 3px 6px !important;
             border: 1.5px solid #000 !important;
             color: #000 !important;
             background: #fff !important;
-            font-size: 10.5px !important;
+            font-size: 10px !important;
             font-weight: 700 !important;
         }
 
@@ -854,134 +875,132 @@
         /* TABLEAU DES ARTICLES */
 
         .items-table {
-            margin-top: 6px !important;
+            margin-top: 5px !important;
             border: 1.5px solid #000 !important;
             color: #000 !important;
-            font-size: 11px !important;
+            font-size: 10.5px !important;
         }
 
         .items-table th {
-            padding: 5px !important;
+            padding: 4px 5px !important;
             border: 1.5px solid #000 !important;
             background: #fff !important;
             color: #000 !important;
-            font-size: 11px !important;
+            font-size: 10.5px !important;
             font-weight: 800 !important;
         }
 
         .items-table td {
-            padding: 5px !important;
+            padding: 4px 5px !important;
             border: 1.5px solid #000 !important;
             color: #000 !important;
-            font-size: 11px !important;
-            line-height: 1.3 !important;
+            font-size: 10.5px !important;
+            line-height: 1.25 !important;
         }
 
         .total-row td {
             border: 1.5px solid #000 !important;
             background: #fff !important;
             color: #000 !important;
-            font-size: 11.5px !important;
+            font-size: 11px !important;
             font-weight: 800 !important;
         }
 
         /* NOTES */
 
         .notes-box {
-            margin-top: 7px !important;
-            padding: 7px !important;
+            margin-top: 6px !important;
+            padding: 6px !important;
             border: 1.5px solid #000 !important;
             color: #000 !important;
-            font-size: 11px !important;
+            font-size: 10.5px !important;
         }
 
         /* SIGNATURES DE LA DEMANDE */
 
         .signature-section {
-            margin-top: 14px !important;
+            margin-top: 10px !important;
         }
 
         .signature-title {
-            margin-bottom: 7px !important;
+            margin-bottom: 6px !important;
             color: #000 !important;
-            font-size: 12.5px !important;
+            font-size: 12px !important;
             font-weight: 800 !important;
         }
 
         .signature-grid {
             grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-            gap: 8px !important;
+            gap: 7px !important;
         }
 
         .signature-box {
-            height: 80px !important;
-            padding: 7px !important;
+            height: 66px !important;
+            padding: 6px !important;
             border: 1.5px solid #000 !important;
             color: #000 !important;
             background: #fff !important;
         }
 
         .signature-box .title {
-            margin-bottom: 6px !important;
+            margin-bottom: 5px !important;
             color: #000 !important;
-            font-size: 10.5px !important;
+            font-size: 10px !important;
             font-weight: 800 !important;
         }
 
         .signature-box .function {
             color: #000 !important;
-            font-size: 10px !important;
-            line-height: 1.3 !important;
+            font-size: 9.5px !important;
+            line-height: 1.25 !important;
         }
 
-        /* ======================================================
-               DEUX PANNEAUX : 60% BON DE PAIEMENT | 40% RAPPORT
-            ====================================================== */
+        /* DEUX PANNEAUX 60/40 */
 
         .payment-divider-line {
-            height: 3px !important;
-            margin-top: 12px !important;
-            margin-bottom: 8px !important;
+            height: 2px !important;
+            margin-top: 10px !important;
+            margin-bottom: 6px !important;
             background: #000 !important;
         }
 
         .payment-split {
             grid-template-columns: minmax(0, 6fr) minmax(0, 4fr) !important;
-            gap: 8px !important;
+            gap: 7px !important;
         }
 
         .split-col {
-            padding: 6px !important;
+            padding: 5px !important;
             border: 1.5px solid #000 !important;
             background: #fff !important;
             color: #000 !important;
         }
 
         .split-title {
-            margin-bottom: 6px !important;
+            margin-bottom: 5px !important;
         }
 
         .split-title span {
-            padding: 4px 10px !important;
+            padding: 3px 8px !important;
             border: 2px solid #000 !important;
             color: #000 !important;
             background: #fff !important;
-            font-size: 11px !important;
+            font-size: 10.5px !important;
             font-weight: 800 !important;
             letter-spacing: .5px !important;
         }
 
-        /* --- Panneau bon de paiement (60%) --- */
+        /* --- Panneau bon de paiement --- */
 
         .payment-summary-stack {
             gap: 0 !important;
-            margin-bottom: 6px !important;
+            margin-bottom: 5px !important;
             border: 1.5px solid #000 !important;
         }
 
         .payment-summary {
-            min-height: 40px !important;
-            padding: 5px 7px !important;
+            min-height: 34px !important;
+            padding: 4px 6px !important;
             border: none !important;
             background: #fff !important;
             color: #000 !important;
@@ -993,54 +1012,54 @@
 
         .payment-summary-label {
             color: #000 !important;
-            font-size: 9.5px !important;
+            font-size: 9px !important;
             font-weight: 800 !important;
         }
 
         .payment-summary-value {
             color: #000 !important;
-            font-size: 11px !important;
+            font-size: 10.5px !important;
         }
 
         .payment-info-grid {
-            gap: 3px !important;
+            gap: 2px !important;
         }
 
         .payment-info-item {
-            padding: 3px 0 !important;
+            padding: 2.5px 0 !important;
             border-bottom: 1.5px solid #000 !important;
             color: #000 !important;
-            font-size: 10px !important;
-            line-height: 1.3 !important;
+            font-size: 9.5px !important;
+            line-height: 1.25 !important;
         }
 
         .payment-info-label {
-            width: 115px !important;
+            width: 105px !important;
             max-width: 55% !important;
             color: #000 !important;
-            font-size: 10px !important;
+            font-size: 9.5px !important;
             font-weight: 800 !important;
         }
 
         .payment-amount {
             color: #000 !important;
-            font-size: 12px !important;
+            font-size: 11px !important;
             font-weight: 800 !important;
         }
 
         .payment-observation {
-            min-height: 30px !important;
-            margin-top: 5px !important;
-            padding: 5px !important;
+            min-height: 26px !important;
+            margin-top: 4px !important;
+            padding: 4px !important;
             border: 1.5px solid #000 !important;
             color: #000 !important;
             background: #fff !important;
-            font-size: 10px !important;
+            font-size: 9.5px !important;
         }
 
         .payment-signatures {
-            gap: 5px !important;
-            margin-top: 6px !important;
+            gap: 4px !important;
+            margin-top: 5px !important;
         }
 
         .payment-signature-box {
@@ -1049,37 +1068,36 @@
         }
 
         .payment-signature-box .box-head {
-            padding: 3px 4px !important;
+            padding: 2px 3px !important;
             border-bottom: 1.5px solid #000 !important;
             background: #fff !important;
             color: #000 !important;
-            font-size: 9px !important;
+            font-size: 8.5px !important;
             font-weight: 800 !important;
         }
 
         .payment-signature-box .box-head .function {
             color: #000 !important;
-            font-size: 8.5px !important;
+            font-size: 8px !important;
         }
 
         .payment-signature-box .sign-area {
-            min-height: 32px !important;
+            min-height: 26px !important;
         }
 
-        /* --- Panneau rapport (40%) :
-                   3 rectangles pleine largeur qui remplissent l'espace --- */
+        /* --- Panneau rapport --- */
 
         .fund-amount-item {
-            margin-bottom: 7px !important;
-            padding: 3px 0 !important;
+            margin-bottom: 5px !important;
+            padding: 2px 0 !important;
             border-bottom: 1.5px solid #000 !important;
             color: #000 !important;
-            font-size: 10px !important;
+            font-size: 9.5px !important;
         }
 
         .fund-report-row {
-            margin-bottom: 8px !important;
-            font-size: 10px !important;
+            margin-bottom: 6px !important;
+            font-size: 9.5px !important;
         }
 
         .fund-report-row .label {
@@ -1088,45 +1106,45 @@
         }
 
         .fund-report-row .fill {
-            height: 11px !important;
+            height: 10px !important;
             border-bottom: 1.5px dotted #000 !important;
         }
 
         .fund-report-row .unit {
             color: #000 !important;
-            font-size: 9.5px !important;
+            font-size: 9px !important;
             font-weight: 800 !important;
         }
 
         .fund-report-sign-grid {
             grid-template-columns: 1fr !important;
             grid-template-rows: repeat(3, 1fr) !important;
-            gap: 6px !important;
-            padding-top: 6px !important;
+            gap: 5px !important;
+            padding-top: 4px !important;
         }
 
         .fund-sign-box {
-            min-height: 34px !important;
-            padding: 4px 5px !important;
+            min-height: 28px !important;
+            padding: 3px 4px !important;
             border: 1.5px solid #000 !important;
             background: #fff !important;
         }
 
         .fund-sign-box .caption {
             color: #000 !important;
-            font-size: 8.5px !important;
+            font-size: 8px !important;
             font-weight: 800 !important;
         }
 
         /* PIED DE PAGE */
 
         .footer {
-            margin-top: 8px !important;
-            padding-top: 5px !important;
+            margin-top: 6px !important;
+            padding-top: 4px !important;
             border-top: 2px solid #000 !important;
             color: #000 !important;
-            font-size: 8.5px !important;
-            line-height: 1.3 !important;
+            font-size: 8px !important;
+            line-height: 1.25 !important;
         }
     }
     </style>

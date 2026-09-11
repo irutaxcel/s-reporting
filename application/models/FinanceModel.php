@@ -10221,13 +10221,32 @@ class FinanceModel extends CI_Model
         return $table;
     }
 
-    /** Mouvements paginés du livre */
+    // /** Mouvements paginés du livre */
+    // public function getLivreMovements($role, $dateFrom = null, $dateTo = null, $search = '', $limit = 15, $offset = 0)
+    // {
+    //     $this->db->select('*');
+    //     $this->applyLivreWhere($role, $dateFrom, $dateTo, $search);
+    //     $this->db->order_by('movement_date', 'DESC');
+    //     $this->db->order_by('id', 'DESC');
+    //     $this->db->limit($limit, $offset);
+
+    //     return $this->db->get()->result();
+    // }
+
+    /**
+     * =====================================================
+     * MOUVEMENTS PAGINÉS DU LIVRE (ordre chronologique ASC)
+     * =====================================================
+     */
     public function getLivreMovements($role, $dateFrom = null, $dateTo = null, $search = '', $limit = 15, $offset = 0)
     {
         $this->db->select('*');
         $this->applyLivreWhere($role, $dateFrom, $dateTo, $search);
-        $this->db->order_by('movement_date', 'DESC');
-        $this->db->order_by('id', 'DESC');
+
+        /* ✅ Ordre croissant : du plus ancien au plus récent */
+        $this->db->order_by('movement_date', 'ASC');
+        $this->db->order_by('id', 'ASC');
+
         $this->db->limit($limit, $offset);
 
         return $this->db->get()->result();

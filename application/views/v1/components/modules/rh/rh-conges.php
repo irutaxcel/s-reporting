@@ -1,28 +1,25 @@
-<!-- Content Wrapper. Contains page content -->
+<!-- Content Wrapper -->
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0"><?= $title ?></h1>
-                </div><!-- /.col -->
+                </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active"><?= $title ?></li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /.content-header -->
 
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
 
-            <!-- ============ STYLE LOCAL (page congés) ============ -->
+            <!-- ============ STYLE LOCAL ============ -->
             <style>
             .section-title {
                 color: #1f7a5c;
@@ -54,6 +51,89 @@
             }
             </style>
 
+            <!-- ============ CALCULS ============ -->
+            <?php
+            $couleurs = ['#1f7a5c', '#2c8a69', '#34608c', '#7a4f1f', '#8a3033', '#6c757d'];
+            $auj    = date('Y-m-d');
+            $plus60 = date('Y-m-d', strtotime('+60 days'));
+            $jours_fr = ['Sunday' => 'Dimanche', 'Monday' => 'Lundi', 'Tuesday' => 'Mardi', 'Wednesday' => 'Mercredi', 'Thursday' => 'Jeudi', 'Friday' => 'Vendredi', 'Saturday' => 'Samedi'];
+
+            $reprise = function ($fin) use ($jours_fr) {
+                $t = strtotime($fin . ' +1 day');
+                return $jours_fr[date('l', $t)] . ' ' . date('d/m', $t);
+            };
+            $avancement = function ($debut, $fin) use ($auj) {
+                $total = max(1, (int) ((strtotime($fin) - strtotime($debut)) / 86400) + 1);
+                $fait  = min($total, max(0, (int) ((strtotime($auj) - strtotime($debut)) / 86400) + 1));
+                return (int) round($fait / $total * 100);
+            };
+
+            /* Employés actifs + droits 2026 */
+            $actifs = [];
+            $nb_actifs = 0;
+            $total_droits = 0;
+            $droits = [];
+            foreach ($employes as $e) {
+                if ($e->statut === 'Fin de contrat') continue;
+                $actifs[$e->employe_id] = $e;
+                $nb_actifs++;
+                $mois  = max(0, (int) ((strtotime($auj) - strtotime($e->date_embauche)) / 2592000));
+                $ans   = (int) floor($mois / 12);
+                $droit = ($ans < 1) ? (int) round($mois * 1.67) : 20 + (int) floor($ans / 4);
+                $droits[$e->employe_id] = ['ans' => $ans, 'mois' => $mois, 'droit' => $droit];
+                $total_droits += $droit;
+            }
+
+            /* Agrégats des congés */
+            $en_conge_auj = [];
+            $nb_attente = 0;
+            $jours_pris = 0;
+            $pris_par = [];
+            $encours_par = [];
+            foreach ($conges as $c) {
+                if ($c->statut !== 'Rejeté' && $c->date_debut <= $auj && $c->date_fin >= $auj) $en_conge_auj[] = $c;
+                if ($c->statut === 'En attente') $nb_attente++;
+                if ($c->statut === 'Approuvé' && substr($c->date_debut, 0, 4) === date('Y')) {
+                    $jours_pris += (int) $c->jours_ouvres;
+                    if ($c->date_fin < $auj) $pris_par[$c->employe_id] = (isset($pris_par[$c->employe_id]) ? $pris_par[$c->employe_id] : 0) + (int) $c->jours_ouvres;
+                    else                     $encours_par[$c->employe_id] = (isset($encours_par[$c->employe_id]) ? $encours_par[$c->employe_id] : 0) + (int) $c->jours_ouvres;
+                }
+            }
+
+            /* Planning 60 jours + conflits (chevauchement même site) */
+            $planning = [];
+            foreach ($conges as $c) {
+                if ($c->statut === 'Rejeté') continue;
+                if ($c->date_fin >= $auj && $c->date_debut <= $plus60) $planning[] = $c;
+            }
+            usort($planning, function ($a, $b) {
+                return strcmp($a->date_debut, $b->date_debut);
+            });
+
+            $conflits = [];
+            for ($i = 0; $i < count($planning); $i++) {
+                for ($j = $i + 1; $j < count($planning); $j++) {
+                    $a = $planning[$i];
+                    $b = $planning[$j];
+                    if ($a->employe_id == $b->employe_id) continue;
+                    $ea = isset($actifs[$a->employe_id]) ? $actifs[$a->employe_id] : NULL;
+                    $eb = isset($actifs[$b->employe_id]) ? $actifs[$b->employe_id] : NULL;
+                    if (
+                        $ea && $eb && $ea->site_affectation === $eb->site_affectation
+                        && $a->date_debut <= $b->date_fin && $b->date_debut <= $a->date_fin
+                    ) {
+                        $conflits[] = [$a, $b, $ea->site_affectation];
+                    }
+                }
+            }
+
+            /* Noms (remplaçants) */
+            $noms = [];
+            foreach ($employes as $e) $noms[$e->employe_id] = $e->prenoms . ' ' . mb_strtoupper($e->nom);
+
+            $badge_type = ['Congé annuel' => 'info', 'Maladie' => 'warning', 'Maternité' => 'primary', 'Circonstance' => 'primary', 'Sans solde' => 'secondary'];
+            ?>
+
             <!-- ============ 1. INDICATEURS ============ -->
             <div class="row">
                 <div class="col-lg-3 col-6">
@@ -61,8 +141,8 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-umbrella-beach"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">En congé aujourd'hui</span>
-                            <span class="info-box-number">3</span>
-                            <span class="progress-description">Sur 55 actifs</span>
+                            <span class="info-box-number"><?= count($en_conge_auj) ?></span>
+                            <span class="progress-description">Sur <?= $nb_actifs ?> actifs</span>
                         </div>
                     </div>
                 </div>
@@ -71,7 +151,7 @@
                         <span class="info-box-icon bg-warning"><i class="fas fa-hourglass-half"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Demandes en attente</span>
-                            <span class="info-box-number">3</span>
+                            <span class="info-box-number"><?= $nb_attente ?></span>
                             <span class="progress-description">À traiter cette semaine</span>
                         </div>
                     </div>
@@ -80,9 +160,10 @@
                     <div class="info-box">
                         <span class="info-box-icon bg-success"><i class="fas fa-calendar-check"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Jours pris (2026)</span>
-                            <span class="info-box-number">148</span>
-                            <span class="progress-description">Sur 1 155 jours de droits</span>
+                            <span class="info-box-text">Jours pris (<?= date('Y') ?>)</span>
+                            <span class="info-box-number"><?= $jours_pris ?></span>
+                            <span class="progress-description">Sur <?= number_format($total_droits, 0, '', ' ') ?> jours
+                                de droits</span>
                         </div>
                     </div>
                 </div>
@@ -91,14 +172,14 @@
                         <span class="info-box-icon bg-danger"><i class="fas fa-exclamation-triangle"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Conflits de planning</span>
-                            <span class="info-box-number">1</span>
-                            <span class="progress-description">Chevauchement Ngagara II</span>
+                            <span class="info-box-number"><?= count($conflits) ?></span>
+                            <span class="progress-description">Chevauchements même site (60 j)</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============ 2. RAPPEL LÉGAL + EN CONGÉ AUJOURD'HUI ============ -->
+            <!-- ============ 2. RÈGLES + EN CONGÉ AUJOURD'HUI ============ -->
             <div class="row">
                 <div class="col-lg-4">
                     <div class="card legal-note">
@@ -123,7 +204,7 @@
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title mb-0"><i class="fas fa-umbrella-beach mr-1 text-success"></i> En congé
-                                aujourd'hui (21/08/2026)</h3>
+                                aujourd'hui (<?= date('d/m/Y') ?>)</h3>
                         </div>
                         <div class="card-body p-0">
                             <table class="table table-hover text-nowrap mb-0">
@@ -138,60 +219,44 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php if (!empty($en_conge_auj)): foreach ($en_conge_auj as $c):
+                                            $initiales = strtoupper(mb_substr($c->prenoms, 0, 1) . mb_substr($c->nom, 0, 1));
+                                            $couleur   = $couleurs[$c->employe_id % count($couleurs)];
+                                    ?>
                                     <tr>
                                         <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#2c8a69">EI</span>
-                                                <div class="font-weight-bold">Espérance INGABIRE <small
-                                                        class="text-muted">(SAT-0007)</small></div>
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials mr-2"
+                                                    style="background:<?= $couleur ?>"><?= $initiales ?></span>
+                                                <div class="font-weight-bold">
+                                                    <?= html_escape($c->prenoms . ' ' . mb_strtoupper($c->nom)) ?>
+                                                    <small
+                                                        class="text-muted">(<?= html_escape($c->matricule) ?>)</small>
+                                                </div>
                                             </div>
                                         </td>
-                                        <td><span class="badge badge-info">Congé annuel</span></td>
-                                        <td>12/08 → 21/08/2026</td>
-                                        <td>10</td>
+                                        <td><span
+                                                class="badge badge-<?= $badge_type[$c->type_conge] ?? 'secondary' ?>"><?= $c->type_conge ?></span>
+                                        </td>
+                                        <td><?= date('d/m', strtotime($c->date_debut)) ?> →
+                                            <?= date('d/m/Y', strtotime($c->date_fin)) ?></td>
+                                        <td><?= $c->jours_ouvres ?></td>
                                         <td>
                                             <div class="progress" style="height:6px;width:120px">
-                                                <div class="progress-bar bg-info" style="width:100%"></div>
+                                                <div class="progress-bar bg-info"
+                                                    style="width:<?= $avancement($c->date_debut, $c->date_fin) ?>%">
+                                                </div>
                                             </div>
                                         </td>
-                                        <td><strong>Lundi 24/08</strong></td>
+                                        <td><strong><?= $reprise($c->date_fin) ?></strong></td>
                                     </tr>
+                                    <?php endforeach;
+                                    else: ?>
                                     <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">CU</span>
-                                                <div class="font-weight-bold">Chantal UWIZEYIMANA <small
-                                                        class="text-muted">(SAT-0038)</small></div>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge badge-info">Congé annuel</span></td>
-                                        <td>17/08 → 28/08/2026</td>
-                                        <td>10</td>
-                                        <td>
-                                            <div class="progress" style="height:6px;width:120px">
-                                                <div class="progress-bar bg-info" style="width:45%"></div>
-                                            </div>
-                                        </td>
-                                        <td><strong>Lundi 31/08</strong></td>
+                                        <td colspan="6" class="text-center text-muted py-3">Personne n'est en congé
+                                            aujourd'hui.</td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#8a3033">ES</span>
-                                                <div class="font-weight-bold">Eric SINDAYIHEBURA <small
-                                                        class="text-muted">(SAT-0028)</small></div>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge badge-info">Congé annuel</span></td>
-                                        <td>18/08 → 28/08/2026</td>
-                                        <td>9</td>
-                                        <td>
-                                            <div class="progress" style="height:6px;width:120px">
-                                                <div class="progress-bar bg-info" style="width:35%"></div>
-                                            </div>
-                                        </td>
-                                        <td><strong>Lundi 31/08</strong></td>
-                                    </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -206,11 +271,11 @@
                         <ul class="nav nav-tabs" role="tablist">
                             <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tabDemandes"><i
                                         class="fas fa-inbox mr-1"></i> Demandes <span
-                                        class="badge badge-warning ml-1">3</span></a></li>
+                                        class="badge badge-warning ml-1"><?= $nb_attente ?></span></a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabPlanning"><i
                                         class="fas fa-calendar-alt mr-1"></i> Planning (60 jours)</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabSoldes"><i
-                                        class="fas fa-wallet mr-1"></i> Soldes 2026</a></li>
+                                        class="fas fa-wallet mr-1"></i> Soldes <?= date('Y') ?></a></li>
                         </ul>
                         <button type="button" class="btn btn-success" data-toggle="modal"
                             data-target="#modalDemandeConge">
@@ -231,136 +296,62 @@
                                         <th>Type</th>
                                         <th>Période demandée</th>
                                         <th>Jours ouvrés</th>
-                                        <th>Supérieur hiérarchique</th>
+                                        <th>Remplaçant proposé</th>
                                         <th>Statut</th>
                                         <th class="text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="table-warning">
+                                    <?php if (!empty($conges)): foreach ($conges as $c):
+                                            $initiales = strtoupper(mb_substr($c->prenoms, 0, 1) . mb_substr($c->nom, 0, 1));
+                                            $couleur   = $couleurs[$c->employe_id % count($couleurs)];
+                                            $row_class = $c->statut === 'En attente' ? 'table-warning' : '';
+                                            if ($c->statut === 'En attente')      $badge_st = '<span class="badge badge-warning">En attente</span>';
+                                            elseif ($c->statut === 'Approuvé')    $badge_st = '<span class="badge badge-success">Approuvé</span>';
+                                            else                                  $badge_st = '<span class="badge badge-danger">Rejeté</span>';
+                                    ?>
+                                    <tr class="<?= $row_class ?>">
                                         <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#2c8a69">DI</span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials mr-2"
+                                                    style="background:<?= $couleur ?>"><?= $initiales ?></span>
                                                 <div>
-                                                    <div class="font-weight-bold">Divine IRAKOZE</div><small
-                                                        class="text-muted">SAT-0033 · Assistant RH</small>
+                                                    <div class="font-weight-bold">
+                                                        <?= html_escape($c->prenoms . ' ' . mb_strtoupper($c->nom)) ?>
+                                                    </div>
+                                                    <small
+                                                        class="text-muted"><?= html_escape($c->matricule . ' · ' . $c->fonction) ?></small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><span class="badge badge-info">Annuel</span></td>
-                                        <td>24/08 → 04/09/2026</td>
-                                        <td>10</td>
-                                        <td><span class="badge badge-success">Favorable</span> <small
-                                                class="text-muted">Resp. RH</small></td>
-                                        <td><span class="badge badge-warning">En attente RH</span></td>
+                                        <td><span
+                                                class="badge badge-<?= $badge_type[$c->type_conge] ?? 'secondary' ?>"><?= $c->type_conge ?></span>
+                                        </td>
+                                        <td><?= date('d/m', strtotime($c->date_debut)) ?> →
+                                            <?= date('d/m/Y', strtotime($c->date_fin)) ?></td>
+                                        <td><?= $c->jours_ouvres ?></td>
+                                        <td><?= !empty($c->remplacant_id) && isset($noms[$c->remplacant_id]) ? html_escape($noms[$c->remplacant_id]) : '<small class="text-muted">— à désigner —</small>' ?>
+                                        </td>
+                                        <td><?= $badge_st ?></td>
                                         <td class="text-right">
+                                            <?php if ($c->statut === 'En attente'): ?>
                                             <button class="btn btn-sm btn-success" title="Approuver"><i
                                                     class="fas fa-check"></i></button>
                                             <button class="btn btn-sm btn-danger" title="Rejeter"><i
                                                     class="fas fa-times"></i></button>
+                                            <?php else: ?>
+                                            <button class="btn btn-sm btn-default" title="Voir"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
-                                    <tr class="table-warning">
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">AN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Ange NIYONKURU</div><small
-                                                        class="text-muted">SAT-0047 · Maçon (Ngozi)</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge badge-info">Annuel</span></td>
-                                        <td>01/09 → 12/09/2026</td>
-                                        <td>10</td>
-                                        <td><span class="badge badge-warning">En attente</span> <small
-                                                class="text-muted">Chef de chantier</small></td>
-                                        <td><span class="badge badge-warning">En attente</span></td>
-                                        <td class="text-right">
-                                            <button class="btn btn-sm btn-success" title="Approuver"><i
-                                                    class="fas fa-check"></i></button>
-                                            <button class="btn btn-sm btn-danger" title="Rejeter"><i
-                                                    class="fas fa-times"></i></button>
-                                        </td>
-                                    </tr>
-                                    <tr class="table-warning">
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">AN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Alice NIYONZIMA</div><small
-                                                        class="text-muted">SAT-0014 · Comptable senior</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge badge-primary">Circonstance (mariage)</span></td>
-                                        <td>28/08/2026</td>
-                                        <td>1</td>
-                                        <td><span class="badge badge-success">Favorable</span> <small
-                                                class="text-muted">DAF</small></td>
-                                        <td><span class="badge badge-warning">En attente RH</span></td>
-                                        <td class="text-right">
-                                            <button class="btn btn-sm btn-success" title="Approuver"><i
-                                                    class="fas fa-check"></i></button>
-                                            <button class="btn btn-sm btn-danger" title="Rejeter"><i
-                                                    class="fas fa-times"></i></button>
-                                        </td>
-                                    </tr>
+                                    <?php endforeach;
+                                    else: ?>
                                     <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">AN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Alice NIYONZIMA</div><small
-                                                        class="text-muted">SAT-0014</small>
-                                                </div>
-                                            </div>
+                                        <td colspan="7" class="text-center text-muted py-4">Aucune demande de congé.
                                         </td>
-                                        <td><span class="badge badge-info">Annuel</span></td>
-                                        <td>09/03 → 20/03/2026</td>
-                                        <td>10</td>
-                                        <td><span class="badge badge-success">Favorable</span></td>
-                                        <td><span class="badge badge-success">Approuvé · pris</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default" title="Voir"><i
-                                                    class="fas fa-eye"></i></button></td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#7a4f1f">DB</span>
-                                                <div>
-                                                    <div class="font-weight-bold">David BIZIMANA</div><small
-                                                        class="text-muted">SAT-0048</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge badge-info">Annuel</span></td>
-                                        <td>03/08 → 14/08/2026</td>
-                                        <td>10</td>
-                                        <td><span class="badge badge-danger">Défavorable</span> <small
-                                                class="text-muted">Effectif insuffisant Ngagara II</small></td>
-                                        <td><span class="badge badge-danger">Rejeté</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default" title="Voir"><i
-                                                    class="fas fa-eye"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#1f7a5c">JN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Jean-Marie NDAYIZEYE</div><small
-                                                        class="text-muted">SAT-0001</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><span class="badge badge-info">Annuel</span></td>
-                                        <td>23/12/2025 → 02/01/2026</td>
-                                        <td>8</td>
-                                        <td><span class="badge badge-success">Favorable</span></td>
-                                        <td><span class="badge badge-success">Approuvé · pris</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default" title="Voir"><i
-                                                    class="fas fa-eye"></i></button></td>
-                                    </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -369,13 +360,20 @@
                     <!-- ===== ONGLET : PLANNING 60 JOURS ===== -->
                     <div class="tab-pane fade" id="tabPlanning">
                         <div class="card-body">
+                            <?php if (!empty($conflits)): $cf = $conflits[0]; ?>
                             <div class="alert alert-warning py-2">
                                 <i class="fas fa-exclamation-triangle mr-1"></i>
-                                <strong>Conflit détecté :</strong> SINDAYIHEBURA (18–28/08) et UWIZEYIMANA (17–28/08)
-                                absents simultanément
-                                alors qu'ils relèvent de la même équipe électricité — prévoir un remplaçant ou décaler
-                                l'un des deux.
+                                <strong>Conflit détecté :</strong>
+                                <?= html_escape($cf[0]->prenoms . ' ' . mb_strtoupper($cf[0]->nom)) ?>
+                                (<?= date('d/m', strtotime($cf[0]->date_debut)) ?> →
+                                <?= date('d/m', strtotime($cf[0]->date_fin)) ?>)
+                                et <?= html_escape($cf[1]->prenoms . ' ' . mb_strtoupper($cf[1]->nom)) ?>
+                                (<?= date('d/m', strtotime($cf[1]->date_debut)) ?> →
+                                <?= date('d/m', strtotime($cf[1]->date_fin)) ?>)
+                                absents simultanément sur <strong><?= html_escape($cf[2]) ?></strong> — prévoir un
+                                remplaçant ou décaler l'un des deux.
                             </div>
+                            <?php endif; ?>
                             <div class="table-responsive">
                                 <table class="table table-sm table-hover text-nowrap">
                                     <thead>
@@ -389,46 +387,32 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <?php if (!empty($planning)): foreach ($planning as $c):
+                                                $e = isset($actifs[$c->employe_id]) ? $actifs[$c->employe_id] : NULL;
+                                                $lieu = $e ? (($e->categorie === 'Chantier') ? $e->site_affectation : $e->departement) : '—';
+                                        ?>
                                         <tr>
-                                            <td>Divine IRAKOZE</td>
-                                            <td>Ressources Humaines</td>
-                                            <td>24/08 → 04/09/2026</td>
-                                            <td>10</td>
-                                            <td>J.-M. NDAYIZEYE (partiel)</td>
-                                            <td><span class="badge badge-warning">En approbation</span></td>
+                                            <td><?= html_escape($c->prenoms . ' ' . mb_strtoupper($c->nom)) ?></td>
+                                            <td><?= html_escape($lieu) ?></td>
+                                            <td><?= date('d/m', strtotime($c->date_debut)) ?> →
+                                                <?= date('d/m/Y', strtotime($c->date_fin)) ?></td>
+                                            <td><?= $c->jours_ouvres ?></td>
+                                            <td><?= !empty($c->remplacant_id) && isset($noms[$c->remplacant_id]) ? html_escape($noms[$c->remplacant_id]) : '— à désigner' ?>
+                                            </td>
+                                            <td>
+                                                <?php if ($c->statut === 'En attente'): ?><span
+                                                    class="badge badge-warning">En approbation</span>
+                                                <?php else: ?><span
+                                                    class="badge badge-success">Approuvé</span><?php endif; ?>
+                                            </td>
                                         </tr>
+                                        <?php endforeach;
+                                        else: ?>
                                         <tr>
-                                            <td>Ange NIYONKURU</td>
-                                            <td>Chantier Ngozi</td>
-                                            <td>01/09 → 12/09/2026</td>
-                                            <td>10</td>
-                                            <td>— à désigner</td>
-                                            <td><span class="badge badge-warning">En approbation</span></td>
+                                            <td colspan="6" class="text-center text-muted py-3">Aucun congé planifié sur
+                                                les 60 prochains jours.</td>
                                         </tr>
-                                        <tr>
-                                            <td>Vestine GAKOBWA</td>
-                                            <td>Chantier Ngozi</td>
-                                            <td>07/09 → 18/09/2026</td>
-                                            <td>10</td>
-                                            <td>D. NUNUBAHA</td>
-                                            <td><span class="badge badge-success">Approuvé</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Thierry NIMUBONA</td>
-                                            <td>DAF / Finance</td>
-                                            <td>14/09 → 25/09/2026</td>
-                                            <td>10</td>
-                                            <td>A. NIYONZIMA</td>
-                                            <td><span class="badge badge-success">Approuvé</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Gilbert RUKARA</td>
-                                            <td>Chantier Ngagara II</td>
-                                            <td>21/09 → 02/10/2026</td>
-                                            <td>10</td>
-                                            <td>— à désigner</td>
-                                            <td><span class="badge badge-success">Approuvé</span></td>
-                                        </tr>
+                                        <?php endif; ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -437,7 +421,7 @@
                         </div>
                     </div>
 
-                    <!-- ===== ONGLET : SOLDES 2026 ===== -->
+                    <!-- ===== ONGLET : SOLDES ===== -->
                     <div class="tab-pane fade" id="tabSoldes">
                         <div class="card-body table-responsive p-0">
                             <table class="table table-hover table-striped text-nowrap">
@@ -445,61 +429,31 @@
                                     <tr>
                                         <th>Employé</th>
                                         <th>Ancienneté</th>
-                                        <th>Droit 2026</th>
+                                        <th>Droit <?= date('Y') ?></th>
                                         <th>Jours pris</th>
-                                        <th>En cours</th>
+                                        <th>En cours / à venir</th>
                                         <th>Solde restant</th>
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php foreach ($actifs as $id => $e):
+                                        $d      = $droits[$id];
+                                        $pris   = isset($pris_par[$id]) ? $pris_par[$id] : 0;
+                                        $enc    = isset($encours_par[$id]) ? $encours_par[$id] : 0;
+                                        $solde  = $d['droit'] - $pris - $enc;
+                                        $badge  = $solde <= 0 ? 'badge-secondary' : ($solde < 5 ? 'badge-warning' : 'badge-success');
+                                    ?>
                                     <tr>
-                                        <td>Jean-Marie NDAYIZEYE <small class="text-muted">(SAT-0001)</small></td>
-                                        <td>6 ans</td>
-                                        <td>21 j</td>
-                                        <td>8</td>
-                                        <td>0</td>
-                                        <td><span class="badge badge-success">13 j</span></td>
+                                        <td><?= html_escape($e->prenoms . ' ' . mb_strtoupper($e->nom)) ?> <small
+                                                class="text-muted">(<?= html_escape($e->matricule) ?>)</small></td>
+                                        <td><?= $d['ans'] < 1 ? '&lt; 1 an <small class="text-muted">(prorata)</small>' : $d['ans'] . ' ans' ?>
+                                        </td>
+                                        <td><?= $d['droit'] ?> j</td>
+                                        <td><?= $pris ?></td>
+                                        <td><?= $enc ?></td>
+                                        <td><span class="badge <?= $badge ?>"><?= $solde ?> j</span></td>
                                     </tr>
-                                    <tr>
-                                        <td>Espérance INGABIRE <small class="text-muted">(SAT-0007)</small></td>
-                                        <td>3 ans</td>
-                                        <td>20 j</td>
-                                        <td>10</td>
-                                        <td>10</td>
-                                        <td><span class="badge badge-info">0 j</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Alice NIYONZIMA <small class="text-muted">(SAT-0014)</small></td>
-                                        <td>5 ans</td>
-                                        <td>21 j</td>
-                                        <td>10</td>
-                                        <td>0</td>
-                                        <td><span class="badge badge-success">11 j</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Patrick HAKIZIMANA <small class="text-muted">(SAT-0021)</small></td>
-                                        <td>4 ans</td>
-                                        <td>21 j</td>
-                                        <td>5</td>
-                                        <td>0</td>
-                                        <td><span class="badge badge-success">16 j</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Justine MBONIMPA <small class="text-muted">(SAT-0032)</small></td>
-                                        <td>2 ans</td>
-                                        <td>20 j</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td><span class="badge badge-success">20 j</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Aymar KIGABIRO <small class="text-muted">(SAT-0008)</small></td>
-                                        <td>&lt; 1 an</td>
-                                        <td>3 j <small class="text-muted">(prorata)</small></td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td><span class="badge badge-success">3 j</span></td>
-                                    </tr>
+                                    <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -512,7 +466,7 @@
                 </div>
             </div>
 
-            <!-- ============ MODALE : NOUVELLE DEMANDE DE CONGÉ ============ -->
+            <!-- ============ MODALE : NOUVELLE DEMANDE ============ -->
             <div class="modal fade" id="modalDemandeConge">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -530,8 +484,7 @@
                                         <div class="form-group"><label>Employé *</label>
                                             <select name="employe_id" class="form-control" required>
                                                 <option value="">— Sélectionner —</option>
-                                                <?php foreach ($employes as $e):
-                                                    if ($e->statut === 'Fin de contrat') continue; ?>
+                                                <?php foreach ($employes as $e): if ($e->statut === 'Fin de contrat') continue; ?>
                                                 <option value="<?= $e->employe_id ?>">
                                                     <?= html_escape($e->matricule . ' · ' . $e->prenoms . ' ' . mb_strtoupper($e->nom)) ?>
                                                 </option>
@@ -572,8 +525,7 @@
                                         <div class="form-group"><label>Remplaçant proposé</label>
                                             <select name="remplacant_id" class="form-control">
                                                 <option value="">— Aucun —</option>
-                                                <?php foreach ($employes as $r):
-                                                    if ($r->statut === 'Fin de contrat') continue; ?>
+                                                <?php foreach ($employes as $r): if ($r->statut === 'Fin de contrat') continue; ?>
                                                 <option value="<?= $r->employe_id ?>">
                                                     <?= html_escape($r->matricule . ' · ' . $r->prenoms . ' ' . mb_strtoupper($r->nom)) ?>
                                                 </option>
@@ -608,12 +560,12 @@
                 </div>
             </div>
 
+            <!-- ============ SCRIPTS ============ -->
             <script>
             document.addEventListener('DOMContentLoaded', function() {
                 var form = document.getElementById('formDemandeConge');
                 if (!form) return;
 
-                /* ----- Calcul des jours ouvrés (lun → ven) en temps réel ----- */
                 function joursOuvres(debut, fin) {
                     var d = new Date(debut),
                         f = new Date(fin),
@@ -630,16 +582,11 @@
                     var deb = form.querySelector('[name="date_debut"]').value;
                     var fin = form.querySelector('[name="date_fin"]').value;
                     var out = form.querySelector('#congeJours');
-                    if (deb && fin && fin >= deb) {
-                        out.value = joursOuvres(deb, fin) + ' jour(s)';
-                    } else {
-                        out.value = '—';
-                    }
+                    out.value = (deb && fin && fin >= deb) ? joursOuvres(deb, fin) + ' jour(s)' : '—';
                 }
                 form.querySelector('[name="date_debut"]').addEventListener('change', majJours);
                 form.querySelector('[name="date_fin"]').addEventListener('change', majJours);
 
-                /* ----- Nom du fichier choisi ----- */
                 form.querySelectorAll('.custom-file-input').forEach(function(input) {
                     input.addEventListener('change', function() {
                         var label = this.closest('.custom-file').querySelector(
@@ -652,8 +599,6 @@
             });
             </script>
 
-        </div><!-- /.container-fluid -->
+        </div>
     </section>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->

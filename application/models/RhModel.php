@@ -91,14 +91,25 @@ class RhModel extends CI_Model
     }
 
     /** Demandes + infos employé (+ remplaçant), des plus récentes aux plus anciennes */
+    // public function get_conges_with_employes()
+    // {
+    //     return $this->db
+    //         ->select('cg.*, e.matricule, e.nom, e.prenoms,
+    //               r.matricule AS remplacant_matricule, r.nom AS remplacant_nom, r.prenoms AS remplacant_prenoms')
+    //         ->from($this->table_conges . ' cg')
+    //         ->join('tbl_employes e', 'e.employe_id = cg.employe_id')
+    //         ->join('tbl_employes r', 'r.employe_id = cg.remplacant_id', 'left')
+    //         ->order_by('cg.conge_id', 'DESC')
+    //         ->get()->result();
+    // }
+
+    /** Demandes de congé + infos employé, des plus récentes aux plus anciennes */
     public function get_conges_with_employes()
     {
         return $this->db
-            ->select('cg.*, e.matricule, e.nom, e.prenoms,
-                  r.matricule AS remplacant_matricule, r.nom AS remplacant_nom, r.prenoms AS remplacant_prenoms')
+            ->select('cg.*, e.matricule, e.nom, e.prenoms, e.fonction')   // ← + e.fonction
             ->from($this->table_conges . ' cg')
             ->join('tbl_employes e', 'e.employe_id = cg.employe_id')
-            ->join('tbl_employes r', 'r.employe_id = cg.remplacant_id', 'left')
             ->order_by('cg.conge_id', 'DESC')
             ->get()->result();
     }
@@ -168,5 +179,34 @@ class RhModel extends CI_Model
     public function get_rapports()
     {
         return $this->db->order_by('cree_le', 'DESC')->get('tbl_rapports')->result();
+    }
+
+    protected $table_pointages = 'tbl_pointages';   // ← nouvelle propriété
+
+    /** Insertion d'un pointage */
+    public function insert_pointage($data)
+    {
+        $this->db->insert($this->table_pointages, $data);
+        return $this->db->insert_id();
+    }
+
+    /** Anti-doublon : 1 pointage max par employé et par jour */
+    public function pointage_existe($employe_id, $date)
+    {
+        return $this->db
+            ->where(['employe_id' => (int) $employe_id, 'date_pointage' => $date])
+            ->count_all_results($this->table_pointages) > 0;
+    }
+
+    /** Pointages + infos employé, du plus récent au plus ancien */
+    public function get_pointages_with_employes()
+    {
+        return $this->db
+            ->select('p.*, e.matricule, e.nom, e.prenoms, e.fonction, e.site_affectation')
+            ->from($this->table_pointages . ' p')
+            ->join('tbl_employes e', 'e.employe_id = p.employe_id')
+            ->order_by('p.date_pointage', 'DESC')
+            ->order_by('e.nom', 'ASC')
+            ->get()->result();
     }
 }

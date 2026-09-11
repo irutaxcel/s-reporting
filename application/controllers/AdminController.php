@@ -597,49 +597,63 @@ class AdminController extends CI_Controller
         ]);
     }
 
+
+
     private function permissionCatalog()
     {
         return [
 
-            /* ---------- TABLEAU DE BORD ---------- */
+            /* ---------- TABLEAU DE BORD GLOBAL ---------- */
             ['code' => 'dash', 'label' => 'Tableau de bord', 'icon' => 'fa-tachometer-alt', 'permissions' => [
                 ['code' => 'dashboard', 'label' => 'Tableau de bord', 'icon' => 'fa-tachometer-alt'],
             ]],
 
             /* ---------- DIRECTION GÉNÉRALE ---------- */
             ['code' => 'dg', 'label' => 'Direction Générale', 'icon' => 'fa-building', 'permissions' => [
-                ['code' => 'reporting',     'label' => 'Reporting',               'icon' => 'fa-chart-bar'],
-                ['code' => 'validations',   'label' => 'Validations',             'icon' => 'fa-check-double'],
-                ['code' => 'notifications', 'label' => 'Notifications & Alertes', 'icon' => 'fa-bell'],
-                ['code' => 'messagerie',    'label' => 'Messagerie interne',      'icon' => 'fa-envelope'],
+                ['code' => 'direction-dashboard', 'label' => 'Tableau de bord', 'icon' => 'fa-tachometer-alt'],
+                ['code' => 'direction-indicateurs', 'label' => 'Indicateurs de performance', 'icon' => 'fa-chart-line'],
+                ['code' => 'direction-reporting-general', 'label' => 'Reporting général', 'icon' => 'fa-file-alt'],
+                ['code' => 'direction-reporting-analytique', 'label' => 'Analytique', 'icon' => 'fa-chart-pie'],
+                ['code' => 'direction-statistiques', 'label' => 'Statistiques', 'icon' => 'fa-chart-bar'],
+                ['code' => 'direction-validations', 'label' => 'Validations & Approbations', 'icon' => 'fa-check-double'],
+                ['code' => 'direction-projets', 'label' => 'Suivi des projets', 'icon' => 'fa-tasks'],
+                ['code' => 'direction-notifications', 'label' => 'Notifications & Alertes', 'icon' => 'fa-bell'],
+                ['code' => 'direction-messagerie', 'label' => 'Messagerie interne', 'icon' => 'fa-envelope'],
+                ['code' => 'synthese-demandes', 'label' => 'Synthèse des demandes', 'icon' => 'fa-clipboard-list'],
+                // ✅ AJOUTER CETTE LIGNE
+                ['code' => 'direction-relation-publique', 'label' => 'Relation Publique', 'icon' => 'fa-handshake'],
+                // FIN AJOUT
+                ['code' => 'direction-utilisateurs', 'label' => 'Gestion des utilisateurs', 'icon' => 'fa-users'],
+                ['code' => 'direction-parametres', 'label' => 'Paramètres', 'icon' => 'fa-cog'],
+                ['code' => 'direction-archives', 'label' => 'Archives', 'icon' => 'fa-archive'],
             ]],
 
             /* ---------- DIRECTION TECHNIQUE ---------- */
             ['code' => 'tech', 'label' => 'Direction Technique', 'icon' => 'fa-hard-hat', 'permissions' => [
-                ['code' => 'projects',              'label' => 'Projets',                 'icon' => 'fa-project-diagram'],
-                ['code' => 'chantiers',             'label' => 'Chantiers & exécution',   'icon' => 'fa-hammer'],
-                ['code' => 'achat',                 'label' => 'Achats & Approvisionnement', 'icon' => 'fa-shopping-cart'],
-                ['code' => 'fournisseurs',          'label' => 'Fournisseurs',            'icon' => 'fa-truck'],
-                ['code' => 'sous-traitant',         'label' => 'Sous-traitants',          'icon' => 'fa-people-carry'],
-                ['code' => 'stock-general',         'label' => 'Stocks',                  'icon' => 'fa-boxes'],
-                ['code' => 'engin-materiel',        'label' => 'Engins & Matériel',       'icon' => 'fa-truck-monster'],
-                ['code' => 'maintenance-carburant', 'label' => 'Maintenance & Carburant', 'icon' => 'fa-gas-pump'],
-                ['code' => 'journal-production',    'label' => 'Journal Production',      'icon' => 'fa-book'],
-                ['code' => 'cout-reelle-rentebilite', 'label' => 'Coût Réel & Rentabilité', 'icon' => 'fa-chart-line'],
-                ['code' => 'evaluation-chantier',   'label' => 'Evaluation Chantier',     'icon' => 'fa-clipboard-check'],
-                ['code' => 'personnel-chantier',    'label' => 'Personnel Chantier',      'icon' => 'fa-users'],
-                ['code' => 'pointage',              'label' => 'Pointage',                'icon' => 'fa-user-clock'],
-                ['code' => 'ordre-service',         'label' => 'Ordres de service',       'icon' => 'fa-file-signature'],
+                ['code' => 'projects',                'label' => 'Projets',                  'icon' => 'fa-project-diagram'],
+                ['code' => 'chantiers',               'label' => 'Chantiers & exécution',    'icon' => 'fa-hammer'],
+                ['code' => 'achat',                   'label' => 'Achats & Approvisionnement', 'icon' => 'fa-shopping-cart'],
+                ['code' => 'fournisseurs',            'label' => 'Fournisseurs',             'icon' => 'fa-truck'],
+                ['code' => 'sous-traitant',           'label' => 'Sous-traitants',           'icon' => 'fa-people-carry'],
+                ['code' => 'stock-general',           'label' => 'Stocks',                   'icon' => 'fa-boxes'],
+                ['code' => 'engin-materiel',          'label' => 'Engins & Matériel',        'icon' => 'fa-truck-monster'],
+                ['code' => 'maintenance-carburant',   'label' => 'Maintenance & Carburant',  'icon' => 'fa-gas-pump'],
+                ['code' => 'journal-production',      'label' => 'Journal Production',       'icon' => 'fa-book'],
+                ['code' => 'cout-reelle-rentebilite', 'label' => 'Coût Réel & Rentabilité',  'icon' => 'fa-chart-line'],
+                ['code' => 'evaluation-chantier',     'label' => 'Evaluation Chantier',      'icon' => 'fa-clipboard-check'],
+                ['code' => 'personnel-chantier',      'label' => 'Personnel Chantier',       'icon' => 'fa-users'],
+                ['code' => 'suivie-paie-chantier',    'label' => 'Suivie Paie Chantier',     'icon' => 'fa-money-bill-wave'],
+                ['code' => 'pointage',                'label' => 'Pointage',                 'icon' => 'fa-user-clock'],
+                ['code' => 'ordre-service',           'label' => 'Ordres de service',        'icon' => 'fa-file-signature'],
             ]],
 
             /* ---------- DAF / FINANCE ---------- */
             ['code' => 'daf', 'label' => 'DAF / Finance', 'icon' => 'fa-coins', 'permissions' => [
-                ['code' => 'finance-dashboard', 'label' => 'Tableau de bord DAF', 'icon' => 'fa-chart-pie'],
-                ['code' => 'finance-rh',        'label' => 'Ressources Humaines', 'icon' => 'fa-users'],
-                ['code' => 'finance-controle',  'label' => 'Contrôle de gestion', 'icon' => 'fa-chart-line'],
+                ['code' => 'finance-dashboard',  'label' => 'Tableau de bord DAF', 'icon' => 'fa-chart-pie'],
+                ['code' => 'finance-controle',   'label' => 'Contrôle de gestion', 'icon' => 'fa-chart-line'],
                 ['code' => 'finance-patrimoine', 'label' => 'Patrimoine',          'icon' => 'fa-building'],
-                ['code' => 'finance-ged',       'label' => 'Documents / GED',     'icon' => 'fa-folder-open'],
-                ['code' => 'finance-report',    'label' => 'Rapports financiers', 'icon' => 'fa-chart-bar'],
+                ['code' => 'finance-ged',        'label' => 'Documents / GED',     'icon' => 'fa-folder-open'],
+                ['code' => 'finance-report',     'label' => 'Rapports financiers', 'icon' => 'fa-chart-bar'],
             ]],
 
             /* ---------- COMPTABILITÉ ---------- */
@@ -657,40 +671,51 @@ class AdminController extends CI_Controller
 
             /* ---------- TRÉSORERIE ---------- */
             ['code' => 'treso', 'label' => 'Trésorerie', 'icon' => 'fa-wallet', 'permissions' => [
-                ['code' => 'caisse',        'label' => 'Caisse',                     'icon' => 'fa-cash-register'],
-                ['code' => 'compte-banques', 'label' => 'Comptes bancaires',          'icon' => 'fa-university'],
-                ['code' => 'encaissements', 'label' => 'Encaissements',              'icon' => 'fa-arrow-circle-down'],
-                ['code' => 'decaissements', 'label' => 'Décaissements',              'icon' => 'fa-arrow-circle-up'],
-                ['code' => 'rapprochement', 'label' => 'Rapprochement bancaire',     'icon' => 'fa-exchange-alt'],
-                ['code' => 'prevision',     'label' => 'Prévisions de trésorerie',   'icon' => 'fa-chart-line'],
+                ['code' => 'caisse',         'label' => 'Caisse',                   'icon' => 'fa-cash-register'],
+                ['code' => 'rapport-financier', 'label' => 'Rapport Financier',      'icon' => 'fa-file-invoice-dollar'],
+                ['code' => 'compte-banques', 'label' => 'Comptes bancaires',        'icon' => 'fa-university'],
+                ['code' => 'rapprochement',  'label' => 'Rapprochement bancaire',   'icon' => 'fa-exchange-alt'],
+                ['code' => 'prevision',      'label' => 'Prévisions de trésorerie', 'icon' => 'fa-chart-line'],
             ]],
 
             /* ---------- FACTURATION ---------- */
             ['code' => 'factu', 'label' => 'Facturation', 'icon' => 'fa-file-invoice-dollar', 'permissions' => [
-                ['code' => 'facture-client',      'label' => 'Factures clients',     'icon' => 'fa-file-invoice'],
+                ['code' => 'facture-client',      'label' => 'Factures clients',      'icon' => 'fa-file-invoice'],
                 ['code' => 'facture-fournisseur', 'label' => 'Factures fournisseurs', 'icon' => 'fa-file-invoice-dollar'],
-                ['code' => 'paiements',           'label' => 'Paiements',            'icon' => 'fa-money-bill-wave'],
-                ['code' => 'echeances',           'label' => 'Échéances',            'icon' => 'fa-calendar-check'],
+                ['code' => 'paiement',            'label' => 'Paiements',             'icon' => 'fa-money-bill-wave'],
+                ['code' => 'echeances',           'label' => 'Échéances',             'icon' => 'fa-calendar-check'],
             ]],
 
             /* ---------- RESSOURCES HUMAINES ---------- */
             ['code' => 'rh', 'label' => 'Ressources Humaines', 'icon' => 'fa-users', 'permissions' => [
-                ['code' => 'employes', 'label' => 'Employés', 'icon' => 'fa-id-badge'],
-                ['code' => 'paie',     'label' => 'Paie',     'icon' => 'fa-money-check-alt'],
+                ['code' => 'rh-dashboard',  'label' => 'Tableau de bord RH',    'icon' => 'fa-tachometer-alt'],
+                ['code' => 'rh-employes',   'label' => 'Employés',              'icon' => 'fa-id-badge'],
+                ['code' => 'rh-contrats',   'label' => 'Contrats & mouvements', 'icon' => 'fa-file-contract'],
+                ['code' => 'rh-registre',   'label' => "Registre d'employeur",  'icon' => 'fa-book'],
+                ['code' => 'rh-presences',  'label' => 'Temps & présences',     'icon' => 'fa-user-clock'],
+                ['code' => 'rh-conges',     'label' => 'Congés',                'icon' => 'fa-umbrella-beach'],
+                ['code' => 'rh-paie',       'label' => 'Paie',                  'icon' => 'fa-money-bill-wave'],
+                ['code' => 'rh-discipline', 'label' => 'Discipline',            'icon' => 'fa-gavel'],
+                ['code' => 'rh-evaluations', 'label' => 'Évaluations',           'icon' => 'fa-clipboard-check'],
+                ['code' => 'rh-rapports',   'label' => 'Rapports & éditions',   'icon' => 'fa-chart-bar'],
             ]],
 
             /* ---------- CRM & CLIENTS ---------- */
             ['code' => 'crm', 'label' => 'CRM & Clients', 'icon' => 'fa-handshake', 'permissions' => [
-                ['code' => 'clients', 'label' => 'Clients', 'icon' => 'fa-handshake'],
-                ['code' => 'devis',   'label' => 'Devis',   'icon' => 'fa-file-signature'],
+                ['code' => 'crm-dashboard', 'label' => 'Tableau de Bord',          'icon' => 'fa-tachometer-alt'],
+                ['code' => 'crm-clients',   'label' => 'Clients',                  'icon' => 'fa-users'],
+                ['code' => 'crm-devis',     'label' => 'Devis',                    'icon' => 'fa-file-invoice-dollar'],
+                ['code' => 'crm-projets',   'label' => 'Projets',                  'icon' => 'fa-project-diagram'],
+                ['code' => 'crm-chantiers', 'label' => 'Chantiers & Avancement',   'icon' => 'fa-hard-hat'],
+                ['code' => 'crm-reporting', 'label' => 'Reporting & Statistiques', 'icon' => 'fa-chart-line'],
             ]],
 
             /* ---------- ADMINISTRATION ---------- */
             ['code' => 'admin', 'label' => 'Administration', 'icon' => 'fa-cogs', 'permissions' => [
-                ['code' => 'users',             'label' => 'Utilisateurs',      'icon' => 'fa-users-cog'],
-                ['code' => 'matrice-access',    'label' => 'Matrice des accès', 'icon' => 'fa-th-large'],
+                ['code' => 'users',             'label' => 'Utilisateurs',        'icon' => 'fa-users-cog'],
+                ['code' => 'matrice-access',    'label' => 'Matrice des accès',   'icon' => 'fa-th-large'],
                 ['code' => 'roles-permissions', 'label' => 'Rôles & Permissions', 'icon' => 'fa-user-tag'],
-                ['code' => 'settings',          'label' => 'Paramètres',        'icon' => 'fa-sliders-h'],
+                ['code' => 'settings',          'label' => 'Paramètres',          'icon' => 'fa-sliders-h'],
             ]],
         ];
     }

@@ -6,23 +6,22 @@
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1 class="m-0"><?= $title ?></h1>
-                </div><!-- /.col -->
+                </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
                         <li class="breadcrumb-item active"><?= $title ?></li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /.content-header -->
 
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
 
-            <!-- ============ STYLE LOCAL (page temps & présences) ============ -->
+            <!-- ============ STYLE LOCAL ============ -->
             <style>
             .section-title {
                 color: #1f7a5c;
@@ -49,19 +48,108 @@
             }
             </style>
 
-            <!-- ============ 1. INDICATEURS DU JOUR (vendredi 21/08/2026) ============ -->
+            <!-- ============ CALCULS (tbl_pointages + tbl_employes) ============ -->
+            <?php
+            $couleurs = ['#1f7a5c', '#2c8a69', '#34608c', '#7a4f1f', '#8a3033', '#6c757d'];
+            $mois_crt = substr($date_vue, 0, 7);
+
+            if (!function_exists('heures_travaillees')) {
+                function heures_travaillees($entree, $sortie)
+                {
+                    if (!$entree || !$sortie) return NULL;
+                    $mins = ((int) substr($sortie, 0, 2) * 60 + (int) substr($sortie, 3, 2))
+                        - ((int) substr($entree, 0, 2) * 60 + (int) substr($entree, 3, 2));
+                    if ($mins < 0) return NULL;
+                    return floor($mins / 60) . ' h ' . str_pad($mins % 60, 2, '0', STR_PAD_LEFT);
+                }
+            }
+
+            /* Effectif actif par site */
+            $nb_actifs = 0;
+            $actifs_par_site = [];
+            foreach ($employes as $e) {
+                if ($e->statut === 'Fin de contrat') continue;
+                $nb_actifs++;
+                $s = $e->site_affectation ?: '—';
+                $actifs_par_site[$s] = isset($actifs_par_site[$s]) ? $actifs_par_site[$s] + 1 : 1;
+            }
+
+            /* Pointages du jour affiché + absents */
+            $pointages_jour = [];
+            $nb_presents = $nb_abs_j = $nb_abs_nj = 0;
+            foreach ($pointages as $p) {
+                if ($p->date_pointage !== $date_vue) continue;
+                $pointages_jour[] = $p;
+                if (in_array($p->situation, ['Présent', 'Retard', 'Demi-journée'])) $nb_presents++;
+                elseif ($p->situation === 'Absence justifiée')     $nb_abs_j++;
+                elseif ($p->situation === 'Absence non justifiée') $nb_abs_nj++;
+            }
+            $taux_presence = $nb_actifs ? round($nb_presents / $nb_actifs * 100) : 0;
+
+            /* Présents par site (jour affiché) */
+            $presents_par_site = [];
+            foreach ($pointages_jour as $p) {
+                if (in_array($p->situation, ['Présent', 'Retard', 'Demi-journée'])) {
+                    $s = $p->site_affectation ?: '—';
+                    $presents_par_site[$s] = isset($presents_par_site[$s]) ? $presents_par_site[$s] + 1 : 1;
+                }
+            }
+
+            /* Mois : retards + heures sup */
+            $nb_retards_mois = 0;
+            $hs_mois = 0;
+            foreach ($pointages as $p) {
+                if (substr($p->date_pointage, 0, 7) !== $mois_crt) continue;
+                if ($p->situation === 'Retard') $nb_retards_mois++;
+                $hs_mois += (float) $p->heures_sup;
+            }
+
+            /* Anomalies du mois */
+            $anomalies = [];
+            foreach ($pointages as $p) {
+                if (substr($p->date_pointage, 0, 7) !== $mois_crt) continue;
+                if ($p->situation === 'Absence non justifiée') {
+                    $anomalies[] = ['classe' => 'danger', 'type' => 'Absence non justifiée', 'detail' => 'Aucun pointage valide pour cette journée', 'p' => $p];
+                } elseif ($p->situation === 'Retard') {
+                    $anomalies[] = ['classe' => 'warning', 'type' => 'Retard', 'detail' => 'Arrivée ' . substr($p->heure_entree, 0, 5), 'p' => $p];
+                } elseif ($p->situation === 'Présent' && $p->heure_entree && !$p->heure_sortie) {
+                    $anomalies[] = ['classe' => 'warning', 'type' => 'Sortie manquante', 'detail' => 'Entrée ' . substr($p->heure_entree, 0, 5) . ' enregistrée, sortie non pointée', 'p' => $p];
+                } elseif ($p->situation === 'Présent' && !$p->heure_entree && $p->heure_sortie) {
+                    $anomalies[] = ['classe' => 'warning', 'type' => 'Entrée manquante', 'detail' => 'Sortie ' . substr($p->heure_sortie, 0, 5) . ' enregistrée, entrée non pointée', 'p' => $p];
+                }
+            }
+
+            /* Synthèse mensuelle par employé */
+            $synthese = [];
+            foreach ($pointages as $p) {
+                if (substr($p->date_pointage, 0, 7) !== $mois_crt) continue;
+                if (!isset($synthese[$p->employe_id])) {
+                    $synthese[$p->employe_id] = ['p' => $p, 'jours' => 0, 'presents' => 0, 'retards' => 0, 'abs_j' => 0, 'abs_nj' => 0, 'hs' => 0];
+                }
+                $s = &$synthese[$p->employe_id];
+                $s['jours']++;
+                if (in_array($p->situation, ['Présent', 'Demi-journée', 'Retard'])) $s['presents']++;
+                if ($p->situation === 'Retard')                $s['retards']++;
+                if ($p->situation === 'Absence justifiée')     $s['abs_j']++;
+                if ($p->situation === 'Absence non justifiée') $s['abs_nj']++;
+                $s['hs'] += (float) $p->heures_sup;
+                unset($s);
+            }
+            ?>
+
+            <!-- ============ 1. INDICATEURS ============ -->
             <div class="row">
                 <div class="col-lg-3 col-6">
                     <div class="info-box">
                         <span class="info-box-icon bg-success"><i class="fas fa-user-check"></i></span>
                         <div class="info-box-content">
-                            <span class="info-box-text">Présents aujourd'hui</span>
-                            <span class="info-box-number">48 / 55</span>
+                            <span class="info-box-text">Présents (<?= date('d/m/Y', strtotime($date_vue)) ?>)</span>
+                            <span class="info-box-number"><?= $nb_presents ?> / <?= $nb_actifs ?></span>
                             <span class="progress-description">
                                 <div class="progress">
-                                    <div class="progress-bar bg-success" style="width:87%"></div>
+                                    <div class="progress-bar bg-success" style="width:<?= $taux_presence ?>%"></div>
                                 </div>
-                                Taux de présence : 87 %
+                                Taux de présence : <?= $taux_presence ?> %
                             </span>
                         </div>
                     </div>
@@ -71,8 +159,9 @@
                         <span class="info-box-icon bg-danger"><i class="fas fa-user-times"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Absents</span>
-                            <span class="info-box-number">2</span>
-                            <span class="progress-description">1 justifiée · 1 non justifiée</span>
+                            <span class="info-box-number"><?= $nb_abs_j + $nb_abs_nj ?></span>
+                            <span class="progress-description"><?= $nb_abs_j ?> justifiée(s) · <?= $nb_abs_nj ?> non
+                                justifiée(s)</span>
                         </div>
                     </div>
                 </div>
@@ -81,8 +170,8 @@
                         <span class="info-box-icon bg-warning"><i class="fas fa-clock"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Retards (mois)</span>
-                            <span class="info-box-number">7</span>
-                            <span class="progress-description">Dont 2 de plus de 30 min</span>
+                            <span class="info-box-number"><?= $nb_retards_mois ?></span>
+                            <span class="progress-description">Mois de <?= date('F Y', strtotime($date_vue)) ?></span>
                         </div>
                     </div>
                 </div>
@@ -91,46 +180,36 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-hourglass-half"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">Heures sup (mois)</span>
-                            <span class="info-box-number">26 h</span>
+                            <span class="info-box-number"><?= (int) $hs_mois ?> h</span>
                             <span class="progress-description">À transmettre à la paie</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============ 2. TAUX DE PRÉSENCE PAR SITE + HORAIRES ============ -->
+            <!-- ============ 2. PRÉSENCE PAR SITE + HORAIRES ============ -->
             <div class="row">
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-header">
                             <h3 class="card-title mb-0"><i class="fas fa-map-marker-alt mr-1 text-success"></i> Présence
-                                par site (aujourd'hui)</h3>
+                                par site (<?= date('d/m/Y', strtotime($date_vue)) ?>)</h3>
                         </div>
                         <div class="card-body">
-                            <p class="mb-1 d-flex justify-content-between"><span><i
-                                        class="fas fa-building mr-1 text-muted"></i>Siège (Bujumbura)</span><strong>95
-                                    %</strong></p>
+                            <?php foreach ($actifs_par_site as $site => $total):
+                                $nb   = isset($presents_par_site[$site]) ? $presents_par_site[$site] : 0;
+                                $pct  = $total ? round($nb / $total * 100) : 0;
+                                $bar  = $pct >= 90 ? 'bg-success' : ($pct >= 75 ? 'bg-warning' : 'bg-danger');
+                                $icon = (stripos($site, 'chantier') !== FALSE) ? 'fa-hard-hat' : 'fa-building';
+                            ?>
+                            <p class="mb-1 d-flex justify-content-between">
+                                <span><i class="fas <?= $icon ?> mr-1 text-muted"></i><?= html_escape($site) ?></span>
+                                <strong><?= $pct ?> %</strong>
+                            </p>
                             <div class="progress mb-3" style="height:8px">
-                                <div class="progress-bar bg-success" style="width:95%"></div>
+                                <div class="progress-bar <?= $bar ?>" style="width:<?= $pct ?>%"></div>
                             </div>
-                            <p class="mb-1 d-flex justify-content-between"><span><i
-                                        class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</span><strong>92
-                                    %</strong></p>
-                            <div class="progress mb-3" style="height:8px">
-                                <div class="progress-bar bg-success" style="width:92%"></div>
-                            </div>
-                            <p class="mb-1 d-flex justify-content-between"><span><i
-                                        class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Gitega</span><strong>88
-                                    %</strong></p>
-                            <div class="progress mb-3" style="height:8px">
-                                <div class="progress-bar bg-warning" style="width:88%"></div>
-                            </div>
-                            <p class="mb-1 d-flex justify-content-between"><span><i
-                                        class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngozi</span><strong>90
-                                    %</strong></p>
-                            <div class="progress" style="height:8px">
-                                <div class="progress-bar bg-success" style="width:90%"></div>
-                            </div>
+                            <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
@@ -164,6 +243,20 @@
                 </div>
             </div>
 
+            <!-- ============ ALERTES FLASHDATA ============ -->
+            <?php if ($this->session->flashdata('error')): ?>
+            <div class="alert alert-danger alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?= $this->session->flashdata('error'); ?>
+            </div>
+            <?php endif; ?>
+            <?php if ($this->session->flashdata('success')): ?>
+            <div class="alert alert-success alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                <?= $this->session->flashdata('success'); ?>
+            </div>
+            <?php endif; ?>
+
             <!-- ============ 3. ONGLETS POINTAGE ============ -->
             <div class="card">
                 <div class="card-header p-2 px-3">
@@ -173,7 +266,7 @@
                                         class="fas fa-calendar-day mr-1"></i> Pointage du jour</a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabAnomalies"><i
                                         class="fas fa-exclamation-circle mr-1"></i> Anomalies <span
-                                        class="badge badge-danger ml-1">4</span></a></li>
+                                        class="badge badge-danger ml-1"><?= count($anomalies) ?></span></a></li>
                             <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tabSynthese"><i
                                         class="fas fa-chart-bar mr-1"></i> Synthèse mensuelle</a></li>
                         </ul>
@@ -192,7 +285,7 @@
                             <div class="input-group">
                                 <div class="input-group-prepend"><span class="input-group-text"><i
                                             class="fas fa-calendar-alt"></i></span></div>
-                                <input type="date" class="form-control" value="2026-08-21">
+                                <input type="date" id="filtreDate" class="form-control" value="<?= $date_vue ?>">
                             </div>
                         </div>
                         <div class="col-md-3 mb-2">
@@ -210,8 +303,6 @@
                                 <option>Présent</option>
                                 <option>Retard</option>
                                 <option>Absent</option>
-                                <option>En congé</option>
-                                <option>Suspendu</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-2">
@@ -243,201 +334,63 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php if (!empty($pointages_jour)): foreach ($pointages_jour as $p):
+                                            $initiales = strtoupper(mb_substr($p->prenoms, 0, 1) . mb_substr($p->nom, 0, 1));
+                                            $couleur   = $couleurs[$p->employe_id % count($couleurs)];
+                                            $icon      = (stripos($p->site_affectation, 'chantier') !== FALSE) ? 'fa-hard-hat' : 'fa-building';
+                                            $ht        = heures_travaillees($p->heure_entree, $p->heure_sortie);
+                                            $sortie_manquante = ($p->situation === 'Présent' && $p->heure_entree && !$p->heure_sortie);
+
+                                            if ($sortie_manquante)                          $badge_sit = '<span class="badge badge-danger">Sortie manquante</span>';
+                                            elseif ($p->situation === 'Présent')            $badge_sit = '<span class="badge badge-success">Présent</span>';
+                                            elseif ($p->situation === 'Retard')             $badge_sit = '<span class="badge badge-warning">Retard</span>';
+                                            elseif ($p->situation === 'Demi-journée')       $badge_sit = '<span class="badge badge-info">Demi-journée</span>';
+                                            elseif ($p->situation === 'Absence justifiée')  $badge_sit = '<span class="badge badge-info">Absence justifiée</span>';
+                                            else                                            $badge_sit = '<span class="badge badge-danger">Absence non justifiée</span>';
+                                    ?>
                                     <tr>
                                         <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#1f7a5c">JN</span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="avatar-initials mr-2"
+                                                    style="background:<?= $couleur ?>"><?= $initiales ?></span>
                                                 <div>
-                                                    <div class="font-weight-bold">Jean-Marie NDAYIZEYE</div><small
-                                                        class="text-muted">SAT-0001</small>
+                                                    <div class="font-weight-bold">
+                                                        <?= html_escape($p->prenoms . ' ' . mb_strtoupper($p->nom)) ?>
+                                                    </div>
+                                                    <small class="text-muted"><?= html_escape($p->matricule) ?></small>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><i class="fas fa-building mr-1 text-muted"></i>Ressources Humaines</td>
-                                        <td><span class="badge badge-light border">07:58</span></td>
-                                        <td><span class="badge badge-light border">17:02</span></td>
-                                        <td>8 h 00</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-success">Présent</span></td>
+                                        <td><i
+                                                class="fas <?= $icon ?> mr-1 text-muted"></i><?= html_escape($p->site_affectation) ?>
+                                        </td>
+                                        <td><?= $p->heure_entree ? '<span class="badge badge-light border">' . substr($p->heure_entree, 0, 5) . '</span>' : '<span class="badge badge-danger">—</span>' ?>
+                                        </td>
+                                        <td><?= $p->heure_sortie ? '<span class="badge badge-light border">' . substr($p->heure_sortie, 0, 5) . '</span>' : '<span class="badge badge-danger">—</span>' ?>
+                                        </td>
+                                        <td><?= $ht ?: '—' ?></td>
+                                        <td><?= (float) $p->heures_sup > 0 ? '<span class="badge badge-info">' . (int) $p->heures_sup . ' h</span>' : '—' ?>
+                                        </td>
+                                        <td><?= $badge_sit ?></td>
                                         <td class="text-right"><button class="btn btn-sm btn-default"
                                                 title="Corriger"><i class="fas fa-edit"></i></button></td>
                                     </tr>
+                                    <?php endforeach;
+                                    else: ?>
                                     <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#7a4f1f">AK</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Aymar KIGABIRO</div><small
-                                                        class="text-muted">SAT-0008</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-building mr-1 text-muted"></i>Direction Générale</td>
-                                        <td><span class="badge badge-warning">08:24</span></td>
-                                        <td><span class="badge badge-light border">17:00</span></td>
-                                        <td>7 h 36</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-warning">Retard +24 min</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
+                                        <td colspan="8" class="text-center text-muted py-4"><i
+                                                class="fas fa-inbox fa-2x mb-2 d-block"></i>Aucun pointage pour cette
+                                            date.</td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">AN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Alice NIYONZIMA</div><small
-                                                        class="text-muted">SAT-0014</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-building mr-1 text-muted"></i>DAF / Finance</td>
-                                        <td><span class="badge badge-light border">07:55</span></td>
-                                        <td><span class="badge badge-light border">17:00</span></td>
-                                        <td>8 h 00</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-success">Présent</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">PH</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Patrick HAKIZIMANA</div><small
-                                                        class="text-muted">SAT-0021</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                        <td><span class="badge badge-light border">07:30</span></td>
-                                        <td><span class="badge badge-light border">17:45</span></td>
-                                        <td>9 h 15</td>
-                                        <td><span class="badge badge-info">1 h 15</span></td>
-                                        <td><span class="badge badge-success">Présent</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#2c8a69">GR</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Gilbert RUKARA</div><small
-                                                        class="text-muted">SAT-0027</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                        <td><span class="badge badge-light border">07:32</span></td>
-                                        <td><span class="badge badge-danger">—</span></td>
-                                        <td>—</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-danger">Sortie manquante</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#6c757d">JM</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Justine MBONIMPA</div><small
-                                                        class="text-muted">SAT-0032</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngagara II</td>
-                                        <td><span class="badge badge-danger">—</span></td>
-                                        <td><span class="badge badge-danger">—</span></td>
-                                        <td>—</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-danger">Absent non justifié</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#34608c">CN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Cédric NIYONGABO</div><small
-                                                        class="text-muted">SAT-0041</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Gitega</td>
-                                        <td><span class="badge badge-light border">07:45</span></td>
-                                        <td><span class="badge badge-light border">17:10</span></td>
-                                        <td>8 h 25</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-success">Présent</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#2c8a69">EI</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Espérance INGABIRE</div><small
-                                                        class="text-muted">SAT-0007</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-building mr-1 text-muted"></i>Direction Générale</td>
-                                        <td colspan="3" class="text-muted"><small>Congé annuel (12/08 →
-                                                21/08/2026)</small></td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-info">En congé</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default" title="Voir"><i
-                                                    class="fas fa-eye"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#8a3033">NI</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Nadia IRAKOZE</div><small
-                                                        class="text-muted">SAT-0059</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-building mr-1 text-muted"></i>Ressources Humaines</td>
-                                        <td><span class="badge badge-light border">08:00</span></td>
-                                        <td><span class="badge badge-light border">17:00</span></td>
-                                        <td>8 h 00</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-success">Présent</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center"><span class="avatar-initials mr-2"
-                                                    style="background:#6c757d">PN</span>
-                                                <div>
-                                                    <div class="font-weight-bold">Prisca NDABASHIMANA</div><small
-                                                        class="text-muted">SAT-0062</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td><i class="fas fa-hard-hat mr-1 text-muted"></i>Chantier Ngozi</td>
-                                        <td><span class="badge badge-light border">07:50</span></td>
-                                        <td><span class="badge badge-light border">17:05</span></td>
-                                        <td>8 h 15</td>
-                                        <td>—</td>
-                                        <td><span class="badge badge-success">Présent</span></td>
-                                        <td class="text-right"><button class="btn btn-sm btn-default"
-                                                title="Corriger"><i class="fas fa-edit"></i></button></td>
-                                    </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
                         <div class="card-footer clearfix">
-                            <small class="text-muted float-left mt-2">Pointage du 21/08/2026 · 48 présents · 2 absents ·
-                                3 congés · 2 suspendus</small>
+                            <small class="text-muted float-left mt-2">
+                                Pointage du <?= date('d/m/Y', strtotime($date_vue)) ?> · <?= $nb_presents ?> présent(s)
+                                · <?= $nb_abs_j + $nb_abs_nj ?> absent(s)
+                            </small>
                         </div>
                     </div>
 
@@ -455,40 +408,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="table-danger">
-                                        <td>21/08/2026</td>
-                                        <td>Justine MBONIMPA <small class="text-muted">(SAT-0032)</small></td>
-                                        <td><span class="badge badge-danger">Absence non justifiée</span></td>
-                                        <td>Aucun pointage — sans nouvelle du chef de chantier</td>
-                                        <td class="text-right">
-                                            <button class="btn btn-sm btn-success">Justifier</button>
-                                            <button class="btn btn-sm btn-default">Signaler au RH</button>
+                                    <?php if (!empty($anomalies)): foreach ($anomalies as $a): ?>
+                                    <tr class="table-<?= $a['classe'] ?>">
+                                        <td><?= date('d/m/Y', strtotime($a['p']->date_pointage)) ?></td>
+                                        <td><?= html_escape($a['p']->prenoms . ' ' . mb_strtoupper($a['p']->nom)) ?>
+                                            <small class="text-muted">(<?= html_escape($a['p']->matricule) ?>)</small>
+                                        </td>
+                                        <td><span class="badge badge-<?= $a['classe'] ?>"><?= $a['type'] ?></span></td>
+                                        <td><?= html_escape($a['detail']) ?></td>
+                                        <td class="text-right"><button class="btn btn-sm btn-success">Traiter</button>
                                         </td>
                                     </tr>
-                                    <tr class="table-warning">
-                                        <td>21/08/2026</td>
-                                        <td>Gilbert RUKARA <small class="text-muted">(SAT-0027)</small></td>
-                                        <td><span class="badge badge-warning">Sortie manquante</span></td>
-                                        <td>Entrée 07:32 enregistrée, sortie non pointée</td>
-                                        <td class="text-right"><button class="btn btn-sm btn-success">Corriger la
-                                                sortie</button></td>
-                                    </tr>
-                                    <tr class="table-warning">
-                                        <td>21/08/2026</td>
-                                        <td>Aymar KIGABIRO <small class="text-muted">(SAT-0008)</small></td>
-                                        <td><span class="badge badge-warning">Retard 24 min</span></td>
-                                        <td>Arrivée 08:24 (horaire 08:00)</td>
-                                        <td class="text-right"><button class="btn btn-sm btn-success">Justifier</button>
+                                    <?php endforeach;
+                                    else: ?>
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">Aucune anomalie ce mois-ci.
                                         </td>
                                     </tr>
-                                    <tr class="table-warning">
-                                        <td>20/08/2026</td>
-                                        <td>Divine NUNUBAHA <small class="text-muted">(SAT-0053)</small></td>
-                                        <td><span class="badge badge-warning">Entrée manquante</span></td>
-                                        <td>Sortie 17:00 enregistrée, entrée non pointée</td>
-                                        <td class="text-right"><button class="btn btn-sm btn-success">Corriger
-                                                l'entrée</button></td>
-                                    </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -497,7 +434,7 @@
                     <!-- ===== ONGLET : SYNTHÈSE MENSUELLE ===== -->
                     <div class="tab-pane fade" id="tabSynthese">
                         <div class="d-flex justify-content-between align-items-center p-3 pb-0">
-                            <h6 class="section-title mb-0">Synthèse — Août 2026 (17 jours ouvrés écoulés)</h6>
+                            <h6 class="section-title mb-0">Synthèse — <?= date('F Y', strtotime($date_vue)) ?></h6>
                             <button type="button" class="btn btn-success btn-sm"><i class="fas fa-share mr-1"></i>
                                 Transmettre à la paie</button>
                         </div>
@@ -506,7 +443,7 @@
                                 <thead>
                                     <tr>
                                         <th>Employé</th>
-                                        <th>Jours ouvrés</th>
+                                        <th>Jours pointés</th>
                                         <th>Présents</th>
                                         <th>Retards</th>
                                         <th>Abs. justifiées</th>
@@ -516,76 +453,30 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <?php if (!empty($synthese)): foreach ($synthese as $s):
+                                            $taux = $s['jours'] ? round($s['presents'] / $s['jours'] * 100) : 0;
+                                            $badge_taux = $taux >= 90 ? 'success' : ($taux >= 75 ? 'warning' : 'danger');
+                                    ?>
                                     <tr>
-                                        <td>Jean-Marie NDAYIZEYE <small class="text-muted">(SAT-0001)</small></td>
-                                        <td>17</td>
-                                        <td>17</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0 h</td>
-                                        <td><span class="badge badge-success">100 %</span></td>
+                                        <td><?= html_escape($s['p']->prenoms . ' ' . mb_strtoupper($s['p']->nom)) ?>
+                                            <small class="text-muted">(<?= html_escape($s['p']->matricule) ?>)</small>
+                                        </td>
+                                        <td><?= $s['jours'] ?></td>
+                                        <td><?= $s['presents'] ?></td>
+                                        <td><?= $s['retards'] ?></td>
+                                        <td><?= $s['abs_j'] ?></td>
+                                        <td><?= $s['abs_nj'] ? '<strong>' . $s['abs_nj'] . '</strong>' : 0 ?></td>
+                                        <td><?= $s['hs'] > 0 ? '<strong>' . (int) $s['hs'] . ' h</strong>' : '0 h' ?>
+                                        </td>
+                                        <td><span class="badge badge-<?= $badge_taux ?>"><?= $taux ?> %</span></td>
                                     </tr>
+                                    <?php endforeach;
+                                    else: ?>
                                     <tr>
-                                        <td>Aymar KIGABIRO <small class="text-muted">(SAT-0008)</small></td>
-                                        <td>14</td>
-                                        <td>14</td>
-                                        <td>2</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0 h</td>
-                                        <td><span class="badge badge-success">100 %</span></td>
+                                        <td colspan="8" class="text-center text-muted py-4">Aucun pointage ce mois-ci.
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Patrick HAKIZIMANA <small class="text-muted">(SAT-0021)</small></td>
-                                        <td>17</td>
-                                        <td>17</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td><strong>12 h</strong></td>
-                                        <td><span class="badge badge-success">100 %</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Justine MBONIMPA <small class="text-muted">(SAT-0032)</small></td>
-                                        <td>17</td>
-                                        <td>15</td>
-                                        <td>0</td>
-                                        <td>1</td>
-                                        <td><strong>1</strong></td>
-                                        <td>0 h</td>
-                                        <td><span class="badge badge-warning">88 %</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Espérance INGABIRE <small class="text-muted">(SAT-0007)</small></td>
-                                        <td>17</td>
-                                        <td>9</td>
-                                        <td>0</td>
-                                        <td>8 (congés)</td>
-                                        <td>0</td>
-                                        <td>0 h</td>
-                                        <td><span class="badge badge-info">Congé</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Gilbert RUKARA <small class="text-muted">(SAT-0027)</small></td>
-                                        <td>17</td>
-                                        <td>16</td>
-                                        <td>1</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td><strong>6 h</strong></td>
-                                        <td><span class="badge badge-success">94 %</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Cédric NIYONGABO <small class="text-muted">(SAT-0041)</small></td>
-                                        <td>17</td>
-                                        <td>17</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td>0</td>
-                                        <td><strong>8 h</strong></td>
-                                        <td><span class="badge badge-success">100 %</span></td>
-                                    </tr>
+                                    <?php endif; ?>
                                 </tbody>
                             </table>
                         </div>
@@ -603,84 +494,121 @@
             <div class="modal fade" id="modalPointage">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
-                        <div class="modal-header bg-success text-white">
-                            <h4 class="modal-title"><i class="fas fa-user-clock mr-2"></i>Saisie / correction de
-                                pointage</h4>
-                            <button type="button" class="close text-white"
-                                data-dismiss="modal"><span>&times;</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Employé *</label>
-                                        <select class="form-control">
-                                            <option>— Sélectionner —</option>
-                                            <option>SAT-0001 · Jean-Marie NDAYIZEYE</option>
-                                            <option>SAT-0027 · Gilbert RUKARA</option>
-                                            <option>SAT-0032 · Justine MBONIMPA</option>
-                                            <option>SAT-0053 · Divine NUNUBAHA</option>
-                                        </select>
+                        <form id="formPointage" method="post" action="<?= base_url('rh-presences-store') ?>"
+                            enctype="multipart/form-data">
+                            <div class="modal-header bg-success text-white">
+                                <h4 class="modal-title"><i class="fas fa-user-clock mr-2"></i>Saisie / correction de
+                                    pointage</h4>
+                                <button type="button" class="close text-white"
+                                    data-dismiss="modal"><span>&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Employé *</label>
+                                            <select name="employe_id" class="form-control" required>
+                                                <option value="">— Sélectionner —</option>
+                                                <?php foreach ($employes as $e):
+                                                    if ($e->statut === 'Fin de contrat') continue; ?>
+                                                <option value="<?= $e->employe_id ?>">
+                                                    <?= html_escape($e->matricule . ' · ' . $e->prenoms . ' ' . mb_strtoupper($e->nom)) ?>
+                                                </option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Date *</label><input type="date" class="form-control"
-                                            value="2026-08-21"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Heure d'entrée</label><input type="time"
-                                            class="form-control" value="07:30"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Heure de sortie</label><input type="time"
-                                            class="form-control" value="17:00"></div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group"><label>Heures supplémentaires</label>
-                                        <select class="form-control">
-                                            <option>Aucune</option>
-                                            <option>1 h</option>
-                                            <option>2 h</option>
-                                            <option>3 h</option>
-                                            <option>4 h et +</option>
-                                        </select>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Date *</label>
+                                            <input type="date" name="date_pointage" class="form-control"
+                                                value="<?= $date_vue ?>" required>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Situation</label>
-                                        <select class="form-control">
-                                            <option>Présent (journée complète)</option>
-                                            <option>Demi-journée</option>
-                                            <option>Retard</option>
-                                            <option>Absence justifiée (maladie, mission…)</option>
-                                            <option>Absence non justifiée</option>
-                                        </select>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Heure d'entrée</label>
+                                            <input type="time" name="heure_entree" class="form-control" value="07:30">
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group"><label>Pièce justificative (certificat,
-                                            autorisation…)</label>
-                                        <div class="custom-file">
-                                            <input type="file" class="custom-file-input" id="fileJustifPointage">
-                                            <label class="custom-file-label" for="fileJustifPointage">Choisir…</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Heure de sortie</label>
+                                            <input type="time" name="heure_sortie" class="form-control" value="17:00">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group"><label>Heures supplémentaires</label>
+                                            <select name="heures_sup" class="form-control">
+                                                <option value="0">Aucune</option>
+                                                <option value="1">1 h</option>
+                                                <option value="2">2 h</option>
+                                                <option value="3">3 h</option>
+                                                <option value="4">4 h et +</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Situation</label>
+                                            <select name="situation" class="form-control">
+                                                <option>Présent</option>
+                                                <option>Demi-journée</option>
+                                                <option>Retard</option>
+                                                <option>Absence justifiée</option>
+                                                <option>Absence non justifiée</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group"><label>Pièce justificative (certificat,
+                                                autorisation…)</label>
+                                            <div class="custom-file">
+                                                <input type="file" name="justificatif" class="custom-file-input"
+                                                    id="fileJustifPointage">
+                                                <label class="custom-file-label"
+                                                    for="fileJustifPointage">Choisir…</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-group"><label>Motif / observation</label>
+                                            <textarea name="motif" class="form-control" rows="2"
+                                                placeholder="Ex. : oubli de pointage confirmé par le chef de chantier…"></textarea>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12">
-                                    <div class="form-group"><label>Motif / observation</label>
-                                        <textarea class="form-control" rows="2"
-                                            placeholder="Ex. : oubli de pointage confirmé par le chef de chantier…"></textarea>
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
-                            <button type="button" class="btn btn-success"><i class="fas fa-save mr-1"></i> Enregistrer
-                                le pointage</button>
-                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Annuler</button>
+                                <button type="submit" class="btn btn-success"><i class="fas fa-save mr-1"></i>
+                                    Enregistrer le pointage</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+
+            <!-- ============ SCRIPTS ============ -->
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+
+                /* Filtre par date → recharge la page */
+                var fd = document.getElementById('filtreDate');
+                if (fd) fd.addEventListener('change', function() {
+                    window.location.search = 'date=' + this.value;
+                });
+
+                /* Nom du fichier choisi */
+                var form = document.getElementById('formPointage');
+                if (form) {
+                    form.querySelectorAll('.custom-file-input').forEach(function(input) {
+                        input.addEventListener('change', function() {
+                            var label = this.closest('.custom-file').querySelector(
+                                '.custom-file-label');
+                            label.textContent = (this.files && this.files.length) ? this.files[
+                                0].name : 'Choisir…';
+                            label.classList.toggle('has-file', this.files.length > 0);
+                        });
+                    });
+                }
+            });
+            </script>
 
         </div><!-- /.container-fluid -->
     </section>

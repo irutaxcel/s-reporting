@@ -398,10 +398,20 @@
                                     <div class="col-md-4">
                                         <div class="form-group"><label>Département</label>
                                             <select name="departement" class="form-control">
-                                                <option>Direction Générale</option>
-                                                <option>DAF / Finance</option>
-                                                <option>Direction Technique</option>
-                                                <option>Ressources Humaines</option>
+                                                <option>DIRECTION GENERALE</option>
+                                                <option>DIRECTION ADMINISTRATIVE ET FINANCIERE</option>
+                                                <option>DIRECTION TECHNIQUE</option>
+                                                <option>RH</option>
+                                                <option>COMPTABILITE</option>
+                                                <option>LOGISTIQUE</option>
+                                                <option>BUREAU TECHNIQUE</option>
+                                                <option>ARCHETECTURE</option>
+                                                <option>INFORMATIQUE</option>
+                                                <option>COMMERCE/MARKETING/JURIDIQUE/DESIGNER</option>
+                                                <option>SUIVI CHANTIERS</option>
+                                                <option>CHARROI</option>
+                                                <option>PLANTON+GARDIEN+CUISINIER</option>
+
                                             </select>
                                         </div>
                                     </div>
@@ -409,9 +419,7 @@
                                         <div class="form-group"><label>Site d'affectation</label>
                                             <select name="site_affectation" class="form-control">
                                                 <option>Siège (Bujumbura)</option>
-                                                <option>Chantier Ngagara II</option>
-                                                <option>Chantier Gitega</option>
-                                                <option>Chantier Ngozi</option>
+                                                <option>Chantiers</option>
                                             </select>
                                         </div>
                                     </div>
@@ -442,8 +450,8 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="form-group"><label>Salaire de base (BIF) *</label><input
-                                                type="number" name="salaire_base" class="form-control" required></div>
+                                        <div class="form-group"><label>Salaire BRUT (BIF) *</label><input type="number"
+                                                name="salaire_base" class="form-control" required></div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group"><label>Mode de paiement</label>

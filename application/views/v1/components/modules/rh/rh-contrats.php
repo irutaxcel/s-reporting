@@ -552,7 +552,7 @@
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="form-group"><label>Salaire de base (BIF) *</label>
+                                        <div class="form-group"><label>Salaire BRUT (BIF) *</label>
                                             <input type="number" name="salaire_base" class="form-control" required>
                                         </div>
                                     </div>
@@ -560,9 +560,7 @@
                                         <div class="form-group"><label>Affectation *</label>
                                             <select name="site_affectation" class="form-control">
                                                 <option>Siège (Bujumbura)</option>
-                                                <option>Chantier Ngagara II</option>
-                                                <option>Chantier Gitega</option>
-                                                <option>Chantier Ngozi</option>
+                                                <option>Chantiers</option>
                                             </select>
                                         </div>
                                     </div>

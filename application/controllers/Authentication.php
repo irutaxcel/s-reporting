@@ -46,10 +46,14 @@ class Authentication extends CI_Controller
             redirect('sign-in');
         }
 
+        // ✔ Récupère le code du rôle pour le helper permissions
+        $roleCode = $this->db->select('code')->where('id', $user->role_id)->get('roles')->row();
+
         $this->session->set_userdata([
             'user_id'    => $user->id,
             'company_id' => $user->company_id,
             'role_id'    => $user->role_id,
+            'role_code'  => $roleCode ? $roleCode->code : '',   // ✔ ajout
             'first_name' => $user->first_name,
             'last_name'  => $user->last_name,
             'email'      => $user->email,
