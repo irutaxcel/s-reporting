@@ -661,9 +661,9 @@ class DgModel extends CI_Model
     }
 
     /**
-     * Récupérer toutes les sorties de caisse relation publique
+     * Récupérer toutes les sorties de caisse relation publique avec filtres
      */
-    public function getSortiesRelationPublique($date_debut = null, $date_fin = null, $status = null): array
+    public function getSortiesRelationPublique($date_debut = null, $date_fin = null, $status = null, $beneficiaire = null): array
     {
         $this->db->select('*');
         $this->db->from('tbl_relation_publique');
@@ -676,6 +676,10 @@ class DgModel extends CI_Model
 
         if ($status) {
             $this->db->where('status', $status);
+        }
+
+        if ($beneficiaire) {
+            $this->db->like('beneficiaire', $beneficiaire);
         }
 
         $this->db->order_by('date_sortie', 'DESC');
@@ -711,5 +715,69 @@ class DgModel extends CI_Model
             'total_valide'        => (float) ($result->total_valide ?? 0),
             'total_en_attente'    => (float) ($result->total_en_attente ?? 0),
         ];
+    }
+
+    /**
+     * Récupérer une sortie RP par son ID
+     */
+    public function getSortieRPById($id)
+    {
+        $this->db->where('id', $id);
+        return $this->db->get('tbl_relation_publique')->row();
+    }
+
+    /**
+     * Supprimer une sortie RP et mettre à jour la caisse
+     */
+    public function deleteSortieRP($id, $sortie): bool
+    {
+        $this->db->trans_start(); // Début de transaction
+
+        try {
+            // ============================================
+            // ÉTAPE 1 : Supprimer le mouvement dans tbl_finance_mouvement_principale
+            // ============================================
+            $this->db->where('document_number', $sortie->reference);
+            // $this->db->where('nature', 'sortie_rp');
+            $this->db->delete('tbl_finance_mouvement_principale');
+
+            // ============================================
+            // ÉTAPE 2 : Mettre à jour le solde de la caisse principale (réajouter le montant)
+            // ============================================
+            $this->db->select('current_balance');
+            $this->db->from('tbl_finance_cashbox');
+            $this->db->where('role', 'principale');
+            $this->db->where('status', 'active');
+            $cashbox = $this->db->get()->row();
+
+            $current_balance = $cashbox ? (float) $cashbox->current_balance : 0;
+            $new_balance = $current_balance + (float) $sortie->montant;
+
+            $this->db->where('role', 'principale');
+            $this->db->where('status', 'active');
+            $this->db->update('tbl_finance_cashbox', [
+                'current_balance' => $new_balance,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            // ============================================
+            // ÉTAPE 3 : Supprimer la sortie dans tbl_relation_publique
+            // ============================================
+            $this->db->where('id', $id);
+            $this->db->delete('tbl_relation_publique');
+
+            $this->db->trans_complete(); // Fin de transaction
+
+            if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                return false;
+            }
+
+            return true;
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Erreur suppression sortie RP ID ' . $id . ': ' . $e->getMessage());
+            return false;
+        }
     }
 }

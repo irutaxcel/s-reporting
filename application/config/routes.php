@@ -67,6 +67,8 @@ $route['direction-archives'] = 'Dgcontroller/directionArchives';
 $route['direction-relation-publique'] = 'Dgcontroller/directionRelationPublique';
 $route['save-relations-publique'] = 'Dgcontroller/saveRelationsPublique';
 
+$route['direction/delete-sortie-rp'] = 'Dgcontroller/deleteSortieRP';
+
 // Route pour mettre à jour le montant autorisé
 $route['direction/update-montant-autorise'] = 'Dgcontroller/updateMontantAutorise';
 

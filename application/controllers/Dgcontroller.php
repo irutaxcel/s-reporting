@@ -26,6 +26,11 @@ class Dgcontroller extends CI_Controller
 
     public function syntheseDemandes()
     {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $data['title'] = 'Synthèse des demandes';
 
         // ============================================
@@ -136,6 +141,11 @@ class Dgcontroller extends CI_Controller
 
     public function imprimerSynthese()
     {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $data['title'] = 'Synthèse des demandes d\'achat - Impression';
 
         // Récupérer les filtres
@@ -180,6 +190,11 @@ class Dgcontroller extends CI_Controller
 
     public function directionArchives()
     {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $data['title'] = 'Archives des demandes d\'achat';
 
         // Récupérer les filtres
@@ -211,20 +226,32 @@ class Dgcontroller extends CI_Controller
      */
     public function directionRelationPublique()
     {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $data['title'] = 'Relation Publique';
 
         // Récupérer les filtres
-        $date_debut = $this->input->get('date_debut') ?: date('Y-m-01');
-        $date_fin   = $this->input->get('date_fin') ?: date('Y-m-d');
+        $data['filtre_date_debut'] = $this->input->get('date_debut') ?: date('Y-m-01');
+        $data['filtre_date_fin'] = $this->input->get('date_fin') ?: date('Y-m-d');
+        $data['filtre_beneficiaire'] = $this->input->get('beneficiaire');
+        $data['filtre_statut'] = $this->input->get('statut');
 
-        $data['filtre_date_debut'] = $date_debut;
-        $data['filtre_date_fin']   = $date_fin;
-
-        // Récupérer les sorties
-        $data['sorties'] = $this->dg->getSortiesRelationPublique($date_debut, $date_fin);
+        // Récupérer les sorties avec filtres
+        $data['sorties'] = $this->dg->getSortiesRelationPublique(
+            $data['filtre_date_debut'],
+            $data['filtre_date_fin'],
+            $data['filtre_statut'],
+            $data['filtre_beneficiaire']
+        );
 
         // Récupérer les statistiques
-        $data['statistiques'] = $this->dg->getStatistiquesSortiesRP($date_debut, $date_fin);
+        $data['statistiques'] = $this->dg->getStatistiquesSortiesRP(
+            $data['filtre_date_debut'],
+            $data['filtre_date_fin']
+        );
 
         // Charger les vues
         $this->load->view('v1/components/layout/header', $data);
@@ -325,5 +352,48 @@ class Dgcontroller extends CI_Controller
             'admin' => 'Administrateur'
         ];
         return $libelles[$code] ?? $code;
+    }
+
+    /**
+     * Supprimer une sortie de caisse Relation Publique
+     */
+    public function deleteSortieRP()
+    {
+        // Vérifier que c'est une requête AJAX
+        if (!$this->input->is_ajax_request()) {
+            echo json_encode(['success' => false, 'message' => 'Requête invalide']);
+            exit;
+        }
+
+        $id = $this->input->post('id');
+
+        if (empty($id)) {
+            echo json_encode(['success' => false, 'message' => 'ID invalide']);
+            exit;
+        }
+
+        // Récupérer les détails de la sortie avant suppression
+        $sortie = $this->dg->getSortieRPById($id);
+
+        if (!$sortie) {
+            echo json_encode(['success' => false, 'message' => 'Sortie non trouvée']);
+            exit;
+        }
+
+        // Supprimer la sortie et mettre à jour les tables
+        $result = $this->dg->deleteSortieRP($id, $sortie);
+
+        if ($result) {
+            echo json_encode([
+                'success' => true,
+                'message' => "La sortie {$sortie->reference} a été supprimée avec succès. Montant restitué : " .
+                    number_format($sortie->montant, 0, ',', ' ') . " BIF"
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression. Veuillez réessayer.'
+            ]);
+        }
     }
 }
