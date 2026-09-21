@@ -34,7 +34,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Total Projets</span>
-                            <span class="info-box-number">47</span>
+                            <span class="info-box-number"><?= $stats['total'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">En Cours</span>
-                            <span class="info-box-number">28</span>
+                            <span class="info-box-number"><?= $stats['en_cours'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Planifiés</span>
-                            <span class="info-box-number">12</span>
+                            <span class="info-box-number"><?= $stats['planifies'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -70,12 +70,11 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Terminés</span>
-                            <span class="info-box-number">7</span>
+                            <span class="info-box-number"><?= $stats['termines'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- /.row -->
 
             <!-- Main Projects Card -->
             <div class="card card-primary card-outline">
@@ -156,286 +155,116 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Projet 1 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td><strong>PROJ-2026-001</strong></td>
-                                    <td>
-                                        <strong>Construction Université Oran</strong><br>
-                                        <small class="text-muted">Début: 01/09/2026</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-building text-primary"></i>
-                                        Ministère de l'Éducation
-                                    </td>
-                                    <td>
-                                        <strong>10,000,000 DA</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-hard-hat"></i> 3 chantiers
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 45%"></div>
-                                        </div>
-                                        <small>45%</small>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-warning" style="width: 30%"></div>
-                                        </div>
-                                        <small>30%</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-sync fa-spin"></i> En cours
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalProjectDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-success" title="Ajouter chantier"
-                                                data-toggle="modal" data-target="#modalAddSite">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-warning" title="Contrat">
-                                                <i class="fas fa-file-contract"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Projet 2 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td><strong>PROJ-2026-002</strong></td>
-                                    <td>
-                                        <strong>Hôpital Régional Annaba</strong><br>
-                                        <small class="text-muted">Début: 15/08/2026</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-landmark text-primary"></i>
-                                        Wilaya d'Annaba
-                                    </td>
-                                    <td>
-                                        <strong>15,500,000 DA</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-hard-hat"></i> 5 chantiers
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 60%"></div>
-                                        </div>
-                                        <small>60%</small>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-info" style="width: 55%"></div>
-                                        </div>
-                                        <small>55%</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-sync fa-spin"></i> En cours
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalProjectDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-success" title="Ajouter chantier"
-                                                data-toggle="modal" data-target="#modalAddSite">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-warning" title="Contrat">
-                                                <i class="fas fa-file-contract"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Projet 3 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td><strong>PROJ-2026-003</strong></td>
-                                    <td>
-                                        <strong>Complexe Sportif Constantine</strong><br>
-                                        <small class="text-muted">Début: 01/10/2026</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-building text-primary"></i>
-                                        Ministère des Sports
-                                    </td>
-                                    <td>
-                                        <strong>8,200,000 DA</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-secondary">
-                                            <i class="fas fa-hard-hat"></i> 0 chantier
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar" style="width: 0%"></div>
-                                        </div>
-                                        <small>0%</small>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar" style="width: 0%"></div>
-                                        </div>
-                                        <small>0%</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-warning">
-                                            <i class="fas fa-clock"></i> Planification
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalProjectDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-success" title="Ajouter chantier"
-                                                data-toggle="modal" data-target="#modalAddSite">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-warning" title="Associer contrat"
-                                                data-toggle="modal" data-target="#modalAssignContract">
-                                                <i class="fas fa-link"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Projet 4 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td><strong>PROJ-2026-004</strong></td>
-                                    <td>
-                                        <strong>Centre Commercial Alger</strong><br>
-                                        <small class="text-muted">Début: 01/03/2026</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-building text-primary"></i>
-                                        SARL ImmoPlus
-                                    </td>
-                                    <td>
-                                        <strong>20,000,000 DA</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-hard-hat"></i> 4 chantiers
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 85%"></div>
-                                        </div>
-                                        <small>85%</small>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 80%"></div>
-                                        </div>
-                                        <small>80%</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-sync fa-spin"></i> En cours
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalProjectDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-success" title="Ajouter chantier"
-                                                data-toggle="modal" data-target="#modalAddSite">
-                                                <i class="fas fa-plus"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-warning" title="Contrat">
-                                                <i class="fas fa-file-contract"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Projet 5 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td><strong>PROJ-2025-045</strong></td>
-                                    <td>
-                                        <strong>Résidence Universitaire Sétif</strong><br>
-                                        <small class="text-muted">Terminé: 30/06/2026</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-building text-primary"></i>
-                                        Ministère de l'Éducation
-                                    </td>
-                                    <td>
-                                        <strong>12,300,000 DA</strong>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-hard-hat"></i> 2 chantiers
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 100%"></div>
-                                        </div>
-                                        <small>100%</small>
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm">
-                                            <div class="progress-bar bg-success" style="width: 100%"></div>
-                                        </div>
-                                        <small>100%</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-check-circle"></i> Terminé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalProjectDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-secondary" title="Ajouter chantier"
-                                                disabled>
-                                                <i class="fas fa-ban"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-warning" title="Contrat">
-                                                <i class="fas fa-file-contract"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <?php if (!empty($projects)): ?>
+                                    <?php foreach ($projects as $project): ?>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="checkbox-item">
+                                            </td>
+                                            <td><strong><?= htmlspecialchars($project->reference ?? 'PROJ-' . $project->id) ?></strong>
+                                            </td>
+                                            <td>
+                                                <strong><?= htmlspecialchars($project->name) ?></strong><br>
+                                                <small class="text-muted">
+                                                    <?php
+                                                    $dateDebut = isset($project->created_at) ? date('d/m/Y', strtotime($project->created_at)) : '-';
+                                                    echo 'Début: ' . $dateDebut;
+                                                    ?>
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <?php if ($project->client_name): ?>
+                                                    <i
+                                                        class="fas fa-<?= $project->type_client == 'public' ? 'landmark' : 'building' ?> text-primary"></i>
+                                                    <?= htmlspecialchars($project->client_name) ?>
+                                                <?php else: ?>
+                                                    <em class="text-muted">Non assigné</em>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td>
+                                                <strong><?= number_format($project->montant ?? 0, 0, ',', ' ') ?> DA</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info">
+                                                    <i class="fas fa-hard-hat"></i> <?= $project->nb_chantiers ?>
+                                                    chantier<?= $project->nb_chantiers > 1 ? 's' : '' ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="progress progress-sm">
+                                                    <?php
+                                                    $avancement = round($project->avg_avancement);
+                                                    $bgClass = $avancement == 100 ? 'bg-success' : ($avancement > 0 ? 'bg-success' : '');
+                                                    ?>
+                                                    <div class="progress-bar <?= $bgClass ?>"
+                                                        style="width: <?= $avancement ?>%"></div>
+                                                </div>
+                                                <small><?= $avancement ?>%</small>
+                                            </td>
+                                            <td>
+                                                <div class="progress progress-sm">
+                                                    <?php
+                                                    $montantTotal = $project->montant ?? 0;
+                                                    $totalDecaisse = $project->total_decaisse ?? 0;
+                                                    $pourcentageDecaisse = $montantTotal > 0 ? round(($totalDecaisse / $montantTotal) * 100) : 0;
+                                                    $bgColor = $pourcentageDecaisse >= 80 ? 'bg-success' : ($pourcentageDecaisse >= 50 ? 'bg-info' : 'bg-warning');
+                                                    ?>
+                                                    <div class="progress-bar <?= $bgColor ?>"
+                                                        style="width: <?= $pourcentageDecaisse ?>%"></div>
+                                                </div>
+                                                <small><?= $pourcentageDecaisse ?>%</small>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $statusClass = '';
+                                                $statusIcon = '';
+                                                switch ($project->status) {
+                                                    case 'En cours':
+                                                        $statusClass = 'badge-success';
+                                                        $statusIcon = '<i class="fas fa-sync fa-spin"></i>';
+                                                        break;
+                                                    case 'Planifié':
+                                                        $statusClass = 'badge-warning';
+                                                        $statusIcon = '<i class="fas fa-clock"></i>';
+                                                        break;
+                                                    case 'Terminé':
+                                                        $statusClass = 'badge-info';
+                                                        $statusIcon = '<i class="fas fa-check-circle"></i>';
+                                                        break;
+                                                    default:
+                                                        $statusClass = 'badge-secondary';
+                                                        $statusIcon = '<i class="fas fa-circle"></i>';
+                                                }
+                                                ?>
+                                                <span class="badge <?= $statusClass ?>">
+                                                    <?= $statusIcon ?> <?= htmlspecialchars($project->status) ?>
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-info" title="Voir détails"
+                                                        onclick="viewProject(<?= $project->id ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-success" title="Ajouter chantier"
+                                                        onclick="addChantier(<?= $project->id ?>, '<?= htmlspecialchars($project->name) ?>')">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-warning" title="Contrat">
+                                                        <i class="fas fa-file-contract"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="10" class="text-center text-muted py-5">
+                                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                                            <p>Aucun projet trouvé</p>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -444,7 +273,7 @@
                     <div class="row mt-3">
                         <div class="col-sm-5">
                             <div class="dataTables_info">
-                                Affichage de 1 à 5 sur 47 projets
+                                Affichage de 1 à <?= count($projects) ?> sur <?= count($projects) ?> projets
                             </div>
                         </div>
                         <div class="col-sm-7">
@@ -455,21 +284,6 @@
                                     </li>
                                     <li class="page-item active">
                                         <a class="page-link" href="#">1</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">2</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">3</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">...</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">10</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">&raquo;</a>
                                     </li>
                                 </ul>
                             </div>
@@ -483,6 +297,74 @@
         </div><!-- /.container-fluid -->
     </section>
     <!-- /.content -->
+
+    <script>
+        // Stockage des données projets
+        var projectsData = <?= json_encode($projects) ?>;
+
+        // Fonction pour voir un projet
+        function viewProject(projectId) {
+            // Trouver le projet
+            var project = null;
+            for (var i = 0; i < projectsData.length; i++) {
+                if (projectsData[i].id == projectId) {
+                    project = projectsData[i];
+                    break;
+                }
+            }
+
+            if (project) {
+                // Redirection vers la page de détail ou ouverture d'un modal
+                alert('Voir détails du projet: ' + project.name);
+                // window.location.href = '<?= base_url("projets-view/") ?>' + projectId;
+            }
+        }
+
+        // Fonction pour ajouter un chantier
+        function addChantier(projectId, projectName) {
+            Swal.fire({
+                title: 'Ajouter un chantier',
+                text: 'Projet: ' + projectName,
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Continuer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirection vers le formulaire d'ajout de chantier
+                    // window.location.href = '<?= base_url("chantiers-add/") ?>' + projectId;
+                    alert('Redirection vers ajout chantier pour le projet ' + projectId);
+                }
+            });
+        }
+
+        // Initialisation
+        $(document).ready(function() {
+            // Activer DataTables si disponible
+            if ($.fn.DataTable) {
+                $('.dataTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr.json"
+                    },
+                    "pageLength": 10,
+                    "lengthMenu": [
+                        [10, 25, 50, -1],
+                        [10, 25, 50, "Tous"]
+                    ],
+                    "order": [
+                        [1, 'desc']
+                    ]
+                });
+            }
+
+            // Select2 pour les filtres
+            $('.select2').select2({
+                theme: 'bootstrap4',
+                placeholder: 'Sélectionner...',
+                allowClear: true
+            });
+        });
+    </script>
 
     <!-- Modal Détails Projet -->
     <div class="modal fade" id="modalProjectDetails">
@@ -858,34 +740,34 @@
 
     <!-- Script pour gérer l'upload et la preview -->
     <script>
-    $(document).ready(function() {
-        // Gestion de l'affichage du nom de fichier
-        $('.custom-file-input').on('change', function() {
-            var fileName = $(this).val().split('\\').pop();
-            $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+        $(document).ready(function() {
+            // Gestion de l'affichage du nom de fichier
+            $('.custom-file-input').on('change', function() {
+                var fileName = $(this).val().split('\\').pop();
+                $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
 
-            // Afficher la preview
-            if (fileName) {
-                var fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
-                $('#contratFileName').text(fileName);
-                $('#contratFileSize').text(fileSize + ' MB');
-                $('#contratPreview').slideDown();
-            }
-        });
+                // Afficher la preview
+                if (fileName) {
+                    var fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+                    $('#contratFileName').text(fileName);
+                    $('#contratFileSize').text(fileSize + ' MB');
+                    $('#contratPreview').slideDown();
+                }
+            });
 
-        // Bouton supprimer contrat
-        $('#btnSupprimerContrat').on('click', function() {
-            $('#fileContrat').val('');
-            $('#fileContrat').siblings('.custom-file-label').html('Choisir un fichier...');
-            $('#contratPreview').slideUp();
-        });
+            // Bouton supprimer contrat
+            $('#btnSupprimerContrat').on('click', function() {
+                $('#fileContrat').val('');
+                $('#fileContrat').siblings('.custom-file-label').html('Choisir un fichier...');
+                $('#contratPreview').slideUp();
+            });
 
-        // Bouton voir contrat (simulation)
-        $('#btnVoirContrat').on('click', function() {
-            alert('Aperçu du contrat: ' + $('#contratFileName').text());
-            // En production: ouvrir le PDF dans un nouvel onglet ou modal
+            // Bouton voir contrat (simulation)
+            $('#btnVoirContrat').on('click', function() {
+                alert('Aperçu du contrat: ' + $('#contratFileName').text());
+                // En production: ouvrir le PDF dans un nouvel onglet ou modal
+            });
         });
-    });
     </script>
 
     <!-- Modal Modifier Avancement -->

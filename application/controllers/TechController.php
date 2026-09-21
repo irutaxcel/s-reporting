@@ -514,6 +514,83 @@ class TechController extends CI_Controller
     //     $this->load->view('v1/components/layout/footer');
     // }
 
+    // public function achatMateriels()
+    // {
+    //     if (!$this->session->userdata('user_id')) {
+    //         redirect('sign-in');
+    //         return;
+    //     }
+
+    //     $title = 'Achats & Approvisionnement';
+
+    //     $user_id = (int) $this->session->userdata('user_id');
+    //     $role_id = (int) $this->session->userdata('role_id');
+
+    //     /*
+    //     * ============================================================
+    //     * PRIVILÈGE : afficher les demandes déjà payées en trésorerie
+    //     * Réservé au SUPER_ADMIN (1) et ADMINISTRATEUR_SYSTEM (2).
+    //     * ============================================================
+    //     */
+    //     $canSeePaidRequests = in_array($role_id, [1, 2], true);
+
+    //     /*
+    //     * Récupération des filtres envoyés par GET
+    //     * include_payes n'est pris en compte QUE si le rôle est autorisé
+    //     * (sécurité côté serveur : un autre rôle ne peut pas forcer l'URL)
+    //     */
+    //     $includePayes = $canSeePaidRequests
+    //         && ($this->input->get('include_payes') === '1');
+
+    //     $filters = [
+    //         'chantier_id'     => trim((string) $this->input->get('chantier_id', true)),
+    //         'workflow_status' => trim((string) $this->input->get('workflow_status', true)),
+    //         'date_debut'      => trim((string) $this->input->get('date_debut', true)),
+    //         'date_fin'        => trim((string) $this->input->get('date_fin', true)),
+    //         'include_payes'   => $includePayes,
+    //         'user_id'         => $user_id,
+    //         'role_id'         => $role_id
+    //     ];
+
+    //     /*
+    //     * Liste des chantiers pour le champ select
+    //     */
+    //     $allChantiers = $this->tech->getAllChantier();
+
+    //     /*
+    //     * Liste des demandes d'achat avec filtres
+    //     */
+    //     $allAchats = $this->tech->getAllAchats($filters);
+
+    //     /*
+    //     * STATISTIQUES - Récupération des compteurs
+    //     */
+    //     $stats = [
+    //         'demandes_validées'    => $this->tech->countDemandesValidees($filters),
+    //         'achats_effectues'     => $this->tech->countAchatsEffectues($filters),
+    //         'en_approvisionnement' => $this->tech->countEnApprovisionnement($filters),
+    //         'livraisons_retard'    => $this->tech->countLivraisonsRetard($filters),
+    //         'deja_payees'          => $this->tech->countDejaPayees($filters)
+    //     ];
+
+    //     /*
+    //     * Données envoyées à la vue
+    //     */
+    //     $data = [
+    //         'title'              => $title,
+    //         'allChantiers'       => $allChantiers,
+    //         'allAchats'          => $allAchats,
+    //         'filters'            => $filters,
+    //         'stats'              => $stats,
+    //         'canSeePaidRequests' => $canSeePaidRequests
+    //     ];
+
+    //     $this->load->view('v1/components/layout/header', ['title' => $title]);
+    //     $this->load->view('v1/components/layout/sidebar');
+    //     $this->load->view('v1/components/modules/technique/achatMateriels', $data);
+    //     $this->load->view('v1/components/layout/footer');
+    // }
+
     public function achatMateriels()
     {
         if (!$this->session->userdata('user_id')) {
@@ -527,27 +604,14 @@ class TechController extends CI_Controller
         $role_id = (int) $this->session->userdata('role_id');
 
         /*
-        * ============================================================
-        * PRIVILÈGE : afficher les demandes déjà payées en trésorerie
-        * Réservé au SUPER_ADMIN (1) et ADMINISTRATEUR_SYSTEM (2).
-        * ============================================================
-        */
-        $canSeePaidRequests = in_array($role_id, [1, 2], true);
-
-        /*
         * Récupération des filtres envoyés par GET
-        * include_payes n'est pris en compte QUE si le rôle est autorisé
-        * (sécurité côté serveur : un autre rôle ne peut pas forcer l'URL)
+        * Note : On affiche TOUTES les demandes (payées incluses) par défaut
         */
-        $includePayes = $canSeePaidRequests
-            && ($this->input->get('include_payes') === '1');
-
         $filters = [
             'chantier_id'     => trim((string) $this->input->get('chantier_id', true)),
             'workflow_status' => trim((string) $this->input->get('workflow_status', true)),
             'date_debut'      => trim((string) $this->input->get('date_debut', true)),
             'date_fin'        => trim((string) $this->input->get('date_fin', true)),
-            'include_payes'   => $includePayes,
             'user_id'         => $user_id,
             'role_id'         => $role_id
         ];
@@ -558,12 +622,12 @@ class TechController extends CI_Controller
         $allChantiers = $this->tech->getAllChantier();
 
         /*
-        * Liste des demandes d'achat avec filtres
+        * Liste des demandes d'achat avec filtres (TOUTES incluses)
         */
         $allAchats = $this->tech->getAllAchats($filters);
 
         /*
-        * STATISTIQUES - Récupération des compteurs
+        * STATISTIQUES
         */
         $stats = [
             'demandes_validées'    => $this->tech->countDemandesValidees($filters),
@@ -577,12 +641,11 @@ class TechController extends CI_Controller
         * Données envoyées à la vue
         */
         $data = [
-            'title'              => $title,
-            'allChantiers'       => $allChantiers,
-            'allAchats'          => $allAchats,
-            'filters'            => $filters,
-            'stats'              => $stats,
-            'canSeePaidRequests' => $canSeePaidRequests
+            'title'        => $title,
+            'allChantiers' => $allChantiers,
+            'allAchats'    => $allAchats,
+            'filters'      => $filters,
+            'stats'        => $stats
         ];
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
@@ -1649,10 +1712,10 @@ class TechController extends CI_Controller
         }
 
         /*
-    |--------------------------------------------------------------------------
-    | Ajout des nouvelles photos
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Ajout des nouvelles photos
+        |--------------------------------------------------------------------------
+        */
 
         $this->uploadEnginFiles(
             'photos',
@@ -1714,10 +1777,10 @@ class TechController extends CI_Controller
             $this->tech->getRecentTechnicalOperations(20);
 
         /*
-    |--------------------------------------------------------------------------
-    | Statistiques
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Statistiques
+        |--------------------------------------------------------------------------
+        */
 
         $data['maintenanceFuelStats'] =
             $this->tech->getMaintenanceFuelStatistics();

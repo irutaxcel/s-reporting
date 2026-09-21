@@ -1165,26 +1165,31 @@ class FinanceController extends CI_Controller
 
         /* Filtres */
         $filters = [
-            'search'    => trim((string) $this->input->get('rapport_search')),
-            'situation' => (string) $this->input->get('rapport_situation'),
-            'date_from' => $this->input->get('rapport_date_from'),
-            'date_to'   => $this->input->get('rapport_date_to'),
+            'search'      => trim((string) $this->input->get('rapport_search')),
+            'situation'   => (string) $this->input->get('rapport_situation'),
+            'chantier_id' => (int) $this->input->get('rapport_chantier'),   /* ✅ nouveau */
+            'date_from'   => $this->input->get('rapport_date_from'),
+            'date_to'     => $this->input->get('rapport_date_to'),
         ];
         $data['rapportFilters'] = $filters;
+
+        /* ✅ Liste des chantiers pour le select du filtre */
+        $data['allChantiers'] = $this->finance->getAllChantiers();
 
         /* Modale : DA avec bon effectué et non régularisées */
         $data['regularizableRequests'] = $this->finance->getRegularizablePurchaseRequests();
 
-        /* Statistiques + lignes + historique */
-        $data['reportStats']         = $this->finance->getFinancialReportStatistics();
-        $data['reportRows']          = $this->finance->getFinancialReportRows($filters);
+        /* Statistiques + lignes + historique (✅ stats filtrées aussi) */
+        $data['reportStats']           = $this->finance->getFinancialReportStatistics($filters);
+        $data['reportRows']            = $this->finance->getFinancialReportRows($filters);
         $data['recentRegularisations'] = $this->finance->getRecentRegularisations(6);
 
-        /* Comptage des situations pour le donut (sans filtre situation) */
+        /* Comptage des situations pour le donut (sans filtre situation, mais avec chantier) */
         $allRows = $this->finance->getFinancialReportRows([
-            'search'    => $filters['search'],
-            'date_from' => $filters['date_from'],
-            'date_to'   => $filters['date_to'],
+            'search'      => $filters['search'],
+            'chantier_id' => $filters['chantier_id'],
+            'date_from'   => $filters['date_from'],
+            'date_to'     => $filters['date_to'],
         ]);
         $counts = ['soldee' => 0, 'retour' => 0, 'supplement' => 0, 'attente' => 0];
         foreach ($allRows as $r) {

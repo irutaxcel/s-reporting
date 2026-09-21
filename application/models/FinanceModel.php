@@ -10474,31 +10474,95 @@ class FinanceModel extends CI_Model
 
     /**
      * =====================================================
+     * TOUS LES CHANTIERS (pour les filtres)
+     * =====================================================
+     */
+    public function getAllChantiers()
+    {
+        return $this->db->select('id, name, ref_chantier')
+            ->from('chantiers')
+            ->order_by('name', 'ASC')
+            ->get()->result();
+    }
+
+    /**
+     * =====================================================
      * STATISTIQUES GLOBALES DU RAPPORT FINANCIER
      * =====================================================
      */
-    public function getFinancialReportStatistics()
+    // public function getFinancialReportStatistics()
+    // {
+    //     /* Total payé (bons effectués) */
+    //     $paid = $this->db->select("SUM(amount_paid) AS total, COUNT(*) AS cnt")
+    //         ->where('payment_status', 'effectue')
+    //         ->get('purchase_payment_vouchers')->row();
+
+    //     /* Retours à la caisse */
+    //     $retours = $this->db->select("SUM(amount) AS total, COUNT(*) AS cnt")
+    //         ->where('regularisation_type', 'retour')
+    //         ->where('status', 'validated')
+    //         ->get('tbl_finance_regularisations')->row();
+
+    //     /* Suppléments payés */
+    //     $supplements = $this->db->select("SUM(amount) AS total, COUNT(*) AS cnt")
+    //         ->where('regularisation_type', 'supplement')
+    //         ->where('status', 'validated')
+    //         ->get('tbl_finance_regularisations')->row();
+
+    //     $totalPaid      = $paid ? (float) $paid->total : 0;
+    //     $totalRetours   = $retours ? (float) $retours->total : 0;
+    //     $totalSupplem   = $supplements ? (float) $supplements->total : 0;
+
+    //     return [
+    //         'total_paid'        => $totalPaid,
+    //         'paid_count'        => $paid ? (int) $paid->cnt : 0,
+    //         'total_retours'     => $totalRetours,
+    //         'retours_count'     => $retours ? (int) $retours->cnt : 0,
+    //         'total_supplements' => $totalSupplem,
+    //         'supplements_count' => $supplements ? (int) $supplements->cnt : 0,
+    //         'adjusted'          => $totalPaid - $totalRetours + $totalSupplem,
+    //     ];
+    // }
+
+    public function getFinancialReportStatistics($filters = [])
     {
+        $chantierId = !empty($filters['chantier_id']) ? (int) $filters['chantier_id'] : 0;
+
         /* Total payé (bons effectués) */
-        $paid = $this->db->select("SUM(amount_paid) AS total, COUNT(*) AS cnt")
-            ->where('payment_status', 'effectue')
-            ->get('purchase_payment_vouchers')->row();
+        $this->db->select("SUM(pv.amount_paid) AS total, COUNT(*) AS cnt")
+            ->from('purchase_payment_vouchers pv')
+            ->join('purchase_request_forms prf', 'prf.id = pv.request_id', 'left')
+            ->where('pv.payment_status', 'effectue');
+        if ($chantierId > 0) {
+            $this->db->where('prf.chantier_id', $chantierId);
+        }
+        $paid = $this->db->get()->row();
 
         /* Retours à la caisse */
-        $retours = $this->db->select("SUM(amount) AS total, COUNT(*) AS cnt")
-            ->where('regularisation_type', 'retour')
-            ->where('status', 'validated')
-            ->get('tbl_finance_regularisations')->row();
+        $this->db->select("SUM(r.amount) AS total, COUNT(*) AS cnt")
+            ->from('tbl_finance_regularisations r')
+            ->join('purchase_request_forms prf', 'prf.id = r.purchase_request_id', 'left')
+            ->where('r.regularisation_type', 'retour')
+            ->where('r.status', 'validated');
+        if ($chantierId > 0) {
+            $this->db->where('prf.chantier_id', $chantierId);
+        }
+        $retours = $this->db->get()->row();
 
         /* Suppléments payés */
-        $supplements = $this->db->select("SUM(amount) AS total, COUNT(*) AS cnt")
-            ->where('regularisation_type', 'supplement')
-            ->where('status', 'validated')
-            ->get('tbl_finance_regularisations')->row();
+        $this->db->select("SUM(r.amount) AS total, COUNT(*) AS cnt")
+            ->from('tbl_finance_regularisations r')
+            ->join('purchase_request_forms prf', 'prf.id = r.purchase_request_id', 'left')
+            ->where('r.regularisation_type', 'supplement')
+            ->where('r.status', 'validated');
+        if ($chantierId > 0) {
+            $this->db->where('prf.chantier_id', $chantierId);
+        }
+        $supplements = $this->db->get()->row();
 
-        $totalPaid      = $paid ? (float) $paid->total : 0;
-        $totalRetours   = $retours ? (float) $retours->total : 0;
-        $totalSupplem   = $supplements ? (float) $supplements->total : 0;
+        $totalPaid    = $paid ? (float) $paid->total : 0;
+        $totalRetours = $retours ? (float) $retours->total : 0;
+        $totalSupplem = $supplements ? (float) $supplements->total : 0;
 
         return [
             'total_paid'        => $totalPaid,
@@ -10514,41 +10578,64 @@ class FinanceModel extends CI_Model
     /**
      * =====================================================
      * LIGNES DU RAPPROCHEMENT (bon payé vs dépense réelle)
+     * ✅ Filtres : chantier, période, recherche, situation
      * =====================================================
      */
     public function getFinancialReportRows($filters = [])
     {
+        /* ---------- ✅ Récupérer le nom du chantier AVANT la requête principale ----------
+       (un select->get() pendant la construction fusionnerait les 2 requêtes !) */
+        $chantierName = null;
+        if (!empty($filters['chantier_id'])) {
+            $chantierRow = $this->db->select('name')
+                ->from('chantiers')
+                ->where('id', (int) $filters['chantier_id'])
+                ->get()->row();
+            $chantierName = $chantierRow ? $chantierRow->name : null;
+        }
+
+        /* ---------- Requête principale ---------- */
         $this->db->select("
-        prf.id,
-        prf.request_date,
-        prf.created_at,
-        prf.destination_chantier,
-        prf.requested_by,
-        prf.buyer_name,
-        ch.name AS chantier_name,
-        pv.id AS voucher_id,
-        pv.payment_number,
-        pv.summary,
-        pv.amount_paid,
-        pv.payment_date,
-        (SELECT COALESCE(SUM(r.amount),0) FROM tbl_finance_regularisations r
-          WHERE r.purchase_request_id = prf.id
-            AND r.regularisation_type = 'retour'
-            AND r.status = 'validated') AS total_retour,
-        (SELECT COALESCE(SUM(r.amount),0) FROM tbl_finance_regularisations r
-          WHERE r.purchase_request_id = prf.id
-            AND r.regularisation_type = 'supplement'
-            AND r.status = 'validated') AS total_supplement,
-        (SELECT r2.regularisation_type FROM tbl_finance_regularisations r2
-          WHERE r2.purchase_request_id = prf.id AND r2.status = 'validated'
-          ORDER BY r2.id DESC LIMIT 1) AS last_type
-    ")
+            prf.id,
+            prf.request_date,
+            prf.created_at,
+            prf.destination_chantier,
+            prf.requested_by,
+            prf.buyer_name,
+            ch.name AS chantier_name,
+            pv.id AS voucher_id,
+            pv.payment_number,
+            pv.summary,
+            pv.amount_paid,
+            pv.payment_date,
+            (SELECT COALESCE(SUM(r.amount),0) FROM tbl_finance_regularisations r
+            WHERE r.purchase_request_id = prf.id
+                AND r.regularisation_type = 'retour'
+                AND r.status = 'validated') AS total_retour,
+            (SELECT COALESCE(SUM(r.amount),0) FROM tbl_finance_regularisations r
+            WHERE r.purchase_request_id = prf.id
+                AND r.regularisation_type = 'supplement'
+                AND r.status = 'validated') AS total_supplement,
+            (SELECT r2.regularisation_type FROM tbl_finance_regularisations r2
+            WHERE r2.purchase_request_id = prf.id AND r2.status = 'validated'
+            ORDER BY r2.id DESC LIMIT 1) AS last_type
+        ")
             ->from('purchase_request_forms prf')
             ->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'inner')
             ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
             ->where('pv.payment_status', 'effectue');
 
-        /* Période (date du bon) */
+        /* ---------- ✅ Filtre par chantier ---------- */
+        if (!empty($filters['chantier_id'])) {
+            $this->db->group_start();
+            $this->db->where('prf.chantier_id', (int) $filters['chantier_id']);
+            if ($chantierName !== null) {
+                $this->db->or_where('prf.destination_chantier', $chantierName);
+            }
+            $this->db->group_end();
+        }
+
+        /* ---------- Période (date du bon) ---------- */
         if (!empty($filters['date_from'])) {
             $this->db->where('pv.payment_date >=', $filters['date_from']);
         }
@@ -10556,7 +10643,7 @@ class FinanceModel extends CI_Model
             $this->db->where('pv.payment_date <=', $filters['date_to']);
         }
 
-        /* Recherche */
+        /* ---------- Recherche ---------- */
         if (!empty($filters['search'])) {
             $s = $filters['search'];
             $this->db->group_start();
@@ -10573,7 +10660,7 @@ class FinanceModel extends CI_Model
             ->order_by('prf.id', 'DESC')
             ->get()->result();
 
-        /* Calculs : dépense réelle, écart, situation */
+        /* ---------- Calculs : dépense réelle, écart, situation ---------- */
         foreach ($rows as $row) {
             $row->amount_paid      = (float) $row->amount_paid;
             $row->total_retour     = (float) $row->total_retour;
@@ -10592,7 +10679,7 @@ class FinanceModel extends CI_Model
             }
         }
 
-        /* Filtre situation */
+        /* ---------- Filtre situation (en PHP) ---------- */
         if (!empty($filters['situation'])) {
             $rows = array_values(array_filter($rows, function ($r) use ($filters) {
                 return $r->situation === $filters['situation'];

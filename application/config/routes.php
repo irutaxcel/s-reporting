@@ -302,7 +302,10 @@ $route['echeances'] = 'FinanceController/echeances';
 $route['crm-dashboard'] = 'CrmController/index';
 
 $route['crm-clients'] = 'CrmController/clients';
+$route['crm-clients-add'] = 'CrmController/addClient';
 
+$route['crm-clients-update'] = 'CrmController/updateClient';
+$route['crm-clients-delete/(:num)'] = 'CrmController/deleteClient/$1';
 
 $route['crm-projets'] = 'CrmController/projets';
 
@@ -310,6 +313,7 @@ $route['crm-chantiers'] = 'CrmController/chantiers';
 
 $route['crm-reporting'] = 'CrmController/reporting';
 
+$route['crm-devis'] = 'CrmController/devis';
 
 $route['users'] = 'AdminController/users';
 $route['utilisateurs-store'] = 'AdminController/storeUser';
