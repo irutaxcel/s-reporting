@@ -233,6 +233,20 @@
         background: #f8f9fa;
     }
 
+    /* ✅ LIGNE GRISEE POUR DEMANDES EFFECTUEES */
+    .row-effectuee-print {
+        background-color: #f0f0f0 !important;
+        opacity: 0.6;
+    }
+
+    .row-effectuee-print td {
+        color: #666;
+    }
+
+    .row-effectuee-print .badge {
+        opacity: 0.7;
+    }
+
     .text-right {
         text-align: right;
     }
@@ -263,6 +277,12 @@
         background: #fff3cd;
         color: #856404;
         border: 1px solid #ffeaa7;
+    }
+
+    .badge-secondary {
+        background: #e2e3e5;
+        color: #383d41;
+        border: 1px solid #d6d8db;
     }
 
     .sous-total {
@@ -509,7 +529,8 @@
                         <th style="width: 15%">Demandé Par</th>
                         <th style="width: 12%" class="text-right">Montant demandé</th>
                         <th style="width: 12%" class="text-right">Montant Autorisé</th>
-                        <th style="width: 17%">Obs.</th>
+                        <th style="width: 10%" class="text-center">Statut</th>
+                        <th style="width: 7%">Obs.</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -530,8 +551,13 @@
                             }
 
                             $subtotal_demande += $total_items;
+                            $montant_autorise = $demande->montant_autorise ?? 0;
+
+                            // ✅ Vérifier si la demande est effectuée
+                            $isEffectuee = ($demande->payment_status == 'effectue');
                         ?>
-                    <tr>
+                    <!-- ✅ Appliquer la classe row-effectuee-print si effectuée -->
+                    <tr class="<?= $isEffectuee ? 'row-effectuee-print' : '' ?>">
                         <td class="text-center"><strong><?= $item_number++ ?></strong></td>
                         <td>
                             <span class="badge badge-<?= $chantier_number % 2 == 0 ? 'success' : 'warning' ?>">
@@ -543,8 +569,28 @@
                             <strong><?= !empty($demande->demandeur_nom) ? $demande->demandeur_nom : ($demande->requested_by ?? $demande->buyer_name ?? '-') ?></strong>
                         </td>
                         <td class="text-right"><strong><?= number_format($total_items, 0, ',', ' ') ?></strong></td>
-                        <td class="text-center">
+                        <td class="text-right">
+                            <?php if ($isEffectuee): ?>
+                            <!-- ✅ Demande effectuée : affichage avec cadenas -->
+                            <span style="color: #666;">
+                                <?= number_format($montant_autorise, 0, ',', ' ') ?>
+                                <i class="fas fa-lock" style="font-size: 0.8em; margin-left: 3px;"></i>
+                            </span>
+                            <?php else: ?>
+                            <!-- ✅ Demande en attente : ligne pointillée -->
                             <span class="manual-input-line"></span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="text-center">
+                            <?php if ($isEffectuee): ?>
+                            <span class="badge badge-secondary">
+                                <i class="fas fa-check-circle mr-1"></i>Effectué
+                            </span>
+                            <?php else: ?>
+                            <span class="badge badge-warning">
+                                <i class="fas fa-clock mr-1"></i>En attente
+                            </span>
+                            <?php endif; ?>
                         </td>
                         <td></td>
                     </tr>
@@ -554,10 +600,16 @@
                     <tr class="sous-total">
                         <td colspan="4" class="text-right">Sous-Total (<?= ucfirst($chantier_name) ?>)</td>
                         <td class="text-right"><?= number_format($subtotal_demande, 0, ',', ' ') ?> BIF</td>
-                        <td class="text-center">
-                            <span class="manual-input-line"></span>
+                        <td class="text-right">
+                            <?php
+                                $subtotal_autorise_chantier = 0;
+                                foreach ($demandes as $dem) {
+                                    $subtotal_autorise_chantier += ($dem->montant_autorise ?? 0);
+                                }
+                                ?>
+                            <?= number_format($subtotal_autorise_chantier, 0, ',', ' ') ?> BIF
                         </td>
-                        <td></td>
+                        <td colspan="2"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -579,10 +631,10 @@
                 <thead>
                     <tr>
                         <th style="width: 5%" class="text-center">N°</th>
-                        <th style="width: 50%">Désignation / Chantier</th>
+                        <th style="width: 45%">Désignation / Chantier</th>
                         <th style="width: 20%" class="text-right">Montant demandé (BIF)</th>
-                        <th style="width: 20%" class="text-right">Montant Autorisé (BIF)</th>
-                        <th style="width: 5%">Observation</th>
+                        <th style="width: 20%" class="text-right">Montant Décaissé (BIF)</th>
+                        <th style="width: 10%" class="text-center">Statut</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -594,9 +646,19 @@
                             <strong><?= number_format($chantier['total_demande'], 0, ',', ' ') ?></strong>
                         </td>
                         <td class="text-right">
-                            <span class="manual-input-line"></span>
+                            <strong><?= number_format($chantier['total_autorise'], 0, ',', ' ') ?></strong>
                         </td>
-                        <td></td>
+                        <td class="text-center">
+                            <?php if ($chantier['total_autorise'] > 0): ?>
+                            <span class="badge badge-success">
+                                <i class="fas fa-check mr-1"></i>Validé
+                            </span>
+                            <?php else: ?>
+                            <span class="badge badge-warning">
+                                <i class="fas fa-clock mr-1"></i>En attente
+                            </span>
+                            <?php endif; ?>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -605,9 +667,8 @@
                         <td colspan="2" class="text-right"><strong>TOTAL GÉNÉRAL</strong></td>
                         <td class="text-right"><strong><?= number_format($total_general_demande, 0, ',', ' ') ?>
                                 BIF</strong></td>
-                        <td class="text-right">
-                            <span class="manual-input-line"></span>
-                        </td>
+                        <td class="text-right"><strong><?= number_format($total_general_autorise, 0, ',', ' ') ?>
+                                BIF</strong></td>
                         <td></td>
                     </tr>
                 </tfoot>

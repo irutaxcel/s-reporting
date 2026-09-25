@@ -210,6 +210,10 @@ $route['cloture-comptable'] = 'FinanceController/cloture_comptable';
 
 $route['caisse'] = 'FinanceController/caisse';
 
+$route['finance-journal-caisse']                = 'FinanceController/financeJournalCaisse';
+$route['finance-journal-caisse/detail/(:num)']  = 'FinanceController/financeJournalCaisseDetail/$1';
+$route['finance-journal-caisse/export']         = 'FinanceController/financeJournalCaisseExport';
+
 $route['finance-cashbox/(:num)'] = 'FinanceController/financeCashbox/$1';
 
 $route['caisse-journal'] = 'FinanceController/caisseJournal';
@@ -309,11 +313,17 @@ $route['crm-clients-delete/(:num)'] = 'CrmController/deleteClient/$1';
 
 $route['crm-projets'] = 'CrmController/projets';
 
-$route['crm-chantiers'] = 'CrmController/chantiers';
+$route['crm-chantiers-add'] = 'CrmController/addChantier';
+
+$route['crm-chantiers-avancement'] = 'CrmController/chantiers';
+$route['crm-chantiers-update-progress'] = 'CrmController/updateProgress';
 
 $route['crm-reporting'] = 'CrmController/reporting';
 
 $route['crm-devis'] = 'CrmController/devis';
+$route['crm-chantiers'] = 'CrmController/chantiersRequest';
+$route['crm-devis-add'] = 'CrmController/addDevis';
+$route['crm-contrat-add'] = 'CrmController/addContrat';
 
 $route['users'] = 'AdminController/users';
 $route['utilisateurs-store'] = 'AdminController/storeUser';

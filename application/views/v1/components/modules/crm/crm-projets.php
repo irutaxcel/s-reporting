@@ -156,66 +156,66 @@
                             </thead>
                             <tbody>
                                 <?php if (!empty($projects)): ?>
-                                    <?php foreach ($projects as $project): ?>
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" class="checkbox-item">
-                                            </td>
-                                            <td><strong><?= htmlspecialchars($project->reference ?? 'PROJ-' . $project->id) ?></strong>
-                                            </td>
-                                            <td>
-                                                <strong><?= htmlspecialchars($project->name) ?></strong><br>
-                                                <small class="text-muted">
-                                                    <?php
+                                <?php foreach ($projects as $project): ?>
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" class="checkbox-item">
+                                    </td>
+                                    <td><strong><?= htmlspecialchars($project->reference ?? 'PROJ-' . $project->id) ?></strong>
+                                    </td>
+                                    <td>
+                                        <strong><?= htmlspecialchars($project->name) ?></strong><br>
+                                        <small class="text-muted">
+                                            <?php
                                                     $dateDebut = isset($project->created_at) ? date('d/m/Y', strtotime($project->created_at)) : '-';
                                                     echo 'Début: ' . $dateDebut;
                                                     ?>
-                                                </small>
-                                            </td>
-                                            <td>
-                                                <?php if ($project->client_name): ?>
-                                                    <i
-                                                        class="fas fa-<?= $project->type_client == 'public' ? 'landmark' : 'building' ?> text-primary"></i>
-                                                    <?= htmlspecialchars($project->client_name) ?>
-                                                <?php else: ?>
-                                                    <em class="text-muted">Non assigné</em>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td>
-                                                <strong><?= number_format($project->montant ?? 0, 0, ',', ' ') ?> DA</strong>
-                                            </td>
-                                            <td>
-                                                <span class="badge badge-info">
-                                                    <i class="fas fa-hard-hat"></i> <?= $project->nb_chantiers ?>
-                                                    chantier<?= $project->nb_chantiers > 1 ? 's' : '' ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="progress progress-sm">
-                                                    <?php
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <?php if ($project->client_name): ?>
+                                        <i
+                                            class="fas fa-<?= $project->type_client == 'public' ? 'landmark' : 'building' ?> text-primary"></i>
+                                        <?= htmlspecialchars($project->client_name) ?>
+                                        <?php else: ?>
+                                        <em class="text-muted">Non assigné</em>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td>
+                                        <strong><?= number_format($project->montant ?? 0, 0, ',', ' ') ?> DA</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            <i class="fas fa-hard-hat"></i> <?= $project->nb_chantiers ?>
+                                            chantier<?= $project->nb_chantiers > 1 ? 's' : '' ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress progress-sm">
+                                            <?php
                                                     $avancement = round($project->avg_avancement);
                                                     $bgClass = $avancement == 100 ? 'bg-success' : ($avancement > 0 ? 'bg-success' : '');
                                                     ?>
-                                                    <div class="progress-bar <?= $bgClass ?>"
-                                                        style="width: <?= $avancement ?>%"></div>
-                                                </div>
-                                                <small><?= $avancement ?>%</small>
-                                            </td>
-                                            <td>
-                                                <div class="progress progress-sm">
-                                                    <?php
+                                            <div class="progress-bar <?= $bgClass ?>"
+                                                style="width: <?= $avancement ?>%"></div>
+                                        </div>
+                                        <small><?= $avancement ?>%</small>
+                                    </td>
+                                    <td>
+                                        <div class="progress progress-sm">
+                                            <?php
                                                     $montantTotal = $project->montant ?? 0;
                                                     $totalDecaisse = $project->total_decaisse ?? 0;
                                                     $pourcentageDecaisse = $montantTotal > 0 ? round(($totalDecaisse / $montantTotal) * 100) : 0;
                                                     $bgColor = $pourcentageDecaisse >= 80 ? 'bg-success' : ($pourcentageDecaisse >= 50 ? 'bg-info' : 'bg-warning');
                                                     ?>
-                                                    <div class="progress-bar <?= $bgColor ?>"
-                                                        style="width: <?= $pourcentageDecaisse ?>%"></div>
-                                                </div>
-                                                <small><?= $pourcentageDecaisse ?>%</small>
-                                            </td>
-                                            <td>
-                                                <?php
+                                            <div class="progress-bar <?= $bgColor ?>"
+                                                style="width: <?= $pourcentageDecaisse ?>%"></div>
+                                        </div>
+                                        <small><?= $pourcentageDecaisse ?>%</small>
+                                    </td>
+                                    <td>
+                                        <?php
                                                 $statusClass = '';
                                                 $statusIcon = '';
                                                 switch ($project->status) {
@@ -236,38 +236,159 @@
                                                         $statusIcon = '<i class="fas fa-circle"></i>';
                                                 }
                                                 ?>
-                                                <span class="badge <?= $statusClass ?>">
-                                                    <?= $statusIcon ?> <?= htmlspecialchars($project->status) ?>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button type="button" class="btn btn-info" title="Voir détails"
-                                                        onclick="viewProject(<?= $project->id ?>)">
-                                                        <i class="fas fa-eye"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-success" title="Ajouter chantier"
-                                                        onclick="addChantier(<?= $project->id ?>, '<?= htmlspecialchars($project->name) ?>')">
-                                                        <i class="fas fa-plus"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-warning" title="Contrat">
-                                                        <i class="fas fa-file-contract"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
+                                        <span class="badge <?= $statusClass ?>">
+                                            <?= $statusIcon ?> <?= htmlspecialchars($project->status) ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button type="button" class="btn btn-info" title="Voir détails"
+                                                onclick="viewProject(<?= $project->id ?>)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-success" title="Ajouter chantier"
+                                                onclick="addChantier(<?= $project->id ?>, '<?= htmlspecialchars($project->name) ?>')">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-warning" title="Contrat">
+                                                <i class="fas fa-file-contract"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
                                 <?php else: ?>
-                                    <tr>
-                                        <td colspan="10" class="text-center text-muted py-5">
-                                            <i class="fas fa-inbox fa-3x mb-3"></i>
-                                            <p>Aucun projet trouvé</p>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-5">
+                                        <i class="fas fa-inbox fa-3x mb-3"></i>
+                                        <p>Aucun projet trouvé</p>
+                                    </td>
+                                </tr>
                                 <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Modal Ajouter Chantier -->
+                    <div class="modal fade" id="modalAddChantier" tabindex="-1" role="dialog"
+                        aria-labelledby="modalAddChantierLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success">
+                                    <h4 class="modal-title" id="modalAddChantierLabel">
+                                        <i class="fas fa-hard-hat"></i> Ajouter un Chantier
+                                    </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <form method="post" action="<?= base_url('crm-chantiers-add') ?>" id="formAddChantier">
+                                    <div class="modal-body">
+                                        <!-- Info Projet -->
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            Projet : <strong id="chantier_projet_name"></strong>
+                                        </div>
+                                        <input type="hidden" name="projet_id" id="chantier_projet_id">
+
+                                        <div class="form-group">
+                                            <label>Nom du Chantier <span class="text-danger">*</span></label>
+                                            <input type="text" name="name" class="form-control"
+                                                placeholder="Ex: Bâtiment Principal" required>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Localisation</label>
+                                                    <input type="text" name="location" class="form-control"
+                                                        placeholder="Ex: Oran - Campus Universitaire">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Chef de Chantier</label>
+                                                    <input type="text" name="chef_chantier" class="form-control"
+                                                        placeholder="Nom du responsable">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Date de Début</label>
+                                                    <input type="date" name="date_debut" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Date de Fin Prévue</label>
+                                                    <input type="date" name="date_fin_prevue" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Statut</label>
+                                                    <select name="status" class="form-control select2">
+                                                        <option value="Planifié">Planifié</option>
+                                                        <option value="En cours">En cours</option>
+                                                        <option value="Terminé">Terminé</option>
+                                                        <option value="Suspendu">Suspendu</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Budget (DA)</label>
+                                                    <input type="number" name="budget" class="form-control"
+                                                        placeholder="0.00" step="0.01" min="0">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Avancement Initial (%)</label>
+                                                    <input type="number" name="avancement" class="form-control"
+                                                        placeholder="0" min="0" max="100" value="0">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer justify-content-between">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">
+                                            <i class="fas fa-times"></i> Annuler
+                                        </button>
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="fas fa-save"></i> Enregistrer le Chantier
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SweetAlert2 JS -->
+                    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                    <script>
+                    // Fonction pour ouvrir directement le modal d'ajout de chantier
+                    function addChantier(projectId, projectName) {
+                        // Remplir les infos du projet dans le modal
+                        $('#chantier_projet_id').val(projectId);
+                        $('#chantier_projet_name').text(projectName);
+
+                        // Réinitialiser le formulaire
+                        $('#formAddChantier')[0].reset();
+
+                        // Remettre le projet_id après le reset (car reset() efface tout)
+                        $('#chantier_projet_id').val(projectId);
+
+                        // Ouvrir directement le modal
+                        $('#modalAddChantier').modal('show');
+                    }
+                    </script>
 
                     <!-- Pagination -->
                     <div class="row mt-3">
@@ -299,71 +420,80 @@
     <!-- /.content -->
 
     <script>
-        // Stockage des données projets
-        var projectsData = <?= json_encode($projects) ?>;
+    // Stockage des données projets
+    var projectsData = <?= json_encode($projects) ?>;
 
-        // Fonction pour voir un projet
-        function viewProject(projectId) {
-            // Trouver le projet
-            var project = null;
-            for (var i = 0; i < projectsData.length; i++) {
-                if (projectsData[i].id == projectId) {
-                    project = projectsData[i];
-                    break;
-                }
-            }
-
-            if (project) {
-                // Redirection vers la page de détail ou ouverture d'un modal
-                alert('Voir détails du projet: ' + project.name);
-                // window.location.href = '<?= base_url("projets-view/") ?>' + projectId;
+    // Fonction pour voir un projet
+    function viewProject(projectId) {
+        // Trouver le projet
+        var project = null;
+        for (var i = 0; i < projectsData.length; i++) {
+            if (projectsData[i].id == projectId) {
+                project = projectsData[i];
+                break;
             }
         }
 
-        // Fonction pour ajouter un chantier
-        function addChantier(projectId, projectName) {
-            Swal.fire({
-                title: 'Ajouter un chantier',
-                text: 'Projet: ' + projectName,
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Continuer',
-                cancelButtonText: 'Annuler'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Redirection vers le formulaire d'ajout de chantier
-                    // window.location.href = '<?= base_url("chantiers-add/") ?>' + projectId;
-                    alert('Redirection vers ajout chantier pour le projet ' + projectId);
-                }
-            });
+        if (project) {
+            // Redirection vers la page de détail ou ouverture d'un modal
+            alert('Voir détails du projet: ' + project.name);
+            // window.location.href = '<?= base_url("projets-view/") ?>' + projectId;
         }
+    }
 
-        // Initialisation
-        $(document).ready(function() {
-            // Activer DataTables si disponible
-            if ($.fn.DataTable) {
-                $('.dataTable').DataTable({
-                    "language": {
-                        "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr.json"
-                    },
-                    "pageLength": 10,
-                    "lengthMenu": [
-                        [10, 25, 50, -1],
-                        [10, 25, 50, "Tous"]
-                    ],
-                    "order": [
-                        [1, 'desc']
-                    ]
-                });
+    // Fonction pour ajouter un chantier
+    function addChantier(projectId, projectName) {
+        Swal.fire({
+            title: 'Ajouter un chantier',
+            text: 'Projet: ' + projectName,
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'Continuer',
+            cancelButtonText: 'Annuler'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Remplir les infos du projet dans le modal
+                $('#chantier_projet_id').val(projectId);
+                $('#chantier_projet_name').text(projectName);
+
+                // Réinitialiser le formulaire
+                $('#formAddChantier')[0].reset();
+
+                // Réinjecter le projet_id après le reset
+                $('#chantier_projet_id').val(projectId);
+
+                // Ouvrir le modal avec le formulaire
+                $('#modalAddChantier').modal('show');
             }
-
-            // Select2 pour les filtres
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                placeholder: 'Sélectionner...',
-                allowClear: true
-            });
         });
+    }
+
+    // Initialisation
+    $(document).ready(function() {
+        // Activer DataTables si disponible
+        if ($.fn.DataTable) {
+            $('.dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr.json"
+                },
+                "pageLength": 10,
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Tous"]
+                ],
+                "order": [
+                    [1, 'desc']
+                ]
+            });
+        }
+
+        // Select2 pour les filtres
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Sélectionner...',
+            allowClear: true
+        });
+    });
     </script>
 
     <!-- Modal Détails Projet -->
@@ -740,34 +870,34 @@
 
     <!-- Script pour gérer l'upload et la preview -->
     <script>
-        $(document).ready(function() {
-            // Gestion de l'affichage du nom de fichier
-            $('.custom-file-input').on('change', function() {
-                var fileName = $(this).val().split('\\').pop();
-                $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
+    $(document).ready(function() {
+        // Gestion de l'affichage du nom de fichier
+        $('.custom-file-input').on('change', function() {
+            var fileName = $(this).val().split('\\').pop();
+            $(this).siblings('.custom-file-label').addClass('selected').html(fileName);
 
-                // Afficher la preview
-                if (fileName) {
-                    var fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
-                    $('#contratFileName').text(fileName);
-                    $('#contratFileSize').text(fileSize + ' MB');
-                    $('#contratPreview').slideDown();
-                }
-            });
-
-            // Bouton supprimer contrat
-            $('#btnSupprimerContrat').on('click', function() {
-                $('#fileContrat').val('');
-                $('#fileContrat').siblings('.custom-file-label').html('Choisir un fichier...');
-                $('#contratPreview').slideUp();
-            });
-
-            // Bouton voir contrat (simulation)
-            $('#btnVoirContrat').on('click', function() {
-                alert('Aperçu du contrat: ' + $('#contratFileName').text());
-                // En production: ouvrir le PDF dans un nouvel onglet ou modal
-            });
+            // Afficher la preview
+            if (fileName) {
+                var fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+                $('#contratFileName').text(fileName);
+                $('#contratFileSize').text(fileSize + ' MB');
+                $('#contratPreview').slideDown();
+            }
         });
+
+        // Bouton supprimer contrat
+        $('#btnSupprimerContrat').on('click', function() {
+            $('#fileContrat').val('');
+            $('#fileContrat').siblings('.custom-file-label').html('Choisir un fichier...');
+            $('#contratPreview').slideUp();
+        });
+
+        // Bouton voir contrat (simulation)
+        $('#btnVoirContrat').on('click', function() {
+            alert('Aperçu du contrat: ' + $('#contratFileName').text());
+            // En production: ouvrir le PDF dans un nouvel onglet ou modal
+        });
+    });
     </script>
 
     <!-- Modal Modifier Avancement -->

@@ -10338,22 +10338,22 @@ class FinanceModel extends CI_Model
 
         /* ---------- 2) DA avec bon effectué, non encore régularisées ---------- */
         $this->db->select("
-            prf.id,
-            prf.request_date,
-            prf.created_at,
-            prf.chantier_id,
-            prf.destination_chantier,
-            prf.total_amount,
-            ch.name AS chantier_name,
-            pv.id AS voucher_id,
-            pv.payment_number,
-            pv.summary,
-            pv.payment_mode,
-            pv.amount_paid,
-            pv.payment_reference,
-            pv.payment_date,
-            pv.observation AS payment_observation
-        ")
+                prf.id,
+                prf.request_date,
+                prf.created_at,
+                prf.chantier_id,
+                prf.destination_chantier,
+                prf.total_amount,
+                ch.name AS chantier_name,
+                pv.id AS voucher_id,
+                pv.payment_number,
+                pv.summary,
+                pv.payment_mode,
+                pv.amount_paid,
+                pv.payment_reference,
+                pv.payment_date,
+                pv.observation AS payment_observation
+            ")
             ->from('purchase_request_forms prf')
             /* Le lien est côté BON : pv.request_id */
             ->join('purchase_payment_vouchers pv', 'pv.request_id = prf.id', 'inner')
@@ -10697,11 +10697,11 @@ class FinanceModel extends CI_Model
     public function getRecentRegularisations($limit = 6)
     {
         return $this->db->select("
-        r.*,
-        pv.payment_number,
-        prf.destination_chantier,
-        ch.name AS chantier_name
-    ")
+            r.*,
+            pv.payment_number,
+            prf.destination_chantier,
+            ch.name AS chantier_name
+        ")
             ->from('tbl_finance_regularisations r')
             ->join('purchase_request_forms prf', 'prf.id = r.purchase_request_id', 'left')
             ->join('purchase_payment_vouchers pv', 'pv.id = r.payment_voucher_id', 'left')
@@ -10710,5 +10710,152 @@ class FinanceModel extends CI_Model
             ->order_by('r.id', 'DESC')
             ->limit($limit)
             ->get()->result();
+    }
+
+        // ======================================================================
+    //  JOURNAL DE CAISSE
+    //  Sources : tbl_finance_mouvement_principale (MVP-...)
+    //            tbl_finance_mouvement_secondaire (MVS-...)
+    //  Caisse  : tbl_finance_cashbox (liée par role = principale/secondaire)
+    //  DA      : purchase_request_forms -> chantiers ; users (créé/validé par)
+    // ======================================================================
+
+    /** Sous-requête qui unifie les deux tables de mouvements. */
+    private function _jcSource()
+    {
+        return "(
+            SELECT CONCAT('P', p.id) AS uid, p.id, 'principale' AS source,
+                   p.reference, p.sens, p.nature, p.movement_date, p.created_at,
+                   p.amount, p.balance_before, p.balance_after, p.devise, p.transfer_reference,
+                   p.label, p.third_party, p.category, p.payment_method, p.document_number,
+                   p.observation, p.status, NULL AS purchase_request_id,
+                   NULL AS purchase_request_reference, p.created_by, p.validated_by
+            FROM tbl_finance_mouvement_principale p
+            UNION ALL
+            SELECT CONCAT('S', s.id), s.id, 'secondaire',
+                   s.reference, s.sens, s.nature, s.movement_date, s.created_at,
+                   s.amount, s.balance_before, s.balance_after, s.devise, s.transfer_reference,
+                   s.label, s.third_party, s.category, s.payment_method, s.document_number,
+                   s.observation, s.status, s.purchase_request_id,
+                   s.purchase_request_reference, s.created_by, s.validated_by
+            FROM tbl_finance_mouvement_secondaire s
+        ) m
+        JOIN tbl_finance_cashbox ca         ON ca.role = m.source
+        LEFT JOIN purchase_request_forms pr ON pr.id = m.purchase_request_id
+        LEFT JOIN chantiers ch              ON ch.id = pr.chantier_id
+        LEFT JOIN users uc                  ON uc.id = m.created_by
+        LEFT JOIN users uv                  ON uv.id = m.validated_by";
+    }
+
+    /** Clause WHERE + paramètres liés à partir des filtres. */
+    private function _jcWhere(array $f, array &$binds)
+    {
+        $w = [];
+        if (!empty($f['caisse_id'])) {
+            $w[] = 'ca.id = ?';
+            $binds[] = (int) $f['caisse_id'];
+        }
+        if (!empty($f['chantier_id'])) {
+            $w[] = 'ch.id = ?';
+            $binds[] = (int) $f['chantier_id'];
+        }
+        if (!empty($f['type'])) {
+            $w[] = 'm.sens = ?';
+            $binds[] = $f['type'];
+        }
+        if (!empty($f['statut'])) {
+            $w[] = 'm.status = ?';
+            $binds[] = $f['statut'];
+        }
+        if (!empty($f['date_debut'])) {
+            $w[] = 'm.movement_date >= ?';
+            $binds[] = $f['date_debut'];
+        }
+        if (!empty($f['date_fin'])) {
+            $w[] = 'm.movement_date <= ?';
+            $binds[] = $f['date_fin'];
+        }
+        if (!empty($f['q'])) {
+            $like = '%' . trim($f['q']) . '%';
+            $w[] = '(m.reference LIKE ? OR m.label LIKE ? OR m.third_party LIKE ?
+                     OR m.purchase_request_reference LIKE ? OR ch.name LIKE ?)';
+            array_push($binds, $like, $like, $like, $like, $like);
+        }
+        return $w ? ' WHERE ' . implode(' AND ', $w) : '';
+    }
+
+    /** Colonnes renvoyées à la vue. */
+    private function _jcSelect()
+    {
+        return "SELECT
+            m.uid, m.id, m.source, m.reference, m.sens AS type, m.nature, m.category,
+            (m.sens = 'entree') AS is_entree,
+            CONCAT(m.movement_date, ' ', TIME(m.created_at)) AS date_operation,
+            m.amount AS montant, m.balance_before AS solde_avant, m.balance_after AS solde_apres,
+            m.devise, m.transfer_reference, m.payment_method, m.document_number,
+            m.label AS libelle, m.third_party AS beneficiaire, m.observation,
+            CASE m.status WHEN 'validated' THEN 'valide'
+                          WHEN 'pending'   THEN 'en_attente'
+                          WHEN 'cancelled' THEN 'annule' ELSE m.status END AS statut,
+            ca.id AS caisse_id, ca.name AS caisse_nom, ca.code AS caisse_code,
+            m.purchase_request_reference AS da_reference,
+            ch.name AS chantier_nom,
+            CONCAT_WS(' ', uc.first_name, uc.last_name) AS cree_par,
+            CONCAT_WS(' ', uv.first_name, uv.last_name) AS valide_par";
+    }
+
+    /** Liste paginée (plus récentes d'abord). $limit = null => tout (export). */
+    public function getJournalCaisse(array $filters = [], $limit = 25, $offset = 0)
+    {
+        $binds = [];
+        $sql = $this->_jcSelect() . ' FROM ' . $this->_jcSource()
+            . $this->_jcWhere($filters, $binds)
+            . ' ORDER BY m.movement_date DESC, m.created_at DESC, m.id DESC';
+
+        if ($limit !== null) {
+            $sql .= ' LIMIT ' . (int) $limit . ' OFFSET ' . (int) $offset;
+        }
+        return $this->db->query($sql, $binds)->result();
+    }
+
+    public function countJournalCaisse(array $filters = [])
+    {
+        $binds = [];
+        $sql = 'SELECT COUNT(*) AS nb FROM ' . $this->_jcSource() . $this->_jcWhere($filters, $binds);
+        return (int) $this->db->query($sql, $binds)->row()->nb;
+    }
+
+    public function getJournalCaisseTotaux(array $filters = [])
+    {
+        $binds = [];
+        $sql = "SELECT COUNT(*) AS nb_operations,
+                       COALESCE(SUM(CASE WHEN m.sens = 'entree' THEN m.amount ELSE 0 END), 0) AS total_entrees,
+                       COALESCE(SUM(CASE WHEN m.sens = 'sortie' THEN m.amount ELSE 0 END), 0) AS total_sorties
+                FROM " . $this->_jcSource() . $this->_jcWhere($filters, $binds);
+        $row = $this->db->query($sql, $binds)->row();
+        $row->solde_net = $row->total_entrees - $row->total_sorties;
+        return $row;
+    }
+
+    /** Détail : $uid = 'P12' (principale) ou 'S309' (secondaire). */
+    public function getJournalCaisseById($uid)
+    {
+        if (!preg_match('/^[PS]\d+$/', (string) $uid)) {
+            return null;
+        }
+        $sql = $this->_jcSelect() . ' FROM ' . $this->_jcSource() . ' WHERE m.uid = ?';
+        return $this->db->query($sql, [$uid])->row();
+    }
+
+    public function getCaissesForFilter()
+    {
+        return $this->db->query(
+            "SELECT id, name AS nom, code FROM tbl_finance_cashbox ORDER BY role = 'secondaire', name"
+        )->result();
+    }
+
+    public function getChantiersForFilter()
+    {
+        return $this->db->query('SELECT id, name AS nom FROM chantiers ORDER BY name')->result();
     }
 }

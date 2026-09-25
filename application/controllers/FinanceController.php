@@ -899,6 +899,118 @@ class FinanceController extends CI_Controller
         redirect('caisse');
     }
 
+    private function _journalCaisseFilters()
+    {
+        $date = function ($v) {
+            return ($v && preg_match('/^\d{4}-\d{2}-\d{2}$/', $v)) ? $v : null;
+        };
+        $type = $this->input->get('type', true);
+
+        return [
+            'caisse_id'   => (int) $this->input->get('caisse_id') ?: null,
+            'chantier_id' => (int) $this->input->get('chantier_id') ?: null,
+            'type'        => in_array($type, ['entree', 'sortie'], true) ? $type : null,
+            'statut'      => $this->input->get('statut', true) ?: null,
+            'date_debut'  => $date($this->input->get('date_debut', true)),
+            'date_fin'    => $date($this->input->get('date_fin', true)),
+            'q'           => trim((string) $this->input->get('q', true)) ?: null,
+        ];
+    }
+
+    public function financeJournalCaisse()
+    {
+        $filters = $this->_journalCaisseFilters();
+
+        $perPage = (int) $this->input->get('per_page');
+        $perPage = in_array($perPage, [10, 25, 50, 100], true) ? $perPage : 25;
+        $page    = max(1, (int) $this->input->get('page'));
+
+        $total   = $this->finance->countJournalCaisse($filters);
+        $nbPages = max(1, (int) ceil($total / $perPage));
+        $page    = min($page, $nbPages);
+        $offset  = ($page - 1) * $perPage;
+
+        $data = [];
+        $data['title']      = 'Caisse'; // garder identique au sidebar
+        $data['filters']    = $filters;
+        $data['operations'] = $this->finance->getJournalCaisse($filters, $perPage, $offset);
+        $data['totaux']     = $this->finance->getJournalCaisseTotaux($filters);
+        $data['caisses']    = $this->finance->getCaissesForFilter();
+        $data['chantiers']  = $this->finance->getChantiersForFilter();
+        $data['pagination'] = [
+            'total'    => $total,
+            'page'     => $page,
+            'nb_pages' => $nbPages,
+            'per_page' => $perPage,
+            'from'     => $total ? $offset + 1 : 0,
+            'to'       => min($offset + $perPage, $total),
+        ];
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/journal_caisse', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function financeJournalCaisseDetail($id = null)
+    {
+        $op = $this->finance->getJournalCaisseById($id);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_status_header($op ? 200 : 404)
+            ->set_output(json_encode($op
+                ? ['success' => true, 'data' => $op]
+                : ['success' => false, 'message' => 'Opération introuvable']));
+    }
+
+    public function financeJournalCaisseExport()
+    {
+        $filters    = $this->_journalCaisseFilters();
+        $operations = $this->finance->getJournalCaisse($filters, null, 0);
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="journal_caisse_' . date('Ymd_His') . '.csv"');
+
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF"); // BOM pour Excel
+        fputcsv($out, [
+            'Date',
+            'Référence',
+            'Caisse',
+            'Code caisse',
+            'Type',
+            'Libellé',
+            'Bénéficiaire',
+            'DA',
+            'Chantier',
+            'Entrée',
+            'Sortie',
+            'Solde après',
+            'Statut'
+        ], ';');
+
+        foreach ($operations as $op) {
+            fputcsv($out, [
+                date('d/m/Y H:i', strtotime($op->date_operation)),
+                $op->reference,
+                $op->caisse_nom,
+                $op->caisse_code,
+                $op->is_entree ? 'Entrée' : 'Sortie',
+                $op->libelle,
+                $op->beneficiaire,
+                $op->da_reference,
+                $op->chantier_nom,
+                $op->is_entree ? $op->montant : '',
+                $op->is_entree ? '' : $op->montant,
+                $op->solde_apres,
+                $op->statut,
+            ], ';');
+        }
+        fclose($out);
+        exit;
+    }
+
     /**
      * Enregistrer une opération de caisse.
      *

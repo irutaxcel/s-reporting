@@ -1642,7 +1642,7 @@ button.quick-action {
                         Affichage de <?= !empty($recentMovements) ? 1 : 0 ?> à <?= count($recentMovements) ?>
                         sur <?= $allMovementsCount ?> opération<?= $allMovementsCount > 1 ? 's' : '' ?>
                     </small>
-                    <a href="<?= base_url('finance/journal-caisse') ?>" class="btn btn-caisse-outline btn-sm">
+                    <a href="<?= base_url('finance-journal-caisse') ?>" class="btn btn-caisse-outline btn-sm">
                         Voir les <?= $allMovementsCount ?> opérations <i class="fas fa-arrow-right ml-1"></i>
                     </a>
                 </div>
@@ -1650,8 +1650,8 @@ button.quick-action {
 
             <?php
             /* -------------------------------------------------
- * Extraction sécurisée
- * ------------------------------------------------- */
+        * Extraction sécurisée
+        * ------------------------------------------------- */
             $categoryExpenses  = isset($secondaryExpensesByCategory) && is_array($secondaryExpensesByCategory)
                 ? $secondaryExpensesByCategory : [];
             $chantierConsumption = isset($secondaryConsumptionByChantier) && is_array($secondaryConsumptionByChantier)

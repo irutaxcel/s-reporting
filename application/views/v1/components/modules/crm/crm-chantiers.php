@@ -34,7 +34,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Total Chantiers</span>
-                            <span class="info-box-number">142</span>
+                            <span class="info-box-number"><?= $stats['total'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">En Cours</span>
-                            <span class="info-box-number">87</span>
+                            <span class="info-box-number"><?= $stats['en_cours'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -58,7 +58,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Non Démarrés</span>
-                            <span class="info-box-number">38</span>
+                            <span class="info-box-number"><?= $stats['non_demarres'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -70,7 +70,7 @@
                         </span>
                         <div class="info-box-content">
                             <span class="info-box-text">Terminés</span>
-                            <span class="info-box-number">17</span>
+                            <span class="info-box-number"><?= $stats['termines'] ?? 0 ?></span>
                         </div>
                     </div>
                 </div>
@@ -100,51 +100,51 @@
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Rechercher un chantier...">
+                                <input type="text" id="searchChantier" class="form-control"
+                                    placeholder="Rechercher un chantier...">
                                 <div class="input-group-append">
-                                    <button type="button" class="btn btn-primary">
+                                    <button type="button" class="btn btn-primary" onclick="applyFilters()">
                                         <i class="fas fa-search"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-control select2">
+                            <select id="filterProjet" class="form-control select2" onchange="applyFilters()">
                                 <option value="">Tous les projets</option>
-                                <option value="1">Construction Université Oran</option>
-                                <option value="2">Hôpital Régional Annaba</option>
-                                <option value="3">Complexe Sportif Constantine</option>
-                                <option value="4">Centre Commercial Alger</option>
+                                <?php if (!empty($projects)): foreach ($projects as $p): ?>
+                                        <option value="<?= $p->id ?>"><?= $p->name ?></option>
+                                <?php endforeach;
+                                endif; ?>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-control select2">
+                            <select id="filterStatut" class="form-control select2" onchange="applyFilters()">
                                 <option value="">Tous les statuts</option>
-                                <option value="non_demarre">Non Démarré</option>
-                                <option value="en_cours">En Cours</option>
-                                <option value="termine">Terminé</option>
-                                <option value="suspendu">Suspendu</option>
+                                <option value="Planifié">Non Démarré</option>
+                                <option value="En cours">En Cours</option>
+                                <option value="Terminé">Terminé</option>
+                                <option value="Suspendu">Suspendu</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select class="form-control select2">
+                            <select id="filterVille" class="form-control select2" onchange="applyFilters()">
                                 <option value="">Toutes les villes</option>
-                                <option value="Alger">Alger</option>
-                                <option value="Oran">Oran</option>
-                                <option value="Constantine">Constantine</option>
-                                <option value="Annaba">Annaba</option>
+                                <option value="alger">Alger</option>
+                                <option value="oran">Oran</option>
+                                <option value="constantine">Constantine</option>
+                                <option value="annaba">Annaba</option>
+                                <option value="bujumbura">Bujumbura</option>
                             </select>
                         </div>
                     </div>
 
                     <!-- Chantiers Table -->
                     <div class="table-responsive">
-                        <table class="table table-bordered table-striped table-hover dataTable">
+                        <table class="table table-bordered table-striped table-hover dataTable" id="chantiersTable">
                             <thead class="thead-light">
                                 <tr>
-                                    <th width="50">
-                                        <input type="checkbox" class="checkbox-toggle">
-                                    </th>
+                                    <th width="50"><input type="checkbox" class="checkbox-toggle"></th>
                                     <th>Nom du Chantier</th>
                                     <th>Projet Associé</th>
                                     <th>Ville</th>
@@ -155,266 +155,104 @@
                                     <th width="200">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <!-- Chantier 1 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td>
-                                        <strong>Bâtiment Principal</strong><br>
-                                        <small class="text-muted">Oran - Campus Universitaire</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-project-diagram text-primary"></i>
-                                        Construction Université Oran
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-map-marker-alt text-danger"></i> Oran
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm mb-1">
-                                            <div class="progress-bar bg-success" style="width: 60%">60%</div>
-                                        </div>
-                                        <small class="text-muted">Mis à jour: 02/09/2026</small>
-                                    </td>
-                                    <td>
-                                        <strong>6,000,000 DA</strong><br>
-                                        <small class="text-muted">(60% du total)</small>
-                                    </td>
-                                    <td>
-                                        <strong class="text-success">3,000,000 DA</strong><br>
-                                        <small class="text-muted">(50% alloué)</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-sync fa-spin"></i> En cours
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-warning" title="Modifier avancement"
-                                                data-toggle="modal" data-target="#modalUpdateProgress">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalChantierDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-secondary" title="Historique">
-                                                <i class="fas fa-history"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Chantier 2 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td>
-                                        <strong>Laboratoires</strong><br>
-                                        <small class="text-muted">Oran - Campus Universitaire</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-project-diagram text-primary"></i>
-                                        Construction Université Oran
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-map-marker-alt text-danger"></i> Oran
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm mb-1">
-                                            <div class="progress-bar bg-warning" style="width: 30%">30%</div>
-                                        </div>
-                                        <small class="text-muted">Mis à jour: 01/09/2026</small>
-                                    </td>
-                                    <td>
-                                        <strong>2,500,000 DA</strong><br>
-                                        <small class="text-muted">(25% du total)</small>
-                                    </td>
-                                    <td>
-                                        <strong class="text-warning">750,000 DA</strong><br>
-                                        <small class="text-muted">(30% alloué)</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-sync fa-spin"></i> En cours
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-warning" title="Modifier avancement"
-                                                data-toggle="modal" data-target="#modalUpdateProgress">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalChantierDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-secondary" title="Historique">
-                                                <i class="fas fa-history"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Chantier 3 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td>
-                                        <strong>Parking</strong><br>
-                                        <small class="text-muted">Oran - Campus Universitaire</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-project-diagram text-primary"></i>
-                                        Construction Université Oran
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-map-marker-alt text-danger"></i> Oran
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm mb-1">
-                                            <div class="progress-bar" style="width: 10%">10%</div>
-                                        </div>
-                                        <small class="text-muted">Mis à jour: 28/08/2026</small>
-                                    </td>
-                                    <td>
-                                        <strong>1,500,000 DA</strong><br>
-                                        <small class="text-muted">(15% du total)</small>
-                                    </td>
-                                    <td>
-                                        <strong class="text-muted">150,000 DA</strong><br>
-                                        <small class="text-muted">(10% alloué)</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-secondary">
-                                            <i class="fas fa-pause-circle"></i> Non démarré
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-warning" title="Modifier avancement"
-                                                data-toggle="modal" data-target="#modalUpdateProgress">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalChantierDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-secondary" title="Historique">
-                                                <i class="fas fa-history"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Chantier 4 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td>
-                                        <strong>Bloc Administratif</strong><br>
-                                        <small class="text-muted">Annaba - Centre Ville</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-project-diagram text-primary"></i>
-                                        Hôpital Régional Annaba
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-map-marker-alt text-danger"></i> Annaba
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm mb-1">
-                                            <div class="progress-bar bg-success" style="width: 75%">75%</div>
-                                        </div>
-                                        <small class="text-muted">Mis à jour: 03/09/2026</small>
-                                    </td>
-                                    <td>
-                                        <strong>8,000,000 DA</strong><br>
-                                        <small class="text-muted">(52% du total)</small>
-                                    </td>
-                                    <td>
-                                        <strong class="text-success">6,000,000 DA</strong><br>
-                                        <small class="text-muted">(75% alloué)</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-success">
-                                            <i class="fas fa-sync fa-spin"></i> En cours
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-warning" title="Modifier avancement"
-                                                data-toggle="modal" data-target="#modalUpdateProgress">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalChantierDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-secondary" title="Historique">
-                                                <i class="fas fa-history"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                <!-- Chantier 5 -->
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" class="checkbox-item">
-                                    </td>
-                                    <td>
-                                        <strong>Urgences</strong><br>
-                                        <small class="text-muted">Annaba - Centre Ville</small>
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-project-diagram text-primary"></i>
-                                        Hôpital Régional Annaba
-                                    </td>
-                                    <td>
-                                        <i class="fas fa-map-marker-alt text-danger"></i> Annaba
-                                    </td>
-                                    <td>
-                                        <div class="progress progress-sm mb-1">
-                                            <div class="progress-bar bg-info" style="width: 100%">100%</div>
-                                        </div>
-                                        <small class="text-muted">Mis à jour: 30/08/2026</small>
-                                    </td>
-                                    <td>
-                                        <strong>4,500,000 DA</strong><br>
-                                        <small class="text-muted">(29% du total)</small>
-                                    </td>
-                                    <td>
-                                        <strong class="text-info">4,500,000 DA</strong><br>
-                                        <small class="text-muted">(100% alloué)</small>
-                                    </td>
-                                    <td>
-                                        <span class="badge badge-info">
-                                            <i class="fas fa-check-circle"></i> Terminé
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <button type="button" class="btn btn-warning" title="Modifier avancement"
-                                                disabled>
-                                                <i class="fas fa-ban"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-info" title="Voir détails"
-                                                data-toggle="modal" data-target="#modalChantierDetails">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button type="button" class="btn btn-secondary" title="Historique">
-                                                <i class="fas fa-history"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                            <tbody id="chantiersTableBody">
+                                <?php if (!empty($chantiers)): ?>
+                                    <?php foreach ($chantiers as $chantier): ?>
+                                        <?php $avancement = round($chantier->avancement ?? 0); ?>
+                                        <tr data-chantier-id="<?= $chantier->id ?>" data-projet-id="<?= $chantier->projet_id ?>"
+                                            data-statut="<?= $chantier->status ?>"
+                                            data-location="<?= strtolower($chantier->location ?? '') ?>">
+                                            <td><input type="checkbox" class="checkbox-item"></td>
+                                            <td>
+                                                <strong><?= htmlspecialchars($chantier->name) ?></strong><br>
+                                                <small
+                                                    class="text-muted"><?= htmlspecialchars($chantier->location ?? '') ?></small>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-project-diagram text-primary"></i>
+                                                <?= htmlspecialchars($chantier->projet_name ?? 'Non assigné') ?>
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                                <?= htmlspecialchars(explode('-', $chantier->location ?? '')[0] ?? $chantier->location ?? '') ?>
+                                            </td>
+                                            <td>
+                                                <div class="progress progress-sm mb-1">
+                                                    <?php
+                                                    $bgClass = 'bg-secondary';
+                                                    if ($avancement >= 75) $bgClass = 'bg-success';
+                                                    elseif ($avancement >= 30) $bgClass = 'bg-warning';
+                                                    elseif ($avancement > 0) $bgClass = 'bg-info';
+                                                    ?>
+                                                    <div class="progress-bar <?= $bgClass ?>"
+                                                        style="width: <?= $avancement ?>%">
+                                                        <?= $avancement ?>%
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">Mis à jour:
+                                                    <?= date('d/m/Y', strtotime($chantier->created_at ?? 'now')) ?></small>
+                                            </td>
+                                            <td>
+                                                <strong><?= number_format($chantier->budget ?? 0, 0, ',', ' ') ?> DA</strong>
+                                            </td>
+                                            <td>
+                                                <?php $montantDecaisse = (($chantier->budget ?? 0) * $avancement / 100); ?>
+                                                <strong class="<?= $avancement > 0 ? 'text-success' : 'text-muted' ?>">
+                                                    <?= number_format($montantDecaisse, 0, ',', ' ') ?> DA
+                                                </strong>
+                                            </td>
+                                            <td>
+                                                <?php
+                                                $statutClass = 'badge-secondary';
+                                                $statutIcon = '<i class="fas fa-circle"></i>';
+                                                $statutText = $chantier->status ?? 'Inconnu';
+                                                if ($chantier->status == 'En cours') {
+                                                    $statutClass = 'badge-success';
+                                                    $statutIcon = '<i class="fas fa-sync fa-spin"></i>';
+                                                    $statutText = 'En cours';
+                                                } elseif ($chantier->status == 'Planifié') {
+                                                    $statutClass = 'badge-secondary';
+                                                    $statutIcon = '<i class="fas fa-pause-circle"></i>';
+                                                    $statutText = 'Non démarré';
+                                                } elseif ($chantier->status == 'Terminé') {
+                                                    $statutClass = 'badge-info';
+                                                    $statutIcon = '<i class="fas fa-check-circle"></i>';
+                                                    $statutText = 'Terminé';
+                                                } elseif ($chantier->status == 'Suspendu') {
+                                                    $statutClass = 'badge-danger';
+                                                    $statutIcon = '<i class="fas fa-ban"></i>';
+                                                    $statutText = 'Suspendu';
+                                                }
+                                                ?>
+                                                <span class="badge <?= $statutClass ?>"><?= $statutIcon ?>
+                                                    <?= $statutText ?></span>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button type="button" class="btn btn-warning" title="Modifier avancement"
+                                                        onclick="updateProgress(<?= $chantier->id ?>, '<?= htmlspecialchars($chantier->name) ?>', <?= $avancement ?>)">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-info" title="Voir détails"
+                                                        onclick="viewChantierDetails(<?= $chantier->id ?>)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-secondary" title="Historique"
+                                                        onclick="viewHistory(<?= $chantier->id ?>)">
+                                                        <i class="fas fa-history"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php else: ?>
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted py-5">
+                                            <i class="fas fa-inbox fa-3x mb-3"></i>
+                                            <p>Aucun chantier trouvé</p>
+                                        </td>
+                                    </tr>
+                                <?php endif; ?>
                             </tbody>
                         </table>
                     </div>
@@ -423,33 +261,15 @@
                     <div class="row mt-3">
                         <div class="col-sm-5">
                             <div class="dataTables_info">
-                                Affichage de 1 à 5 sur 142 chantiers
+                                Affichage de <span id="visibleCount"><?= count($chantiers ?? []) ?></span> sur
+                                <?= count($chantiers ?? []) ?> chantiers
                             </div>
                         </div>
                         <div class="col-sm-7">
                             <div class="dataTables_paginate paging_simple_numbers float-right">
                                 <ul class="pagination">
-                                    <li class="page-item disabled">
-                                        <a class="page-link" href="#">&laquo;</a>
-                                    </li>
-                                    <li class="page-item active">
-                                        <a class="page-link" href="#">1</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">2</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">3</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">...</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">29</a>
-                                    </li>
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">&raquo;</a>
-                                    </li>
+                                    <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+                                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -463,393 +283,335 @@
     </section>
     <!-- /.content -->
 
-    <!-- Modal Modifier Avancement -->
-    <div class="modal fade" id="modalUpdateProgress">
-        <div class="modal-dialog">
+    <!-- ========================================== -->
+    <!-- MODAL : Détails Chantier                   -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="modalChantierDetails" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-warning">
-                    <h4 class="modal-title">
-                        <i class="fas fa-chart-line"></i> Modifier l'Avancement
-                    </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                <div class="modal-header bg-info">
+                    <h4 class="modal-title"><i class="fas fa-hard-hat"></i> Détails du Chantier</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <h5><i class="fas fa-hard-hat text-warning"></i> <span id="detailChantierNom"></span></h5>
+                            <p class="text-muted">
+                                <strong>Projet:</strong> <span id="detailProjetName"></span><br>
+                                <strong>Localisation:</strong> <span id="detailLocation"></span>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <span id="detailStatutBadge" class="badge badge-lg"></span>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-success"><i class="fas fa-chart-line"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Avancement</span>
+                                    <span class="info-box-number" id="detailAvancement"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-primary"><i class="fas fa-money-bill-wave"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Budget</span>
+                                    <span class="info-box-number" id="detailBudget"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-warning"><i class="fas fa-hand-holding-usd"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">Décaissé</span>
+                                    <span class="info-box-number" id="detailDecaisse"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mb-3"><i class="fas fa-calendar-alt text-primary"></i> Planning</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm table-bordered">
+                            <tr>
+                                <td><strong>Date Début:</strong></td>
+                                <td id="detailDateDebut"></td>
+                                <td><strong>Date Fin Prévue:</strong></td>
+                                <td id="detailDateFin"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chef de Chantier:</strong></td>
+                                <td colspan="3" id="detailChefChantier"></td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <h6 class="mb-3"><i class="fas fa-tasks text-success"></i> Progression</h6>
+                    <div class="progress mb-3" style="height: 30px;">
+                        <div id="detailProgressBar" class="progress-bar bg-success" role="progressbar" style="width: 0%"
+                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fas fa-times"></i>
+                        Fermer</button>
+                    <button type="button" class="btn btn-warning" onclick="openUpdateModalFromDetails()"
+                        data-dismiss="modal"><i class="fas fa-edit"></i> Modifier Avancement</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- MODAL : Modifier Avancement (DYNAMIQUE)    -->
+    <!-- ========================================== -->
+    <div class="modal fade" id="modalUpdateProgress" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h4 class="modal-title"><i class="fas fa-chart-line"></i> Modifier l'Avancement</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <form id="formUpdateProgress" method="post" action="<?= base_url('crm-chantiers-update-progress') ?>">
+                    <div class="modal-body">
+                        <input type="hidden" id="updateChantierId" name="chantier_id">
+
                         <div class="alert alert-info">
-                            <strong>Chantier:</strong> Bâtiment Principal<br>
-                            <strong>Projet:</strong> Construction Université Oran
+                            <strong>Chantier:</strong> <span id="updateChantierName"></span><br>
+                            <strong>Projet:</strong> <span id="updateProjetName"></span>
                         </div>
 
                         <div class="form-group">
                             <label>Avancement Actuel</label>
                             <div class="progress mb-2">
-                                <div class="progress-bar bg-success" style="width: 60%">60%</div>
+                                <div id="currentProgressBar" class="progress-bar bg-success" style="width: 0%">0%</div>
                             </div>
-                            <small class="text-muted">
-                                Montant alloué: 6,000,000 DA | Décaissé: 3,000,000 DA
-                            </small>
+                            <small class="text-muted">Budget: <span id="updateBudget"></span> DA | Décaissé: <span
+                                    id="updateDecaisse"></span> DA</small>
                         </div>
 
                         <div class="form-group">
                             <label>Nouvel Avancement (%) <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="newProgress" min="0" max="100" value="60"
-                                required>
-                            <small class="form-text text-muted">
-                                <i class="fas fa-calculator"></i>
-                                Le montant décaissé sera recalculé automatiquement
-                            </small>
+                            <input type="number" class="form-control" id="newProgress" name="avancement" min="0"
+                                max="100" value="0" required oninput="calculateUpdate()">
+                            <small class="form-text text-muted"><i class="fas fa-calculator"></i> Le montant décaissé
+                                sera recalculé automatiquement</small>
                         </div>
 
-                        <div class="alert alert-success" id="calculationPreview">
+                        <div class="alert alert-success" id="calculationPreview" style="display:none;">
                             <h6><i class="fas fa-calculator"></i> Calcul Automatique</h6>
                             <div class="row">
                                 <div class="col-6">
-                                    <strong>Nouveau montant alloué:</strong><br>
-                                    <span id="newAllocated">6,000,000 DA</span>
+                                    <strong>Nouveau montant décaissé:</strong><br>
+                                    <span id="newDisbursed" class="text-primary font-weight-bold"></span> DA
                                 </div>
                                 <div class="col-6">
-                                    <strong>Nouveau montant décaissé:</strong><br>
-                                    <span id="newDisbursed">3,000,000 DA</span>
+                                    <strong>Différence:</strong><br>
+                                    <span id="diffAmount" class="font-weight-bold"></span> DA
                                 </div>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Statut</label>
+                            <select class="form-control select2" name="statut" id="updateStatut" required>
+                                <option value="Planifié">Planifié (Non démarré)</option>
+                                <option value="En cours">En cours</option>
+                                <option value="Terminé">Terminé</option>
+                                <option value="Suspendu">Suspendu</option>
+                            </select>
                         </div>
 
                         <div class="form-group">
                             <label>Commentaire</label>
-                            <textarea class="form-control" rows="2"
+                            <textarea class="form-control" name="commentaire" rows="2"
                                 placeholder="Description de l'avancement..."></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label>Responsable de la mise à jour</label>
-                            <input type="text" class="form-control" placeholder="Nom du responsable">
-                        </div>
-
-                        <div class="form-group">
                             <label>Date de mise à jour</label>
-                            <input type="date" class="form-control" value="<?= date('Y-m-d') ?>">
+                            <input type="date" class="form-control" name="date_maj" value="<?= date('Y-m-d') ?>">
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Annuler
-                    </button>
-                    <button type="button" class="btn btn-warning">
-                        <i class="fas fa-save"></i> Mettre à jour
-                    </button>
-                </div>
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fas fa-times"></i>
+                            Annuler</button>
+                        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Mettre à jour</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <!-- /.modal -->
-
-    <!-- Modal Détails Chantier -->
-    <div class="modal fade" id="modalChantierDetails">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h4 class="modal-title">
-                        <i class="fas fa-hard-hat"></i> Détails du Chantier
-                    </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <!-- Info Chantier -->
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <h5>
-                                <i class="fas fa-hard-hat text-warning"></i>
-                                Bâtiment Principal
-                            </h5>
-                            <p class="text-muted">
-                                <strong>Projet:</strong> Construction Université Oran<br>
-                                <strong>Localisation:</strong> Oran - Campus Universitaire
-                            </p>
-                        </div>
-                        <div class="col-md-4 text-right">
-                            <span class="badge badge-success badge-lg">
-                                <i class="fas fa-sync fa-spin"></i> En cours
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Stats du Chantier -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-success">
-                                    <i class="fas fa-chart-line"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Avancement</span>
-                                    <span class="info-box-number">60%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-primary">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Montant Alloué</span>
-                                    <span class="info-box-number">6M DA</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="info-box">
-                                <span class="info-box-icon bg-warning">
-                                    <i class="fas fa-hand-holding-usd"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Montant Décaissé</span>
-                                    <span class="info-box-number">3M DA</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Planning -->
-                    <h6 class="mb-3">
-                        <i class="fas fa-calendar-alt text-primary"></i> Planning
-                    </h6>
-                    <div class="table-responsive mb-4">
-                        <table class="table table-sm table-bordered">
-                            <tr>
-                                <td><strong>Date Début:</strong></td>
-                                <td>01/09/2026</td>
-                                <td><strong>Date Fin Prévue:</strong></td>
-                                <td>15/02/2028</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Responsable:</strong></td>
-                                <td colspan="3">Ahmed Benali</td>
-                            </tr>
-                        </table>
-                    </div>
-
-                    <!-- Historique Avancement -->
-                    <h6 class="mb-3">
-                        <i class="fas fa-history text-secondary"></i> Historique des Mises à Jour
-                    </h6>
-                    <div class="table-responsive">
-                        <table class="table table-sm table-striped">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Ancien %</th>
-                                    <th>Nouveau %</th>
-                                    <th>Responsable</th>
-                                    <th>Commentaire</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>02/09/2026</td>
-                                    <td>45%</td>
-                                    <td><span class="badge badge-success">60%</span></td>
-                                    <td>Ahmed Benali</td>
-                                    <td>Avancement gros oeuvre terminé</td>
-                                </tr>
-                                <tr>
-                                    <td>15/08/2026</td>
-                                    <td>30%</td>
-                                    <td><span class="badge badge-warning">45%</span></td>
-                                    <td>Ahmed Benali</td>
-                                    <td>Fondations terminées</td>
-                                </tr>
-                                <tr>
-                                    <td>01/08/2026</td>
-                                    <td>10%</td>
-                                    <td><span class="badge badge-info">30%</span></td>
-                                    <td>Karim Slimani</td>
-                                    <td>Début terrassement</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Contrat Associé -->
-                    <h6 class="mb-3 mt-4">
-                        <i class="fas fa-file-contract text-danger"></i> Contrat Associé
-                    </h6>
-                    <div class="alert alert-info">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <strong>N° Contrat:</strong> CNT-2026-001<br>
-                                <strong>Type:</strong> Marché Public<br>
-                                <strong>Montant:</strong> 6,000,000 DA
-                            </div>
-                            <div class="col-md-6 text-right">
-                                <button type="button" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-download"></i> Télécharger
-                                </button>
-                                <button type="button" class="btn btn-sm btn-info">
-                                    <i class="fas fa-eye"></i> Voir
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Fermer
-                    </button>
-                    <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#modalUpdateProgress"
-                        data-dismiss="modal">
-                        <i class="fas fa-edit"></i> Modifier Avancement
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- /.modal -->
-
-    <!-- Modal Mise à Jour Globale -->
-    <div class="modal fade" id="modalGlobalProgress">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h4 class="modal-title">
-                        <i class="fas fa-chart-line"></i> Mise à Jour Globale des Avancements
-                    </h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Attention:</strong> Cette action mettra à jour tous les chantiers sélectionnés.
-                    </div>
-
-                    <form>
-                        <div class="form-group">
-                            <label>Sélectionner les chantiers à mettre à jour</label>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th width="50">
-                                                <input type="checkbox" id="selectAllGlobal">
-                                            </th>
-                                            <th>Chantier</th>
-                                            <th>Projet</th>
-                                            <th>Avancement Actuel</th>
-                                            <th width="120">Nouvel Avancement</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" class="chantier-select">
-                                            </td>
-                                            <td>Bâtiment Principal</td>
-                                            <td>Université Oran</td>
-                                            <td>
-                                                <span class="badge badge-success">60%</span>
-                                            </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm" min="0"
-                                                    max="100" value="60">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" class="chantier-select">
-                                            </td>
-                                            <td>Laboratoires</td>
-                                            <td>Université Oran</td>
-                                            <td>
-                                                <span class="badge badge-warning">30%</span>
-                                            </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm" min="0"
-                                                    max="100" value="30">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" class="chantier-select">
-                                            </td>
-                                            <td>Parking</td>
-                                            <td>Université Oran</td>
-                                            <td>
-                                                <span class="badge badge-secondary">10%</span>
-                                            </td>
-                                            <td>
-                                                <input type="number" class="form-control form-control-sm" min="0"
-                                                    max="100" value="10">
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Commentaire global</label>
-                            <textarea class="form-control" rows="2"
-                                placeholder="Raison de la mise à jour..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Responsable</label>
-                            <input type="text" class="form-control" placeholder="Nom du responsable">
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Annuler
-                    </button>
-                    <button type="button" class="btn btn-info">
-                        <i class="fas fa-save"></i> Mettre à jour tout
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- /.modal -->
 
 </div>
 <!-- /.content-wrapper -->
 
-<!-- Script pour le calcul automatique -->
+<!-- ========================================== -->
+<!-- SCRIPTS                                      -->
+<!-- ========================================== -->
 <script>
-$(document).ready(function() {
-    // Calcul automatique lors du changement de pourcentage
-    $('#newProgress').on('input', function() {
-        var newProgress = $(this).val();
-        var totalProjet = 10000000; // Montant total du projet (à récupérer dynamiquement)
-        var currentDisbursed = 3000000; // Montant décaissé actuel
+    // Variable globale
+    var currentChantier = null;
+    var chantiersData = <?= json_encode($chantiers ?? []) ?>;
 
-        // Calcul du nouveau montant alloué
-        var newAllocated = (totalProjet * newProgress / 100).toFixed(0);
+    // Fonction pour voir les détails
+    function viewChantierDetails(chantierId) {
+        var chantier = chantiersData.find(c => c.id == chantierId);
+        if (!chantier) {
+            alert('Chantier non trouvé !');
+            return;
+        }
 
-        // Calcul du nouveau montant décaissé (proportionnel)
-        var newDisbursed = (currentDisbursed * newProgress / 60).toFixed(
-        0); // 60% est l'avancement actuel
+        currentChantier = chantier;
 
-        // Mise à jour de l'affichage
-        $('#newAllocated').text(formatCurrency(newAllocated) + ' DA');
-        $('#newDisbursed').text(formatCurrency(newDisbursed) + ' DA');
-    });
+        $('#detailChantierNom').text(chantier.name);
+        $('#detailProjetName').text(chantier.projet_name || 'Non assigné');
+        $('#detailLocation').text(chantier.location || '-');
 
-    // Fonction pour formater les montants
-    function formatCurrency(amount) {
-        return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        var statutClass = 'badge-secondary',
+            statutText = chantier.status || 'Inconnu';
+        if (chantier.status == 'En cours') {
+            statutClass = 'badge-success';
+            statutText = 'En cours';
+        } else if (chantier.status == 'Planifié') {
+            statutClass = 'badge-secondary';
+            statutText = 'Non démarré';
+        } else if (chantier.status == 'Terminé') {
+            statutClass = 'badge-info';
+            statutText = 'Terminé';
+        } else if (chantier.status == 'Suspendu') {
+            statutClass = 'badge-danger';
+            statutText = 'Suspendu';
+        }
+
+        $('#detailStatutBadge').attr('class', 'badge badge-lg ' + statutClass).text(statutText);
+
+        var avancement = parseFloat(chantier.avancement) || 0;
+        $('#detailAvancement').text(avancement + '%');
+        $('#detailProgressBar').css('width', avancement + '%').text(avancement + '%');
+
+        var budget = parseFloat(chantier.budget) || 0;
+        var decaisse = (budget * avancement / 100).toFixed(2);
+        $('#detailBudget').text(formatNumber(budget) + ' DA');
+        $('#detailDecaisse').text(formatNumber(decaisse) + ' DA');
+
+        $('#detailDateDebut').text(chantier.date_debut ? formatDate(chantier.date_debut) : '-');
+        $('#detailDateFin').text(chantier.date_fin_prevue ? formatDate(chantier.date_fin_prevue) : '-');
+        $('#detailChefChantier').text(chantier.chef_chantier || 'Non assigné');
+
+        $('#modalChantierDetails').modal('show');
     }
 
-    // Select all pour la mise à jour globale
-    $('#selectAllGlobal').on('change', function() {
-        $('.chantier-select').prop('checked', $(this).prop('checked'));
+    function openUpdateModalFromDetails() {
+        if (currentChantier) {
+            updateProgress(currentChantier.id, currentChantier.name, parseFloat(currentChantier.avancement) || 0);
+        }
+    }
+
+    function updateProgress(chantierId, chantierName, currentProgress) {
+        var chantier = chantiersData.find(c => c.id == chantierId);
+        if (!chantier) {
+            alert('Chantier non trouvé !');
+            return;
+        }
+
+        $('#updateChantierId').val(chantierId);
+        $('#updateChantierName').text(chantierName);
+        $('#updateProjetName').text(chantier.projet_name || 'Non assigné');
+
+        $('#currentProgressBar').css('width', currentProgress + '%').text(currentProgress + '%');
+
+        var budget = parseFloat(chantier.budget) || 0;
+        var currentDecaisse = (budget * currentProgress / 100).toFixed(2);
+        $('#updateBudget').text(formatNumber(budget));
+        $('#updateDecaisse').text(formatNumber(currentDecaisse));
+
+        $('#newProgress').val(currentProgress);
+        $('#updateStatut').val(chantier.status);
+
+        calculateUpdate();
+        $('#modalUpdateProgress').modal('show');
+    }
+
+    function calculateUpdate() {
+        if (!currentChantier) return;
+
+        var newProgress = parseFloat($('#newProgress').val()) || 0;
+        var budget = parseFloat(currentChantier.budget) || 0;
+        var currentProgress = parseFloat(currentChantier.avancement) || 0;
+
+        var newDecaisse = (budget * newProgress / 100).toFixed(2);
+        var currentDecaisse = (budget * currentProgress / 100).toFixed(2);
+        var diff = (newDecaisse - currentDecaisse).toFixed(2);
+
+        $('#newDisbursed').text(formatNumber(newDecaisse));
+        $('#diffAmount').text(diff >= 0 ? '+' + formatNumber(diff) : formatNumber(diff))
+            .removeClass('text-danger text-success')
+            .addClass(diff >= 0 ? 'text-success' : 'text-danger');
+
+        $('#calculationPreview').show();
+    }
+
+    function viewHistory(chantierId) {
+        Swal.fire({
+            icon: 'info',
+            title: 'Historique',
+            text: 'Fonctionnalité à implémenter pour le chantier ID: ' + chantierId
+        });
+    }
+
+    function formatNumber(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return '-';
+        var date = new Date(dateStr);
+        return date.toLocaleDateString('fr-FR');
+    }
+
+    // Filtrage
+    function applyFilters() {
+        var search = $('#searchChantier').val().toLowerCase();
+        var projet = $('#filterProjet').val();
+        var statut = $('#filterStatut').val();
+        var ville = $('#filterVille').val().toLowerCase();
+        var visible = 0;
+
+        $('#chantiersTableBody tr').each(function() {
+            var row = $(this);
+            var text = row.text().toLowerCase();
+            var rProjet = row.data('projet-id');
+            var rStatut = row.data('statut');
+            var rVille = row.data('location');
+
+            var show = true;
+            if (search && text.indexOf(search) === -1) show = false;
+            if (projet && rProjet != projet) show = false;
+            if (statut && rStatut != statut) show = false;
+            if (ville && rVille.indexOf(ville) === -1) show = false;
+
+            row.toggle(show);
+            if (show) visible++;
+        });
+        $('#visibleCount').text(visible);
+    }
+
+    $(document).ready(function() {
+        $('.select2').select2({
+            theme: 'bootstrap4',
+            placeholder: 'Sélectionner...',
+            allowClear: true
+        });
+        $('#searchChantier').on('keyup', applyFilters);
     });
-});
 </script>

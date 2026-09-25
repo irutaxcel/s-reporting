@@ -281,22 +281,12 @@ class DgModel extends CI_Model
 
 
 
+    /**
+     * Récupérer les demandes d'achat groupées par chantier avec filtres
+     * (AFFICHE TOUTES les demandes, y compris celles déjà payées)
+     */
     public function getDemandesByChantier($user_id = null, $date_debut = null, $date_fin = null, $chantier_filtre = null): array
     {
-        // ✅ ÉTAPE 1 : Récupérer les IDs des demandes déjà payées
-        $this->db->select('purchase_request_id');
-        $this->db->from('tbl_finance_mouvement_secondaire');
-        $this->db->where('status', 'validated');
-        $this->db->where('purchase_request_id IS NOT NULL');
-        $paid_requests = $this->db->get()->result();
-
-        // Créer un tableau des IDs payés
-        $paid_ids = [0]; // 0 par défaut pour éviter les erreurs SQL si vide
-        foreach ($paid_requests as $row) {
-            $paid_ids[] = $row->purchase_request_id;
-        }
-
-        // ✅ ÉTAPE 2 : Requête principale
         $this->db->select('pf.*, 
                 pv.id as voucher_id, 
                 pv.request_id, 
@@ -310,8 +300,8 @@ class DgModel extends CI_Model
         $this->db->join($this->table_vouchers . ' pv', 'pf.id = pv.request_id', 'left');
         $this->db->join('users u', 'pf.created_by = u.id', 'left');
 
-        // ✅ Exclure les demandes déjà payées (avec un tableau, pas une closure)
-        $this->db->where_not_in('pf.id', $paid_ids);
+        // ❌ SUPPRIMER le where_not_in qui excluait les demandes payées
+        // On affiche TOUTES les demandes maintenant
 
         $this->db->where('pf.company_id', 2);
 
@@ -331,6 +321,9 @@ class DgModel extends CI_Model
 
         return $this->db->get()->result();
     }
+
+    // Faire la même chose pour getVoucherStatistics() et getVouchersByChantier()
+    // Supprimer les where_not_in
 
     public function getVoucherStatistics($user_id = null, $date_debut = null, $date_fin = null, $chantier_filtre = null): array
     {
@@ -369,11 +362,14 @@ class DgModel extends CI_Model
         $total_demande = $this->db->get()->row()->amount_paid ?? 0;
 
         // 2. Total autorisé
+        // Ne compte que les demandes déjà effectuées (payées) : un montant simplement saisi/autorisé
+        // sur une demande encore en attente n'est pas encore un montant "exécuté".
         $this->db->select_sum('pv.amount_paid');
         $this->db->from($this->table_vouchers . ' pv');
         $this->db->join($this->table_forms . ' pf', 'pv.request_id = pf.id', 'left');
         $this->db->where('pf.company_id', 2);
         $this->db->where('pv.amount_paid >', 0);
+        $this->db->where('pv.payment_status', 'effectue');
         $this->db->where($exclude_condition); // ✅ Exclure les payés
 
         if ($date_debut && $date_fin) {

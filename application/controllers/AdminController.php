@@ -706,7 +706,7 @@ class AdminController extends CI_Controller
                 ['code' => 'crm-clients',   'label' => 'Clients',                  'icon' => 'fa-users'],
                 ['code' => 'crm-devis',     'label' => 'Devis',                    'icon' => 'fa-file-invoice-dollar'],
                 ['code' => 'crm-projets',   'label' => 'Projets',                  'icon' => 'fa-project-diagram'],
-                ['code' => 'crm-chantiers', 'label' => 'Chantiers & Avancement',   'icon' => 'fa-hard-hat'],
+                ['code' => 'crm-chantiers-avancement', 'label' => 'Chantiers & Avancement',   'icon' => 'fa-hard-hat'],
                 ['code' => 'crm-reporting', 'label' => 'Reporting & Statistiques', 'icon' => 'fa-chart-line'],
             ]],
 

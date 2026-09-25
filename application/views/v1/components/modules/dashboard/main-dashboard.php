@@ -516,7 +516,7 @@
 <!-- /.content-wrapper -->
 
 <!-- Scripts pour les graphiques -->
-<script>
+<!-- <script>
     $(document).ready(function() {
         // Graphique Evolution CA
         var revenueChart = new Chart($('#revenueChart'), {
@@ -589,4 +589,4 @@
             }
         });
     });
-</script>
+</script> -->
