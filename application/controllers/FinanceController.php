@@ -845,14 +845,80 @@ class FinanceController extends CI_Controller
         $data['recentMovements']   = $this->finance->getRecentMovements(6);
         $data['allMovementsCount'] = $this->finance->countAllMovements();
 
-        /* Dépenses secondaire par catégorie + consommation par chantier */
-        $data['secondaryExpensesByCategory']    = $this->finance->getSecondaryExpensesByCategory();
-        $data['secondaryConsumptionByChantier'] = $this->finance->getSecondaryConsumptionByChantier();
+        /* Dépenses secondaire par catégorie + consommation par chantier (filtrables) */
+        $expenseRange = $this->_resolveExpensePeriod($this->input->get('expense_period', true));
+        $data['expenseRange'] = $expenseRange;
+
+        $data['secondaryExpensesByCategory'] = $this->finance->getSecondaryExpensesByCategory(
+            $expenseRange['start'],
+            $expenseRange['end']
+        );
+        $data['secondaryConsumptionByChantier'] = $this->finance->getSecondaryConsumptionByChantier(
+            $expenseRange['start'],
+            $expenseRange['end']
+        );
 
         $this->load->view('v1/components/layout/header', $data);
         $this->load->view('v1/components/layout/sidebar', $data);
         $this->load->view('v1/components/modules/finance/caisse', $data);
         $this->load->view('v1/components/layout/footer');
+    }
+
+    /**
+     * Résout une clé de période en plage de dates [start, end].
+     * Utilisé par le filtre "Dépenses / Consommation par chantier" de la caisse.
+     */
+    private function _resolveExpensePeriod($period)
+    {
+        $options = [
+            'day'     => "Aujourd'hui",
+            'week'    => 'Cette semaine',
+            'month'   => 'Ce mois',
+            '3months' => '3 mois',
+            '6months' => '6 mois',
+            'year'    => 'Cette année',
+        ];
+
+        if (!isset($options[$period])) {
+            $period = 'month';
+        }
+
+        $today = new DateTime('today'); // 00:00:00
+        $end   = (clone $today)->setTime(23, 59, 59);
+
+        switch ($period) {
+            case 'day':
+                $start = clone $today;
+                break;
+            case 'week':
+                $start = (clone $today)->modify('monday this week');
+                break;
+            case '3months':
+                $start = (clone $today)->modify('-3 months');
+                break;
+            case '6months':
+                $start = (clone $today)->modify('-6 months');
+                break;
+            case 'year':
+                $start = new DateTime($today->format('Y') . '-01-01');
+                break;
+            case 'month':
+            default:
+                $start = (clone $today)->modify('first day of this month');
+                break;
+        }
+        $start->setTime(0, 0, 0);
+
+        return [
+            'key'     => $period,
+            'label'   => $options[$period],
+            'options' => $options,
+            'start'   => $start->format('Y-m-d H:i:s'),
+            'end'     => $end->format('Y-m-d H:i:s'),
+            'display' => $start->format('d/m/Y') === $end->format('d/m/Y')
+                ? $start->format('d/m/Y')
+                : $start->format('d/m/Y') . ' → ' . $end->format('d/m/Y'),
+        ];
     }
 
     public function caisseStore()
@@ -1206,8 +1272,8 @@ class FinanceController extends CI_Controller
         $data['livreDateTo']   = $dateTo;
         $data['livreSearch']   = $search;
 
-        /* ---------- Pagination ---------- */
-        $perPage    = 15;
+        /* ---------- Pagination (affichage décroissant) ---------- */
+        $perPage    = 30;
         $total      = $this->finance->countLivreMovements($role, $dateFrom, $dateTo, $search);
         $totalPages = max(1, (int) ceil($total / $perPage));
 
@@ -1215,9 +1281,28 @@ class FinanceController extends CI_Controller
         if ($page > $totalPages) {
             $page = $totalPages;
         }
-        $offset = ($page - 1) * $perPage;
+        $offset = ($page - 1) * $perPage;          // offset "visuel" (ordre décroissant)
 
-        $data['livreMovements']  = $this->finance->getLivreMovements($role, $dateFrom, $dateTo, $search, $perPage, $offset);
+        /*
+         * La requête reste en ordre croissant (le solde cumulé en dépend).
+         * On calcule la tranche ASC correspondant à la page DESC demandée :
+         *   page 1  -> les $perPage derniers mouvements
+         *   dernière page -> les premiers mouvements (tranche éventuellement incomplète)
+         */
+        $ascOffset = $total - ($page * $perPage);
+        $ascLimit  = $perPage;
+        if ($ascOffset < 0) {
+            $ascLimit += $ascOffset;               // tranche partielle sur la dernière page
+            $ascOffset = 0;
+        }
+
+        $movements = [];
+        if ($ascLimit > 0) {
+            $movements = $this->finance->getLivreMovements($role, $dateFrom, $dateTo, $search, $ascLimit, $ascOffset);
+            $movements = array_reverse($movements); // plus récent en premier
+        }
+
+        $data['livreMovements']  = $movements;
         $data['livreStats']      = $this->finance->getLivreStatistics($role, $dateFrom, $dateTo, $search);
         $data['livrePagination'] = [
             'total'        => $total,
@@ -1225,6 +1310,8 @@ class FinanceController extends CI_Controller
             'current_page' => $page,
             'total_pages'  => $totalPages,
             'offset'       => $offset,
+            // numéro chronologique de la 1re ligne affichée (ex. 378 en page 1)
+            'number_start' => $ascOffset + count($movements),
         ];
 
         $this->load->view('v1/components/layout/header', $data);
@@ -1417,1514 +1504,13 @@ class FinanceController extends CI_Controller
         $this->load->view('v1/components/modules/finance/rapport_financier_print', $data);
     }
 
-    // public function banques()
-    // {
-    //     if (!$this->session->userdata('user_id')) {
-    //         redirect('sign-in');
-    //         return;
-    //     }
 
-    //     $data['title'] = 'Comptes bancaires';
 
-    //     // $data['allChantiers'] = $this->tech->getAllChantier();
 
-    //     // $data['encaissementsData'] = $this->tech->getEncaissementsData();
 
-    //     $data['nextBankAccountCode'] =
-    //         $this->finance->getNextBankAccountCode();
 
-    //     $data['allBankAccounts'] =
-    //         $this->finance->getAllActiveBankAccounts();
 
-    //     $data['nextBankOperationReference'] =
-    //         $this->finance->getNextBankOperationReference();
 
-    //     $this->load->view('v1/components/layout/header', $data);
-    //     $this->load->view('v1/components/layout/sidebar', $data);
-    //     $this->load->view('v1/components/modules/finance/banques', $data);
-    //     $this->load->view('v1/components/layout/footer', $data);
-    // }
-
-    public function banques()
-    {
-
-        if (!$this->session->userdata('user_id')) {
-            redirect('sign-in');
-            return;
-        }
-
-        $data = [];
-
-        $data['title'] =
-            'Comptes bancaires';
-
-        /*
-     * Statistiques principales.
-     */
-        $data['bankMainStatistics'] =
-            $this->finance
-            ->getBankMainStatistics();
-
-        /*
-     * Comptes bancaires.
-     */
-        $data['allBankAccounts'] =
-            $this->finance
-            ->getAllActiveBankAccounts();
-
-        /*
-     * Situation des comptes.
-     */
-        $data['bankAccountSituations'] =
-            $this->finance
-            ->getBankAccountSituations();
-
-        $data['activeBankAccountsCount'] =
-            $this->finance
-            ->countActiveBankAccounts();
-
-        /*
-     * Mouvements bancaires récents.
-     */
-        $data['recentBankOperations'] =
-            $this->finance
-            ->getRecentBankOperations(10);
-
-        $data['bankOperationsCount'] =
-            $this->finance
-            ->countBankOperations();
-
-        /*
-     * Évolution des flux.
-     */
-        $bankFlowPeriod = trim(
-            (string) $this->input->get(
-                'bankflow_period',
-                true
-            )
-        );
-
-        $allowedPeriods = [
-            '7days',
-            '30days',
-            'month',
-            'year',
-        ];
-
-        if (
-            !in_array(
-                $bankFlowPeriod,
-                $allowedPeriods,
-                true
-            )
-        ) {
-            $bankFlowPeriod = '7days';
-        }
-
-        $data['bankFlowPeriod'] =
-            $bankFlowPeriod;
-
-        $data['bankFlowEvolution'] =
-            $this->finance
-            ->getBankFlowEvolution(
-                $bankFlowPeriod
-            );
-
-        $data['bankBalanceDistribution'] =
-            $this->finance
-            ->getBankBalanceDistribution();
-
-        /*
-     * Références automatiques.
-     */
-        $data['nextBankAccountCode'] =
-            $this->finance
-            ->getNextBankAccountCode();
-
-        $data['nextBankOperationReference'] =
-            $this->finance
-            ->getNextBankOperationReference();
-
-        $data['bankAlerts'] =
-            $this->finance
-            ->getBankAlerts(6);
-
-        $data['bankAlertsCount'] =
-            count(
-                $data['bankAlerts']
-            );
-
-        $this->load->view(
-            'v1/components/layout/header',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/layout/sidebar',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/modules/finance/banques',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/layout/footer'
-        );
-    }
-
-    /**
-     * Enregistre un nouveau compte bancaire.
-     */
-    public function bankAccountStore()
-    {
-        /*
-        * =========================================================
-        * 1. AUTORISER UNIQUEMENT LES REQUÊTES POST
-        * =========================================================
-        */
-
-        if ($this->input->method(TRUE) !== 'POST') {
-            show_404();
-            return;
-        }
-
-        /*
-        * Charger la bibliothèque de validation.
-        */
-        $this->load->library('form_validation');
-
-        /*
-        * =========================================================
-        * 2. RÈGLES DE VALIDATION
-        * =========================================================
-        */
-
-        $this->form_validation->set_rules(
-            'name',
-            'Intitulé du compte',
-            'trim|required|min_length[2]|max_length[150]'
-        );
-
-        $this->form_validation->set_rules(
-            'bank_name',
-            'Banque',
-            'trim|required|in_list[CRDB,BANCOBU,ECOBANK,KCB,BCB,BHB,INTERBANK]'
-        );
-
-        $this->form_validation->set_rules(
-            'account_number',
-            'Numéro de compte',
-            'trim|required|min_length[4]|max_length[100]'
-        );
-
-        $this->form_validation->set_rules(
-            'account_type',
-            'Type de compte',
-            'trim|required|in_list[courant,epargne,garantie,projet,credit]'
-        );
-
-        $this->form_validation->set_rules(
-            'currency',
-            'Devise',
-            'trim|required|in_list[BIF,USD,EUR]'
-        );
-
-        $this->form_validation->set_rules(
-            'opening_balance',
-            'Solde initial',
-            'trim|numeric|greater_than_equal_to[0]'
-        );
-
-        $this->form_validation->set_rules(
-            'alert_threshold',
-            'Seuil d’alerte',
-            'trim|numeric|greater_than_equal_to[0]'
-        );
-
-        $this->form_validation->set_rules(
-            'branch_name',
-            'Agence bancaire',
-            'trim|max_length[150]'
-        );
-
-        $this->form_validation->set_rules(
-            'swift_code',
-            'Code SWIFT',
-            'trim|max_length[50]'
-        );
-
-        $this->form_validation->set_rules(
-            'observation',
-            'Observation',
-            'trim|max_length[2000]'
-        );
-
-        /*
-     * =========================================================
-     * 3. MESSAGES DE VALIDATION
-     * =========================================================
-     */
-
-        $this->form_validation->set_message(
-            'required',
-            'Le champ {field} est obligatoire.'
-        );
-
-        $this->form_validation->set_message(
-            'min_length',
-            'Le champ {field} doit contenir au moins {param} caractères.'
-        );
-
-        $this->form_validation->set_message(
-            'max_length',
-            'Le champ {field} ne doit pas dépasser {param} caractères.'
-        );
-
-        $this->form_validation->set_message(
-            'numeric',
-            'Le champ {field} doit contenir un montant valide.'
-        );
-
-        $this->form_validation->set_message(
-            'greater_than_equal_to',
-            'Le champ {field} ne peut pas contenir une valeur négative.'
-        );
-
-        $this->form_validation->set_message(
-            'in_list',
-            'La valeur sélectionnée pour {field} est invalide.'
-        );
-
-        /*
-     * =========================================================
-     * 4. ARRÊTER EN CAS D’ERREUR DE VALIDATION
-     * =========================================================
-     */
-
-        if ($this->form_validation->run() === FALSE) {
-            /*
-         * Conserver temporairement les données saisies.
-         */
-            $this->session->set_flashdata(
-                'bank_account_old_input',
-                $this->input->post(NULL, TRUE)
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            $this->session->set_flashdata(
-                'error',
-                validation_errors('<div>', '</div>')
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-     * =========================================================
-     * 5. RÉCUPÉRER ET NETTOYER LES DONNÉES
-     * =========================================================
-     */
-
-        $name = trim(
-            (string) $this->input->post(
-                'name',
-                TRUE
-            )
-        );
-
-        $bankName = strtoupper(
-            trim(
-                (string) $this->input->post(
-                    'bank_name',
-                    TRUE
-                )
-            )
-        );
-
-        $accountNumber = trim(
-            (string) $this->input->post(
-                'account_number',
-                TRUE
-            )
-        );
-
-        $accountType = trim(
-            (string) $this->input->post(
-                'account_type',
-                TRUE
-            )
-        );
-
-        $currency = strtoupper(
-            trim(
-                (string) $this->input->post(
-                    'currency',
-                    TRUE
-                )
-            )
-        );
-
-        $openingBalance = (float) $this->input->post(
-            'opening_balance',
-            TRUE
-        );
-
-        $alertThreshold = (float) $this->input->post(
-            'alert_threshold',
-            TRUE
-        );
-
-        $branchName = trim(
-            (string) $this->input->post(
-                'branch_name',
-                TRUE
-            )
-        );
-
-        $swiftCode = strtoupper(
-            trim(
-                (string) $this->input->post(
-                    'swift_code',
-                    TRUE
-                )
-            )
-        );
-
-        $observation = trim(
-            (string) $this->input->post(
-                'observation',
-                TRUE
-            )
-        );
-
-        /*
-     * Retirer les espaces inutiles du numéro de compte
-     * pour éviter les doublons de forme :
-     *
-     * 0151 0010 02456
-     * 0151001002456
-     */
-        $normalizedAccountNumber = preg_replace(
-            '/[\s\-]+/',
-            '',
-            $accountNumber
-        );
-
-        if ($normalizedAccountNumber === '') {
-            $this->session->set_flashdata(
-                'error',
-                'Le numéro de compte bancaire est invalide.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-     * Le code SWIFT est généralement enregistré
-     * sans espaces.
-     */
-        if ($swiftCode !== '') {
-            $swiftCode = preg_replace(
-                '/\s+/',
-                '',
-                $swiftCode
-            );
-        }
-
-        /*
-     * =========================================================
-     * 6. CONTRÔLES SUPPLÉMENTAIRES
-     * =========================================================
-     */
-
-        if ($openingBalance < 0) {
-            $this->session->set_flashdata(
-                'error',
-                'Le solde initial ne peut pas être négatif.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        if ($alertThreshold < 0) {
-            $this->session->set_flashdata(
-                'error',
-                'Le seuil d’alerte ne peut pas être négatif.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-     * =========================================================
-     * 7. VÉRIFIER SI LE NUMÉRO DE COMPTE EXISTE DÉJÀ
-     * =========================================================
-     */
-
-        $existingAccount = $this->db
-            ->where(
-                'account_number',
-                $normalizedAccountNumber
-            )
-            ->get('tbl_finance_bank_account')
-            ->row();
-
-        if ($existingAccount) {
-            $this->session->set_flashdata(
-                'error',
-                'Ce numéro de compte bancaire est déjà enregistré sous l’intitulé « '
-                    . html_escape($existingAccount->name)
-                    . ' ».'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-     * Vérifier également l’intitulé dans la même banque
-     * et dans la même devise.
-     */
-        $existingName = $this->db
-            ->where('bank_name', $bankName)
-            ->where('currency', $currency)
-            ->where('name', $name)
-            ->get('tbl_finance_bank_account')
-            ->row();
-
-        if ($existingName) {
-            $this->session->set_flashdata(
-                'error',
-                'Un compte bancaire portant cet intitulé existe déjà pour cette banque et cette devise.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-     * =========================================================
-     * 8. DÉMARRER UNE TRANSACTION
-     * =========================================================
-     */
-
-        $this->db->trans_begin();
-
-        try {
-            /*
-         * =====================================================
-         * 9. GÉNÉRER LE CODE AUTOMATIQUEMENT
-         * =====================================================
-         *
-         * Exemple :
-         *
-         * BAN-2026-001
-         * BAN-2026-002
-         * BAN-2026-003
-         */
-
-            $year = date('Y');
-
-            $codePrefix = 'BAN-' . $year . '-';
-
-            /*
-         * Rechercher le dernier code de l’année en cours.
-         */
-            $lastBankAccount = $this->db
-                ->select('code')
-                ->from('tbl_finance_bank_account')
-                ->like(
-                    'code',
-                    $codePrefix,
-                    'after'
-                )
-                ->order_by('code', 'DESC')
-                ->limit(1)
-                ->get()
-                ->row();
-
-            $nextNumber = 1;
-
-            if (
-                $lastBankAccount
-                && !empty($lastBankAccount->code)
-            ) {
-                /*
-             * Exemple :
-             * BAN-2026-007 devient 007.
-             */
-                $lastCodeParts = explode(
-                    '-',
-                    $lastBankAccount->code
-                );
-
-                $lastNumber = (int) end(
-                    $lastCodeParts
-                );
-
-                $nextNumber = $lastNumber + 1;
-            }
-
-            $bankAccountCode = $codePrefix
-                . str_pad(
-                    (string) $nextNumber,
-                    3,
-                    '0',
-                    STR_PAD_LEFT
-                );
-
-            /*
-         * Sécurité supplémentaire :
-         * vérifier que le code n’existe pas.
-         */
-            while (
-                $this->db
-                ->where('code', $bankAccountCode)
-                ->count_all_results(
-                    'tbl_finance_bank_account'
-                ) > 0
-            ) {
-                $nextNumber++;
-
-                $bankAccountCode = $codePrefix
-                    . str_pad(
-                        (string) $nextNumber,
-                        3,
-                        '0',
-                        STR_PAD_LEFT
-                    );
-            }
-
-            /*
-         * =====================================================
-         * 10. PRÉPARER LES DONNÉES
-         * =====================================================
-         */
-
-            $currentUserId = $this->session->userdata(
-                'user_id'
-            );
-
-            /*
-         * Selon ton système, l’identifiant peut aussi être
-         * stocké dans la session sous "id".
-         */
-            if (!$currentUserId) {
-                $currentUserId = $this->session->userdata(
-                    'id'
-                );
-            }
-
-            $bankAccountData = [
-                'code' => $bankAccountCode,
-
-                'name' => $name,
-
-                'bank_name' => $bankName,
-
-                'account_number' =>
-                $normalizedAccountNumber,
-
-                'account_type' => $accountType,
-
-                'currency' => $currency,
-
-                /*
-             * Lors de la création :
-             * current_balance = opening_balance.
-             */
-                'opening_balance' =>
-                $openingBalance,
-
-                'current_balance' =>
-                $openingBalance,
-
-                'alert_threshold' =>
-                $alertThreshold,
-
-                'branch_name' =>
-                $branchName !== ''
-                    ? $branchName
-                    : NULL,
-
-                'swift_code' =>
-                $swiftCode !== ''
-                    ? $swiftCode
-                    : NULL,
-
-                'observation' =>
-                $observation !== ''
-                    ? $observation
-                    : NULL,
-
-                'status' => 'active',
-
-                'created_by' =>
-                $currentUserId ?: NULL,
-
-                'updated_by' => NULL,
-
-                'created_at' =>
-                date('Y-m-d H:i:s'),
-
-                'updated_at' => NULL,
-            ];
-
-            /*
-         * =====================================================
-         * 11. INSERTION DANS LA BASE
-         * =====================================================
-         */
-
-            $inserted = $this->finance
-                ->createBankAccount(
-                    $bankAccountData
-                );
-
-            if (!$inserted) {
-                throw new Exception(
-                    'Le compte bancaire n’a pas pu être enregistré.'
-                );
-            }
-
-            $bankAccountId = (int)
-            $this->db->insert_id();
-
-            if ($bankAccountId <= 0) {
-                throw new Exception(
-                    'L’identifiant du compte bancaire n’a pas été généré.'
-                );
-            }
-
-            /*
-         * =====================================================
-         * 12. VÉRIFIER LA TRANSACTION
-         * =====================================================
-         */
-
-            if ($this->db->trans_status() === FALSE) {
-                throw new Exception(
-                    'Une erreur de base de données est survenue pendant l’enregistrement.'
-                );
-            }
-
-            /*
-         * Valider définitivement les modifications.
-         */
-            $this->db->trans_commit();
-
-            /*
-         * =====================================================
-         * 13. MESSAGE DE SUCCÈS
-         * =====================================================
-         */
-
-            $bankLabels = [
-                'CRDB' =>
-                'CRDB Bank',
-
-                'BANCOBU' =>
-                'BANCOBU',
-
-                'ECOBANK' =>
-                'ECOBANK',
-
-                'KCB' =>
-                'KCB Bank',
-
-                'BCB' =>
-                'Banque de Crédit de Bujumbura',
-
-                'BHB' =>
-                'Banque de l’Habitat du Burundi',
-
-                'INTERBANK' =>
-                'Interbank Burundi',
-            ];
-
-            $displayBankName = isset(
-                $bankLabels[$bankName]
-            )
-                ? $bankLabels[$bankName]
-                : $bankName;
-
-            $this->session->set_flashdata(
-                'success',
-                'Le compte bancaire '
-                    . $bankAccountCode
-                    . ' — '
-                    . $name
-                    . ' auprès de '
-                    . $displayBankName
-                    . ' a été créé avec succès.'
-            );
-
-            redirect('compte-banques');
-            return;
-        } catch (Throwable $exception) {
-            /*
-         * Annuler toutes les modifications en cas d’erreur.
-         */
-            if (
-                $this->db->trans_status() === FALSE
-                || $this->db->trans_depth() > 0
-            ) {
-                $this->db->trans_rollback();
-            }
-
-            log_message(
-                'error',
-                'Erreur création compte bancaire : '
-                    . $exception->getMessage()
-            );
-
-            /*
-         * Conserver les anciennes valeurs pour rouvrir
-         * la modale sans perdre la saisie.
-         */
-            $this->session->set_flashdata(
-                'bank_account_old_input',
-                $this->input->post(NULL, TRUE)
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_account_modal',
-                TRUE
-            );
-
-            $this->session->set_flashdata(
-                'error',
-                $exception->getMessage()
-                    ?: 'Le compte bancaire n’a pas pu être enregistré.'
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-    }
-
-    /**
-     * Enregistre une opération bancaire :
-     *
-     * - encaissement ;
-     * - décaissement ;
-     * - transfert entre comptes bancaires.
-     */
-    public function bankOperationStore()
-    {
-        /*
-        * =========================================================
-        * 1. AUTORISER UNIQUEMENT POST
-        * =========================================================
-        */
-
-        if ($this->input->method(TRUE) !== 'POST') {
-            show_404();
-            return;
-        }
-
-        $this->load->library('form_validation');
-
-        /*
-        * =========================================================
-        * 2. RÈGLES DE VALIDATION
-        * =========================================================
-        */
-
-        $this->form_validation->set_rules(
-            'operation_type',
-            'Type d’opération',
-            'trim|required|in_list[encaissement,decaissement,transfert]'
-        );
-
-        $this->form_validation->set_rules(
-            'operation_date',
-            'Date de l’opération',
-            'trim|required'
-        );
-
-        $this->form_validation->set_rules(
-            'bank_account_id',
-            'Compte bancaire concerné',
-            'trim|required|integer'
-        );
-
-        $this->form_validation->set_rules(
-            'amount',
-            'Montant',
-            'trim|required|numeric|greater_than[0]'
-        );
-
-        $this->form_validation->set_rules(
-            'category',
-            'Catégorie',
-            'trim|max_length[100]'
-        );
-
-        $this->form_validation->set_rules(
-            'third_party',
-            'Tiers ou bénéficiaire',
-            'trim|max_length[255]'
-        );
-
-        $this->form_validation->set_rules(
-            'payment_method',
-            'Mode d’opération',
-            'trim|required|in_list[transfer,deposit,cheque,withdrawal]'
-        );
-
-        $this->form_validation->set_rules(
-            'document_number',
-            'Numéro de pièce',
-            'trim|max_length[100]'
-        );
-
-        $this->form_validation->set_rules(
-            'label',
-            'Libellé de l’opération',
-            'trim|required|max_length[2000]'
-        );
-
-        /*
-        * Le compte destination est obligatoire
-        * uniquement pour un transfert.
-        */
-        $operationType = trim(
-            (string) $this->input->post(
-                'operation_type',
-                TRUE
-            )
-        );
-
-        if ($operationType === 'transfert') {
-            $this->form_validation->set_rules(
-                'destination_bank_account_id',
-                'Compte destination',
-                'trim|required|integer'
-            );
-        }
-
-        /*
-        * =========================================================
-        * 3. MESSAGES DE VALIDATION
-        * =========================================================
-        */
-
-        $this->form_validation->set_message(
-            'required',
-            'Le champ {field} est obligatoire.'
-        );
-
-        $this->form_validation->set_message(
-            'integer',
-            'La valeur du champ {field} est invalide.'
-        );
-
-        $this->form_validation->set_message(
-            'numeric',
-            'Le champ {field} doit contenir un montant valide.'
-        );
-
-        $this->form_validation->set_message(
-            'greater_than',
-            'Le montant doit être supérieur à zéro.'
-        );
-
-        $this->form_validation->set_message(
-            'in_list',
-            'La valeur sélectionnée pour {field} est invalide.'
-        );
-
-        $this->form_validation->set_message(
-            'max_length',
-            'Le champ {field} ne doit pas dépasser {param} caractères.'
-        );
-
-        /*
-        * =========================================================
-        * 4. ARRÊTER EN CAS D’ERREUR
-        * =========================================================
-        */
-
-        if ($this->form_validation->run() === FALSE) {
-            $this->session->set_flashdata(
-                'bank_operation_old_input',
-                $this->input->post(NULL, TRUE)
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_operation_modal',
-                TRUE
-            );
-
-            $this->session->set_flashdata(
-                'error',
-                validation_errors('<div>', '</div>')
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-        * =========================================================
-        * 5. RÉCUPÉRATION DES DONNÉES
-        * =========================================================
-        */
-
-        $operationDate = trim(
-            (string) $this->input->post(
-                'operation_date',
-                TRUE
-            )
-        );
-
-        $bankAccountId = (int) $this->input->post(
-            'bank_account_id',
-            TRUE
-        );
-
-        $destinationBankAccountId = (int)
-        $this->input->post(
-            'destination_bank_account_id',
-            TRUE
-        );
-
-        $amount = (float) $this->input->post(
-            'amount',
-            TRUE
-        );
-
-        $category = trim(
-            (string) $this->input->post(
-                'category',
-                TRUE
-            )
-        );
-
-        $thirdParty = trim(
-            (string) $this->input->post(
-                'third_party',
-                TRUE
-            )
-        );
-
-        $paymentMethod = trim(
-            (string) $this->input->post(
-                'payment_method',
-                TRUE
-            )
-        );
-
-        $documentNumber = trim(
-            (string) $this->input->post(
-                'document_number',
-                TRUE
-            )
-        );
-
-        $label = trim(
-            (string) $this->input->post(
-                'label',
-                TRUE
-            )
-        );
-
-        /*
-        * =========================================================
-        * 6. DÉTERMINER SOURCE ET DESTINATION
-        * =========================================================
-        */
-
-        $sourceBankAccountId = NULL;
-        $finalDestinationBankAccountId = NULL;
-
-        /*
-        * Encaissement :
-        * le compte sélectionné reçoit l’argent.
-        */
-        if ($operationType === 'encaissement') {
-            $finalDestinationBankAccountId =
-                $bankAccountId;
-        }
-
-        /*
-        * Décaissement :
-        * le compte sélectionné fournit l’argent.
-        */ elseif ($operationType === 'decaissement') {
-            $sourceBankAccountId =
-                $bankAccountId;
-        }
-
-        /*
-        * Transfert :
-        * le compte sélectionné est la source,
-        * et destination_bank_account_id est la destination.
-        */ elseif ($operationType === 'transfert') {
-            $sourceBankAccountId =
-                $bankAccountId;
-
-            $finalDestinationBankAccountId =
-                $destinationBankAccountId;
-
-            if (
-                $sourceBankAccountId
-                === $finalDestinationBankAccountId
-            ) {
-                $this->session->set_flashdata(
-                    'error',
-                    'Le compte source et le compte destination doivent être différents.'
-                );
-
-                $this->session->set_flashdata(
-                    'open_bank_operation_modal',
-                    TRUE
-                );
-
-                redirect('compte-banques');
-                return;
-            }
-        }
-
-        /*
-        * =========================================================
-        * 7. VÉRIFIER LE COMPTE PRINCIPAL
-        * =========================================================
-        */
-
-        $referenceAccountId =
-            $sourceBankAccountId
-            ?: $finalDestinationBankAccountId;
-
-        $referenceAccount = $this->db
-            ->where('id', $referenceAccountId)
-            ->get('tbl_finance_bank_account')
-            ->row();
-
-        if (!$referenceAccount) {
-            $this->session->set_flashdata(
-                'error',
-                'Le compte bancaire sélectionné est introuvable.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_operation_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        if ($referenceAccount->status !== 'active') {
-            $this->session->set_flashdata(
-                'error',
-                'Le compte bancaire sélectionné n’est pas actif.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_operation_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-        * =========================================================
-        * 8. VÉRIFIER LE COMPTE DESTINATION DU TRANSFERT
-        * =========================================================
-        */
-
-        if ($operationType === 'transfert') {
-            $destinationAccount = $this->db
-                ->where(
-                    'id',
-                    $finalDestinationBankAccountId
-                )
-                ->get('tbl_finance_bank_account')
-                ->row();
-
-            if (!$destinationAccount) {
-                $this->session->set_flashdata(
-                    'error',
-                    'Le compte bancaire destination est introuvable.'
-                );
-
-                $this->session->set_flashdata(
-                    'open_bank_operation_modal',
-                    TRUE
-                );
-
-                redirect('compte-banques');
-                return;
-            }
-
-            if ($destinationAccount->status !== 'active') {
-                $this->session->set_flashdata(
-                    'error',
-                    'Le compte bancaire destination n’est pas actif.'
-                );
-
-                $this->session->set_flashdata(
-                    'open_bank_operation_modal',
-                    TRUE
-                );
-
-                redirect('compte-banques');
-                return;
-            }
-
-            /*
-            * Sans gestion de taux de change,
-            * un transfert doit utiliser la même devise.
-            */
-            if (
-                $referenceAccount->currency
-                !== $destinationAccount->currency
-            ) {
-                $this->session->set_flashdata(
-                    'error',
-                    'Le transfert est impossible entre deux comptes de devises différentes. Ajoutez d’abord un système de taux de change.'
-                );
-
-                $this->session->set_flashdata(
-                    'open_bank_operation_modal',
-                    TRUE
-                );
-
-                redirect('compte-banques');
-                return;
-            }
-        }
-
-        /*
-        * =========================================================
-        * 9. VÉRIFIER LE SOLDE DISPONIBLE
-        * =========================================================
-        */
-
-        if (
-            in_array(
-                $operationType,
-                ['decaissement', 'transfert'],
-                TRUE
-            )
-            && (float) $referenceAccount->current_balance
-            < $amount
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'Solde insuffisant. Le compte '
-                    . $referenceAccount->name
-                    . ' dispose seulement de '
-                    . number_format(
-                        (float) $referenceAccount
-                            ->current_balance,
-                        2,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $referenceAccount->currency
-                    . '.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_operation_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-        * =========================================================
-        * 10. UPLOAD FACULTATIF
-        * =========================================================
-        */
-
-        $attachmentName = NULL;
-
-        if (
-            isset($_FILES['attachment'])
-            && !empty($_FILES['attachment']['name'])
-        ) {
-            $uploadPath =
-                FCPATH
-                . 'uploads/finance/bank_operations/';
-
-            if (!is_dir($uploadPath)) {
-                mkdir(
-                    $uploadPath,
-                    0755,
-                    TRUE
-                );
-            }
-
-            $config = [
-                'upload_path' =>
-                $uploadPath,
-
-                'allowed_types' =>
-                'pdf|jpg|jpeg|png|doc|docx|xls|xlsx',
-
-                'max_size' =>
-                5120,
-
-                'encrypt_name' =>
-                TRUE,
-
-                'remove_spaces' =>
-                TRUE,
-            ];
-
-            $this->load->library(
-                'upload',
-                $config
-            );
-
-            if (
-                !$this->upload->do_upload(
-                    'attachment'
-                )
-            ) {
-                $this->session->set_flashdata(
-                    'error',
-                    strip_tags(
-                        $this->upload
-                            ->display_errors()
-                    )
-                );
-
-                $this->session->set_flashdata(
-                    'open_bank_operation_modal',
-                    TRUE
-                );
-
-                redirect('compte-banques');
-                return;
-            }
-
-            $uploadedFile =
-                $this->upload->data();
-
-            $attachmentName =
-                $uploadedFile['file_name'];
-        }
-
-        /*
-        * =========================================================
-        * 11. IDENTIFIANT UTILISATEUR
-        * =========================================================
-        */
-
-        $currentUserId =
-            $this->session->userdata(
-                'user_id'
-            );
-
-        if (!$currentUserId) {
-            $currentUserId =
-                $this->session->userdata(
-                    'id'
-                );
-        }
-
-        /*
-        * =========================================================
-        * 12. PRÉPARER LES DONNÉES
-        * =========================================================
-        */
-
-        $operationData = [
-            'operation_type' =>
-            $operationType,
-
-            'operation_date' =>
-            $operationDate,
-
-            'source_cashbox_id' =>
-            $sourceCashboxId,
-
-            'destination_cashbox_id' =>
-            $destinationCashboxId,
-
-            'purchase_request_id' =>
-            $purchaseRequestId > 0
-                ? $purchaseRequestId
-                : null,
-
-            'payment_voucher_id' =>
-            $paymentVoucherId > 0
-                ? $paymentVoucherId
-                : null,
-
-            'purchase_request_reference' =>
-            $purchaseRequestReference !== ''
-                ? $purchaseRequestReference
-                : null,
-
-            'payment_voucher_reference' =>
-            $paymentVoucherReference !== ''
-                ? $paymentVoucherReference
-                : null,
-
-            'expense_justification' =>
-            $expenseJustification !== ''
-                ? $expenseJustification
-                : null,
-
-            'amount' =>
-            $amount,
-
-            'currency' =>
-            $currency,
-
-            'category' =>
-            $category !== ''
-                ? $category
-                : null,
-
-            'third_party' =>
-            $thirdParty !== ''
-                ? $thirdParty
-                : null,
-
-            'payment_method' =>
-            $paymentMethod,
-
-            'document_number' =>
-            $documentNumber !== ''
-                ? $documentNumber
-                : null,
-
-            'attachment' =>
-            $attachmentName,
-
-            'label' =>
-            $automaticLabel,
-
-            'observation' =>
-            $observation !== ''
-                ? $observation
-                : null,
-
-            'status' =>
-            'validated',
-
-            'created_by' =>
-            $currentUserId,
-
-            'validated_by' =>
-            $currentUserId,
-
-            'created_at' =>
-            date('Y-m-d H:i:s'),
-        ];
-
-        /*
-        * =========================================================
-        * 13. ENREGISTRER VIA LE MODÈLE
-        * =========================================================
-        */
-
-        $result =
-            $this->finance
-            ->createBankOperation(
-                $operationData
-            );
-
-        if (
-            empty($result['status'])
-        ) {
-            if ($attachmentName) {
-                @unlink(
-                    FCPATH
-                        . 'uploads/finance/bank_operations/'
-                        . $attachmentName
-                );
-            }
-
-            $this->session->set_flashdata(
-                'error',
-                $result['message']
-                    ?? 'L’opération bancaire n’a pas pu être enregistrée.'
-            );
-
-            $this->session->set_flashdata(
-                'open_bank_operation_modal',
-                TRUE
-            );
-
-            redirect('compte-banques');
-            return;
-        }
-
-        /*
-        * =========================================================
-        * 14. MESSAGE DE SUCCÈS
-        * =========================================================
-        */
-
-        $operationLabels = [
-            'encaissement' =>
-            'L’encaissement bancaire',
-
-            'decaissement' =>
-            'Le décaissement bancaire',
-
-            'transfert' =>
-            'Le transfert bancaire',
-        ];
-
-        $this->session->set_flashdata(
-            'success',
-            $operationLabels[$operationType]
-                . ' '
-                . $result['reference']
-                . ' a été enregistré avec succès.'
-        );
-
-        redirect('compte-banques');
-    }
 
     /**
      * Affiche la page de gestion des encaissements.
@@ -3328,22 +1914,22 @@ class FinanceController extends CI_Controller
             'Décaissements';
 
         /*
-     * Caisses pour la modale.
-     */
+        * Caisses pour la modale.
+        */
         $data['allCashboxes'] =
             $this->finance
             ->getAllActiveCashboxes();
 
         /*
-     * Statistiques principales.
-     */
+        * Statistiques principales.
+        */
         $data['decaissementStatistics'] =
             $this->finance
             ->getDecaissementMainStatistics();
 
         /*
-     * Période du graphique.
-     */
+        * Période du graphique.
+        */
         $allowedDecaissementPeriods = [
             '6months',
             '12months',
@@ -3372,8 +1958,8 @@ class FinanceController extends CI_Controller
             $decaissementPeriod;
 
         /*
-     * Données dynamiques du graphique.
-     */
+        * Données dynamiques du graphique.
+        */
         $data['decaissementEvolution'] =
             $this->finance
             ->getDecaissementEvolution(
@@ -3381,10 +1967,10 @@ class FinanceController extends CI_Controller
             );
 
         /*
- * =========================================================
- * HISTORIQUE DES DÉCAISSEMENTS
- * =========================================================
- */
+        * =========================================================
+        * HISTORIQUE DES DÉCAISSEMENTS
+        * =========================================================
+        */
 
         $decaissementsPerPage = 10;
 
@@ -3398,15 +1984,15 @@ class FinanceController extends CI_Controller
         }
 
         /*
- * Nombre total de décaissements.
- */
+        * Nombre total de décaissements.
+        */
         $totalDecaissements =
             $this->finance
             ->countDecaissementHistory();
 
         /*
- * Nombre total de pages.
- */
+        * Nombre total de pages.
+        */
         $totalDecaissementPages =
             $totalDecaissements > 0
             ? (int) ceil(
@@ -3416,8 +2002,8 @@ class FinanceController extends CI_Controller
             : 1;
 
         /*
- * Empêcher une page supérieure au nombre disponible.
- */
+        * Empêcher une page supérieure au nombre disponible.
+        */
         if (
             $currentDecaissementPage
             > $totalDecaissementPages
@@ -3427,8 +2013,8 @@ class FinanceController extends CI_Controller
         }
 
         /*
- * Offset SQL.
- */
+        * Offset SQL.
+        */
         $decaissementOffset =
             (
                 $currentDecaissementPage - 1
@@ -3436,8 +2022,8 @@ class FinanceController extends CI_Controller
             * $decaissementsPerPage;
 
         /*
- * Données du tableau.
- */
+        * Données du tableau.
+        */
         $data['decaissementHistory'] =
             $this->finance
             ->getDecaissementHistory(
@@ -3446,8 +2032,8 @@ class FinanceController extends CI_Controller
             );
 
         /*
- * Informations de pagination.
- */
+        * Informations de pagination.
+        */
         $data['decaissementPagination'] = [
             'current_page' =>
             $currentDecaissementPage,
@@ -3466,14 +2052,14 @@ class FinanceController extends CI_Controller
         ];
 
         /*
- * =========================================================
- * SYNTHÈSE DES DÉCAISSEMENTS PAR CHANTIER
- * =========================================================
- */
+        * =========================================================
+        * SYNTHÈSE DES DÉCAISSEMENTS PAR CHANTIER
+        * =========================================================
+        */
 
         /*
- * Par défaut, la synthèse porte sur le mois en cours.
- */
+        * Par défaut, la synthèse porte sur le mois en cours.
+        */
         $chantierSummaryStartDate =
             date('Y-m-01');
 
@@ -3481,8 +2067,8 @@ class FinanceController extends CI_Controller
             date('Y-m-t');
 
         /*
- * Dates éventuellement envoyées par les filtres.
- */
+        * Dates éventuellement envoyées par les filtres.
+        */
         $requestedStartDate = trim(
             (string) $this->input->get(
                 'chantier_start_date',
@@ -3498,8 +2084,8 @@ class FinanceController extends CI_Controller
         );
 
         /*
- * Vérifier le format YYYY-MM-DD.
- */
+        * Vérifier le format YYYY-MM-DD.
+        */
         if (
             !empty($requestedStartDate)
             && preg_match(
@@ -3523,8 +2109,8 @@ class FinanceController extends CI_Controller
         }
 
         /*
- * Éviter une période inversée.
- */
+        * Éviter une période inversée.
+        */
         if (
             strtotime($chantierSummaryStartDate)
             > strtotime($chantierSummaryEndDate)
@@ -3576,920 +2162,11 @@ class FinanceController extends CI_Controller
         );
     }
 
-    public function rapprochement()
-    {
-        if (!$this->session->userdata('user_id')) {
-            redirect('sign-in');
-            return;
-        }
 
-        $data = [];
 
-        $data['title'] = 'Rapprochement bancaire';
 
-        /*
-        * Comptes bancaires.
-        */
-        $data['allBankAccounts'] =
-            $this->finance
-            ->getAllActiveBankAccounts();
 
-        /*
-        * Sessions pouvant être analysées.
-        */
-        $data['reconciliations'] =
-            $this->finance
-            ->getReconciliationsAvailableForAnalysis();
 
-        /*
-        * Statistiques.
-        */
-        $data['reconciliationStatistics'] =
-            $this->finance
-            ->getBankReconciliationMainStatistics();
-
-        $this->load->view(
-            'v1/components/layout/header',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/layout/sidebar',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/modules/finance/rapprochement',
-            $data
-        );
-
-        $this->load->view(
-            'v1/components/layout/footer'
-        );
-    }
-
-    /**
-     * Démarre une nouvelle session de rapprochement bancaire.
-     */
-    public function reconciliationStore()
-    {
-        /*
-        * Vérifier l'authentification.
-        */
-        if (!$this->session->userdata('user_id')) {
-            redirect('sign-in');
-            return;
-        }
-
-        /*
-        * Accepter uniquement POST.
-        */
-        if ($this->input->method(true) !== 'POST') {
-            show_404();
-            return;
-        }
-
-        $this->load->library('form_validation');
-
-        /*
-        * Règles de validation.
-        */
-        $this->form_validation->set_rules(
-            'bank_account_id',
-            'Compte bancaire',
-            'trim|required|integer'
-        );
-
-        $this->form_validation->set_rules(
-            'period_start',
-            'Date de début',
-            'trim|required'
-        );
-
-        $this->form_validation->set_rules(
-            'period_end',
-            'Date de fin',
-            'trim|required'
-        );
-
-        $this->form_validation->set_rules(
-            'statement_opening_balance',
-            'Solde initial du relevé',
-            'trim|required|numeric'
-        );
-
-        $this->form_validation->set_rules(
-            'statement_closing_balance',
-            'Solde final du relevé',
-            'trim|required|numeric'
-        );
-
-        $this->form_validation->set_rules(
-            'observation',
-            'Observation',
-            'trim|max_length[1000]'
-        );
-
-        /*
-        * Messages personnalisés.
-        */
-        $this->form_validation->set_message(
-            'required',
-            'Le champ {field} est obligatoire.'
-        );
-
-        $this->form_validation->set_message(
-            'integer',
-            'Le champ {field} est invalide.'
-        );
-
-        $this->form_validation->set_message(
-            'numeric',
-            'Le champ {field} doit contenir un montant valide.'
-        );
-
-        $this->form_validation->set_message(
-            'max_length',
-            'Le champ {field} dépasse la longueur autorisée.'
-        );
-
-        /*
-        * Validation échouée.
-        */
-        if ($this->form_validation->run() === false) {
-            $this->session->set_flashdata(
-                'error',
-                validation_errors('<div>', '</div>')
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Récupération des données.
-        */
-        $bankAccountId = (int) $this->input->post(
-            'bank_account_id',
-            true
-        );
-
-        $periodStart = trim(
-            (string) $this->input->post(
-                'period_start',
-                true
-            )
-        );
-
-        $periodEnd = trim(
-            (string) $this->input->post(
-                'period_end',
-                true
-            )
-        );
-
-        $statementOpeningBalance = (float) $this->input->post(
-            'statement_opening_balance',
-            true
-        );
-
-        $statementClosingBalance = (float) $this->input->post(
-            'statement_closing_balance',
-            true
-        );
-
-        $observation = trim(
-            (string) $this->input->post(
-                'observation',
-                true
-            )
-        );
-
-        /*
-        * Vérification du format des dates.
-        */
-        $startDateObject = DateTime::createFromFormat(
-            'Y-m-d',
-            $periodStart
-        );
-
-        $endDateObject = DateTime::createFromFormat(
-            'Y-m-d',
-            $periodEnd
-        );
-
-        if (
-            !$startDateObject
-            || $startDateObject->format('Y-m-d') !== $periodStart
-            || !$endDateObject
-            || $endDateObject->format('Y-m-d') !== $periodEnd
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'La période du rapprochement est invalide.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * La date de début ne peut pas être supérieure
-        * à la date de fin.
-        */
-        if ($periodStart > $periodEnd) {
-            $this->session->set_flashdata(
-                'error',
-                'La date de début doit être antérieure ou égale à la date de fin.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Vérifier les montants.
-        *
-        * Un compte bancaire peut éventuellement avoir un solde négatif.
-        * On n'applique donc pas greater_than_equal_to[0]
-        * au niveau métier.
-        */
-        if (
-            !is_finite($statementOpeningBalance)
-            || !is_finite($statementClosingBalance)
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'Les soldes du relevé sont invalides.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Récupérer le compte depuis la base.
-        *
-        * Ne jamais faire confiance à :
-        * - currency envoyé par le formulaire ;
-        * - system_balance envoyé par le formulaire.
-        */
-        $bankAccount =
-            $this->finance->getActiveBankAccountById(
-                $bankAccountId
-            );
-
-        if (!$bankAccount) {
-            $this->session->set_flashdata(
-                'error',
-                'Le compte bancaire sélectionné est introuvable ou inactif.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Vérifier l'existence d'une session identique.
-        */
-        $alreadyExists =
-            $this->finance
-            ->bankReconciliationAlreadyExists(
-                $bankAccountId,
-                $periodStart,
-                $periodEnd
-            );
-
-        if ($alreadyExists) {
-            $this->session->set_flashdata(
-                'error',
-                'Un rapprochement est déjà ouvert pour ce compte et cette période.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Calculer les vrais soldes système depuis la base.
-        */
-        $systemOpeningBalance =
-            $this->finance
-            ->getBankAccountSystemBalanceAtDate(
-                $bankAccountId,
-                $periodStart
-            );
-
-        $systemClosingBalance =
-            $this->finance
-            ->getBankAccountSystemClosingBalance(
-                $bankAccountId,
-                $periodEnd
-            );
-
-        /*
-        * Écart initial.
-        *
-        * Formule :
-        * solde final banque - solde final système
-        */
-        $differenceBeforeAdjustment =
-            $statementClosingBalance
-            - $systemClosingBalance;
-
-        /*
-        * Au démarrage, aucun ajustement n'a encore été effectué.
-        */
-        $adjustmentAmount = 0;
-
-        $differenceAfterAdjustment =
-            $differenceBeforeAdjustment;
-
-        /*
-        * Préparation des données.
-        */
-        $reconciliationData = [
-            'bank_account_id' =>
-            $bankAccountId,
-
-            'period_start' =>
-            $periodStart,
-
-            'period_end' =>
-            $periodEnd,
-
-            /*
-            * La devise vient du compte bancaire,
-            * et non du champ caché du formulaire.
-            */
-            'currency' =>
-            $bankAccount->currency,
-
-            'statement_opening_balance' =>
-            $statementOpeningBalance,
-
-            'statement_closing_balance' =>
-            $statementClosingBalance,
-
-            'system_opening_balance' =>
-            $systemOpeningBalance,
-
-            'system_closing_balance' =>
-            $systemClosingBalance,
-
-            'difference_before_adjustment' =>
-            $differenceBeforeAdjustment,
-
-            'adjustment_amount' =>
-            $adjustmentAmount,
-
-            'difference_after_adjustment' =>
-            $differenceAfterAdjustment,
-
-            'matched_operations_count' =>
-            0,
-
-            'unmatched_operations_count' =>
-            0,
-
-            'anomalies_count' =>
-            0,
-
-            /*
-            * Utiliser la session plutôt que le champ caché.
-            */
-            'responsible_user_id' =>
-            (int) $this->session->userdata('user_id'),
-
-            'validated_by' =>
-            null,
-
-            'observation' =>
-            $observation !== ''
-                ? $observation
-                : null,
-
-            'validation_observation' =>
-            null,
-
-            'status' =>
-            'in_progress',
-
-            'started_at' =>
-            date('Y-m-d H:i:s'),
-
-            'completed_at' =>
-            null,
-
-            'validated_at' =>
-            null,
-
-            'created_at' =>
-            date('Y-m-d H:i:s'),
-
-            'updated_at' =>
-            null,
-        ];
-
-        /*
-        * Enregistrement dans le modèle.
-        */
-        $result =
-            $this->finance
-            ->createBankReconciliation(
-                $reconciliationData
-            );
-
-        if (!$result['status']) {
-            $this->session->set_flashdata(
-                'error',
-                $result['message']
-                    ?? 'Le rapprochement bancaire n’a pas pu être démarré.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Message de succès.
-        */
-        $this->session->set_flashdata(
-            'success',
-            'Le rapprochement bancaire '
-                . $result['reference']
-                . ' a été démarré avec succès.'
-        );
-
-        redirect('rapprochement');
-    }
-
-    /**
-     * Importe et enregistre un relevé bancaire.
-     */
-    public function bankStatementImportStore()
-    {
-        /*
-     * Vérifier que l'utilisateur est connecté.
-     */
-        if (!$this->session->userdata('user_id')) {
-            redirect('sign-in');
-            return;
-        }
-
-        /*
-        * Accepter uniquement les requêtes POST.
-        */
-        if ($this->input->method(true) !== 'POST') {
-            show_404();
-            return;
-        }
-
-        $this->load->library('form_validation');
-
-        /*
-        * Règles de validation.
-        */
-        $this->form_validation->set_rules(
-            'bank_account_id',
-            'Compte bancaire',
-            'trim|required|integer'
-        );
-
-        $this->form_validation->set_rules(
-            'statement_date',
-            'Date du relevé',
-            'trim|required'
-        );
-
-        $this->form_validation->set_rules(
-            'period_start',
-            'Période de début',
-            'trim|required'
-        );
-
-        $this->form_validation->set_rules(
-            'period_end',
-            'Période de fin',
-            'trim|required'
-        );
-
-        $this->form_validation->set_rules(
-            'opening_balance',
-            'Solde initial du relevé',
-            'trim|numeric'
-        );
-
-        $this->form_validation->set_rules(
-            'closing_balance',
-            'Solde final du relevé',
-            'trim|required|numeric'
-        );
-
-        $this->form_validation->set_rules(
-            'observation',
-            'Observation',
-            'trim|max_length[1000]'
-        );
-
-        /*
-        * Messages de validation.
-        */
-        $this->form_validation->set_message(
-            'required',
-            'Le champ {field} est obligatoire.'
-        );
-
-        $this->form_validation->set_message(
-            'integer',
-            'Le champ {field} est invalide.'
-        );
-
-        $this->form_validation->set_message(
-            'numeric',
-            'Le champ {field} doit contenir un montant valide.'
-        );
-
-        $this->form_validation->set_message(
-            'max_length',
-            'Le champ {field} dépasse la longueur autorisée.'
-        );
-
-        /*
-        * Validation du formulaire.
-        */
-        if ($this->form_validation->run() === false) {
-            $this->session->set_flashdata(
-                'error',
-                validation_errors('<div>', '</div>')
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Vérifier que le fichier est présent.
-        */
-        if (
-            !isset($_FILES['statement_file'])
-            || empty($_FILES['statement_file']['name'])
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'Le fichier du relevé bancaire est obligatoire.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Récupération des données du formulaire.
-        */
-        $bankAccountId = (int) $this->input->post(
-            'bank_account_id',
-            true
-        );
-
-        $statementDate = trim(
-            (string) $this->input->post(
-                'statement_date',
-                true
-            )
-        );
-
-        $periodStart = trim(
-            (string) $this->input->post(
-                'period_start',
-                true
-            )
-        );
-
-        $periodEnd = trim(
-            (string) $this->input->post(
-                'period_end',
-                true
-            )
-        );
-
-        $openingBalanceInput =
-            $this->input->post(
-                'opening_balance',
-                true
-            );
-
-        $closingBalanceInput =
-            $this->input->post(
-                'closing_balance',
-                true
-            );
-
-        $openingBalance =
-            $openingBalanceInput === ''
-            || $openingBalanceInput === null
-            ? 0
-            : (float) $openingBalanceInput;
-
-        $closingBalance =
-            (float) $closingBalanceInput;
-
-        $observation = trim(
-            (string) $this->input->post(
-                'observation',
-                true
-            )
-        );
-
-        /*
-        * Vérifier les formats de dates.
-        */
-        if (
-            !$this->isValidDate($statementDate)
-            || !$this->isValidDate($periodStart)
-            || !$this->isValidDate($periodEnd)
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'Une ou plusieurs dates du relevé sont invalides.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Vérifier la cohérence de la période.
-        */
-        if ($periodStart > $periodEnd) {
-            $this->session->set_flashdata(
-                'error',
-                'La période de début doit être antérieure ou égale à la période de fin.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * La date du relevé ne devrait normalement pas
-        * être antérieure à la fin de sa période.
-        */
-        if ($statementDate < $periodEnd) {
-            $this->session->set_flashdata(
-                'error',
-                'La date du relevé ne peut pas être antérieure à la fin de la période.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Vérifier le compte bancaire depuis la base.
-        */
-        $bankAccount =
-            $this->finance
-            ->getActiveBankAccountById(
-                $bankAccountId
-            );
-
-        if (!$bankAccount) {
-            $this->session->set_flashdata(
-                'error',
-                'Le compte bancaire sélectionné est introuvable ou inactif.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Vérifier si un relevé existe déjà.
-        */
-        $statementExists =
-            $this->finance
-            ->bankStatementAlreadyExists(
-                $bankAccountId,
-                $periodStart,
-                $periodEnd
-            );
-
-        if ($statementExists) {
-            $this->session->set_flashdata(
-                'error',
-                'Un relevé bancaire existe déjà pour ce compte et cette période.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Préparer le dossier d'upload.
-        */
-        $uploadPath =
-            FCPATH
-            . 'uploads/finance/bank_statements/';
-
-        if (!is_dir($uploadPath)) {
-            $directoryCreated = mkdir(
-                $uploadPath,
-                0755,
-                true
-            );
-
-            if (!$directoryCreated && !is_dir($uploadPath)) {
-                $this->session->set_flashdata(
-                    'error',
-                    'Le dossier des relevés bancaires ne peut pas être créé.'
-                );
-
-                redirect('rapprochement');
-                return;
-            }
-        }
-
-        /*
-        * Configuration de l'upload.
-        */
-        $uploadConfig = [
-            'upload_path' =>
-            $uploadPath,
-
-            'allowed_types' =>
-            'pdf|xls|xlsx|csv',
-
-            'max_size' =>
-            10240,
-
-            'encrypt_name' =>
-            true,
-
-            'remove_spaces' =>
-            true,
-
-            'detect_mime' =>
-            true,
-        ];
-
-        $this->load->library(
-            'upload',
-            $uploadConfig
-        );
-
-        /*
-        * Envoyer le fichier.
-        */
-        if (!$this->upload->do_upload('statement_file')) {
-            $uploadError = strip_tags(
-                $this->upload->display_errors()
-            );
-
-            $this->session->set_flashdata(
-                'error',
-                $uploadError
-                    ?: 'Le fichier du relevé bancaire est invalide.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        $uploadedFile =
-            $this->upload->data();
-
-        $storedFileName =
-            $uploadedFile['file_name'];
-
-        /*
-        * Préparer l'enregistrement.
-        */
-        $statementData = [
-            'bank_account_id' =>
-            $bankAccountId,
-
-            'statement_date' =>
-            $statementDate,
-
-            'period_start' =>
-            $periodStart,
-
-            'period_end' =>
-            $periodEnd,
-
-            /*
-            * La devise vient du compte bancaire.
-            */
-            'currency' =>
-            $bankAccount->currency,
-
-            'opening_balance' =>
-            $openingBalance,
-
-            'closing_balance' =>
-            $closingBalance,
-
-            'file_name' =>
-            $storedFileName,
-
-            'original_file_name' =>
-            $uploadedFile['orig_name'] ?? null,
-
-            'file_type' =>
-            $uploadedFile['file_type'] ?? null,
-
-            /*
-            * CodeIgniter fournit file_size en Ko.
-            * Nous le convertissons en octets.
-            */
-            'file_size' =>
-            isset($uploadedFile['file_size'])
-                ? (int) round(
-                    (float) $uploadedFile['file_size']
-                        * 1024
-                )
-                : null,
-
-            'total_lines' =>
-            0,
-
-            'imported_lines' =>
-            0,
-
-            'rejected_lines' =>
-            0,
-
-            'observation' =>
-            $observation !== ''
-                ? $observation
-                : null,
-
-            'processing_message' =>
-            null,
-
-            'status' =>
-            'uploaded',
-
-            'imported_by' =>
-            (int) $this->session->userdata(
-                'user_id'
-            ),
-
-            'processed_at' =>
-            null,
-
-            'created_at' =>
-            date('Y-m-d H:i:s'),
-
-            'updated_at' =>
-            null,
-        ];
-
-        /*
-        * Insérer dans la base.
-        */
-        $result =
-            $this->finance
-            ->createBankStatement(
-                $statementData
-            );
-
-        /*
-        * En cas d'échec de l'insertion,
-        * supprimer le fichier déjà envoyé.
-        */
-        if (!$result['status']) {
-            $uploadedFilePath =
-                $uploadPath
-                . $storedFileName;
-
-            if (is_file($uploadedFilePath)) {
-                @unlink($uploadedFilePath);
-            }
-
-            $this->session->set_flashdata(
-                'error',
-                $result['message']
-                    ?? 'Le relevé bancaire n’a pas pu être enregistré.'
-            );
-
-            redirect('rapprochement');
-            return;
-        }
-
-        /*
-        * Message de succès.
-        */
-        $this->session->set_flashdata(
-            'success',
-            'Le relevé bancaire '
-                . $result['reference']
-                . ' a été importé avec succès.'
-        );
-
-        redirect('rapprochement');
-    }
 
     /**
      * Vérifie qu'une date respecte le format Y-m-d.
@@ -4508,854 +2185,1472 @@ class FinanceController extends CI_Controller
             && $dateObject->format('Y-m-d') === $date;
     }
 
-    /**
-     * Lance l'analyse automatique d'un rapprochement bancaire.
-     *
-     * Cette méthode :
-     * 1. vérifie l'utilisateur et la requête POST ;
-     * 2. récupère la session de rapprochement ;
-     * 3. recherche le relevé correspondant au compte et à la période ;
-     * 4. compare les lignes du relevé aux opérations bancaires du système ;
-     * 5. enregistre les résultats dans
-     *    tbl_finance_bank_reconciliation_item ;
-     * 6. met à jour les statistiques de la session.
-     */
-    public function analyzeBankReconciliationStore()
+        /* =====================================================================
+     * =====================================================================
+     *  MODULE BANQUE V2 — CONTRÔLEUR
+     * =====================================================================
+     * ===================================================================== */
+
+    /** Types qui DÉBITENT le compte sélectionné dans le formulaire. */
+    private $bankDebitTypes = ['decaissement', 'transfert', 'retrait_banque', 'frais_bancaires'];
+
+    /* ---------------------------------------------------------------------
+     * OUTILS INTERNES
+     * ------------------------------------------------------------------- */
+
+    /** Vérifie la connexion. $json = true pour les appels AJAX. */
+    private function bankRequireLogin(bool $json = false): bool
     {
-        /*
-     * Route de retour.
-     */
-        $redirectUrl = 'rapprochement';
+        if ($this->session->userdata('user_id')) {
+            return true;
+        }
 
-        /*
-     * =========================================================
-     * 1. VÉRIFIER L'AUTHENTIFICATION
-     * =========================================================
-     */
-        $userId = (int) $this->session->userdata('user_id');
-
-        if ($userId <= 0) {
+        if ($json) {
+            $this->bankJson(['status' => false, 'message' => 'Session expirée. Reconnectez-vous.'], 401);
+        } else {
             redirect('sign-in');
+        }
+
+        return false;
+    }
+
+    private function bankCurrentUserId(): ?int
+    {
+        $userId = $this->session->userdata('user_id') ?: $this->session->userdata('id');
+
+        return $userId ? (int) $userId : null;
+    }
+
+    /** Réponse JSON (renvoie aussi le nouveau jeton CSRF si la protection est active). */
+    private function bankJson(array $payload, int $httpStatus = 200): void
+    {
+        $payload['csrf_hash'] = $this->security->get_csrf_hash();
+
+        $this->output
+            ->set_status_header($httpStatus)
+            ->set_content_type('application/json', 'utf-8')
+            ->set_output(json_encode($payload, JSON_UNESCAPED_UNICODE));
+    }
+
+    /** Erreur de formulaire : message + réouverture de la modale + saisie conservée. */
+    private function bankRedirectError(string $message, string $modalFlag = '', string $oldInputKey = ''): void
+    {
+        $this->session->set_flashdata('error', $message);
+
+        if ($modalFlag !== '') {
+            $this->session->set_flashdata($modalFlag, true);
+        }
+
+        if ($oldInputKey !== '') {
+            $this->session->set_flashdata($oldInputKey, $this->input->post(null, true));
+        }
+
+        redirect('compte-banques');
+    }
+
+    /** Messages de validation en français. */
+    private function bankValidationMessages(): void
+    {
+        $this->form_validation->set_message('required', 'Le champ {field} est obligatoire.');
+        $this->form_validation->set_message('integer', 'La valeur du champ {field} est invalide.');
+        $this->form_validation->set_message('numeric', 'Le champ {field} doit contenir un montant valide.');
+        $this->form_validation->set_message('greater_than', 'Le champ {field} doit être supérieur à {param}.');
+        $this->form_validation->set_message('greater_than_equal_to', 'Le champ {field} ne peut pas être négatif.');
+        $this->form_validation->set_message('in_list', 'La valeur sélectionnée pour {field} est invalide.');
+        $this->form_validation->set_message('min_length', 'Le champ {field} doit contenir au moins {param} caractères.');
+        $this->form_validation->set_message('max_length', 'Le champ {field} ne doit pas dépasser {param} caractères.');
+    }
+
+    /** Retrouve l'id d'une banque à partir de son code ou de son nom. */
+    private function bankIdFromCode(string $codeOrName): int
+    {
+        $codeOrName = trim($codeOrName);
+
+        foreach ($this->finance->getActiveBanks() as $bank) {
+            if (strcasecmp($bank->code, $codeOrName) === 0 || strcasecmp($bank->name, $codeOrName) === 0) {
+                return (int) $bank->id;
+            }
+        }
+
+        return 0;
+    }
+
+    /** Upload facultatif de la pièce justificative. */
+    private function bankUploadAttachment(): array
+    {
+        if (empty($_FILES['attachment']['name'])) {
+            return ['status' => true, 'file' => null];
+        }
+
+        $uploadPath = FCPATH . 'uploads/finance/bank_operations/';
+
+        if (!is_dir($uploadPath) && !mkdir($uploadPath, 0755, true) && !is_dir($uploadPath)) {
+            return ['status' => false, 'message' => 'Le dossier des pièces justificatives ne peut pas être créé.'];
+        }
+
+        $this->load->library('upload');
+        $this->upload->initialize([
+            'upload_path'   => $uploadPath,
+            'allowed_types' => 'pdf|jpg|jpeg|png|doc|docx|xls|xlsx',
+            'max_size'      => 5120,
+            'encrypt_name'  => true,
+            'remove_spaces' => true,
+        ]);
+
+        if (!$this->upload->do_upload('attachment')) {
+            return ['status' => false, 'message' => strip_tags($this->upload->display_errors())];
+        }
+
+        return ['status' => true, 'file' => $this->upload->data('file_name')];
+    }
+
+    /* ---------------------------------------------------------------------
+     * PAGE : COMPTES BANCAIRES
+     * ------------------------------------------------------------------- */
+
+    public function banques()
+    {
+        if (!$this->bankRequireLogin()) {
             return;
         }
 
-        /*
-     * =========================================================
-     * 2. ACCEPTER UNIQUEMENT UNE REQUÊTE POST
-     * =========================================================
-     */
-        if (strtoupper($this->input->method()) !== 'POST') {
+        $currency = 'BIF';
+        $banks    = $this->finance->getActiveBanks();
+
+        /* Filtres */
+        $filters = [
+            'search'   => trim((string) $this->input->get('search', true)),
+            'bank_id'  => (int) $this->input->get('bank_id', true),
+            'currency' => (string) $this->input->get('currency', true),
+            'status'   => (string) $this->input->get('status', true),
+        ];
+
+        /* Compatibilité vue actuelle : filtre banque envoyé par son nom */
+        $legacyBankName = trim((string) $this->input->get('bank_name', true));
+
+        if ($filters['bank_id'] <= 0 && $legacyBankName !== '') {
+            $filters['bank_id'] = $this->bankIdFromCode($legacyBankName);
+        }
+
+        /* Période du graphique */
+        $period = (string) $this->input->get('bankflow_period', true);
+
+        if (!in_array($period, ['7days', '30days', 'month', 'year'], true)) {
+            $period = '7days';
+        }
+
+        /* Statistiques */
+        $statistics = $this->finance->getBankMainStatistics($currency);
+        $statistics['active_bif_accounts'] = $statistics['currency_accounts']; /* compatibilité vue */
+
+        $data = [
+            'title'                      => 'Comptes bancaires',
+
+            'banks'                      => $banks,
+            'availableBanks'             => array_map(function ($bank) {
+                return (object) ['bank_name' => $bank->name];
+            }, $banks),
+            'bankFilters'                => $filters + ['bank_name' => $legacyBankName],
+
+            'bankMainStatistics'         => $statistics,
+            'allBankAccounts'            => $this->finance->getActiveBankAccounts(),
+            'bankAccountSituations'      => $this->finance->getBankAccounts($filters),
+            'activeBankAccountsCount'    => $statistics['active_accounts'],
+
+            'recentBankOperations'       => $this->finance->getRecentBankOperations(10),
+            'bankOperationsCount'        => $this->finance->countBankOperations(),
+
+            'bankFlowPeriod'             => $period,
+            'bankFlowEvolution'          => $this->finance->getBankFlowEvolution($period, $currency),
+            'bankBalanceDistribution'    => $this->finance->getBankBalanceDistribution($currency),
+
+            'nextBankAccountCode'        => $this->finance->getNextBankAccountCode(),
+            'nextBankOperationReference' => $this->finance->getNextBankOperationReference(),
+
+            'bankAlerts'                 => $this->finance->getBankAlerts(6),
+
+            'principalCashbox'           => $this->finance->getPrincipalCashbox(),
+        ];
+
+        $data['bankAlertsCount'] = count($data['bankAlerts']);
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/banques', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /* ---------------------------------------------------------------------
+     * COMPTES BANCAIRES : CRÉATION / MODIFICATION / DÉTAIL
+     * ------------------------------------------------------------------- */
+
+    public function bankAccountStore()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
             show_404();
             return;
         }
 
-        /*
-     * =========================================================
-     * 3. RÉCUPÉRER LES DONNÉES DU FORMULAIRE
-     * =========================================================
-     */
-        $reconciliationId = (int) $this->input->post(
-            'reconciliation_id',
-            true
-        );
+        /* Compatibilité vue actuelle : banque envoyée par son code, pas de date d'ouverture */
+        if (!$this->input->post('bank_id') && $this->input->post('bank_name')) {
+            $_POST['bank_id'] = $this->bankIdFromCode((string) $this->input->post('bank_name', true));
+        }
 
-        $dateTolerance = (int) $this->input->post(
-            'date_tolerance',
-            true
-        );
+        if (!$this->input->post('opening_date')) {
+            $_POST['opening_date'] = date('Y-m-d');
+        }
 
-        $amountToleranceRaw = $this->input->post(
-            'amount_tolerance',
-            true
-        );
+        $this->form_validation->set_rules('name', 'Intitulé du compte', 'trim|required|min_length[2]|max_length[150]');
+        $this->form_validation->set_rules('bank_id', 'Banque', 'trim|required|integer|greater_than[0]');
+        $this->form_validation->set_rules('account_number', 'Numéro de compte', 'trim|required|min_length[4]|max_length[100]');
+        $this->form_validation->set_rules('account_type', 'Type de compte', 'trim|required|in_list[courant,epargne,garantie,projet,credit]');
+        $this->form_validation->set_rules('currency', 'Devise', 'trim|required|in_list[BIF,USD,EUR]');
+        $this->form_validation->set_rules('opening_date', 'Date d’ouverture', 'trim|required');
+        $this->form_validation->set_rules('opening_balance', 'Solde initial', 'trim|numeric|greater_than_equal_to[0]');
+        $this->form_validation->set_rules('overdraft_limit', 'Découvert autorisé', 'trim|numeric|greater_than_equal_to[0]');
+        $this->form_validation->set_rules('alert_threshold', 'Seuil d’alerte', 'trim|numeric|greater_than_equal_to[0]');
+        $this->form_validation->set_rules('branch_name', 'Agence', 'trim|max_length[150]');
+        $this->form_validation->set_rules('accounting_account_id', 'Compte comptable', 'trim|integer');
+        $this->form_validation->set_rules('observation', 'Observation', 'trim|max_length[2000]');
+        $this->bankValidationMessages();
 
-        /*
-     * Nettoyer le montant au cas où l'utilisateur saisit
-     * des espaces ou une virgule.
-     */
-        $amountToleranceRaw = str_replace(
-            [' ', ','],
-            ['', '.'],
-            (string) $amountToleranceRaw
-        );
-
-        $amountTolerance = is_numeric($amountToleranceRaw)
-            ? (float) $amountToleranceRaw
-            : 0;
-
-        /*
-     * =========================================================
-     * 4. VALIDER LES INFORMATIONS DU FORMULAIRE
-     * =========================================================
-     */
-        if ($reconciliationId <= 0) {
-            $this->session->set_flashdata(
-                'error',
-                'Veuillez sélectionner une session de rapprochement.'
+        if ($this->form_validation->run() === false) {
+            $this->bankRedirectError(
+                validation_errors('<div>', '</div>'),
+                'open_bank_account_modal',
+                'bank_account_old_input'
             );
-
-            redirect($redirectUrl);
             return;
         }
 
-        /*
-     * Tolérances autorisées dans le formulaire.
-     */
-        $allowedDateTolerances = [0, 1, 2, 3, 5];
+        $openingDate = (string) $this->input->post('opening_date', true);
 
-        if (!in_array($dateTolerance, $allowedDateTolerances, true)) {
-            $dateTolerance = 3;
-        }
-
-        if ($amountTolerance < 0) {
-            $amountTolerance = 0;
-        }
-
-        /*
-     * Limite de sécurité.
-     *
-     * Une tolérance excessivement élevée peut rapprocher
-     * des opérations totalement différentes.
-     */
-        if ($amountTolerance > 100000000) {
-            $this->session->set_flashdata(
-                'error',
-                'La tolérance sur le montant est trop élevée.'
+        if (!$this->isValidDate($openingDate) || $openingDate > date('Y-m-d')) {
+            $this->bankRedirectError(
+                'La date d’ouverture est invalide ou située dans le futur.',
+                'open_bank_account_modal',
+                'bank_account_old_input'
             );
-
-            redirect($redirectUrl);
             return;
         }
 
-        /*
-     * =========================================================
-     * 5. VÉRIFIER LES TABLES NÉCESSAIRES
-     * =========================================================
-     */
-        $requiredTables = [
-            'tbl_finance_bank_reconciliation',
-            'tbl_finance_bank_statement',
-            'tbl_finance_bank_statement_line',
-            'tbl_finance_bank_operation',
-            'tbl_finance_bank_reconciliation_item',
+        /* "0151 0010-02456" → "0151001002456" */
+        $accountNumber = strtoupper(preg_replace('/[\s\-]+/', '', (string) $this->input->post('account_number', true)));
+
+        $result = $this->finance->createBankAccount([
+            'bank_id'               => (int) $this->input->post('bank_id', true),
+            'name'                  => trim((string) $this->input->post('name', true)),
+            'account_number'        => $accountNumber,
+            'account_type'          => $this->input->post('account_type', true),
+            'currency'              => $this->input->post('currency', true),
+            'branch_name'           => $this->input->post('branch_name', true),
+            'accounting_account_id' => $this->input->post('accounting_account_id', true),
+            'opening_date'          => $openingDate,
+            'opening_balance'       => (float) $this->input->post('opening_balance', true),
+            'overdraft_limit'       => (float) $this->input->post('overdraft_limit', true),
+            'alert_threshold'       => (float) $this->input->post('alert_threshold', true),
+            'observation'           => $this->input->post('observation', true),
+            'created_by'            => $this->bankCurrentUserId(),
+        ]);
+
+        if (!$result['status']) {
+            $this->bankRedirectError($result['message'], 'open_bank_account_modal', 'bank_account_old_input');
+            return;
+        }
+
+        $this->session->set_flashdata('success', $result['message']);
+        redirect('compte-banques');
+    }
+
+    public function bankAccountUpdate()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $this->form_validation->set_rules('id', 'Compte', 'trim|required|integer|greater_than[0]');
+        $this->form_validation->set_rules('name', 'Intitulé du compte', 'trim|required|min_length[2]|max_length[150]');
+        $this->form_validation->set_rules('status', 'Statut', 'trim|required|in_list[active,inactive,blocked,closed]');
+        $this->form_validation->set_rules('overdraft_limit', 'Découvert autorisé', 'trim|numeric|greater_than_equal_to[0]');
+        $this->form_validation->set_rules('alert_threshold', 'Seuil d’alerte', 'trim|numeric|greater_than_equal_to[0]');
+        $this->form_validation->set_rules('branch_name', 'Agence', 'trim|max_length[150]');
+        $this->form_validation->set_rules('accounting_account_id', 'Compte comptable', 'trim|integer');
+        $this->form_validation->set_rules('observation', 'Observation', 'trim|max_length[2000]');
+        $this->bankValidationMessages();
+
+        if ($this->form_validation->run() === false) {
+            $this->bankRedirectError(validation_errors('<div>', '</div>'), 'open_bank_account_edit_modal');
+            return;
+        }
+
+        $result = $this->finance->updateBankAccount(
+            (int) $this->input->post('id', true),
+            [
+                'name'                  => trim((string) $this->input->post('name', true)),
+                'status'                => $this->input->post('status', true),
+                'branch_name'           => $this->input->post('branch_name', true),
+                'accounting_account_id' => $this->input->post('accounting_account_id', true),
+                'overdraft_limit'       => (float) $this->input->post('overdraft_limit', true),
+                'alert_threshold'       => (float) $this->input->post('alert_threshold', true),
+                'observation'           => $this->input->post('observation', true),
+            ],
+            $this->bankCurrentUserId()
+        );
+
+        $this->session->set_flashdata($result['status'] ? 'success' : 'error', $result['message']);
+        redirect('compte-banques');
+    }
+
+    /** JSON : détail d'un compte (modales « Voir » et « Modifier »). */
+    public function bankAccountView($id = null)
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        $account = $this->finance->getBankAccountById((int) $id);
+
+        if (!$account) {
+            $this->bankJson(['status' => false, 'message' => 'Compte bancaire introuvable.'], 404);
+            return;
+        }
+
+        $this->bankJson(['status' => true, 'data' => $account]);
+    }
+
+    /* ---------------------------------------------------------------------
+     * OPÉRATIONS BANCAIRES
+     * ------------------------------------------------------------------- */
+
+    public function bankOperationStore()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $type = trim((string) $this->input->post('operation_type', true));
+
+        $types   = 'encaissement,decaissement,transfert,retrait_banque,versement_banque,frais_bancaires,interets_crediteurs';
+        $methods = 'virement,cheque,versement_especes,retrait_especes,prelevement,autre,transfer,deposit,withdrawal';
+
+        $this->form_validation->set_rules('operation_type', 'Type d’opération', 'trim|required|in_list[' . $types . ']');
+        $this->form_validation->set_rules('operation_date', 'Date de l’opération', 'trim|required');
+        $this->form_validation->set_rules('value_date', 'Date de valeur', 'trim');
+        $this->form_validation->set_rules('bank_account_id', 'Compte bancaire', 'trim|required|integer|greater_than[0]');
+        $this->form_validation->set_rules('amount', 'Montant', 'trim|required|numeric|greater_than[0]');
+        $this->form_validation->set_rules('category', 'Catégorie', 'trim|max_length[100]');
+        $this->form_validation->set_rules('third_party', 'Tiers / Bénéficiaire', 'trim|max_length[255]');
+        $this->form_validation->set_rules('payment_method', 'Mode d’opération', 'trim|required|in_list[' . $methods . ']');
+        $this->form_validation->set_rules('document_number', 'Numéro de pièce', 'trim|max_length[100]');
+        $this->form_validation->set_rules('label', 'Libellé', 'trim|required|max_length[255]');
+        $this->form_validation->set_rules('observation', 'Observation', 'trim|max_length[2000]');
+
+        if ($type === 'transfert') {
+            $this->form_validation->set_rules(
+                'destination_bank_account_id',
+                'Compte destination',
+                'trim|required|integer|greater_than[0]'
+            );
+        }
+
+        $this->bankValidationMessages();
+
+        if ($this->form_validation->run() === false) {
+            $this->bankRedirectError(
+                validation_errors('<div>', '</div>'),
+                'open_bank_operation_modal',
+                'bank_operation_old_input'
+            );
+            return;
+        }
+
+        /* Dates */
+        $operationDate = (string) $this->input->post('operation_date', true);
+        $valueDate     = trim((string) $this->input->post('value_date', true));
+
+        if (!$this->isValidDate($operationDate) || $operationDate > date('Y-m-d')) {
+            $this->bankRedirectError(
+                'La date de l’opération est invalide ou située dans le futur.',
+                'open_bank_operation_modal',
+                'bank_operation_old_input'
+            );
+            return;
+        }
+
+        if ($valueDate !== '' && !$this->isValidDate($valueDate)) {
+            $this->bankRedirectError('La date de valeur est invalide.', 'open_bank_operation_modal', 'bank_operation_old_input');
+            return;
+        }
+
+        /* Le compte sélectionné est débité ou crédité selon le type */
+        $accountId = (int) $this->input->post('bank_account_id', true);
+        $isDebit   = in_array($type, $this->bankDebitTypes, true);
+
+        $sourceId      = $isDebit ? $accountId : null;
+        $destinationId = $type === 'transfert'
+            ? (int) $this->input->post('destination_bank_account_id', true)
+            : ($isDebit ? null : $accountId);
+
+        if ($type === 'transfert' && $sourceId === $destinationId) {
+            $this->bankRedirectError(
+                'Le compte source et le compte destination doivent être différents.',
+                'open_bank_operation_modal',
+                'bank_operation_old_input'
+            );
+            return;
+        }
+
+        /* Compatibilité vue actuelle : anciens codes de mode d'opération */
+        $legacyMethods = [
+            'transfer'   => 'virement',
+            'deposit'    => 'versement_especes',
+            'withdrawal' => 'retrait_especes',
         ];
 
-        foreach ($requiredTables as $requiredTable) {
-            if (!$this->db->table_exists($requiredTable)) {
-                log_message(
-                    'error',
-                    'Table manquante pour le rapprochement : '
-                        . $requiredTable
-                );
+        $paymentMethod = (string) $this->input->post('payment_method', true);
+        $paymentMethod = $legacyMethods[$paymentMethod] ?? $paymentMethod;
 
-                $this->session->set_flashdata(
-                    'error',
-                    'La table '
-                        . $requiredTable
-                        . ' est absente de la base de données.'
-                );
+        /* Pièce justificative */
+        $upload = $this->bankUploadAttachment();
 
-                redirect($redirectUrl);
-                return;
+        if (!$upload['status']) {
+            $this->bankRedirectError($upload['message'], 'open_bank_operation_modal', 'bank_operation_old_input');
+            return;
+        }
+
+        $result = $this->finance->createBankOperation([
+            'operation_type'              => $type,
+            'operation_date'              => $operationDate,
+            'value_date'                  => $valueDate,
+            'source_bank_account_id'      => $sourceId,
+            'destination_bank_account_id' => $destinationId,
+            'amount'                      => (float) $this->input->post('amount', true),
+            'category'                    => $this->input->post('category', true),
+            'third_party'                 => $this->input->post('third_party', true),
+            'payment_method'              => $paymentMethod,
+            'document_number'             => $this->input->post('document_number', true),
+            'attachment'                  => $upload['file'],
+            'source_type'                 => $this->input->post('source_type', true),
+            'source_id'                   => $this->input->post('source_id', true),
+            'chantier_id'                 => $this->input->post('chantier_id', true),
+            'label'                       => trim((string) $this->input->post('label', true)),
+            'observation'                 => $this->input->post('observation', true),
+            'status'                      => $this->input->post('save_as_pending') ? 'pending' : 'validated',
+            'created_by'                  => $this->bankCurrentUserId(),
+        ]);
+
+        if (!$result['status']) {
+            if (!empty($upload['file'])) {
+                @unlink(FCPATH . 'uploads/finance/bank_operations/' . $upload['file']);
+            }
+
+            $this->bankRedirectError($result['message'], 'open_bank_operation_modal', 'bank_operation_old_input');
+            return;
+        }
+
+        $this->session->set_flashdata('success', $result['message']);
+        redirect('compte-banques');
+    }
+
+    /** JSON : détail d'une opération avec ses lignes du livre. */
+    public function bankOperationView($id = null)
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        $operation = $this->finance->getBankOperationById((int) $id);
+
+        if (!$operation) {
+            $this->bankJson(['status' => false, 'message' => 'Opération introuvable.'], 404);
+            return;
+        }
+
+        $this->bankJson(['status' => true, 'data' => $operation]);
+    }
+
+    /** AJAX POST : valider une opération en attente. */
+    public function bankOperationValidate()
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $result = $this->finance->validateBankOperation(
+            (int) $this->input->post('operation_id', true),
+            $this->bankCurrentUserId()
+        );
+
+        $this->bankJson($result, $result['status'] ? 200 : 422);
+    }
+
+    /** AJAX POST : annuler une opération (contre-passation si validée). */
+    public function bankOperationCancel()
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $result = $this->finance->cancelBankOperation(
+            (int) $this->input->post('operation_id', true),
+            (string) $this->input->post('cancel_reason', true),
+            $this->bankCurrentUserId()
+        );
+
+        $this->bankJson($result, $result['status'] ? 200 : 422);
+    }
+
+        /* ---------------------------------------------------------------------
+     * RAPPROCHEMENT BANCAIRE (6a)
+     * ------------------------------------------------------------------- */
+
+    /** Erreur de création : message + réouverture de la modale. */
+    private function reconciliationRedirectError(string $message): void
+    {
+        $this->session->set_flashdata('error', $message);
+        $this->session->set_flashdata('open_reconciliation_modal', true);
+        $this->session->set_flashdata('reconciliation_old_input', $this->input->post(null, true));
+        redirect('rapprochement');
+    }
+
+    /** Page : liste des rapprochements + situation par compte. */
+    public function rapprochement()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        $statusLabels = $this->finance->getReconciliationStatusLabels();
+        $status       = (string) $this->input->get('status', true);
+
+        $filters = [
+            'bank_account_id' => (int) $this->input->get('bank_account_id', true),
+            'status'          => array_key_exists($status, $statusLabels) ? $status : '',
+        ];
+
+        $accountRows = [];
+
+        foreach ($this->finance->getBankAccounts([]) as $account) {
+            $accountRows[] = (object) [
+                'account'          => $account,
+                'period_start'     => $this->finance->getReconciliationPeriodStart($account),
+                'expected_opening' => $this->finance->getReconciliationExpectedOpening($account),
+                'open'             => $this->finance->getOpenReconciliation((int) $account->id),
+            ];
+        }
+
+        $data = [
+            'title'           => 'Rapprochement bancaire',
+            'accountRows'     => $accountRows,
+            'reconciliations' => $this->finance->getReconciliations($filters),
+            'filters'         => $filters,
+            'statusLabels'    => $statusLabels,
+        ];
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/rapprochement', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /** POST : création d'un rapprochement + relevé. */
+    public function reconciliationStore()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $this->form_validation->set_rules('bank_account_id', 'Compte bancaire', 'trim|required|integer|greater_than[0]');
+        $this->form_validation->set_rules('period_end', 'Date de fin', 'trim|required');
+        $this->form_validation->set_rules('statement_date', 'Date du relevé', 'trim');
+        $this->form_validation->set_rules('statement_number', 'N° du relevé', 'trim|max_length[50]');
+        $this->form_validation->set_rules('statement_opening_balance', 'Solde initial du relevé', 'trim|required|numeric');
+        $this->form_validation->set_rules('statement_closing_balance', 'Solde final du relevé', 'trim|required|numeric');
+        $this->form_validation->set_rules('observation', 'Observation', 'trim|max_length[1000]');
+        $this->bankValidationMessages();
+
+        if ($this->form_validation->run() === false) {
+            $this->reconciliationRedirectError(validation_errors('<div>', '</div>'));
+            return;
+        }
+
+        $periodEnd     = (string) $this->input->post('period_end', true);
+        $statementDate = trim((string) $this->input->post('statement_date', true));
+
+        if (!$this->isValidDate($periodEnd)) {
+            $this->reconciliationRedirectError('La date de fin est invalide.');
+            return;
+        }
+
+        if ($statementDate !== '' && !$this->isValidDate($statementDate)) {
+            $this->reconciliationRedirectError('La date du relevé est invalide.');
+            return;
+        }
+
+        $result = $this->finance->createReconciliation([
+            'bank_account_id'           => (int) $this->input->post('bank_account_id', true),
+            'period_end'                => $periodEnd,
+            'statement_date'            => $statementDate,
+            'statement_number'          => $this->input->post('statement_number', true),
+            'statement_opening_balance' => (float) $this->input->post('statement_opening_balance', true),
+            'statement_closing_balance' => (float) $this->input->post('statement_closing_balance', true),
+            'observation'               => $this->input->post('observation', true),
+            'created_by'                => $this->bankCurrentUserId(),
+        ]);
+
+        if (!$result['status']) {
+            $this->reconciliationRedirectError($result['message']);
+            return;
+        }
+
+        $this->session->set_flashdata('success', $result['message']);
+        redirect('rapprochement/' . (int) $result['id']);
+    }
+
+    /** Page : espace de travail d'un rapprochement. */
+    public function reconciliationWorkspace($id = null)
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        $reconciliation = $this->finance->getReconciliationById((int) $id);
+
+        if (!$reconciliation) {
+            $this->session->set_flashdata('error', 'Rapprochement introuvable.');
+            redirect('rapprochement');
+            return;
+        }
+
+        $data = [
+            'title'          => 'Rapprochement bancaire',
+            'reconciliation' => $reconciliation,
+            'summary'        => $this->finance->getReconciliationSummary($reconciliation),
+            'statementLines' => $this->finance->getStatementLines((int) $reconciliation->statement_id),
+            'statusLabels'   => $this->finance->getReconciliationStatusLabels(),
+            'canEdit'        => in_array($reconciliation->status, ['draft', 'in_progress', 'completed'], true),
+        ];
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/rapprochement_detail', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /** POST : ajout manuel d'une ligne au relevé. */
+    public function statementLineStore()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $reconciliationId = (int) $this->input->post('reconciliation_id', true);
+        $back             = 'rapprochement/' . $reconciliationId;
+
+        $this->form_validation->set_rules('operation_date', 'Date', 'trim|required');
+        $this->form_validation->set_rules('value_date', 'Date de valeur', 'trim');
+        $this->form_validation->set_rules('label', 'Libellé', 'trim|required|max_length[255]');
+        $this->form_validation->set_rules('bank_reference', 'Référence banque', 'trim|max_length[100]');
+        $this->form_validation->set_rules('direction', 'Sens', 'trim|required|in_list[debit,credit]');
+        $this->form_validation->set_rules('amount', 'Montant', 'trim|required|numeric|greater_than[0]');
+        $this->bankValidationMessages();
+
+        if ($this->form_validation->run() === false) {
+            $this->session->set_flashdata('error', validation_errors('<div>', '</div>'));
+            redirect($back);
+            return;
+        }
+
+        $operationDate = (string) $this->input->post('operation_date', true);
+        $valueDate     = trim((string) $this->input->post('value_date', true));
+
+        if (!$this->isValidDate($operationDate) || ($valueDate !== '' && !$this->isValidDate($valueDate))) {
+            $this->session->set_flashdata('error', 'Date invalide.');
+            redirect($back);
+            return;
+        }
+
+        $result = $this->finance->addStatementLine($reconciliationId, [
+            'operation_date' => $operationDate,
+            'value_date'     => $valueDate,
+            'label'          => trim((string) $this->input->post('label', true)),
+            'bank_reference' => $this->input->post('bank_reference', true),
+            'direction'      => $this->input->post('direction', true),
+            'amount'         => (float) $this->input->post('amount', true),
+        ]);
+
+        $this->session->set_flashdata($result['status'] ? 'success' : 'error', $result['message']);
+        redirect($back);
+    }
+
+    /** AJAX POST : suppression d'une ligne du relevé. */
+    public function statementLineDelete()
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $result = $this->finance->deleteStatementLine(
+            (int) $this->input->post('reconciliation_id', true),
+            (int) $this->input->post('line_id', true)
+        );
+
+        $this->bankJson($result, $result['status'] ? 200 : 422);
+    }
+
+    /** Date CSV : 31/10/2026, 1/10/2026, 2026-10-31, 31-10-2026, 31.10.2026. */
+    private function bankCsvDate(string $value): ?string
+    {
+        $value = trim($value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        foreach (['d/m/Y', 'j/n/Y', 'Y-m-d', 'd-m-Y', 'j-n-Y', 'd.m.Y'] as $format) {
+            $date   = DateTime::createFromFormat('!' . $format, $value);
+            $errors = DateTime::getLastErrors();
+
+            if ($date && (!$errors || ($errors['warning_count'] === 0 && $errors['error_count'] === 0))) {
+                return $date->format('Y-m-d');
             }
         }
 
-        /*
-     * =========================================================
-     * 6. RÉCUPÉRER LA SESSION DE RAPPROCHEMENT
-     * =========================================================
-     */
-        $reconciliation = $this->finance
-            ->getBankReconciliationById($reconciliationId);
+        return null;
+    }
 
-        if (!$reconciliation) {
-            $this->session->set_flashdata(
-                'error',
-                'La session de rapprochement sélectionnée est introuvable.'
-            );
+    /** Montant CSV : « 1 250 000 », « 1.250.000,50 », « 1,250,000.50 ». Retourne -1 si invalide. */
+    private function bankCsvAmount($value): float
+    {
+        $value = str_replace(["\xC2\xA0", ' ', "'"], '', trim((string) $value));
 
-            redirect($redirectUrl);
-            return;
+        if ($value === '' || $value === '-') {
+            return 0.0;
         }
 
-        /*
-     * Empêcher l'analyse d'une session déjà clôturée.
-     */
-        $blockedStatuses = [
-            'validated',
-            'cancelled',
-            'closed',
-        ];
-
-        if (
-            in_array(
-                (string) $reconciliation->status,
-                $blockedStatuses,
-                true
-            )
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'Cette session est déjà validée, clôturée ou annulée.'
-            );
-
-            redirect($redirectUrl);
-            return;
+        if (strpos($value, ',') !== false && strpos($value, '.') !== false) {
+            /* Le dernier séparateur rencontré est le séparateur décimal */
+            if (strrpos($value, ',') > strrpos($value, '.')) {
+                $value = str_replace(',', '.', str_replace('.', '', $value));
+            } else {
+                $value = str_replace(',', '', $value);
+            }
+        } elseif (strpos($value, ',') !== false) {
+            $value = str_replace(',', '.', $value);
         }
 
-        /*
-     * Vérifier les informations essentielles de la session.
+        return is_numeric($value) ? abs(round((float) $value, 2)) : -1.0;
+    }
+
+    /**
+     * Analyse un relevé CSV au format du modèle :
+     * date ; date_valeur ; libelle ; reference ; debit ; credit
      */
-        $bankAccountId = isset($reconciliation->bank_account_id)
-            ? (int) $reconciliation->bank_account_id
-            : 0;
+    private function bankParseStatementCsv(string $path): array
+    {
+        $rows   = [];
+        $errors = [];
 
-        $periodStart = isset($reconciliation->period_start)
-            ? (string) $reconciliation->period_start
-            : '';
+        $handle = fopen($path, 'r');
 
-        $periodEnd = isset($reconciliation->period_end)
-            ? (string) $reconciliation->period_end
-            : '';
-
-        if (
-            $bankAccountId <= 0
-            || empty($periodStart)
-            || empty($periodEnd)
-        ) {
-            $this->session->set_flashdata(
-                'error',
-                'La session sélectionnée ne contient pas un compte ou une période valide.'
-            );
-
-            redirect($redirectUrl);
-            return;
+        if (!$handle) {
+            return ['rows' => [], 'errors' => ['Le fichier ne peut pas être lu.']];
         }
 
-        if (strtotime($periodStart) > strtotime($periodEnd)) {
-            $this->session->set_flashdata(
-                'error',
-                'La date de début de la session est supérieure à la date de fin.'
-            );
+        /* Séparateur détecté sur la première ligne */
+        $firstLine = (string) fgets($handle);
+        $delimiter = ';';
+        $best      = substr_count($firstLine, ';');
 
-            redirect($redirectUrl);
-            return;
+        foreach ([',', "\t"] as $candidate) {
+            if (substr_count($firstLine, $candidate) > $best) {
+                $best      = substr_count($firstLine, $candidate);
+                $delimiter = $candidate;
+            }
         }
 
-        /*
-     * =========================================================
-     * 7. TROUVER LE RELEVÉ BANCAIRE CORRESPONDANT
-     * =========================================================
-     *
-     * La méthode du modèle doit vérifier :
-     * - le même bank_account_id ;
-     * - une période qui couvre ou croise la session.
-     */
-        $statement = $this->finance
-            ->getStatementForReconciliation(
-                $bankAccountId,
-                $periodStart,
-                $periodEnd
-            );
+        rewind($handle);
 
-        if (!$statement) {
-            $bankName = !empty($reconciliation->bank_name)
-                ? $reconciliation->bank_name
-                : 'sélectionné';
+        $lineNo = 0;
 
-            $this->session->set_flashdata(
-                'error',
-                'Aucun relevé bancaire du compte '
-                    . $bankName
-                    . ' ne couvre la période du '
-                    . date('d/m/Y', strtotime($periodStart))
-                    . ' au '
-                    . date('d/m/Y', strtotime($periodEnd))
-                    . '.'
-            );
+        while (($columns = fgetcsv($handle, 0, $delimiter)) !== false) {
+            $lineNo++;
 
-            redirect($redirectUrl);
-            return;
-        }
+            if ($lineNo > 2000) {
+                $errors[] = 'Import limité à 2 000 lignes : la suite du fichier a été ignorée.';
+                break;
+            }
 
-        $statementId = isset($statement->id)
-            ? (int) $statement->id
-            : 0;
+            /* Encodage Excel Windows → UTF-8, BOM retiré */
+            $columns = array_map(function ($cell) {
+                $cell = (string) $cell;
 
-        if ($statementId <= 0) {
-            $this->session->set_flashdata(
-                'error',
-                'Le relevé bancaire trouvé ne possède pas un identifiant valide.'
-            );
+                if (function_exists('mb_check_encoding') && !mb_check_encoding($cell, 'UTF-8')) {
+                    $cell = mb_convert_encoding($cell, 'UTF-8', 'Windows-1252');
+                }
 
-            redirect($redirectUrl);
-            return;
-        }
+                return trim(preg_replace('/^\xEF\xBB\xBF/', '', $cell));
+            }, $columns);
 
-        /*
-     * =========================================================
-     * 8. RÉCUPÉRER LES LIGNES DU RELEVÉ
-     * =========================================================
-     */
-        $statementLines = $this->finance
-            ->getStatementLinesForAnalysis(
-                $statementId,
-                $periodStart,
-                $periodEnd
-            );
-
-        if (empty($statementLines)) {
-            $this->session->set_flashdata(
-                'error',
-                'Le relevé bancaire a bien été trouvé, mais il ne contient '
-                    . 'aucune ligne à analyser. Le fichier PDF, Excel ou CSV doit '
-                    . 'd’abord être transformé en lignes dans '
-                    . 'tbl_finance_bank_statement_line.'
-            );
-
-            redirect($redirectUrl);
-            return;
-        }
-
-        /*
-     * =========================================================
-     * 9. INITIALISER LES COMPTEURS
-     * =========================================================
-     */
-        $matchedCount = 0;
-        $partialCount = 0;
-        $anomalyCount = 0;
-        $missingSystemCount = 0;
-
-        $totalDifference = 0;
-        $totalStatementAmount = 0;
-        $totalSystemAmount = 0;
-
-        $now = date('Y-m-d H:i:s');
-
-        /*
-     * =========================================================
-     * 10. DÉMARRER LA TRANSACTION SQL
-     * =========================================================
-     */
-        $this->db->trans_begin();
-
-        /*
-     * Supprimer seulement les résultats automatiques
-     * non validés de cette session.
-     */
-        $this->finance
-            ->deletePreviousAutomaticAnalysis($reconciliationId);
-
-        /*
-     * Il est conseillé de remettre les lignes de ce relevé
-     * à l'état unmatched avant une nouvelle analyse.
-     */
-        $this->db
-            ->where('statement_id', $statementId)
-            ->where_in(
-                'matching_status',
-                [
-                    'matched',
-                    'partially_matched',
-                    'unmatched',
-                ]
-            )
-            ->update(
-                'tbl_finance_bank_statement_line',
-                [
-                    'matching_status' => 'unmatched',
-                    'updated_at'      => $now,
-                ]
-            );
-
-        /*
-     * =========================================================
-     * 11. ANALYSER CHAQUE LIGNE DU RELEVÉ BANCAIRE
-     * =========================================================
-     */
-        foreach ($statementLines as $statementLine) {
-            $statementLineId = isset($statementLine->id)
-                ? (int) $statementLine->id
-                : 0;
-
-            if ($statementLineId <= 0) {
+            /* Ligne vide */
+            if (implode('', $columns) === '') {
                 continue;
             }
 
-            $statementDate = !empty($statementLine->operation_date)
-                ? $statementLine->operation_date
-                : null;
-
-            /*
-         * Prendre la valeur absolue du montant.
-         *
-         * Le sens débit/crédit est normalement géré par
-         * operation_direction dans la méthode de recherche.
-         */
-            $statementAmount = isset($statementLine->amount)
-                ? abs((float) $statementLine->amount)
-                : 0;
-
-            $totalStatementAmount += $statementAmount;
-
-            /*
-         * Chercher la meilleure opération SATRACO possible.
-         */
-            $bankOperation = $this->finance
-                ->findMatchingBankOperation(
-                    $bankAccountId,
-                    $statementLine,
-                    $dateTolerance,
-                    $amountTolerance
-                );
-
-            /*
-         * -----------------------------------------------------
-         * CAS 1 : UNE OPÉRATION SYSTÈME A ÉTÉ TROUVÉE
-         * -----------------------------------------------------
-         */
-            if ($bankOperation) {
-                $bankOperationId = isset($bankOperation->id)
-                    ? (int) $bankOperation->id
-                    : 0;
-
-                $systemAmount = isset($bankOperation->amount)
-                    ? abs((float) $bankOperation->amount)
-                    : 0;
-
-                $systemDate = !empty($bankOperation->operation_date)
-                    ? $bankOperation->operation_date
-                    : null;
-
-                $totalSystemAmount += $systemAmount;
-
-                /*
-             * Calculer l'écart entre les deux montants.
-             */
-                $differenceAmount = abs(
-                    $systemAmount - $statementAmount
-                );
-
-                /*
-             * Calculer l'écart de dates.
-             */
-                $dateDifferenceDays = 0;
-
-                if ($systemDate && $statementDate) {
-                    $systemTimestamp = strtotime($systemDate);
-                    $statementTimestamp = strtotime($statementDate);
-
-                    $dateDifferenceDays = (int) floor(
-                        abs(
-                            $systemTimestamp
-                                - $statementTimestamp
-                        ) / 86400
-                    );
-                }
-
-                /*
-             * Déterminer le résultat de la comparaison.
-             */
-                if (
-                    $differenceAmount <= $amountTolerance
-                    && $dateDifferenceDays <= $dateTolerance
-                ) {
-                    /*
-                 * Correspondance parfaite dans les tolérances.
-                 */
-                    $matchingStatus = 'matched';
-                    $statementLineStatus = 'matched';
-
-                    $matchedCount++;
-                } elseif ($differenceAmount > $amountTolerance) {
-                    /*
-                 * Une opération potentielle a été trouvée,
-                 * mais le montant dépasse la tolérance.
-                 */
-                    $matchingStatus = 'amount_mismatch';
-                    $statementLineStatus = 'partially_matched';
-
-                    $partialCount++;
-                    $anomalyCount++;
-                    $totalDifference += $differenceAmount;
-                } else {
-                    /*
-                 * Le montant est compatible, mais pas la date.
-                 */
-                    $matchingStatus = 'date_mismatch';
-                    $statementLineStatus = 'partially_matched';
-
-                    $partialCount++;
-                    $anomalyCount++;
-                }
-
-                /*
-             * Calculer un score de confiance sur 100.
-             */
-                $confidenceScore = 100;
-
-                /*
-             * Retirer 10 points par jour de différence,
-             * avec un maximum de 40 points.
-             */
-                $confidenceScore -= min(
-                    40,
-                    $dateDifferenceDays * 10
-                );
-
-                /*
-             * Retirer des points si les montants diffèrent.
-             */
-                if ($differenceAmount > 0) {
-                    if ($statementAmount > 0) {
-                        $differencePercentage = (
-                            $differenceAmount
-                            / $statementAmount
-                        ) * 100;
-
-                        $confidenceScore -= min(
-                            50,
-                            (int) round($differencePercentage)
-                        );
-                    } else {
-                        $confidenceScore -= 50;
-                    }
-                }
-
-                $confidenceScore = max(
-                    0,
-                    min(100, $confidenceScore)
-                );
-
-                /*
-             * Insérer le résultat de la comparaison.
-             */
-                $this->finance
-                    ->insertReconciliationItem(
-                        [
-                            'reconciliation_id' =>
-                            $reconciliationId,
-
-                            'bank_operation_id' =>
-                            $bankOperationId,
-
-                            'statement_line_id' =>
-                            $statementLineId,
-
-                            'system_operation_date' =>
-                            $systemDate,
-
-                            'statement_operation_date' =>
-                            $statementDate,
-
-                            'system_amount' =>
-                            $systemAmount,
-
-                            'statement_amount' =>
-                            $statementAmount,
-
-                            'difference_amount' =>
-                            $differenceAmount,
-
-                            'matching_status' =>
-                            $matchingStatus,
-
-                            'matching_method' =>
-                            'automatic',
-
-                            'confidence_score' =>
-                            $confidenceScore,
-
-                            'justification' =>
-                            null,
-
-                            'observation' =>
-                            'Analyse automatique : tolérance de date de ±'
-                                . $dateTolerance
-                                . ' jour(s) et tolérance de montant de '
-                                . number_format(
-                                    $amountTolerance,
-                                    2,
-                                    '.',
-                                    ''
-                                )
-                                . '.',
-
-                            /*
-                         * matched_by est renseigné uniquement
-                         * pour une vraie correspondance.
-                         */
-                            'matched_by' =>
-                            $matchingStatus === 'matched'
-                                ? $userId
-                                : null,
-
-                            'matched_at' =>
-                            $matchingStatus === 'matched'
-                                ? $now
-                                : null,
-
-                            'created_at' =>
-                            $now,
-                        ]
-                    );
-
-                /*
-             * Mettre à jour la ligne bancaire.
-             */
-                $this->finance
-                    ->updateStatementLineMatchingStatus(
-                        $statementLineId,
-                        $statementLineStatus
-                    );
-            } else {
-                /*
-             * -------------------------------------------------
-             * CAS 2 : AUCUNE OPÉRATION SYSTÈME TROUVÉE
-             * -------------------------------------------------
-             */
-                $missingSystemCount++;
-                $anomalyCount++;
-
-                /*
-             * L'intégralité du montant constitue un écart
-             * tant qu'aucune opération système n'est associée.
-             */
-                $totalDifference += $statementAmount;
-
-                $this->finance
-                    ->insertReconciliationItem(
-                        [
-                            'reconciliation_id' =>
-                            $reconciliationId,
-
-                            'bank_operation_id' =>
-                            null,
-
-                            'statement_line_id' =>
-                            $statementLineId,
-
-                            'system_operation_date' =>
-                            null,
-
-                            'statement_operation_date' =>
-                            $statementDate,
-
-                            'system_amount' =>
-                            0,
-
-                            'statement_amount' =>
-                            $statementAmount,
-
-                            'difference_amount' =>
-                            $statementAmount,
-
-                            'matching_status' =>
-                            'missing_system_entry',
-
-                            'matching_method' =>
-                            'automatic',
-
-                            'confidence_score' =>
-                            0,
-
-                            'justification' =>
-                            null,
-
-                            'observation' =>
-                            'Cette opération figure sur le relevé bancaire, '
-                                . 'mais aucune opération correspondante n’a été '
-                                . 'trouvée dans le système.',
-
-                            'matched_by' =>
-                            null,
-
-                            'matched_at' =>
-                            null,
-
-                            'created_at' =>
-                            $now,
-                        ]
-                    );
-
-                $this->finance
-                    ->updateStatementLineMatchingStatus(
-                        $statementLineId,
-                        'unmatched'
-                    );
+            /* Ligne d'en-tête */
+            if ($lineNo === 1 && stripos($columns[0], 'date') !== false) {
+                continue;
             }
+
+            $columns   = array_pad($columns, 6, '');
+            $date      = $this->bankCsvDate($columns[0]);
+            $valueDate = $columns[1] !== '' ? $this->bankCsvDate($columns[1]) : null;
+            $label     = mb_substr($columns[2], 0, 255);
+            $debit     = $this->bankCsvAmount($columns[4]);
+            $credit    = $this->bankCsvAmount($columns[5]);
+
+            if (!$date) {
+                $errors[] = 'Ligne ' . $lineNo . ' : date invalide (« ' . $columns[0] . ' »).';
+                continue;
+            }
+
+            if ($columns[1] !== '' && !$valueDate) {
+                $errors[] = 'Ligne ' . $lineNo . ' : date de valeur invalide.';
+                continue;
+            }
+
+            if ($label === '') {
+                $errors[] = 'Ligne ' . $lineNo . ' : libellé manquant.';
+                continue;
+            }
+
+            if ($debit < 0 || $credit < 0) {
+                $errors[] = 'Ligne ' . $lineNo . ' : montant invalide.';
+                continue;
+            }
+
+            if (($debit > 0) === ($credit > 0)) {
+                $errors[] = 'Ligne ' . $lineNo . ' : renseignez soit un débit, soit un crédit.';
+                continue;
+            }
+
+            $rows[] = [
+                'line'           => $lineNo,
+                'operation_date' => $date,
+                'value_date'     => $valueDate,
+                'label'          => $label,
+                'bank_reference' => mb_substr($columns[3], 0, 100),
+                'debit'          => $debit,
+                'credit'         => $credit,
+            ];
         }
 
-        /*
-     * =========================================================
-     * 12. CALCULER LES TOTAUX DE LA SESSION
-     * =========================================================
-     */
-        $totalAnalyzed = count($statementLines);
+        fclose($handle);
 
-        $unmatchedCount = max(
-            0,
-            $totalAnalyzed - $matchedCount
-        );
+        return ['rows' => $rows, 'errors' => $errors];
+    }
 
-        /*
-     * Solde final communiqué par la banque.
-     */
-        if (isset($statement->closing_balance)) {
-            $statementClosingBalance = (float) $statement->closing_balance;
-        } elseif (isset($reconciliation->statement_closing_balance)) {
-            $statementClosingBalance =
-                (float) $reconciliation->statement_closing_balance;
-        } else {
-            $statementClosingBalance = 0;
-        }
-
-        /*
-     * Solde actuellement enregistré dans SATRACO.
-     */
-        if (isset($reconciliation->system_balance)) {
-            $systemBalance = (float) $reconciliation->system_balance;
-        } elseif (isset($reconciliation->account_current_balance)) {
-            $systemBalance =
-                (float) $reconciliation->account_current_balance;
-        } else {
-            $systemBalance = 0;
-        }
-
-        /*
-     * Écart entre le solde bancaire et le solde système.
-     */
-        $differenceBefore = abs(
-            $statementClosingBalance - $systemBalance
-        );
-
-        /*
-     * Pourcentage rapproché.
-     */
-        $matchingPercentage = $totalAnalyzed > 0
-            ? round(
-                ($matchedCount / $totalAnalyzed) * 100,
-                2
-            )
-            : 0;
-
-        /*
-     * =========================================================
-     * 13. METTRE À JOUR LA SESSION
-     * =========================================================
-     */
-        $sessionUpdated = $this->finance
-            ->updateBankReconciliation(
-                $reconciliationId,
-                [
-                    'total_operations' =>
-                    $totalAnalyzed,
-
-                    'matched_operations' =>
-                    $matchedCount,
-
-                    'unmatched_operations' =>
-                    $unmatchedCount,
-
-                    'difference_before_adjustment' =>
-                    $differenceBefore,
-
-                    'difference_after_adjustment' =>
-                    $totalDifference,
-
-                    'status' =>
-                    'in_progress',
-
-                    'updated_at' =>
-                    $now,
-                ]
-            );
-
-        if (!$sessionUpdated) {
-            $this->db->trans_rollback();
-
-            $this->session->set_flashdata(
-                'error',
-                'Impossible de mettre à jour la session de rapprochement.'
-            );
-
-            redirect($redirectUrl);
+    /** POST : import CSV des lignes du relevé. */
+    public function statementImport()
+    {
+        if (!$this->bankRequireLogin()) {
             return;
         }
 
-        /*
-     * =========================================================
-     * 14. VÉRIFIER ET TERMINER LA TRANSACTION
-     * =========================================================
-     */
-        if ($this->db->trans_status() === false) {
-            $this->db->trans_rollback();
-
-            log_message(
-                'error',
-                'Échec de l’analyse du rapprochement bancaire. '
-                    . 'Session ID : '
-                    . $reconciliationId
-            );
-
-            $this->session->set_flashdata(
-                'error',
-                'Une erreur est survenue pendant l’analyse. '
-                    . 'Aucune donnée n’a été enregistrée.'
-            );
-
-            redirect($redirectUrl);
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
             return;
         }
 
-        $this->db->trans_commit();
+        $reconciliationId = (int) $this->input->post('reconciliation_id', true);
+        $back             = 'rapprochement/' . $reconciliationId;
+        $file             = $_FILES['statement_file'] ?? null;
 
-        /*
-     * =========================================================
-     * 15. MESSAGE DE SUCCÈS
-     * =========================================================
-     */
-        $message = 'Analyse terminée avec succès : '
-            . $totalAnalyzed
-            . ' opération(s) analysée(s), '
-            . $matchedCount
-            . ' correspondance(s), '
-            . $partialCount
-            . ' correspondance(s) partielle(s), '
-            . $missingSystemCount
-            . ' opération(s) absente(s) du système et '
-            . $anomalyCount
-            . ' anomalie(s). Taux de rapprochement : '
-            . number_format(
-                $matchingPercentage,
-                2,
-                ',',
-                ' '
-            )
-            . ' %.';
+        if (!$file || empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            $this->session->set_flashdata('error', 'Choisissez un fichier CSV à importer.');
+            redirect($back);
+            return;
+        }
 
-        $this->session->set_flashdata(
-            'success',
-            $message
+        $extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($extension, ['csv', 'txt'], true)) {
+            $this->session->set_flashdata('error', 'Format non accepté. Depuis Excel : Fichier → Enregistrer sous → « CSV (séparateur : point-virgule) ».');
+            redirect($back);
+            return;
+        }
+
+        if ($file['size'] > 2 * 1024 * 1024) {
+            $this->session->set_flashdata('error', 'Fichier trop volumineux (2 Mo maximum).');
+            redirect($back);
+            return;
+        }
+
+        $parsed = $this->bankParseStatementCsv($file['tmp_name']);
+
+        if (empty($parsed['rows'])) {
+            $details = !empty($parsed['errors'])
+                ? '<br>' . implode('<br>', array_map('html_escape', array_slice($parsed['errors'], 0, 10)))
+                : '';
+
+            $this->session->set_flashdata('error', 'Aucune ligne valide trouvée dans le fichier.' . $details);
+            redirect($back);
+            return;
+        }
+
+        $result = $this->finance->importStatementLines(
+            $reconciliationId,
+            $parsed['rows'],
+            $file['name'],
+            $this->bankCurrentUserId()
         );
 
-        redirect($redirectUrl);
+        if (!$result['status']) {
+            $this->session->set_flashdata('error', $result['message']);
+            redirect($back);
+            return;
+        }
+
+        $errors  = array_merge($parsed['errors'], $result['errors']);
+        $message = '<strong>' . (int) $result['imported'] . '</strong> ligne(s) importée(s).';
+
+        if (!empty($errors)) {
+            $message .= '<br><br><strong>' . count($errors) . ' ligne(s) ignorée(s) :</strong><br>'
+                . implode('<br>', array_map('html_escape', array_slice($errors, 0, 10)))
+                . (count($errors) > 10 ? '<br>…' : '');
+        }
+
+        $this->session->set_flashdata('success', $message);
+        redirect($back);
+    }
+
+    /** Téléchargement du modèle CSV. */
+    public function statementTemplate()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="modele_releve_bancaire.csv"');
+
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF");
+        fputcsv($out, ['date', 'date_valeur', 'libelle', 'reference', 'debit', 'credit'], ';');
+        fputcsv($out, ['01/10/2026', '01/10/2026', 'VIREMENT RECU CLIENT ABC', 'VIR123456', '', '2500000'], ';');
+        fputcsv($out, ['03/10/2026', '03/10/2026', 'FRAIS TENUE DE COMPTE', 'FRS-OCT', '15000', ''], ';');
+        fclose($out);
+        exit;
+    }
+
+    /** AJAX POST : annulation d'un rapprochement non validé. */
+    public function reconciliationCancel()
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $result = $this->finance->cancelReconciliation(
+            (int) $this->input->post('reconciliation_id', true),
+            (string) $this->input->post('cancel_reason', true),
+            $this->bankCurrentUserId()
+        );
+
+        $this->bankJson($result, $result['status'] ? 200 : 422);
+    }
+
+        /* ---------------------------------------------------------------------
+     * LIVRE DE BANQUE
+     * ------------------------------------------------------------------- */
+
+    /** Filtres communs à la page, l'impression et l'export. */
+    private function bankLedgerFilters(): array
+    {
+        $dateFrom = (string) $this->input->get('date_from', true);
+        $dateTo   = (string) $this->input->get('date_to', true);
+
+        if (!$this->isValidDate($dateFrom)) {
+            $dateFrom = date('Y-m-01');
+        }
+
+        if (!$this->isValidDate($dateTo)) {
+            $dateTo = date('Y-m-d');
+        }
+
+        if ($dateFrom > $dateTo) {
+            [$dateFrom, $dateTo] = [$dateTo, $dateFrom];
+        }
+
+        $sens       = (string) $this->input->get('sens', true);
+        $reconciled = (string) $this->input->get('reconciled', true);
+        $nature     = (string) $this->input->get('nature', true);
+
+        return [
+            'date_from'  => $dateFrom,
+            'date_to'    => $dateTo,
+            'sens'       => in_array($sens, ['entree', 'sortie'], true) ? $sens : '',
+            'nature'     => array_key_exists($nature, $this->finance->getBankMovementNatureLabels()) ? $nature : '',
+            'search'     => trim((string) $this->input->get('search', true)),
+            'reconciled' => in_array($reconciled, ['yes', 'no'], true) ? $reconciled : '',
+        ];
+    }
+
+    /** Compte demandé, ou premier compte actif si aucun identifiant. */
+    private function bankLedgerAccount($id)
+    {
+        if ((int) $id > 0) {
+            return $this->finance->getBankAccountById((int) $id);
+        }
+
+        $accounts = $this->finance->getActiveBankAccounts();
+
+        return !empty($accounts) ? $this->finance->getBankAccountById((int) $accounts[0]->id) : null;
+    }
+
+    /** Page : livre de banque d'un compte. */
+    public function bankLedger($id = null)
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        $account = $this->bankLedgerAccount($id);
+
+        if (!$account) {
+            $this->session->set_flashdata('error', 'Aucun compte bancaire trouvé. Créez d’abord un compte.');
+            redirect('compte-banques');
+            return;
+        }
+
+        $filters = $this->bankLedgerFilters();
+        $ledger  = $this->finance->getBankLedger((int) $account->id, $filters);
+
+        /* Pagination (ordre chronologique conservé) */
+        $perPage = 50;
+        $total   = count($ledger['rows']);
+        $pages   = max(1, (int) ceil($total / $perPage));
+        $page    = min(max(1, (int) $this->input->get('page')), $pages);
+
+        $ledger['rows'] = array_slice($ledger['rows'], ($page - 1) * $perPage, $perPage);
+
+        $data = [
+            'title'        => 'Livre de banque',
+            'account'      => $account,
+            'accounts'     => $this->finance->getBankAccounts([]),
+            'filters'      => $filters,
+            'ledger'       => $ledger,
+            'natureLabels' => $this->finance->getBankMovementNatureLabels(),
+            'pagination'   => [
+                'page'     => $page,
+                'pages'    => $pages,
+                'total'    => $total,
+                'per_page' => $perPage,
+                'from'     => $total ? ($page - 1) * $perPage + 1 : 0,
+                'to'       => min($page * $perPage, $total),
+            ],
+        ];
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/banque_livre', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /** Impression du livre (page autonome, toutes les lignes filtrées). */
+    public function bankLedgerPrint($id = null)
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        $account = $this->bankLedgerAccount($id);
+
+        if (!$account) {
+            show_404();
+            return;
+        }
+
+        $filters = $this->bankLedgerFilters();
+
+        $this->load->view('v1/components/modules/finance/banque_livre_print', [
+            'title'        => 'Livre de banque',
+            'account'      => $account,
+            'filters'      => $filters,
+            'ledger'       => $this->finance->getBankLedger((int) $account->id, $filters),
+            'natureLabels' => $this->finance->getBankMovementNatureLabels(),
+            'printedBy'    => trim($this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name')),
+        ]);
+    }
+
+    /** Export CSV du livre (compatible Excel). */
+    public function bankLedgerExport($id = null)
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        $account = $this->bankLedgerAccount($id);
+
+        if (!$account) {
+            show_404();
+            return;
+        }
+
+        $filters = $this->bankLedgerFilters();
+        $ledger  = $this->finance->getBankLedger((int) $account->id, $filters);
+        $natures = $this->finance->getBankMovementNatureLabels();
+
+        $amount = function ($value) {
+            return number_format((float) $value, 2, ',', '');
+        };
+
+        $date = function ($value) {
+            return $value ? date('d/m/Y', strtotime($value)) : '';
+        };
+
+        $filename = 'livre_banque_' . $account->code . '_' . $filters['date_from'] . '_au_' . $filters['date_to'] . '.csv';
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF"); /* BOM pour Excel */
+
+        fputcsv($out, ['Livre de banque', $account->code . ' — ' . $account->name, $account->bank_name, $account->account_number, $account->currency], ';');
+        fputcsv($out, ['Période', $date($filters['date_from']) . ' au ' . $date($filters['date_to'])], ';');
+        fputcsv($out, [], ';');
+
+        fputcsv($out, ['N°', 'Date', 'Date de valeur', 'Référence', 'Opération', 'Nature', 'Libellé', 'Tiers', 'N° de pièce', 'Entrée', 'Sortie', 'Solde', 'Pointé'], ';');
+        fputcsv($out, ['', $date($filters['date_from']), '', '', '', '', 'Solde d’ouverture', '', '', '', '', $amount($ledger['opening_balance']), ''], ';');
+
+        foreach ($ledger['rows'] as $row) {
+            fputcsv($out, [
+                $row->line_number,
+                $date($row->movement_date),
+                $date($row->value_date),
+                $row->reference,
+                $row->operation_reference,
+                $natures[$row->nature] ?? $row->nature,
+                $row->label,
+                $row->third_party,
+                $row->document_number,
+                $row->entry_amount > 0 ? $amount($row->entry_amount) : '',
+                $row->exit_amount > 0 ? $amount($row->exit_amount) : '',
+                $amount($row->running_balance),
+                (int) $row->is_reconciled === 1 ? 'Oui' : 'Non',
+            ], ';');
+        }
+
+        fputcsv($out, ['', '', '', '', '', '', 'Totaux', '', '', $amount($ledger['filtered_in']), $amount($ledger['filtered_out']), '', ''], ';');
+        fputcsv($out, ['', $date($filters['date_to']), '', '', '', '', 'Solde de clôture', '', '', '', '', $amount($ledger['closing_balance']), ''], ';');
+
+        fclose($out);
+        exit;
+    }
+
+        /* =====================================================================
+     *  PRÉVISIONS DE TRÉSORERIE
+     * ===================================================================== */
+
+    /** Filtres communs à la page et à l'export. */
+    private function previsionFilters(): array
+    {
+        $horizon  = (string) $this->input->get('horizon', true);
+        $currency = (string) $this->input->get('currency', true);
+        $scenario = (string) $this->input->get('scenario', true);
+        $flow     = (string) $this->input->get('flow_type', true);
+        $status   = (string) $this->input->get('status', true);
+
+        return [
+            'horizon'   => in_array($horizon, ['13w', '6m', '12m'], true) ? $horizon : '13w',
+            'currency'  => in_array($currency, ['BIF', 'USD', 'EUR'], true) ? $currency : 'BIF',
+            'scenario'  => in_array($scenario, ['pondere', 'brut'], true) ? $scenario : 'pondere',
+            'threshold' => trim((string) $this->input->get('threshold', true)),
+            'flow_type' => in_array($flow, ['entree', 'sortie'], true) ? $flow : '',
+            'status'    => in_array($status, ['open', 'planned', 'partially_realized', 'realized', 'cancelled'], true) ? $status : 'open',
+        ];
+    }
+
+    /** Calcule position, seuil et plan pour des filtres donnés. */
+    private function previsionBuild(array $filters): array
+    {
+        $position  = $this->finance->getTreasuryStartingPosition($filters['currency']);
+        $threshold = is_numeric($filters['threshold']) ? max(0, (float) $filters['threshold']) : $position['alert_threshold'];
+
+        $plan = $this->finance->getTreasuryPlan(
+            $filters['horizon'],
+            $filters['currency'],
+            $filters['scenario'],
+            $position['total'],
+            $threshold
+        );
+
+        return [$position, $threshold, $plan];
     }
 
     public function prevision()
     {
-        if (!$this->session->userdata('user_id')) {
-            redirect('sign-in');
+        if (!$this->bankRequireLogin()) {
             return;
         }
 
-        $title = 'Prévisions de trésorerie';
+        $filters = $this->previsionFilters();
+        [$position, $threshold, $plan] = $this->previsionBuild($filters);
 
-        $this->load->view('v1/components/layout/header', ['title' => $title]);
-        $this->load->view('v1/components/layout/sidebar');
-        $this->load->view('v1/components/modules/finance/prevision');
-        $this->load->view('v1/components/layout/footer');
+        $data = [
+            'title'                => 'Prévisions de trésorerie',
+            'filters'              => $filters,
+            'position'             => $position,
+            'threshold'            => $threshold,
+            'plan'                 => $plan,
+            'categories'           => $this->finance->getForecastCategories(),
+            'forecasts'            => $this->finance->getTreasuryForecasts([
+                'currency'  => $filters['currency'],
+                'flow_type' => $filters['flow_type'],
+                'status'    => $filters['status'],
+            ]),
+            'forecastVsActual'     => $this->finance->getForecastVsActual($filters['currency'], 6),
+            'bankAccounts'         => $this->finance->getActiveBankAccounts(),
+            'chantiers'            => $this->finance->getAllChantiers(),
+            'realizableOperations' => $this->finance->getRealizableBankOperations($filters['currency']),
+        ];
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/finance/prevision', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /** POST : nouvelle prévision (avec récurrence éventuelle). */
+    public function previsionStore()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $back = 'prevision?' . (string) $this->input->post('return_query', true);
+
+        $this->form_validation->set_rules('flow_type', 'Sens du flux', 'trim|required|in_list[entree,sortie]');
+        $this->form_validation->set_rules('category', 'Catégorie', 'trim|required|max_length[100]');
+        $this->form_validation->set_rules('label', 'Libellé', 'trim|required|max_length[255]');
+        $this->form_validation->set_rules('expected_date', 'Date prévue', 'trim|required');
+        $this->form_validation->set_rules('amount', 'Montant', 'trim|required|numeric|greater_than[0]');
+        $this->form_validation->set_rules('currency', 'Devise', 'trim|required|in_list[BIF,USD,EUR]');
+        $this->form_validation->set_rules('probability', 'Probabilité', 'trim|required|integer|greater_than_equal_to[0]|less_than_equal_to[100]');
+        $this->form_validation->set_rules('recurrence', 'Récurrence', 'trim|required|in_list[none,weekly,monthly,quarterly,yearly]');
+        $this->form_validation->set_rules('recurrence_end_date', 'Fin de récurrence', 'trim');
+        $this->form_validation->set_rules('bank_account_id', 'Compte bancaire', 'trim|integer');
+        $this->form_validation->set_rules('chantier_id', 'Chantier', 'trim|integer');
+        $this->form_validation->set_rules('third_party', 'Tiers', 'trim|max_length[255]');
+        $this->form_validation->set_rules('observation', 'Observation', 'trim|max_length[2000]');
+        $this->bankValidationMessages();
+        $this->form_validation->set_message('less_than_equal_to', 'Le champ {field} ne peut pas dépasser {param}.');
+
+        $error = null;
+
+        if ($this->form_validation->run() === false) {
+            $error = validation_errors('<div>', '</div>');
+        } else {
+            $expectedDate = (string) $this->input->post('expected_date', true);
+            $recurrence   = (string) $this->input->post('recurrence', true);
+            $endDate      = trim((string) $this->input->post('recurrence_end_date', true));
+
+            if (!$this->isValidDate($expectedDate)) {
+                $error = 'La date prévue est invalide.';
+            } elseif ($recurrence !== 'none' && !$this->isValidDate($endDate)) {
+                $error = 'Indiquez une date de fin de récurrence valide.';
+            }
+        }
+
+        if ($error === null) {
+            $result = $this->finance->createTreasuryForecast([
+                'flow_type'           => $this->input->post('flow_type', true),
+                'category'            => $this->input->post('category', true),
+                'label'               => trim((string) $this->input->post('label', true)),
+                'expected_date'       => $expectedDate,
+                'amount'              => (float) $this->input->post('amount', true),
+                'currency'            => $this->input->post('currency', true),
+                'probability'         => (int) $this->input->post('probability', true),
+                'recurrence'          => $recurrence,
+                'recurrence_end_date' => $endDate,
+                'bank_account_id'     => $this->input->post('bank_account_id', true),
+                'chantier_id'         => $this->input->post('chantier_id', true),
+                'third_party'         => $this->input->post('third_party', true),
+                'observation'         => $this->input->post('observation', true),
+                'created_by'          => $this->bankCurrentUserId(),
+            ]);
+
+            if ($result['status']) {
+                $this->session->set_flashdata('success', $result['message']);
+                redirect($back);
+                return;
+            }
+
+            $error = $result['message'];
+        }
+
+        $this->session->set_flashdata('error', $error);
+        $this->session->set_flashdata('open_forecast_modal', true);
+        $this->session->set_flashdata('forecast_old_input', $this->input->post(null, true));
+        redirect($back);
+    }
+
+    /** AJAX POST : réalisation d'une prévision. */
+    public function previsionRealize()
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $date = (string) $this->input->post('realized_date', true);
+
+        if (!$this->isValidDate($date) || $date > date('Y-m-d')) {
+            $this->bankJson(['status' => false, 'message' => 'La date de réalisation est invalide ou dans le futur.'], 422);
+            return;
+        }
+
+        $result = $this->finance->realizeTreasuryForecast(
+            (int) $this->input->post('forecast_id', true),
+            (float) $this->input->post('realized_amount', true),
+            $date,
+            (int) $this->input->post('bank_operation_id', true) ?: null,
+            $this->bankCurrentUserId()
+        );
+
+        $this->bankJson($result, $result['status'] ? 200 : 422);
+    }
+
+    /** AJAX POST : annulation d'une prévision (ou de la suite de sa série). */
+    public function previsionCancel()
+    {
+        if (!$this->bankRequireLogin(true)) {
+            return;
+        }
+
+        if ($this->input->method(true) !== 'POST') {
+            show_404();
+            return;
+        }
+
+        $result = $this->finance->cancelTreasuryForecast(
+            (int) $this->input->post('forecast_id', true),
+            (string) $this->input->post('cancel_reason', true),
+            (bool) $this->input->post('cancel_series', true),
+            $this->bankCurrentUserId()
+        );
+
+        $this->bankJson($result, $result['status'] ? 200 : 422);
+    }
+
+    /** Export CSV du plan de trésorerie (compatible Excel). */
+    public function previsionExport()
+    {
+        if (!$this->bankRequireLogin()) {
+            return;
+        }
+
+        $filters = $this->previsionFilters();
+        [$position, $threshold, $plan] = $this->previsionBuild($filters);
+
+        $amount = function ($value) {
+            return number_format((float) $value, 0, ',', '');
+        };
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="plan_tresorerie_' . $filters['currency'] . '_' . date('Ymd') . '.csv"');
+
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF");
+
+        fputcsv($out, ['Plan de trésorerie', $filters['currency'], 'Scénario : ' . ($filters['scenario'] === 'pondere' ? 'pondéré' : 'brut'), 'Édité le ' . date('d/m/Y H:i')], ';');
+        fputcsv($out, [], ';');
+
+        $header = ['Rubrique'];
+
+        foreach ($plan['periods'] as $period) {
+            $header[] = $period['label'] . ' (' . $period['sublabel'] . ')';
+        }
+
+        $header[] = 'Total';
+        fputcsv($out, $header, ';');
+
+        $line = function (string $label, array $values, $total = '') use ($out, $amount) {
+            fputcsv($out, array_merge([$label], array_map($amount, $values), [$total === '' ? '' : $amount($total)]), ';');
+        };
+
+        $line('Solde de début', $plan['openings']);
+
+        foreach ($plan['rows']['entree'] as $row) {
+            $line('  + ' . $row['label'], $row['values'], $row['total']);
+        }
+
+        $line('Total encaissements', $plan['totals_in'], $plan['total_in']);
+
+        foreach ($plan['rows']['sortie'] as $row) {
+            $line('  - ' . $row['label'], $row['values'], $row['total']);
+        }
+
+        $line('Total décaissements', $plan['totals_out'], $plan['total_out']);
+        $line('Flux net', $plan['net'], $plan['total_in'] - $plan['total_out']);
+        $line('Solde de fin', $plan['closings']);
+        $line('Seuil de sécurité', array_fill(0, count($plan['periods']), $threshold));
+
+        fclose($out);
+        exit;
     }
 
     public function factureClient()

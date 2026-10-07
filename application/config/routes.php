@@ -61,6 +61,18 @@ $route['dashboard'] = 'DashboardController/mainDashboard';
 
 $route['main-dashboard'] = 'DashboardController/mainDashboard';
 
+$route['direction-dashboard'] = 'Dgcontroller/dashboard';
+
+$route['direction-indicateurs'] = 'Dgcontroller/indicateurPerformance';
+
+$route['direction-reporting-general'] = 'Dgcontroller/reportingGeneral';
+
+$route['direction-reporting-analytique'] = 'Dgcontroller/reportingAnalytique';
+
+$route['direction-statistiques'] = 'Dgcontroller/statistique';
+
+$route['direction-projets'] = 'Dgcontroller/projectFollow';
+
 $route['synthese-demandes'] = 'Dgcontroller/syntheseDemandes';
 $route['direction-archives'] = 'Dgcontroller/directionArchives';
 
@@ -131,22 +143,42 @@ $route['stock-article-store'] = 'TechController/stockArticleStore';
 $route['stock-emplacement-store'] = 'TechController/stockEmplacementStore';
 $route['stock-quantite-store'] = 'TechController/stockQuantiteStore';
 
-$route['engin-materiel'] = 'TechController/enginMateriel';
-$route['engin-materiel-store'] = 'TechController/enginMaterielStore';
+$route['stock-bl-requests']          = 'TechController/blPaidRequests';
+$route['stock-bl-items/(:num)']      = 'TechController/blRequestItems/$1';
+$route['stock-bl-store']             = 'TechController/blStore';
 
-$route['engin-materiel-update'] = 'TechController/enginMaterielUpdate';
+$route['stock-delivery-notes']              = 'TechController/deliveryNotes';
+$route['stock-delivery-note-detail/(:num)'] = 'TechController/deliveryNoteDetail/$1';
+$route['stock-delivery-note-print/(:num)']  = 'TechController/deliveryNotePrint/$1';
 
-$route['engin-materiel-delete'] = 'TechController/enginMaterielDelete';
+// ---- Engin & Materiel ------------------------------------------------------
+$route['engin-materiel']                = 'TechController/enginMateriel';
+$route['engin-materiel-store']          = 'TechController/enginMaterielStore';
+$route['engin-materiel-update']         = 'TechController/enginMaterielUpdate';
+$route['engin-materiel-get/(:num)']     = 'TechController/enginMaterielGet/$1';
+$route['engin-materiel-delete']         = 'TechController/enginMaterielDelete';
+$route['engin-materiel-export']         = 'TechController/enginMaterielExport';
+$route['engin-materiel-dossier/(:num)'] = 'TechController/enginMaterielDossier/$1';
+$route['engin-photo-delete']            = 'TechController/enginPhotoDelete';
+$route['engin-photo-principale']        = 'TechController/enginPhotoPrincipale';
+$route['engin-document-delete']         = 'TechController/enginDocumentDelete';
+$route['engin-affecter']                = 'TechController/enginAffecter';
+$route['engin-reformer']                = 'TechController/enginReformer';
 
-$route['engin-materiel-files'] = 'TechController/enginMaterielFiles';
-
-$route['engin-photo-delete'] = 'TechController/enginPhotoDelete';
-$route['engin-document-delete'] = 'TechController/enginDocumentDelete';
-
-$route['maintenance-carburant'] = 'TechController/maintenanceCarburant';
-$route['add-new-ravitaillement'] = 'TechController/addNewRavitaillement';
-
-$route['new-technique-maintenance'] = 'TechController/newTechniqueMaintenance';
+// ---- Maintenance & Carburant ---------------------------------------------
+$route['maintenance-carburant']             = 'TechController/maintenanceCarburant';
+$route['maintenance-carburant-export']      = 'TechController/maintenanceCarburantExport';
+$route['add-new-ravitaillement']            = 'TechController/addNewRavitaillement';
+$route['engin-fuel-update']                 = 'TechController/enginFuelUpdate';
+$route['engin-fuel-get/(:num)']             = 'TechController/enginFuelGet/$1';
+$route['engin-fuel-cancel']                 = 'TechController/enginFuelCancel';
+$route['new-technique-maintenance']         = 'TechController/newTechniqueMaintenance';
+$route['engin-maintenance-update']          = 'TechController/enginMaintenanceUpdate';
+$route['engin-maintenance-get/(:num)']      = 'TechController/enginMaintenanceGet/$1';
+$route['engin-maintenance-status']          = 'TechController/enginMaintenanceStatus';
+$route['engin-maintenance-document-delete'] = 'TechController/enginMaintenanceDocumentDelete';
+$route['engin-panne-store']                 = 'TechController/enginPanneStore';
+$route['engin-panne-status']                = 'TechController/enginPanneStatus';
 
 $route['cout-reelle-rentebilite'] = 'TechController/coutReelleRentebilite';
 
@@ -238,25 +270,36 @@ $route['rapport-financier'] = 'FinanceController/rapportFinancier';
 
 $route['finance-retour_caisse'] = 'FinanceController/retourCaisseStore';
 
-$route['compte-banques'] = 'FinanceController/banques';
-$route['bank-account-store']
-    = 'FinanceController/bankAccountStore';
-$route['bank-operation-store']
-    = 'FinanceController/bankOperationStore';
+/* ===================== BANQUE V2 ===================== */
+$route['compte-banques']             = 'FinanceController/banques';
+$route['bank-account-store']         = 'FinanceController/bankAccountStore';
+$route['bank-account-update']        = 'FinanceController/bankAccountUpdate';
+$route['bank-account-view/(:num)']   = 'FinanceController/bankAccountView/$1';
+$route['bank-operation-store']       = 'FinanceController/bankOperationStore';
+$route['bank-operation-view/(:num)'] = 'FinanceController/bankOperationView/$1';
+$route['bank-operation-validate']    = 'FinanceController/bankOperationValidate';
+$route['bank-operation-cancel']      = 'FinanceController/bankOperationCancel';
+
+$route['banque-livre']               = 'FinanceController/bankLedger';
+$route['banque-livre/(:num)']        = 'FinanceController/bankLedger/$1';
+$route['banque-livre-print/(:num)']  = 'FinanceController/bankLedgerPrint/$1';
+$route['banque-livre-export/(:num)'] = 'FinanceController/bankLedgerExport/$1';
+
+/* ===================== RAPPROCHEMENT BANCAIRE ===================== */
+$route['rapprochement/(:num)']   = 'FinanceController/reconciliationWorkspace/$1';
+$route['reconciliation-store']   = 'FinanceController/reconciliationStore';
+$route['reconciliation-cancel']  = 'FinanceController/reconciliationCancel';
+$route['statement-line-store']   = 'FinanceController/statementLineStore';
+$route['statement-line-delete']  = 'FinanceController/statementLineDelete';
+$route['statement-import']       = 'FinanceController/statementImport';
+$route['statement-template']     = 'FinanceController/statementTemplate';
 
 $route['encaissements'] = 'FinanceController/encaissements';
 
 $route['decaissements'] = 'FinanceController/decaissements';
 
 $route['rapprochement'] = 'FinanceController/rapprochement';
-$route['finance/rapprochement/store'] =
-    'FinanceController/reconciliationStore';
-$route['finance/rapprochement/releve/import'] =
-    'FinanceController/bankStatementImportStore';
 
-
-$route['finance/rapprochement/analyser'] =
-    'FinanceController/analyzeBankReconciliationStore';
 
 $route['rh-dashboard'] = 'RhController/index';
 $route['rh-employes'] = 'RhController/employes';
@@ -297,6 +340,12 @@ $route['rh-rapports'] = 'RhController/rhRapport';
 $route['rh-parametres'] = 'RhController/rhParametres';
 
 $route['prevision'] = 'FinanceController/prevision';
+
+/* ===================== PRÉVISIONS DE TRÉSORERIE ===================== */
+$route['prevision-store']   = 'FinanceController/previsionStore';
+$route['prevision-realize'] = 'FinanceController/previsionRealize';
+$route['prevision-cancel']  = 'FinanceController/previsionCancel';
+$route['prevision-export']  = 'FinanceController/previsionExport';
 
 $route['facture-client'] = 'FinanceController/factureClient';
 $route['facture-fournisseur'] = 'FinanceController/factureFournisseur';

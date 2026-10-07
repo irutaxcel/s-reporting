@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:3306
--- Généré le : mer. 30 sep. 2026 à 18:13
+-- Généré le : lun. 28 sep. 2026 à 10:14
 -- Version du serveur : 11.4.13-MariaDB
 -- Version de PHP : 8.4.25
 
@@ -3836,7 +3836,7 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (298, 2, 1441, 'BP-2026-000298', 'Petrole, Mèche , Vis', 'especes', 66000.00, 'FACTURE ', '2026-08-06', '', 'en_attente', 29, '2026-08-06 14:13:23', '2026-08-15 20:27:54'),
 (299, 2, 1440, 'BP-2026-000299', 'reliure du document architectural du Bungalow ', 'especes', 10000.00, 'Espèce', '2026-08-06', '', 'en_attente', 25, '2026-08-06 14:18:47', '2026-08-15 20:27:54'),
 (300, 2, 1435, 'BP-2026-000300', 'Chargement et déchargement de ciment kabimba ', 'especes', 30000.00, 'payé en espèce', '2026-08-06', '', 'en_attente', 25, '2026-08-06 14:28:51', '2026-08-15 20:27:54'),
-(301, 2, 1442, 'BP-2026-000301', 'Chaussures de sécurité , Botines de sécurité , Casque, Casseroles , Assiette , Registre , Torche , Tank 3000l', 'especes', 2330000.00, 'Facture', '2026-08-06', '', 'en_attente', 54, '2026-08-06 14:35:36', '2026-09-29 09:05:32'),
+(301, 2, 1442, 'BP-2026-000301', 'Chaussures de sécurité , Botines de sécurité , Casque, Casseroles , Assiette , Registre , Torche , Tank 3000l', 'especes', 4590000.00, 'Facture', '2026-08-06', '', 'en_attente', 54, '2026-08-06 14:35:36', '2026-08-15 20:27:54'),
 (302, 2, 1438, 'BP-2026-000302', 'Remboursement des frais de déplacement en taxi pour le trajet du bureau vers Kamenge', 'especes', 40000.00, 'payé en espèce', '2026-08-06', '', 'en_attente', 25, '2026-08-06 15:15:30', '2026-08-15 20:27:54'),
 (303, 2, 1438, 'BP-2026-000303', 'Remboursement des frais de déplacement en taxi pour le trajet du bureau vers Kamenge', 'especes', 40000.00, 'payé en espèce', '2026-08-06', '', 'en_attente', 25, '2026-08-06 15:15:30', '2026-08-15 20:27:54'),
 (304, 2, 1443, 'BP-2026-000304', 'Tuyau d\'arrosage(Rouleau de 50m)', 'especes', 420000.00, 'FACTURE', '2026-08-06', '', 'en_attente', 25, '2026-08-06 15:36:30', '2026-08-15 20:27:54'),
@@ -4504,7 +4504,7 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (963, 2, 1994, 'BP-2026-000963', ' TUYAUX D\'EAU DE RADIATEUR POUR PELLE CHARGEUSE, MAIN D\'OEUVRE', 'especes', 115000.00, 'PAYE EN ESPECE', '2026-09-08', '', 'effectue', 39, '2026-09-08 14:50:43', '2026-09-09 14:39:15'),
 (964, 2, 2116, 'BP-2026-000964', 'Réparation des brouettes', 'especes', 40000.00, 'Bon de paiement', '2026-09-08', '', 'effectue', 54, '2026-09-08 15:08:02', '2026-09-09 13:30:42'),
 (965, 2, 2115, 'BP-2026-000965', 'Chargement et déchargement des tubes et cornier', 'especes', 19800.00, 'Bon de paiement', '2026-09-08', '', 'effectue', 54, '2026-09-08 15:09:35', '2026-09-09 13:32:00'),
-(966, 2, 2117, 'BP-2026-000966', 'MORTESSEUR POUR HILLUX E4924A', 'especes', 500000.00, 'Paiement en Espece', '2026-09-08', '', 'effectue', 22, '2026-09-08 16:41:53', '2026-09-28 15:23:32'),
+(966, 2, 2117, 'BP-2026-000966', 'MORTESSEUR POUR HILLUX E4924A', 'especes', 500000.00, 'Paiement en Espece', '2026-09-08', '', 'en_attente', 22, '2026-09-08 16:41:53', '2026-09-08 16:41:53'),
 (967, 2, 2118, 'BP-2026-000967', 'TANK KIBOKO, NIPLE TANK 1POUCE , CLAPET ANTI RETOUR 1 POUCE, FLOTTEUR TANK 3/4, COUDE GALVANISE 3/4, MANCHON GALVANISE 3/4, NIPLE 3/4, RACCORD UNION 3/4, VANNE 3/4 FIRMAT, REDUCTEUR 1 POUCE SUR 3/4, VANNE FIRMAT 1 POUCE , COUDE GALVANISE 1 POUCE, TE GALVANISE 1 POUCE , RACCORD UNION 1 POUCE, NIPLE TANK 3/4, SURPRESSEUR PEDROLO, MANCHON GALVANISE 1 POUCE , TUYAUX PPR 3/4 BUJUMBURA, TUYAUX PPR 1 POUCE BUJUMBURA, NIPLE 1 POUCE , TE GALVANISE 3/4, TEFLON, FILACE, ANTI RETOUR 3/4, MANCHON ADAPTATEUR PE 3/4, MANCHON REDUCTEUR 1POUCE SUR 3/4,chargement et déchargement,Ibiziriko', 'especes', 15000000.00, 'Factures', '2026-09-08', '', 'en_attente', 54, '2026-09-08 16:48:04', '2026-09-22 08:47:06'),
 (968, 2, 2119, 'BP-2026-000968', 'SABLES GROS  (HOWO)', 'especes', 550000.00, 'Espèce', '2026-09-08', '', 'effectue', 54, '2026-09-08 22:23:15', '2026-09-09 11:12:34'),
 (969, 2, 2120, 'BP-2026-000969', 'Fer  à béton  de 12, Fil a liguatire , Chargement et déchargement ', 'especes', 7168000.00, 'Facture ', '2026-09-09', '', 'en_attente', 54, '2026-09-09 07:37:52', '2026-09-09 07:37:52'),
@@ -4640,7 +4640,7 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1099, 2, 2246, 'BP-2026-001099', 'Supplement a payer sur achat materiel n ⁰DA1820', 'especes', 1349600.00, 'En espèces ', '2026-09-14', '', 'en_attente', 38, '2026-09-14 11:26:47', '2026-09-14 11:26:47'),
 (1100, 2, 2245, 'BP-2026-001100', 'Supplement a payer sur achat materiel n ⁰DA1894', 'especes', 30000.00, 'En espèces', '2026-09-14', '', 'effectue', 38, '2026-09-14 11:27:10', '2026-09-14 14:39:26'),
 (1101, 2, 2247, 'BP-2026-001101', 'Frais de chargement du sable en benne', 'especes', 20000.00, 'Bon de paiement', '2026-09-14', '', 'effectue', 36, '2026-09-14 12:50:10', '2026-09-15 14:51:14'),
-(1102, 2, 2248, 'BP-2026-001102', 'Paiement de l\'essance du Hilux E 4924 A, Frais de transfert  et de retrait via lumicash', 'transfert_mobile', 491400.00, 'Cfr Trésorerie', '2026-09-14', '', 'effectue', 36, '2026-09-14 14:12:34', '2026-09-30 12:50:50'),
+(1102, 2, 2248, 'BP-2026-001102', 'Paiement de l\'essance du Hilux E 4924 A, Frais de transfert  et de retrait via lumicash', 'transfert_mobile', 491400.00, 'Cfr Trésorerie', '2026-09-14', '', 'en_attente', 36, '2026-09-14 14:12:34', '2026-09-14 14:12:34'),
 (1103, 2, 2249, 'BP-2026-001103', 'Latte, Clonier pvc, Clous de l\'un', 'especes', 58000.00, 'En espèces ', '2026-09-14', '', 'effectue', 38, '2026-09-14 14:50:23', '2026-09-14 14:53:29'),
 (1104, 2, 2250, 'BP-2026-001104', 'PYT coach de sport ', 'especes', 60000.00, 'Pyt en espèces', '2026-09-14', '', 'effectue', 35, '2026-09-14 15:17:38', '2026-09-14 15:21:58'),
 (1105, 2, 2251, 'BP-2026-001105', 'FRAIS RATIONS ET FRAIS ROUTIERS DES CHAUFFEURS', 'especes', 500000.00, 'BON DE PAIEMENT', '2026-09-14', '', 'effectue', 28, '2026-09-14 16:31:42', '2026-09-14 16:47:00'),
@@ -4774,17 +4774,17 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1233, 2, 2390, 'BP-2026-001233', 'Fer plat 40x40, Mastique de Fer  boite, Ciment kabimba , Silcone blanche', 'especes', 550000.00, 'Espece', '2026-09-22', '', 'effectue', 22, '2026-09-22 09:17:38', '2026-09-22 15:39:20'),
 (1234, 2, 2372, 'BP-2026-001234', 'Thineur  (en bidon, Acides, Esui main, jexes, inzembe', 'especes', 465000.00, 'Espece', '2026-09-22', '', 'effectue', 22, '2026-09-22 09:19:36', '2026-09-22 15:40:36'),
 (1235, 2, 2300, 'BP-2026-001235', 'Ciment kabimba , Frais de transport ', 'especes', 610000.00, 'En espèces', '2026-09-22', '', 'effectue', 22, '2026-09-22 09:23:47', '2026-09-22 09:27:23'),
-(1236, 2, 2392, 'BP-2026-001236', 'Chargement des perches ', 'especes', 30000.00, 'Facture ', '2026-09-22', '', 'effectue', 54, '2026-09-22 10:34:13', '2026-09-30 12:55:07'),
-(1237, 2, 2393, 'BP-2026-001237', 'Ciment , Chargement dechargement', 'especes', 303000.00, 'En espèces', '2026-09-22', '', 'effectue', 38, '2026-09-22 12:38:29', '2026-09-29 09:26:04'),
-(1238, 2, 2394, 'BP-2026-001238', 'RENOUVELLEMENT DU PLAQUE IT POUR MIXER TRUCK, MAIN D\'OEUVRE', 'especes', 600000.00, 'Bon de paiement', '2026-09-22', '', 'effectue', 39, '2026-09-22 12:47:24', '2026-09-28 12:38:24'),
+(1236, 2, 2392, 'BP-2026-001236', 'Chargement des perches ', 'especes', 30000.00, 'Facture ', '2026-09-22', '', 'en_attente', 54, '2026-09-22 10:34:13', '2026-09-22 10:34:13'),
+(1237, 2, 2393, 'BP-2026-001237', 'Ciment , Chargement dechargement ', 'especes', 1192000.00, 'En espèces ', '2026-09-22', '', 'en_attente', 38, '2026-09-22 12:38:29', '2026-09-22 12:38:29'),
+(1238, 2, 2394, 'BP-2026-001238', 'RENOUVELLEMENT DU PLAQUE IT POUR MIXER TRUCK, MAIN D\'OEUVRE', 'especes', 600000.00, 'Bon de paiement', '2026-09-22', '', 'en_attente', 39, '2026-09-22 12:47:24', '2026-09-23 13:53:16'),
 (1239, 2, 2396, 'BP-2026-001239', 'Location du Tuktuk Pour le déplacement des matériaux sur chantier ', 'especes', 140000.00, 'Bon de paiement', '2026-09-22', '', 'en_attente', 54, '2026-09-22 13:51:55', '2026-09-22 13:51:55'),
 (1240, 2, 2397, 'BP-2026-001240', 'Location du Tuktuk Pour le déplacement des matériaux sur chantier ', 'especes', 150000.00, 'Bon de paiement', '2026-09-22', '', 'en_attente', 54, '2026-09-22 13:52:13', '2026-09-22 13:52:13'),
-(1241, 2, 2398, 'BP-2026-001241', 'Location du Tuktuk Pour le déplacement des matériaux sur chantier ', 'especes', 60000.00, 'Bon de paiement', '2026-09-22', '', 'effectue', 54, '2026-09-22 13:52:29', '2026-09-28 12:59:58'),
+(1241, 2, 2398, 'BP-2026-001241', 'Location du Tuktuk Pour le déplacement des matériaux sur chantier ', 'especes', 60000.00, 'Bon de paiement', '2026-09-22', '', 'en_attente', 54, '2026-09-22 13:52:29', '2026-09-22 13:52:29'),
 (1242, 2, 2399, 'BP-2026-001242', 'Ciment Kabimba , Chargement et  déchargement', 'especes', 303000.00, 'Facture', '2026-09-22', '', 'effectue', 54, '2026-09-22 14:01:30', '2026-09-25 15:03:01'),
 (1243, 2, 2400, 'BP-2026-001243', 'Groupe électrogène , Howo A8152B', 'especes', 855000.00, 'Bon de paiement', '2026-09-22', '', 'effectue', 39, '2026-09-22 14:18:28', '2026-09-22 16:09:27'),
 (1244, 2, 2395, 'BP-2026-001244', 'reparation du PNEU pour dyna E4178A', 'especes', 15000.00, 'Bon de paiement', '2026-09-22', '', 'effectue', 39, '2026-09-22 14:20:43', '2026-09-22 16:01:07'),
 (1245, 2, 2401, 'BP-2026-001245', 'Frais de ration et routiers des chauffeurs', 'especes', 400000.00, 'Bon de paiement', '2026-09-22', '', 'effectue', 46, '2026-09-22 14:22:24', '2026-09-22 16:28:32'),
-(1246, 2, 2402, 'BP-2026-001246', 'Souris , Switch avec 8 ports ', 'especes', 120000.00, 'En espèces', '2026-09-22', '', 'effectue', 35, '2026-09-22 15:48:37', '2026-09-29 14:23:46'),
+(1246, 2, 2402, 'BP-2026-001246', 'Souris , Switch avec 8 ports ', 'especes', 120000.00, 'En espèces', '2026-09-22', '', 'en_attente', 35, '2026-09-22 15:48:37', '2026-09-22 15:48:37'),
 (1247, 2, 2403, 'BP-2026-001247', 'Ciment , Chargement dechargement ', 'especes', 298000.00, 'En espèces', '2026-09-22', '', 'effectue', 38, '2026-09-22 16:06:48', '2026-09-22 16:14:03'),
 (1248, 2, 2404, 'BP-2026-001248', 'Supplément pour carburant de groupe électrogène ', 'especes', 15000.00, 'Payé par espèce ', '2026-09-22', '', 'effectue', 39, '2026-09-22 16:08:11', '2026-09-22 16:11:16'),
 (1249, 2, 2405, 'BP-2026-001249', 'Reparation Portalle', 'especes', 450000.00, 'Bon de paiement', '2026-09-22', '', 'effectue', 22, '2026-09-22 16:16:07', '2026-09-24 12:01:45'),
@@ -4804,7 +4804,7 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1263, 2, 2418, 'BP-2026-001263', 'Ciment , Chargement dechargement', 'especes', 909000.00, 'FACTURE', '2026-09-23', '', 'effectue', 29, '2026-09-23 11:42:57', '2026-09-24 12:02:43'),
 (1264, 2, 2419, 'BP-2026-001264', 'Balayeur', 'especes', 38000.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 29, '2026-09-23 11:44:50', '2026-09-24 12:02:31'),
 (1265, 2, 2416, 'BP-2026-001265', 'Plancher', 'especes', 704000.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 54, '2026-09-23 11:46:20', '2026-09-24 10:39:06'),
-(1266, 2, 2420, 'BP-2026-001266', 'BOULON CENTRE pour DYNA E4178A, MAIN D\'OEUVRE', 'especes', 75000.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 45, '2026-09-23 12:27:05', '2026-09-28 15:28:22'),
+(1266, 2, 2420, 'BP-2026-001266', 'BOULON CENTRE pour DYNA E4178A, MAIN D\'OEUVRE', 'especes', 75000.00, 'Bon de paiement', '2026-09-23', '', 'en_attente', 45, '2026-09-23 12:27:05', '2026-09-23 15:48:00'),
 (1267, 2, 2425, 'BP-2026-001267', 'Cornier (20×20) 2mm', 'especes', 1480000.00, 'Facture ', '2026-09-23', '', 'effectue', 54, '2026-09-23 12:43:39', '2026-09-24 10:40:04'),
 (1268, 2, 2428, 'BP-2026-001268', 'Tuyaux PPR1 Pouce, Vanne 1 pouce Firmat, Niple 1 pouce, Coude galvanise 1 poue, Coude galvanise 1/2, T 1/2 galvanise, Raccord union 1/2, Anti retour maat 1 pouce, Robinet Firmat1/2, Manchon galvanise 1 pouce, Teflon, Filace, colle tangit, Coude pvc de 63, Tuyaux pvc 63 pn10, Siphon du sol  métallique, Surpresseur, Réducteur pvc 63/32, TuyauxPPR 1/2 Bujumbura', 'especes', 2061000.00, 'Especes', '2026-09-23', '', 'en_attente', 44, '2026-09-23 13:08:51', '2026-09-23 13:08:51'),
 (1269, 2, 2429, 'BP-2026-001269', 'Remplacement du vitre cassé', 'especes', 350000.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 44, '2026-09-23 13:11:34', '2026-09-23 15:19:15'),
@@ -4819,12 +4819,12 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1278, 2, 2438, 'BP-2026-001278', 'Valve pour un pneus de dyna E4178A', 'especes', 30000.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 25, '2026-09-23 14:34:18', '2026-09-23 14:36:15'),
 (1279, 2, 2439, 'BP-2026-001279', 'bouillie, tangawizi, omo', 'especes', 73000.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 25, '2026-09-23 14:45:39', '2026-09-24 12:02:04'),
 (1280, 2, 2437, 'BP-2026-001280', 'beignets le 24/09/2026, Capati le 25/09/2026', 'especes', 110500.00, 'Bon de paiement', '2026-09-23', '', 'effectue', 25, '2026-09-23 14:49:15', '2026-09-24 12:02:17'),
-(1281, 2, 2440, 'BP-2026-001281', 'GASOLINE TREATMENT POUR HILUX E4924A ', 'especes', 35000.00, 'FACTURE', '2026-09-23', '', 'effectue', 25, '2026-09-23 15:44:21', '2026-09-28 15:28:38'),
-(1282, 2, 2408, 'BP-2026-001282', ' Achat d\'une roulement pour Bétonnière , Achat d\'une pompe pour Bétonnière  ', 'especes', 620000.00, 'FACTURE', '2026-09-23', '', 'effectue', 25, '2026-09-23 15:46:06', '2026-09-28 13:04:04'),
-(1283, 2, 2421, 'BP-2026-001283', 'PLAQUETTE POUR PROBOX L5495A, HUILLE MOTEUR , MAIN D\'OEUVRE', 'especes', 170000.00, 'FACTURE', '2026-09-23', '', 'effectue', 25, '2026-09-23 15:49:46', '2026-09-28 15:28:03'),
-(1284, 2, 2422, 'BP-2026-001284', 'POMPE A EAU POUR SUCCED L0501A, MAIN D\'OEUVRE', 'especes', 150000.00, 'FACTURE', '2026-09-23', '', 'effectue', 25, '2026-09-23 15:51:30', '2026-09-28 15:27:36'),
+(1281, 2, 2440, 'BP-2026-001281', 'GASOLINE TREATMENT POUR HILUX E4924A ', 'especes', 35000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:44:21', '2026-09-23 15:44:21'),
+(1282, 2, 2408, 'BP-2026-001282', ' Achat d\'une roulement pour Bétonnière , Achat d\'une pompe pour Bétonnière  ', 'especes', 620000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:46:06', '2026-09-23 15:46:06'),
+(1283, 2, 2421, 'BP-2026-001283', 'PLAQUETTE POUR PROBOX L5495A, HUILLE MOTEUR , MAIN D\'OEUVRE', 'especes', 170000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:49:46', '2026-09-23 15:49:46'),
+(1284, 2, 2422, 'BP-2026-001284', 'POMPE A EAU POUR SUCCED L0501A, MAIN D\'OEUVRE', 'especes', 150000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:51:30', '2026-09-23 15:51:30'),
 (1285, 2, 2424, 'BP-2026-001285', 'AMORTISSEUR AVANT POUR NISSAN K3757A, AMORTISSEUR ARRIERE, RETURE FISSE, ROTURE PENCAGE, BOUGIE, TUYAUX CENTRALE, CONTRE POIDS, DYNOSTIC, MAIN D\'OEUVRE', 'especes', 1540000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:53:02', '2026-09-23 15:53:02'),
-(1286, 2, 2423, 'BP-2026-001286', 'POMPE A ESSENCE POUR HIACE E2464A, PLAQUETTE, MAIN D\'OEUVRE', 'especes', 350000.00, 'FACTURE', '2026-09-23', '', 'effectue', 25, '2026-09-23 15:54:24', '2026-09-28 15:27:11'),
+(1286, 2, 2423, 'BP-2026-001286', 'POMPE A ESSENCE POUR HIACE E2464A, PLAQUETTE, MAIN D\'OEUVRE', 'especes', 350000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:54:24', '2026-09-23 15:54:24'),
 (1287, 2, 2426, 'BP-2026-001287', 'SPAPE POUR HILLUX C1566A, HULLE MOTEUR, POMPE D\'AMORSAGE, FILTRE A AIR, reparation du POMPE INJECTEUR, FILTRE DE MASSE, COSSE BATERIE, LAVAGE DE RADIATEUR, BOUGIE DE CHAUFFAGE, FISIBLE HUILE MOTEUR, MAIN D\'OEUVRE', 'especes', 1655000.00, 'FACTURE', '2026-09-23', '', 'en_attente', 25, '2026-09-23 15:56:17', '2026-09-23 15:56:17'),
 (1288, 2, 2441, 'BP-2026-001288', 'Tube (40×40) Musumba , Ferplat (40×40), Meche à  béton (14), Cheville métallique , Disque à couper  , Baguettes , Antirouille , Petrol , Petit rouleaux ', 'especes', 764000.00, 'Facture ', '2026-09-23', '', 'en_attente', 54, '2026-09-23 16:18:45', '2026-09-23 16:18:45'),
 (1289, 2, 2442, 'BP-2026-001289', 'Douille de 10, Douille de 8, Ecouteur, Gant , Ceinture de sécurité ', 'especes', 907000.00, 'Facture ', '2026-09-23', '', 'en_attente', 54, '2026-09-23 16:51:46', '2026-09-23 16:51:46'),
@@ -4832,14 +4832,14 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1291, 2, 2444, 'BP-2026-001291', 'Ciment Kabimba , Chargement et déchargement', 'especes', 303000.00, 'Facture', '2026-09-24', '', 'effectue', 54, '2026-09-24 08:46:00', '2026-09-24 11:34:37'),
 (1292, 2, 2445, 'BP-2026-001292', '	Renew Domain(homeskings.bi)', 'especes', 118000.00, 'Paiement en Espece', '2026-09-24', '', 'effectue', 22, '2026-09-24 08:51:10', '2026-09-25 10:01:26'),
 (1293, 2, 2446, 'BP-2026-001293', 'Tôles , Chargement et déchargement ', 'especes', 1989000.00, 'Facture ', '2026-09-24', '', 'effectue', 54, '2026-09-24 09:02:54', '2026-09-24 11:34:06'),
-(1294, 2, 2447, 'BP-2026-001294', 'frais d assurance automobile (J2818A), Frais d assurance automobile (I4945A)', 'especes', 417000.00, 'FACTURE', '2026-09-24', '', 'effectue', 28, '2026-09-24 09:13:24', '2026-09-28 12:06:21'),
-(1295, 2, 2447, 'BP-2026-001295', 'frais d assurance automobile (J2818A), Frais d assurance automobile (I4945A)', 'especes', 417000.00, 'FACTURE', '2026-09-24', '', 'effectue', 28, '2026-09-24 09:13:24', '2026-09-28 12:06:21'),
+(1294, 2, 2447, 'BP-2026-001294', 'frais d assurance automobile (J2818A), Frais d assurance automobile (I4945A)', 'especes', 417000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 28, '2026-09-24 09:13:24', '2026-09-24 09:13:24'),
+(1295, 2, 2447, 'BP-2026-001295', 'frais d assurance automobile (J2818A), Frais d assurance automobile (I4945A)', 'especes', 417000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 28, '2026-09-24 09:13:24', '2026-09-24 09:13:24'),
 (1296, 2, 2449, 'BP-2026-001296', 'Main d\'oeuvre(fouille de piscine)', 'especes', 500000.00, 'Bon de paiement', '2026-09-24', '', 'effectue', 38, '2026-09-24 09:23:48', '2026-09-24 11:26:05'),
-(1297, 2, 2448, 'BP-2026-001297', 'RAM PC4 de 8 GB  pour desktop DELL', 'especes', 300000.00, 'FACTURE', '2026-09-24', '', 'effectue', 25, '2026-09-24 09:30:41', '2026-09-29 14:23:23'),
-(1298, 2, 2450, 'BP-2026-001298', 'lustre escalier, snack light', 'especes', 1000000.00, 'FACTURE', '2026-09-24', '', 'effectue', 25, '2026-09-24 09:33:41', '2026-09-29 14:37:26'),
+(1297, 2, 2448, 'BP-2026-001297', 'RAM PC4 de 8 GB  pour desktop DELL', 'especes', 300000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 25, '2026-09-24 09:30:41', '2026-09-24 09:30:41'),
+(1298, 2, 2450, 'BP-2026-001298', 'lustre escalier, snack light', 'especes', 2000000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 25, '2026-09-24 09:33:41', '2026-09-24 09:33:41'),
 (1299, 2, 2451, 'BP-2026-001299', ' Mazout pour  un moteur électrogène ', 'especes', 260000.00, 'Bon de paiement', '2026-09-24', '', 'effectue', 54, '2026-09-24 09:41:03', '2026-09-24 11:34:25'),
 (1300, 2, 2328, 'BP-2026-001300', 'Frais de restauration du 14 au 18 , DAF NDAGIJE MARIAM., Frais de restauration du 13 au 18 ,DT NIYIMBONA EMMANUEL., Frais de restauration du 14 au 18 ,EMERUSABE DAVID.', 'especes', 192000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 25, '2026-09-24 09:52:28', '2026-09-24 09:52:28'),
-(1301, 2, 2299, 'BP-2026-001301', 'Frais d\'assurance maladie mois  de septembre ,nombre de 48.', 'especes', 1921500.00, 'FACTURE', '2026-09-24', '', 'effectue', 25, '2026-09-24 09:58:46', '2026-09-29 14:31:56'),
+(1301, 2, 2299, 'BP-2026-001301', 'Frais d\'assurance maladie mois  de septembre ,nombre de 48.', 'especes', 1920000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 25, '2026-09-24 09:58:46', '2026-09-24 09:58:46'),
 (1302, 2, 2452, 'BP-2026-001302', 'Frais de ration et routiers pour les chauffeurs', 'especes', 180000.00, 'Bon de paiement', '2026-09-24', '', 'effectue', 46, '2026-09-24 10:20:05', '2026-09-25 15:57:40'),
 (1303, 2, 2453, 'BP-2026-001303', 'Frais de sécurité par GICICO', 'especes', 400000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 46, '2026-09-24 10:26:20', '2026-09-24 10:49:39'),
 (1304, 2, 2454, 'BP-2026-001304', 'Frais de sécurité par GICICO', 'especes', 708000.00, 'FACTURE', '2026-09-24', '', 'en_attente', 46, '2026-09-24 10:30:42', '2026-09-24 10:48:32'),
@@ -4855,20 +4855,20 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1314, 2, 2464, 'BP-2026-001314', 'FRAIS DE FACILITATION POUR RETIRER DE PLAQUE DE PELLE CHARGEUR', 'especes', 20000.00, 'BON DE PAIEMENT', '2026-09-24', '', 'effectue', 28, '2026-09-24 11:54:34', '2026-09-24 12:15:43'),
 (1315, 2, 2464, 'BP-2026-001315', 'FRAIS DE FACILITATION POUR RETIRER DE PLAQUE DE PELLE CHARGEUR', 'especes', 20000.00, 'BON DE PAIEMENT', '2026-09-24', '', 'effectue', 28, '2026-09-24 11:54:34', '2026-09-24 12:15:43'),
 (1316, 2, 2465, 'BP-2026-001316', 'Nettoyage , Transaction', 'especes', 120000.00, 'Bon de paiement', '2026-09-24', '', 'effectue', 38, '2026-09-24 12:07:49', '2026-09-25 15:34:00'),
-(1317, 2, 2466, 'BP-2026-001317', 'Clous de 10 en kg', 'especes', 100000.00, 'Facture', '2026-09-24', '', 'effectue', 54, '2026-09-24 15:42:20', '2026-09-29 14:46:30'),
+(1317, 2, 2466, 'BP-2026-001317', 'Clous de 10 en kg', 'especes', 100000.00, 'Facture', '2026-09-24', '', 'en_attente', 54, '2026-09-24 15:42:20', '2026-09-25 09:19:05'),
 (1318, 2, 2467, 'BP-2026-001318', 'M.O Kenya', 'especes', 1940000.00, 'Paiement especes', '2026-09-25', '', 'effectue', 50, '2026-09-25 07:41:49', '2026-09-25 12:53:36'),
-(1319, 2, 2468, 'BP-2026-001319', 'Ciment kabimba , Frais de transport', 'especes', 610000.00, 'FACTURE', '2026-09-25', '', 'effectue', 25, '2026-09-25 09:15:57', '2026-09-29 14:11:08'),
+(1319, 2, 2468, 'BP-2026-001319', 'Ciment kabimba , Frais de transport', 'especes', 610000.00, 'FACTURE', '2026-09-25', '', 'en_attente', 25, '2026-09-25 09:15:57', '2026-09-25 09:16:35'),
 (1320, 2, 2469, 'BP-2026-001320', 'Sambusa et ibiyoba pour les visiteurs', 'especes', 39000.00, 'Pyt en espèces', '2026-09-25', '', 'effectue', 35, '2026-09-25 09:22:58', '2026-09-25 09:23:36'),
 (1321, 2, 2470, 'BP-2026-001321', 'Mazout pour Benne I 4549A (nettoyage au brarudi)', 'especes', 260000.00, 'Payé en espèces ', '2026-09-25', '', 'effectue', 39, '2026-09-25 10:01:29', '2026-09-25 10:33:21'),
-(1322, 2, 2471, 'BP-2026-001322', 'Ciment, CHARGEMENT DECHARGEMENT', 'especes', 606000.00, 'Facture', '2026-09-25', '', 'effectue', 29, '2026-09-25 10:22:57', '2026-09-28 12:09:22'),
+(1322, 2, 2471, 'BP-2026-001322', 'Ciment, CHARGEMENT DECHARGEMENT ', 'especes', 1939200.00, 'Facture ', '2026-09-25', '', 'en_attente', 29, '2026-09-25 10:22:57', '2026-09-25 10:22:57'),
 (1323, 2, 2381, 'BP-2026-001323', 'Clous de 10cm (kg)', 'especes', 50000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 10:29:18', '2026-09-25 10:31:29'),
 (1324, 2, 2492, 'BP-2026-001324', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 2160000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:10:23', '2026-09-25 11:57:03'),
-(1325, 2, 2491, 'BP-2026-001325', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1100000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:11:56', '2026-09-29 14:10:44'),
+(1325, 2, 2491, 'BP-2026-001325', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1100000.00, 'Paiement en Espece', '2026-09-25', '', 'en_attente', 22, '2026-09-25 11:11:56', '2026-09-25 11:11:56'),
 (1326, 2, 2490, 'BP-2026-001326', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1000000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:12:40', '2026-09-25 11:57:17'),
 (1327, 2, 2489, 'BP-2026-001327', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 40000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:13:31', '2026-09-25 11:57:40'),
 (1328, 2, 2488, 'BP-2026-001328', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1600000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:14:15', '2026-09-25 11:57:59'),
-(1329, 2, 2487, 'BP-2026-001329', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1415000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:14:55', '2026-09-29 14:10:03'),
-(1330, 2, 2486, 'BP-2026-001330', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 890000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:15:36', '2026-09-29 14:10:29'),
+(1329, 2, 2487, 'BP-2026-001329', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1415000.00, 'Paiement en Espece', '2026-09-25', '', 'en_attente', 22, '2026-09-25 11:14:55', '2026-09-25 11:14:55'),
+(1330, 2, 2486, 'BP-2026-001330', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 890000.00, 'Paiement en Espece', '2026-09-25', '', 'en_attente', 22, '2026-09-25 11:15:36', '2026-09-25 11:15:36'),
 (1331, 2, 2493, 'BP-2026-001331', 'CARBURAT/ESSENCE HIACE L2464A', 'especes', 440000.00, 'Bon de paiement', '2026-09-25', '', 'effectue', 39, '2026-09-25 11:15:43', '2026-09-25 15:21:51'),
 (1332, 2, 2485, 'BP-2026-001332', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 1654000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:22:00', '2026-09-25 11:58:17'),
 (1333, 2, 2484, 'BP-2026-001333', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 800000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:22:51', '2026-09-25 11:58:32'),
@@ -4885,87 +4885,21 @@ INSERT INTO `purchase_payment_vouchers` (`id`, `company_id`, `request_id`, `paym
 (1344, 2, 2473, 'BP-2026-001344', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 156000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:35:41', '2026-09-25 12:31:35'),
 (1345, 2, 2472, 'BP-2026-001345', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'especes', 250000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 11:36:58', '2026-09-25 12:31:58'),
 (1346, 2, 2494, 'BP-2026-001346', 'Réparation de lavabo et traçage des filières sur un tuyaux galvanisé', 'especes', 40000.00, 'Bon de paiement', '2026-09-25', '', 'effectue', 54, '2026-09-25 11:50:34', '2026-09-25 12:26:25'),
-(1347, 2, 2495, 'BP-2026-001347', 'MAIN D OEUVRE DE FABRICATION CUISINE POUR GIHOSHA ZONE', 'especes', 1500000.00, 'FACTURE', '2026-09-25', '', 'effectue', 28, '2026-09-25 12:41:18', '2026-09-30 12:22:20'),
+(1347, 2, 2495, 'BP-2026-001347', 'MAIN D OEUVRE DE FABRICATION CUISINE POUR GIHOSHA ZONE', 'especes', 1500000.00, 'FACTURE', '2026-09-25', '', 'en_attente', 28, '2026-09-25 12:41:18', '2026-09-25 12:41:18'),
 (1348, 2, 2497, 'BP-2026-001348', 'Frais de restauration du personnel pour 2 semaines (vendredi du 18/09/2026 et vendredi du 25/09/2026', 'especes', 898000.00, 'Paiement en Espece', '2026-09-25', '', 'effectue', 22, '2026-09-25 14:55:22', '2026-09-25 15:10:46'),
 (1349, 2, 2498, 'BP-2026-001349', 'UBUYI (kg), Sucre (kg), Citrons ', 'especes', 88000.00, 'Bon de Paiement ', '2026-09-25', '', 'effectue', 37, '2026-09-25 15:01:52', '2026-09-25 15:22:28'),
 (1350, 2, 2499, 'BP-2026-001350', 'Kwibarutsa Serges', 'especes', 200000.00, 'Pyt en espèces', '2026-09-25', '', 'effectue', 35, '2026-09-25 15:27:30', '2026-09-25 15:29:19'),
-(1351, 2, 2500, 'BP-2026-001351', 'Sables bennes', 'especes', 150000.00, 'Bon de paiement', '2026-09-25', '', 'effectue', 54, '2026-09-25 15:41:44', '2026-09-28 12:58:55'),
+(1351, 2, 2500, 'BP-2026-001351', 'Sables bennes', 'especes', 50000.00, 'Bon de paiement', '2026-09-25', '', 'en_attente', 54, '2026-09-25 15:41:44', '2026-09-25 15:41:44'),
 (1352, 2, 2288, 'BP-2026-001352', 'Botte ', 'especes', 250000.00, 'En espèces ', '2026-09-28', '', 'en_attente', 39, '2026-09-28 08:12:54', '2026-09-28 08:12:54'),
 (1353, 2, 2501, 'BP-2026-001353', 'Kwikoreza amatafari, Kwubaka ifuru, Guhemba abakozi, Ikoti', 'especes', 1835000.00, 'Payé par espèce ', '2026-09-28', '', 'en_attente', 39, '2026-09-28 08:14:52', '2026-09-28 08:14:52'),
-(1354, 2, 2502, 'BP-2026-001354', 'Planches , Chargement et', 'especes', 426000.00, 'FACTURE', '2026-09-28', '', 'en_attente', 37, '2026-09-28 09:02:42', '2026-09-29 09:12:08'),
-(1355, 2, 2504, 'BP-2026-001355', 'Mazout pour Benne I4549A I 4549A, Mazout pour Dyna E4178A, Hillux C1566A, Gris élévateur E6809A', 'especes', 260000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 39, '2026-09-28 09:04:37', '2026-09-29 09:45:46'),
-(1356, 2, 2505, 'BP-2026-001356', 'Cadenat, Verous métalique, Pomelles (paire)', 'especes', 35000.00, 'FACTURE', '2026-09-28', '', 'effectue', 37, '2026-09-28 09:06:49', '2026-09-28 13:04:16'),
-(1357, 2, 2506, 'BP-2026-001357', 'Frais de suivis du dossier BIO KINGS', 'especes', 150000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 46, '2026-09-28 09:10:14', '2026-09-28 12:44:51'),
-(1358, 2, 2507, 'BP-2026-001358', 'Essence pour succed L0501A, Essence pour Hillux  E 4923A, Essence pour Nissan E3757', 'especes', 740000.00, 'Payé par espèce', '2026-09-28', '', 'effectue', 39, '2026-09-28 09:13:37', '2026-09-28 12:42:32'),
-(1359, 2, 2508, 'BP-2026-001359', 'Ciment Kabimba , Chargement et déchargement', 'especes', 606000.00, 'Facture', '2026-09-28', '', 'effectue', 54, '2026-09-28 09:17:16', '2026-09-28 13:05:37'),
-(1360, 2, 2509, 'BP-2026-001360', 'Cheville métallique de 10 ', 'especes', 50000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 54, '2026-09-28 09:17:32', '2026-09-28 13:00:28'),
-(1361, 2, 2510, 'BP-2026-001361', 'Tube 40x40, Antirouille , Baguette', 'especes', 331000.00, 'FACTURE', '2026-09-28', '', 'effectue', 38, '2026-09-28 09:32:31', '2026-09-29 09:25:46'),
-(1362, 2, 2515, 'BP-2026-001362', 'Platresse ', 'especes', 60000.00, 'Facture ', '2026-09-28', '', 'effectue', 54, '2026-09-28 11:22:23', '2026-09-28 12:59:27'),
-(1363, 2, 2503, 'BP-2026-001363', 'Eagle mineral water/bidons, Eagle mineral water/Pa', 'especes', 187500.00, 'Paiement en Espece', '2026-09-28', '', 'effectue', 22, '2026-09-28 11:28:34', '2026-09-28 11:35:39'),
-(1364, 2, 2516, 'BP-2026-001364', 'Contribution Social pour Melance', 'especes', 100000.00, 'Paiement en Espece', '2026-09-28', '', 'effectue', 22, '2026-09-28 11:30:35', '2026-09-28 11:35:25'),
-(1365, 2, 2517, 'BP-2026-001365', 'Frais de ration et routiers pour les chauffeurs', 'especes', 400000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 46, '2026-09-28 11:31:15', '2026-09-28 12:45:02'),
-(1366, 2, 2520, 'BP-2026-001366', 'Cadenas , Pomelle , Verrou', 'especes', 50000.00, 'Facture ', '2026-09-28', '', 'effectue', 54, '2026-09-28 11:38:21', '2026-09-28 12:59:08'),
-(1367, 2, 2521, 'BP-2026-001367', 'M.O Tanzania', 'especes', 350000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 50, '2026-09-28 11:39:12', '2026-09-28 13:09:31'),
-(1368, 2, 2522, 'BP-2026-001368', 'TAXES SUR L ESPACE PUBLICITAIRE DE SATRACO CONSTRUCTION', 'especes', 1320000.00, 'BORDEREAU', '2026-09-28', '', 'en_attente', 28, '2026-09-28 11:42:43', '2026-09-28 11:42:43'),
-(1369, 2, 2523, 'BP-2026-001369', 'paiement d activite standard de Homes kings Travels', 'especes', 200000.00, 'BORDEREAU', '2026-09-28', '', 'effectue', 28, '2026-09-28 11:45:26', '2026-09-29 15:04:44'),
-(1370, 2, 2523, 'BP-2026-001370', 'paiement d activite standard de Homes kings Travels', 'especes', 200000.00, 'BORDEREAU', '2026-09-28', '', 'effectue', 28, '2026-09-28 11:45:28', '2026-09-29 15:04:44'),
-(1371, 2, 2514, 'BP-2026-001371', 'AVance sur MOD de terrassement  ( NDIHOKUBWAYO Michell', 'especes', 600000.00, 'En espèces', '2026-09-28', '', 'effectue', 22, '2026-09-28 11:48:51', '2026-09-28 11:52:40'),
-(1372, 2, 2518, 'BP-2026-001372', 'paiement de l impot foncier pour GHIRINI GUIDO,NDAGIJE ALDO GEORGES,SUCCESSION JACQUES NDAGIJE', 'especes', 286800.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 25, '2026-09-28 11:52:16', '2026-09-28 12:06:37'),
-(1373, 2, 2524, 'BP-2026-001373', 'Frais de ration et routiers pour les chauffeurs', 'especes', 100000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 46, '2026-09-28 11:54:11', '2026-09-28 12:44:35'),
-(1374, 2, 2527, 'BP-2026-001374', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:02', '2026-09-28 12:27:12'),
-(1375, 2, 2527, 'BP-2026-001375', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:04', '2026-09-28 12:27:12'),
-(1376, 2, 2527, 'BP-2026-001376', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:06', '2026-09-28 12:27:12'),
-(1377, 2, 2527, 'BP-2026-001377', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:06', '2026-09-28 12:27:12'),
-(1378, 2, 2527, 'BP-2026-001378', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:08', '2026-09-28 12:27:12'),
-(1379, 2, 2527, 'BP-2026-001379', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:10', '2026-09-28 12:27:12'),
-(1380, 2, 2527, 'BP-2026-001380', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'especes', 15000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'effectue', 28, '2026-09-28 12:05:10', '2026-09-28 12:27:12'),
-(1381, 2, 2528, 'BP-2026-001381', 'Creoline, Kole ', 'especes', 27000.00, 'Espèce', '2026-09-28', '', 'effectue', 54, '2026-09-28 12:13:17', '2026-09-28 13:00:42'),
-(1382, 2, 2529, 'BP-2026-001382', 'Fil a liguatire en kg', 'especes', 60000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 54, '2026-09-28 12:23:40', '2026-09-28 12:59:39'),
-(1383, 2, 2530, 'BP-2026-001383', 'Chargement dechargement des pavee', 'especes', 152280.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 38, '2026-09-28 12:36:41', '2026-09-29 14:42:31'),
-(1384, 2, 2531, 'BP-2026-001384', 'Inkwi ', 'especes', 150000.00, 'Paiement en Espece', '2026-09-28', '', 'effectue', 22, '2026-09-28 13:34:29', '2026-09-28 13:58:56'),
-(1385, 2, 2533, 'BP-2026-001385', 'CARBURAT/MAZOUT POUR GROUPE ELECTRONIQUE', 'especes', 270000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 25, '2026-09-28 14:20:30', '2026-09-28 14:25:08'),
-(1386, 2, 2534, 'BP-2026-001386', 'IBITUMBURA, ICAPATI, IMIKATE, IVOKA, ISAMBUSA', 'especes', 290000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'en_attente', 28, '2026-09-28 14:40:07', '2026-09-28 14:40:07'),
-(1387, 2, 2534, 'BP-2026-001387', 'IBITUMBURA, ICAPATI, IMIKATE, IVOKA, ISAMBUSA', 'especes', 290000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'en_attente', 28, '2026-09-28 14:40:08', '2026-09-28 14:40:08'),
-(1388, 2, 2534, 'BP-2026-001388', 'IBITUMBURA, ICAPATI, IMIKATE, IVOKA, ISAMBUSA', 'especes', 290000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'en_attente', 28, '2026-09-28 14:40:08', '2026-09-28 14:40:08'),
-(1389, 2, 2534, 'BP-2026-001389', 'IBITUMBURA, ICAPATI, IMIKATE, IVOKA, ISAMBUSA', 'especes', 290000.00, 'BON DE PAIEMENT', '2026-09-28', '', 'en_attente', 28, '2026-09-28 14:40:08', '2026-09-28 14:40:08'),
-(1390, 2, 2534, 'BP-2026-001390', 'IBITUMBURA, ICAPATI, IMIKATE, IVOKA, ISAMBUSA', 'especes', 112500.00, 'BON DE PAIEMENT', '2026-09-28', '', 'en_attente', 28, '2026-09-28 14:40:09', '2026-09-28 15:49:05'),
-(1391, 2, 2496, 'BP-2026-001391', 'lame de scie, porte scie, pelles, pioches, ibiziriko, baches, ciments, Indobo, bidons, Equere, Fil macons, Madriers, planches, chargement des planches', 'especes', 1620000.00, 'FACTURE', '2026-09-28', '', 'effectue', 25, '2026-09-28 15:03:01', '2026-09-28 17:02:55'),
-(1392, 2, 2535, 'BP-2026-001392', 'Hydraulique pour paucre cat ', 'especes', 400000.00, 'Payé par espèce ', '2026-09-28', '', 'effectue', 39, '2026-09-28 15:08:41', '2026-09-28 15:23:12'),
-(1393, 2, 2536, 'BP-2026-001393', 'Levé  et calcul des volumes ( quartier EX borabora', 'especes', 600000.00, 'Bon de paiement', '2026-09-28', '', 'effectue', 25, '2026-09-28 15:45:48', '2026-09-28 16:43:33'),
-(1394, 2, 2537, 'BP-2026-001394', 'Ibitumbura, Capati', 'especes', 112500.00, 'Pyt en espèces', '2026-09-28', '', 'effectue', 35, '2026-09-28 15:56:59', '2026-09-28 15:57:51'),
-(1395, 2, 2538, 'BP-2026-001395', 'Mazout pour Dyna E4178A  pour le transport de matériel vers kabezi', 'especes', 270000.00, 'Payé par espèce', '2026-09-28', '', 'effectue', 39, '2026-09-28 16:34:36', '2026-09-28 16:44:01'),
-(1396, 2, 2539, 'BP-2026-001396', 'planches, chargement des planches et Madriers', 'especes', 1415000.00, 'Especes', '2026-09-28', '', 'effectue', 44, '2026-09-28 16:54:40', '2026-09-28 17:03:13'),
-(1397, 2, 2540, 'BP-2026-001397', 'Ciment, CHARGEMENT DECHARGEMENT ', 'especes', 1212000.00, 'facture', '2026-09-29', '', 'en_attente', 29, '2026-09-29 08:55:55', '2026-09-29 08:55:55'),
-(1398, 2, 2541, 'BP-2026-001398', 'SABLE DE GROS CALIBRE', 'especes', 450000.00, 'BON DE PAIEMENT', '2026-09-29', '', 'en_attente', 29, '2026-09-29 09:01:48', '2026-09-29 09:01:48'),
-(1399, 2, 2542, 'BP-2026-001399', 'Ciment kabimba , CHARGEMENT DECHARGEMENT ', 'especes', 1939200.00, 'facture,Bon de paiement', '2026-09-29', '', 'en_attente', 29, '2026-09-29 09:04:10', '2026-09-29 09:04:10'),
-(1400, 2, 2360, 'BP-2026-001400', 'Ciment , Chargement dechargement ', 'especes', 303000.00, 'FACTURE', '2026-09-29', '', 'effectue', 25, '2026-09-29 09:15:10', '2026-09-29 09:25:29'),
-(1401, 2, 2544, 'BP-2026-001401', 'SABLE DE GROS CALIBRE', 'especes', 450000.00, 'Bon de paiement', '2026-09-29', '', 'en_attente', 29, '2026-09-29 09:19:21', '2026-09-29 09:19:21'),
-(1402, 2, 2543, 'BP-2026-001402', 'Main-d\'œuvre pour R2PARATIO Howo D8152A ', 'especes', 400000.00, 'Bon de paiement', '2026-09-29', '', 'effectue', 25, '2026-09-29 09:34:43', '2026-09-29 09:50:53'),
-(1403, 2, 2545, 'BP-2026-001403', 'Essence pour Hillux E4924A', 'especes', 220000.00, 'Bon de paiement ', '2026-09-29', '', 'effectue', 39, '2026-09-29 09:35:41', '2026-09-29 09:44:47'),
-(1404, 2, 2546, 'BP-2026-001404', 'Ciment Kabimba , Chargement et déchargement', 'especes', 1878000.00, 'Facture', '2026-09-29', '', 'en_attente', 54, '2026-09-29 09:35:48', '2026-09-30 17:43:47'),
-(1405, 2, 2547, 'BP-2026-001405', 'Frais de ration et routiers pour les chauffeurs', 'especes', 400000.00, 'Bon de paiement', '2026-09-29', '', 'effectue', 46, '2026-09-29 10:23:41', '2026-09-29 15:02:37'),
-(1406, 2, 2548, 'BP-2026-001406', 'Coude de 40 pvc , Tuyaux 40, Siphon gaine 40', 'especes', 18000.00, 'Facture ', '2026-09-29', '', 'effectue', 54, '2026-09-29 11:30:49', '2026-09-29 11:39:24'),
-(1407, 2, 2549, 'BP-2026-001407', 'Ciment, Chargement dechargement', 'especes', 187800.00, 'FACTURE', '2026-09-29', '', 'effectue', 38, '2026-09-29 12:08:46', '2026-09-29 14:42:54'),
-(1408, 2, 2550, 'BP-2026-001408', 'paiement des accomptes deuxieme trimestre', 'especes', 8492335.00, 'QUITTANCE', '2026-09-29', '', 'en_attente', 28, '2026-09-29 12:53:11', '2026-09-29 12:53:11'),
-(1409, 2, 2551, 'BP-2026-001409', 'KUGURA INKWI', 'especes', 500000.00, 'BON DE PAIEMENT', '2026-09-29', '', 'effectue', 39, '2026-09-29 13:56:25', '2026-09-29 14:16:27'),
-(1410, 2, 2552, 'BP-2026-001410', 'ESSENCE POUR HIACE E2464A', 'especes', 220000.00, 'Bon de paiement ', '2026-09-29', '', 'effectue', 39, '2026-09-29 14:04:39', '2026-09-29 16:59:19'),
-(1411, 2, 2553, 'BP-2026-001411', 'SNACK LIGHT', 'especes', 1000000.00, 'FACTURE', '2026-09-29', '', 'en_attente', 25, '2026-09-29 14:36:41', '2026-09-29 14:36:41'),
-(1412, 2, 2554, 'BP-2026-001412', 'Supplément sur la demande num 1856, 1786', 'especes', 79100.00, 'Bon de Paiement ', '2026-09-29', '', 'effectue', 37, '2026-09-29 14:45:12', '2026-09-29 14:51:34'),
-(1413, 2, 2555, 'BP-2026-001413', 'IMIKATE, IVOKA , IBITUMBURA, UBUYI (kg), ISUKARI(kg)', 'especes', 142000.00, 'Bon de Paiement ', '2026-09-29', '', 'effectue', 37, '2026-09-29 15:09:25', '2026-09-29 15:19:11'),
-(1414, 2, 2512, 'BP-2026-001414', 'Thineur  (en bidon, Jexes, inzembe, acide, Disque a béton ( petit', 'especes', 376500.00, 'Bon de paiement', '2026-09-29', '', 'effectue', 25, '2026-09-29 16:04:05', '2026-09-29 16:14:33'),
-(1415, 2, 2556, 'BP-2026-001415', 'SABLE DE GROS CALIBRE', 'especes', 450000.00, 'BON DE PAIEMENT', '2026-09-30', '', 'en_attente', 29, '2026-09-30 08:49:56', '2026-09-30 08:49:56'),
-(1416, 2, 2557, 'BP-2026-001416', 'Ciment kabimba , Frais de transport ', 'especes', 610000.00, 'FACTURE', '2026-09-30', '', 'en_attente', 37, '2026-09-30 08:52:33', '2026-09-30 08:52:33'),
-(1417, 2, 2558, 'BP-2026-001417', 'Chargeur Iphone', 'especes', 100000.00, 'En espèces', '2026-09-30', '', 'en_attente', 55, '2026-09-30 09:02:11', '2026-09-30 09:02:11'),
-(1418, 2, 2519, 'BP-2026-001418', 'Ciment kabimba , Ficelles rouleaux, Toles planes 1,5mm de 2m, Silicone sosiso, Disque a couper, paquet de baguettes, Ciment blanc', 'especes', 568000.00, 'Facture', '2026-09-30', '', 'effectue', 22, '2026-09-30 11:02:10', '2026-09-30 11:38:41'),
-(1419, 2, 2559, 'BP-2026-001419', 'CARBURAT/MAZOUT pour benne I4549A, POUR HILUX', 'especes', 520000.00, 'Bon de paiement', '2026-09-30', '', 'effectue', 25, '2026-09-30 11:32:26', '2026-09-30 12:42:39'),
-(1420, 2, 2560, 'BP-2026-001420', 'ACHAT CARBURANT L4521A', 'especes', 120000.00, 'BON DE PAIEMENT', '2026-09-30', '', 'effectue', 22, '2026-09-30 11:45:27', '2026-09-30 12:01:22'),
-(1421, 2, 2561, 'BP-2026-001421', 'Unité pour DG du 22/9', 'especes', 20000.00, 'Pyt en espèces', '2026-09-30', '', 'effectue', 35, '2026-09-30 11:49:48', '2026-09-30 11:52:30'),
-(1422, 2, 2562, 'BP-2026-001422', 'Separation etagère', 'especes', 1000000.00, 'FACTURE', '2026-09-30', '', 'en_attente', 37, '2026-09-30 12:04:43', '2026-09-30 12:04:43'),
-(1423, 2, 2563, 'BP-2026-001423', 'MOD pour cuisine ', 'especes', 1500000.00, 'Pyt en espèces', '2026-09-30', '', 'en_attente', 35, '2026-09-30 12:14:54', '2026-09-30 12:14:54'),
-(1424, 2, 2564, 'BP-2026-001424', 'Hillux E4923A, Rav 4 E4521A', 'especes', 660000.00, 'Bon de paiement', '2026-09-30', '', 'effectue', 39, '2026-09-30 12:35:27', '2026-09-30 12:42:27'),
-(1425, 2, 2565, 'BP-2026-001425', 'Savon Multi-usage (5L), Savon Nettoyant Vitres , Esuis-mains pour le talochage , Petits esuis-mains pour Nettoyer les vitres , Balai moderne pour les arraignés ', 'especes', 140000.00, 'FACTURE', '2026-09-30', '', 'en_attente', 37, '2026-09-30 12:52:56', '2026-09-30 12:52:56'),
-(1426, 2, 2568, 'BP-2026-001426', 'Loyer HomesKings Septembre', 'especes', 8850000.00, 'Pyt en espèces', '2026-09-30', '', 'en_attente', 35, '2026-09-30 17:27:58', '2026-09-30 17:27:58'),
-(1427, 2, 2569, 'BP-2026-001427', 'Clous de 5cm en kg, Clous de 6cm, Clous de 10', 'especes', 200000.00, 'Espèce', '2026-09-30', '', 'en_attente', 54, '2026-09-30 17:42:47', '2026-09-30 17:42:47');
+(1354, 2, 2502, 'BP-2026-001354', 'Planches , Chargement et ', 'especes', 156200.00, 'FACTURE', '2026-09-28', '', 'en_attente', 37, '2026-09-28 09:02:42', '2026-09-28 09:02:42'),
+(1355, 2, 2504, 'BP-2026-001355', 'Mazout pour Benne I4549A I 4549A, Mazout pour Dyna E4178A, Hillux C1566A, Gris élévateur E6809A', 'especes', 1040000.00, 'Payé par espèce ', '2026-09-28', '', 'en_attente', 39, '2026-09-28 09:04:37', '2026-09-28 09:04:37'),
+(1356, 2, 2505, 'BP-2026-001356', 'Cadenat, Verous métalique, Pomelles (paire)', 'especes', 35000.00, 'FACTURE', '2026-09-28', '', 'en_attente', 37, '2026-09-28 09:06:49', '2026-09-28 09:06:49'),
+(1357, 2, 2506, 'BP-2026-001357', 'Frais de suivis du dossier BIO KINGS', 'especes', 150000.00, 'Bon de paiement', '2026-09-28', '', 'en_attente', 46, '2026-09-28 09:10:14', '2026-09-28 09:10:14'),
+(1358, 2, 2507, 'BP-2026-001358', 'Essence pour succed L0501A, Essence pour Hillux  E 4923A, Essence pour Nissan E3757', 'especes', 660000.00, 'Payé par espèce ', '2026-09-28', '', 'en_attente', 39, '2026-09-28 09:13:37', '2026-09-28 09:13:37'),
+(1359, 2, 2508, 'BP-2026-001359', 'Ciment Kabimba , Chargement et déchargement ', 'especes', 1818000.00, 'Facture ', '2026-09-28', '', 'en_attente', 54, '2026-09-28 09:17:16', '2026-09-28 09:17:16'),
+(1360, 2, 2509, 'BP-2026-001360', 'Cheville métallique de 10 ', 'especes', 50000.00, 'Bon de paiement', '2026-09-28', '', 'en_attente', 54, '2026-09-28 09:17:32', '2026-09-28 09:17:32'),
+(1361, 2, 2510, 'BP-2026-001361', 'Tube 40x40, Antirouille , Baguette ', 'especes', 331000.00, 'En espèces ', '2026-09-28', '', 'en_attente', 38, '2026-09-28 09:32:31', '2026-09-28 09:32:31');
 
 -- --------------------------------------------------------
 
@@ -6495,7 +6429,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1439, 2, 18, 'Fonctionnemnt', 'NKESHIMANA côme', 'Nkorerimana Emmanuel ', 'chantier', 1, 750000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-06', NULL, 'Valide', 44, '2026-08-06 13:49:27', 'non_paye', NULL),
 (1440, 2, 18, 'Fonctionnemnt', 'Jean Marie RUGAMIRA', 'Jean Marie RUGAMIRA', 'chantier', 1, 10000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-06', NULL, 'Valide', 52, '2026-08-06 13:54:12', 'non_paye', NULL),
 (1441, 2, 18, 'Fonctionnemnt', 'Hatefekimana J Claude', 'Hategekimana J claude', 'chantier', 1, 66000.00, 'Chef comptable,MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-06', NULL, 'Valide', 29, '2026-08-06 14:11:55', 'non_paye', NULL),
-(1442, 2, 32, 'KIVOGA UNIVERSITY', 'Michel Ndihokubwayo', 'Nizigama samson ', 'chantier', 1, 2330000.00, 'Ir Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-06', NULL, 'en_attente', 54, '2026-08-06 14:28:16', 'non_paye', NULL),
+(1442, 2, 32, 'KIVOGA UNIVERSITY', 'Michel Ndihokubwayo', 'Nizigama samson ', 'chantier', 1, 4590000.00, 'Ir Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-06', NULL, 'en_attente', 54, '2026-08-06 14:28:16', 'non_paye', NULL),
 (1443, 2, 30, 'CIBITOKE/CLINIQUE UBUNTU', 'Ir Vincent ', 'Michel Manirakiza ', 'chantier', 1, 420000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-06', NULL, 'Valide', 37, '2026-08-06 15:23:57', 'non_paye', NULL),
 (1444, 2, 31, 'BRARUDI', 'Ir Alexis', 'Nizigama samson ', 'chantier', 1, 1736000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-06', NULL, 'Valide', 54, '2026-08-06 15:44:43', 'non_paye', NULL),
 (1445, 2, 18, 'Fonctionnemnt', 'Ir DAVID EMERUSABE', 'Ir EMERUSABE DAVID', 'chantier', 1, 40000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-06', NULL, 'Valide', 23, '2026-08-06 16:08:25', 'non_paye', NULL),
@@ -6533,6 +6467,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1480, 2, 18, 'Fonctionnemnt', 'Niyitegeka Jacques ', 'Niyitegeka Jacques ', 'chantier', 1, 90000.00, 'Maniragaba Serge Chef comptable ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-07', NULL, 'en_attente', 45, '2026-08-07 14:01:24', 'non_paye', NULL),
 (1481, 2, 18, 'Fonctionnemnt', 'EMERY KWIZERIMANA', 'EMERY KWIZERIMANA', 'chantier', 1, 145500.00, 'COMPTABLE,SERGES MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-07', NULL, 'Valide', 29, '2026-08-07 14:36:22', 'non_paye', NULL),
 (1482, 2, 31, 'BRARUDI', 'Ir Alexis', 'Nizigama samson ', 'chantier', 1, 776000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-07', NULL, 'Valide', 54, '2026-08-07 15:30:51', 'non_paye', NULL),
+(1483, 2, 31, 'BRARUDI', 'Ir Alexis', 'Nizigama samson ', 'chantier', 1, 170000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-07', NULL, 'en_attente', 54, '2026-08-07 15:38:55', 'non_paye', NULL),
 (1484, 2, 31, 'BRARUDI', 'Ir Alexis', 'Nizigama samson ', 'chantier', 1, 456000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-07', NULL, 'Valide', 54, '2026-08-07 15:41:18', 'non_paye', NULL),
 (1485, 2, 31, 'BRARUDI', 'Ir Alexis', 'Nizigama samson ', 'chantier', 1, 1186000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-07', NULL, 'en_attente', 54, '2026-08-07 15:43:09', 'non_paye', NULL),
 (1486, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir claude ', 'Nizigama samson ', 'chantier', 1, 80000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-10', NULL, 'Valide', 54, '2026-08-10 08:54:37', 'non_paye', NULL),
@@ -6603,9 +6538,9 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1556, 2, 18, 'Fonctionnemnt', 'Jacques NIYITEGEKA', 'IGIRUMWETE Pischon', 'chantier', 1, 80000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 51, '2026-08-13 09:47:10', 'non_paye', NULL),
 (1557, 2, 17, 'KINANIRA 3', 'Kwizera Vedaste', 'Habonimana Anniella ', 'chantier', 1, 1648000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 38, '2026-08-13 09:58:20', 'non_paye', NULL),
 (1558, 2, 7, 'GIHOSHA ZONE', 'Kwizera Vedaste', 'Habonimana Anniella ', 'chantier', 1, 3700000.00, 'Ir Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-13', NULL, 'en_attente', 38, '2026-08-13 10:02:47', 'non_paye', NULL),
-(1559, 2, 18, 'Fonctionnemnt', 'NKESHIMANA Côme ', 'NKESHIMANA Côme ', 'chantier', 1, 750000.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 46, '2026-08-13 10:08:18', 'non_paye', NULL),
-(1563, 2, 18, 'Fonctionnemnt', 'NKESHIMANA Côme ', 'NKESHIMANA Côme ', 'chantier', 1, 84159.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 46, '2026-08-13 10:43:11', 'non_paye', NULL);
+(1559, 2, 18, 'Fonctionnemnt', 'NKESHIMANA Côme ', 'NKESHIMANA Côme ', 'chantier', 1, 750000.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 46, '2026-08-13 10:08:18', 'non_paye', NULL);
 INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(1563, 2, 18, 'Fonctionnemnt', 'NKESHIMANA Côme ', 'NKESHIMANA Côme ', 'chantier', 1, 84159.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 46, '2026-08-13 10:43:11', 'non_paye', NULL),
 (1564, 2, 18, 'Fonctionnemnt', 'Niyitegeka Jacques ', 'Niyitegeka Jacques ', 'chantier', 1, 700000.00, 'Maniragaba Serge Chef comptable ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 45, '2026-08-13 10:45:32', 'non_paye', NULL),
 (1565, 2, 18, 'Fonctionnemnt', 'Niyitegeka Jacques ', 'Niyitegeka Jacques ', 'chantier', 1, 55000.00, 'Maniragaba Serge Chef comptable ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 45, '2026-08-13 10:54:49', 'non_paye', NULL),
 (1566, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 18000.00, 'Ir Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-13', NULL, 'Valide', 38, '2026-08-13 10:59:06', 'non_paye', NULL),
@@ -6740,9 +6675,9 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1697, 2, 17, 'KINANIRA 3', 'Vital', 'Habonimana Anniella ', 'chantier', 1, 1520500.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 38, '2026-08-20 09:18:09', 'non_paye', NULL),
 (1698, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 1255000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 38, '2026-08-20 09:28:15', 'non_paye', NULL),
 (1699, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 1500000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 38, '2026-08-20 09:31:21', 'non_paye', NULL),
-(1700, 2, 4, 'KING\'S SCHOOL', 'Ir Dieudonne Sabukunze', 'Nizigama samson ', 'chantier', 1, 140000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 54, '2026-08-20 09:37:32', 'non_paye', NULL),
-(1701, 2, 7, 'GIHOSHA ZONE', 'Habonimana Moïse', 'Habonimana Anniella ', 'chantier', 1, 255000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 38, '2026-08-20 10:50:02', 'non_paye', NULL);
+(1700, 2, 4, 'KING\'S SCHOOL', 'Ir Dieudonne Sabukunze', 'Nizigama samson ', 'chantier', 1, 140000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 54, '2026-08-20 09:37:32', 'non_paye', NULL);
 INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(1701, 2, 7, 'GIHOSHA ZONE', 'Habonimana Moïse', 'Habonimana Anniella ', 'chantier', 1, 255000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 38, '2026-08-20 10:50:02', 'non_paye', NULL),
 (1702, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 2700000.00, 'Ir  EMERUSABE David ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 44, '2026-08-20 11:02:57', 'non_paye', NULL),
 (1703, 2, 18, 'Fonctionnemnt', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 1920000.00, 'DT NIMBONA EMMANUEL', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 39, '2026-08-20 11:23:15', 'non_paye', NULL),
 (1704, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 5120000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-20', NULL, 'Valide', 54, '2026-08-20 11:30:43', 'non_paye', NULL),
@@ -6815,7 +6750,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1773, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 265000.00, 'Ir  EMERUSABE David ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-24', NULL, 'Valide', 44, '2026-08-24 10:59:27', 'non_paye', NULL),
 (1774, 2, 1, 'IBB entrepots', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 172000.00, 'Ir  NIBITANGA Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-24', NULL, 'Valide', 44, '2026-08-24 11:12:17', 'non_paye', NULL),
 (1775, 2, 4, 'KING\'S SCHOOL', 'Ir Dieudonne Sabukunze', 'Nizigama samson ', 'chantier', 1, 2483000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-24', NULL, 'Valide', 54, '2026-08-24 11:18:47', 'non_paye', NULL),
-(1777, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 9767000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-24', NULL, 'En Attente', 54, '2026-08-24 11:51:30', 'non_paye', NULL),
+(1777, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 9467000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-24', NULL, 'en_attente', 54, '2026-08-24 11:51:30', 'non_paye', NULL),
 (1779, 2, 18, 'Fonctionnemnt', 'MANIRAGABA SERGES', 'NKESHIMANA Come', 'chantier', 1, 150000.00, 'MANIRAGABA  Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-24', NULL, 'Valide', 46, '2026-08-24 11:54:40', 'non_paye', NULL),
 (1780, 2, 4, 'KING\'S SCHOOL', 'Ir Dieudonne Sabukunze', 'Nizigama samson ', 'chantier', 1, 800000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-24', NULL, 'Valide', 54, '2026-08-24 12:07:31', 'non_paye', NULL),
 (1781, 2, 17, 'KINANIRA 3', 'Niyindamutsa Adelin', 'Habonimana Anniella ', 'chantier', 1, 1815000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-24', NULL, 'en_attente', 38, '2026-08-24 12:19:55', 'non_paye', NULL),
@@ -6879,9 +6814,9 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1841, 2, 18, 'Fonctionnemnt', 'HABIGABWA GEDEON', 'GEDEON', 'chantier', 1, 50000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 23, '2026-08-27 13:03:27', 'non_paye', NULL),
 (1842, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 586000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-27', NULL, 'en_attente', 54, '2026-08-27 13:40:52', 'non_paye', NULL),
 (1843, 2, 18, 'Fonctionnemnt', 'NDUWAYO EMMANUEL', 'NIYITEGEKA  JACQUES', 'chantier', 1, 100000.00, 'CHEF COMPTABLE,MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-08-27', NULL, 'en_attente', 28, '2026-08-27 13:52:41', 'non_paye', NULL),
-(1845, 2, 18, 'Fonctionnemnt', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 20000.00, 'CHEF COMPTABLE,MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 28, '2026-08-27 13:55:19', 'non_paye', NULL),
-(1846, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 2443000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 54, '2026-08-27 14:02:06', 'non_paye', NULL);
+(1845, 2, 18, 'Fonctionnemnt', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 20000.00, 'CHEF COMPTABLE,MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 28, '2026-08-27 13:55:19', 'non_paye', NULL);
 INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(1846, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 2443000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 54, '2026-08-27 14:02:06', 'non_paye', NULL),
 (1847, 2, 18, 'Fonctionnemnt', 'KWIZERA Emery', 'KWIZERA Emery', 'chantier', 1, 49000.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 44, '2026-08-27 14:03:21', 'non_paye', NULL),
 (1848, 2, 18, 'Fonctionnemnt', 'NIBITANGA                       Fabrice', 'Fabrice                 NIBITANGA', 'chantier', 1, 520000.00, 'Directeur           Technique', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 36, '2026-08-27 14:19:14', 'non_paye', NULL),
 (1849, 2, 18, 'Fonctionnemnt', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 1450000.00, 'MANIRAGABA Serges ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-08-27', NULL, 'Valide', 44, '2026-08-27 14:20:52', 'non_paye', NULL),
@@ -7016,10 +6951,10 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (1985, 2, 1, 'IBB entrepots', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 450000.00, 'Ir  NIBITANGA Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 44, '2026-09-03 09:53:39', 'non_paye', NULL),
 (1986, 2, 4, 'KING\'S SCHOOL', 'Ir Dieudonne Sabukunze', 'Nizigama samson ', 'chantier', 1, 400000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 54, '2026-09-03 09:58:40', 'non_paye', NULL),
 (1988, 2, 18, 'Fonctionnemnt', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 1300000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 39, '2026-09-03 10:31:27', 'non_paye', NULL),
-(1989, 2, 28, 'EDEN GARDEN III', 'Ir Janvier NDAYIZEYE', 'Michel Manirakiza ', 'chantier', 1, 13624000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-03', NULL, 'en_attente', 37, '2026-09-03 10:31:50', 'non_paye', NULL),
-(1990, 2, 18, 'Fonctionnemnt', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 960000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 39, '2026-09-03 10:33:54', 'non_paye', NULL),
-(1991, 2, 17, 'KINANIRA 3', 'Slash', 'Habonimana Anniella ', 'chantier', 1, 2610000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 38, '2026-09-03 10:36:18', 'non_paye', NULL);
+(1989, 2, 28, 'EDEN GARDEN III', 'Ir Janvier NDAYIZEYE', 'Michel Manirakiza ', 'chantier', 1, 13624000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-03', NULL, 'en_attente', 37, '2026-09-03 10:31:50', 'non_paye', NULL);
 INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(1990, 2, 18, 'Fonctionnemnt', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 960000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 39, '2026-09-03 10:33:54', 'non_paye', NULL),
+(1991, 2, 17, 'KINANIRA 3', 'Slash', 'Habonimana Anniella ', 'chantier', 1, 2610000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 38, '2026-09-03 10:36:18', 'non_paye', NULL),
 (1992, 2, 18, 'Fonctionnemnt', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 1000000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 39, '2026-09-03 10:36:52', 'non_paye', NULL),
 (1993, 2, 25, 'Bloque Ciment', 'Nkorerimana Emmanuel ', 'Séverin TUYISABEB', 'chantier', 1, 1212000.00, 'Ir  EMERUSABE David ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'en_attente', NULL, '2026-09-03', NULL, 'En Attente', 44, '2026-09-03 10:42:55', 'non_paye', NULL),
 (1994, 2, 18, 'Fonctionnemnt', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 115000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-03', NULL, 'Valide', 39, '2026-09-03 10:44:14', 'non_paye', NULL),
@@ -7127,6 +7062,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2104, 2, 12, 'JABE USDA', 'Ir NIRERA Kévin ', 'Michel Manirakiza ', 'chantier', 1, 365000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-08', NULL, 'Valide', 37, '2026-09-08 10:23:33', 'non_paye', NULL),
 (2105, 2, 7, 'GIHOSHA ZONE', 'NKORERIMANA Emmanuel', 'NKORERIMANA Emmanuel', 'chantier', 1, 650000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-08', NULL, 'Valide', 22, '2026-09-08 10:32:37', 'non_paye', NULL),
 (2107, 2, 14, 'GATOKE CLAUDOIR', 'NKORERIMANA Emmanuel', 'NKORERIMANA Emmanuel', 'chantier', 1, 3865000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-08', NULL, 'Valide', 44, '2026-09-08 11:39:35', 'non_paye', NULL),
+(2108, 2, 18, 'FONCTIONNEMENT', 'Beline Irakoze', 'Beline Irakoze', 'chantier', 1, 30000.00, 'Chef Comptable/ Serges MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-08', NULL, 'en_attente', 55, '2026-09-08 11:54:58', 'non_paye', NULL),
 (2110, 2, 18, 'FONCTIONNEMENT', 'Beline Irakoze', 'Beline Irakoze', 'chantier', 1, 6000000.00, 'Chef Comptable/ Serges MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-08', NULL, 'en_attente', 55, '2026-09-08 11:58:27', 'non_paye', NULL),
 (2111, 2, 18, 'FONCTIONNEMENT', 'Beline Irakoze', 'Beline Irakoze', 'chantier', 1, 360000.00, 'Chef Comptable/ Serges MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-08', NULL, 'en_attente', 55, '2026-09-08 11:59:10', 'non_paye', NULL),
 (2112, 2, 18, 'FONCTIONNEMENT', 'James NGENDAKUMANA ', 'James NGENDAKUMANA ', 'chantier', 1, 320000.00, 'Chef comptable/Serges ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-08', NULL, 'Valide', 50, '2026-09-08 13:14:20', 'non_paye', NULL),
@@ -7153,11 +7089,11 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2133, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 920000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 39, '2026-09-09 09:43:36', 'non_paye', NULL),
 (2134, 2, 1, 'IBB entrepots', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 1000000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 39, '2026-09-09 09:45:27', 'non_paye', NULL),
 (2135, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 290000.00, 'DT EMMANUEL', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 39, '2026-09-09 10:33:32', 'non_paye', NULL),
-(2136, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 3450000.00, 'Ir  NIBITANGA Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 44, '2026-09-09 10:38:42', 'non_paye', NULL),
+(2136, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 3450000.00, 'Ir  NIBITANGA Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 44, '2026-09-09 10:38:42', 'non_paye', NULL);
+INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
 (2137, 2, 18, 'FONCTIONNEMENT', 'Beline Irakoze', 'Beline Irakoze', 'chantier', 1, 400000.00, 'Chef Comptable/ Serges MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 55, '2026-09-09 11:11:00', 'non_paye', NULL),
 (2138, 2, 18, 'FONCTIONNEMENT', 'KAZE DAN', 'KAZE DAN', 'chantier', 1, 8000000.00, 'Chef Comptable / MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 22, '2026-09-09 11:26:38', 'non_paye', NULL),
-(2139, 2, 4, 'KING\'S SCHOOL', 'NKORERIMANA Emmanuel', 'NKORERIMANA Emmanuel', 'chantier', 1, 1000000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 44, '2026-09-09 13:16:48', 'non_paye', NULL);
-INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(2139, 2, 4, 'KING\'S SCHOOL', 'NKORERIMANA Emmanuel', 'NKORERIMANA Emmanuel', 'chantier', 1, 1000000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 44, '2026-09-09 13:16:48', 'non_paye', NULL),
 (2140, 2, 4, 'KING\'S SCHOOL', 'Ir Dieudonne Sabukunze', 'Nizigama samson ', 'chantier', 1, 220000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 54, '2026-09-09 13:40:19', 'non_paye', NULL),
 (2141, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NKESHIMANA COME', 'chantier', 1, 700000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 28, '2026-09-09 13:56:55', 'non_paye', NULL),
 (2142, 2, 4, 'KING\'S SCHOOL', 'Ir Michel Ndihokubwayo', 'SAMSON NIZIGAMA', 'chantier', 1, 388000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-09', NULL, 'Valide', 54, '2026-09-09 14:00:30', 'non_paye', NULL),
@@ -7283,7 +7219,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2266, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 4300000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-15', NULL, 'en_attente', 28, '2026-09-15 14:58:18', 'non_paye', NULL),
 (2267, 2, 24, 'Maramvya Brique Cute', 'NIMBONA Saïdi', 'NIYONKURU J DE DIEU', 'chantier', 1, 1000000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-15', NULL, 'Valide', 37, '2026-09-15 15:03:18', 'non_paye', NULL),
 (2268, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 230000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-15', NULL, 'Valide', 39, '2026-09-15 15:23:34', 'non_paye', NULL),
-(2269, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 3800000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-15', NULL, 'En Attente', 54, '2026-09-15 16:59:13', 'non_paye', NULL),
+(2269, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 3800000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-15', NULL, 'en_attente', 54, '2026-09-15 16:59:13', 'non_paye', NULL),
 (2271, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'SAMSON NIZIGAMA', 'chantier', 1, 44000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-15', NULL, 'Valide', 54, '2026-09-15 18:22:28', 'non_paye', NULL),
 (2272, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'SAMSON NIZIGAMA', 'chantier', 1, 240000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 54, '2026-09-16 08:51:04', 'non_paye', NULL),
 (2273, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 756000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 54, '2026-09-16 08:52:19', 'non_paye', NULL),
@@ -7291,11 +7227,11 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2275, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 909000.00, 'Ir David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 29, '2026-09-16 09:07:12', 'non_paye', NULL),
 (2276, 2, 18, 'FONCTIONNEMENT', 'RUGAMBIRA THOMAS ', 'UWIZIGIRA Violette', 'chantier', 1, 272000.00, 'NIYITEGEKA Jacques ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 44, '2026-09-16 09:16:42', 'non_paye', NULL),
 (2277, 2, 18, 'FONCTIONNEMENT', 'RUGAMBIRA THOMAS ', 'RUGAMBIRA THOMAS ', 'chantier', 1, 170000.00, 'UWIZIGIRA VIOLETTE ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 44, '2026-09-16 09:18:28', 'non_paye', NULL),
-(2278, 2, 18, 'FONCTIONNEMENT', 'Nduwimana isaac', 'Nizigama samson ', 'chantier', 1, 20000.00, 'Serges  MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 54, '2026-09-16 09:49:48', 'non_paye', NULL),
+(2278, 2, 18, 'FONCTIONNEMENT', 'Nduwimana isaac', 'Nizigama samson ', 'chantier', 1, 20000.00, 'Serges  MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 54, '2026-09-16 09:49:48', 'non_paye', NULL);
+INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
 (2279, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'SAMSON NIZIGAMA', 'chantier', 1, 444500.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 54, '2026-09-16 09:59:50', 'non_paye', NULL),
 (2280, 2, 18, 'FONCTIONNEMENT', 'KWIZERA Emery', 'KWIZERA Emery', 'chantier', 1, 14000.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 44, '2026-09-16 11:29:33', 'non_paye', NULL),
-(2281, 2, 18, 'FONCTIONNEMENT', 'KWIZERA CADEAU', 'Cadeau ', 'chantier', 1, 175000.00, 'DT NIYIMBONA EMMANUEL', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 29, '2026-09-16 11:40:23', 'non_paye', NULL);
-INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(2281, 2, 18, 'FONCTIONNEMENT', 'KWIZERA CADEAU', 'Cadeau ', 'chantier', 1, 175000.00, 'DT NIYIMBONA EMMANUEL', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 29, '2026-09-16 11:40:23', 'non_paye', NULL),
 (2282, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 7000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-16', NULL, 'en_attente', 54, '2026-09-16 11:41:22', 'non_paye', NULL),
 (2283, 2, 18, 'FONCTIONNEMENT', 'Niyonzima Gilbert', 'Niyonzima Gilbert', 'chantier', 1, 500000.00, 'chef comptable Maniragaba serge', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 41, '2026-09-16 12:31:13', 'non_paye', NULL),
 (2284, 2, 18, 'FONCTIONNEMENT', 'Althur', 'Arthur', 'chantier', 1, 105000.00, 'chef comptable Maniragaba serge', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-16', NULL, 'Valide', 41, '2026-09-16 12:35:23', 'non_paye', NULL),
@@ -7312,7 +7248,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2296, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 690000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-17', NULL, 'en_attente', 38, '2026-09-17 08:50:13', 'non_paye', NULL),
 (2297, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 500000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-17', NULL, 'Valide', 38, '2026-09-17 08:56:23', 'non_paye', NULL),
 (2298, 2, 12, 'JABE USDA', 'Ir NIRERA Kévin ', 'Michel Manirakiza ', 'chantier', 1, 200000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-17', NULL, 'Valide', 37, '2026-09-17 08:59:49', 'non_paye', NULL),
-(2299, 2, 18, 'FONCTIONNEMENT', 'Jeannette moses', 'Jeannette moses', 'chantier', 1, 1921500.00, 'chef comptable Maniragaba serge', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-17', NULL, 'Valide', 41, '2026-09-17 09:03:14', 'non_paye', NULL),
+(2299, 2, 18, 'FONCTIONNEMENT', 'Jeannette moses', 'Jeannette moses', 'chantier', 1, 1920000.00, 'chef comptable Maniragaba serge', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-17', NULL, 'Valide', 41, '2026-09-17 09:03:14', 'non_paye', NULL),
 (2300, 2, 30, 'CIBITOKE/CLINIQUE UBUNTU', 'Ir Vincent ', 'Michel Manirakiza ', 'chantier', 1, 610000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-17', NULL, 'Valide', 37, '2026-09-17 09:03:24', 'non_paye', NULL),
 (2301, 2, 14, 'GATOKE CLAUDOIR', 'CISHAHAYO          Elie Moses', 'NKORERIMANA                      Emmanuel', 'chantier', 1, 1890000.00, 'Fabrice          NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-17', NULL, 'Valide', 36, '2026-09-17 09:05:48', 'non_paye', NULL),
 (2302, 2, 14, 'GATOKE CLAUDOIR', 'CISHAHAYO          Elie Moses', 'NKORERIMANA                      Emmanuel', 'chantier', 1, 3120000.00, 'Fabrice          NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-17', NULL, 'en_attente', 36, '2026-09-17 09:32:13', 'non_paye', NULL),
@@ -7372,11 +7308,11 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2356, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 20000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-18', NULL, 'en_attente', 28, '2026-09-18 15:00:45', 'non_paye', NULL),
 (2358, 2, 31, 'BRARUDI', 'Ir claude ', 'Nizigama samson ', 'chantier', 1, 120000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-21', NULL, 'en_attente', 54, '2026-09-21 08:49:47', 'non_paye', NULL),
 (2359, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 60000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 54, '2026-09-21 08:50:40', 'non_paye', NULL),
-(2360, 2, 7, 'GIHOSHA ZONE', 'Ir Eric Nsengiyumva', 'Habonimana Anniella ', 'chantier', 1, 303000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 38, '2026-09-21 09:16:29', 'non_paye', NULL),
+(2360, 2, 7, 'GIHOSHA ZONE', 'Ir Eric Nsengiyumva', 'Habonimana Anniella ', 'chantier', 1, 2424000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-21', NULL, 'en_attente', 38, '2026-09-21 09:16:29', 'non_paye', NULL),
 (2361, 2, 3, 'KABEZI', 'Maurice', 'NKORERIMANA                      Emmanuel', 'chantier', 1, 2020000.00, 'Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 36, '2026-09-21 09:19:25', 'non_paye', NULL),
 (2362, 2, 3, 'KABEZI', 'NDACAYISABA           Maurice', 'NKORERIMANA                      Emmanuel', 'chantier', 1, 2610000.00, 'Fabrice          NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 36, '2026-09-21 09:32:54', 'non_paye', NULL),
 (2363, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'SAMSON NIZIGAMA', 'chantier', 1, 243000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 54, '2026-09-21 10:19:12', 'non_paye', NULL),
-(2364, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'SAMSON NIZIGAMA', 'chantier', 1, 4312000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-21', NULL, 'En Attente', 54, '2026-09-21 10:23:08', 'non_paye', NULL),
+(2364, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'SAMSON NIZIGAMA', 'chantier', 1, 4312000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-21', NULL, 'en_attente', 54, '2026-09-21 10:23:08', 'non_paye', NULL),
 (2365, 2, 4, 'KING\'S SCHOOL', 'Ir Michel Ndihokubwayo', 'SAMSON NIZIGAMA', 'chantier', 1, 779100.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 54, '2026-09-21 10:30:03', 'non_paye', NULL),
 (2366, 2, 24, 'Maramvya Brique Cute', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 990000.00, 'Ir  NIBITANGA Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 44, '2026-09-21 11:07:35', 'non_paye', NULL),
 (2367, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 250000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-21', NULL, 'en_attente', 28, '2026-09-21 11:10:51', 'non_paye', NULL),
@@ -7395,13 +7331,14 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2380, 2, 18, 'FONCTIONNEMENT', 'UWIZIGIRA  violette', 'UWIZIGIRA VIOLETTE ', 'chantier', 1, 1420000.00, 'UWIZIGIRA Violette', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 56, '2026-09-21 15:18:14', 'non_paye', NULL),
 (2381, 2, 12, 'JABE USDA', 'Ir NIRERA Kévin ', 'Michel Manirakiza ', 'chantier', 1, 50000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 37, '2026-09-21 16:36:09', 'non_paye', NULL),
 (2382, 2, 1, 'IBB entrepots', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 1000000.00, 'DT EMMANUEL NIMBONA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-21', NULL, 'Valide', 39, '2026-09-21 19:11:55', 'non_paye', NULL),
+(2383, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 50000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-22', NULL, 'en_attente', 54, '2026-09-22 07:49:43', 'non_paye', NULL),
 (2384, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 100000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 28, '2026-09-22 08:45:37', 'non_paye', NULL),
 (2385, 2, 18, 'FONCTIONNEMENT', 'IRUTAVYOSE Axcel', 'IRUTAVYOSE Axcel', 'chantier', 1, 608000.00, 'Chef Comptable / MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 22, '2026-09-22 08:58:10', 'non_paye', NULL),
 (2386, 2, 23, 'PAVE', 'Imani mugisha', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 30000.00, 'Ir David Emerusabe', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'En Attente', 29, '2026-09-22 08:59:49', 'non_paye', NULL),
 (2387, 2, 7, 'GIHOSHA ZONE', 'Ir Eric Nsengiyumva', 'Habonimana Anniella ', 'chantier', 1, 303000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 38, '2026-09-22 09:05:47', 'non_paye', NULL),
 (2390, 2, 14, 'GATOKE CLAUDOIR', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 550000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 44, '2026-09-22 09:06:06', 'non_paye', NULL),
-(2392, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 30000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 54, '2026-09-22 10:33:31', 'non_paye', NULL),
-(2393, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 303000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 38, '2026-09-22 12:38:11', 'non_paye', NULL),
+(2392, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 30000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-22', NULL, 'en_attente', 54, '2026-09-22 10:33:31', 'non_paye', NULL),
+(2393, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 1192000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 38, '2026-09-22 12:38:11', 'non_paye', NULL),
 (2394, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 600000.00, 'DT EMMANUEL NIMBONA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 39, '2026-09-22 12:47:01', 'non_paye', NULL),
 (2395, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 15000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-22', NULL, 'Valide', 39, '2026-09-22 12:59:18', 'non_paye', NULL),
 (2396, 2, 2, 'TEMOINS DE JEHOVAH', 'NTIBANDEKEYE JAPHET ', 'Nizigama samson ', 'chantier', 1, 140000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-22', NULL, 'en_attente', 54, '2026-09-22 13:09:18', 'non_paye', NULL),
@@ -7427,12 +7364,12 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2416, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 704000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 54, '2026-09-23 11:40:16', 'non_paye', NULL),
 (2417, 2, 25, 'Bloque Ciment', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 606000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 29, '2026-09-23 11:40:17', 'non_paye', NULL),
 (2418, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 909000.00, 'Ir David Emerusabe', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 29, '2026-09-23 11:42:23', 'non_paye', NULL),
-(2419, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 38000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 29, '2026-09-23 11:43:57', 'non_paye', NULL),
+(2419, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 38000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 29, '2026-09-23 11:43:57', 'non_paye', NULL);
+INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
 (2420, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 75000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:26:50', 'non_paye', NULL),
 (2421, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 170000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:29:31', 'non_paye', NULL),
 (2422, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 150000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:31:20', 'non_paye', NULL),
-(2423, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 350000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:32:55', 'non_paye', NULL);
-INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
+(2423, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 350000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:32:55', 'non_paye', NULL),
 (2424, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 1540000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:38:26', 'non_paye', NULL),
 (2425, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 1480000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 54, '2026-09-23 12:43:20', 'non_paye', NULL),
 (2426, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACK', 'NIYITEGEKA JACK', 'chantier', 1, 1655000.00, 'DT NIMBONA EMMANUEL', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-23', NULL, 'Valide', 45, '2026-09-23 12:46:23', 'non_paye', NULL),
@@ -7458,7 +7395,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2447, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 417000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 28, '2026-09-24 09:13:06', 'non_paye', NULL),
 (2448, 2, 18, 'FONCTIONNEMENT', 'Tuyishime Providence', 'Tuyishime Providence', 'chantier', 1, 300000.00, 'Serges ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 51, '2026-09-24 09:16:03', 'non_paye', NULL),
 (2449, 2, 33, 'KIRIRI SAMUEL', 'Nsavyimana Emmanuel ', 'Habonimana Anniella ', 'chantier', 1, 500000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 38, '2026-09-24 09:23:15', 'non_paye', NULL),
-(2450, 2, 14, 'GATOKE CLAUDOIR', 'CISHAHAYO          Elie Moses', 'CISHAHAYO ELIE MOSES', 'chantier', 1, 1000000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 22, '2026-09-24 09:30:30', 'non_paye', NULL),
+(2450, 2, 14, 'GATOKE CLAUDOIR', 'CISHAHAYO          Elie Moses', 'CISHAHAYO ELIE MOSES', 'chantier', 1, 2000000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 22, '2026-09-24 09:30:30', 'non_paye', NULL),
 (2451, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 260000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 54, '2026-09-24 09:40:47', 'non_paye', NULL),
 (2452, 2, 18, 'FONCTIONNEMENT', 'NKESHIMANA Come', 'NKESHIMANA Come', 'chantier', 1, 180000.00, 'MANIRAGABA  Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 46, '2026-09-24 10:19:07', 'non_paye', NULL),
 (2453, 2, 7, 'GIHOSHA ZONE', 'NKESHIMANA Come', 'NKESHIMANA Come', 'chantier', 1, 400000.00, 'Ir NIBITANGA Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-24', NULL, 'Valide', 46, '2026-09-24 10:25:45', 'non_paye', NULL),
@@ -7478,7 +7415,7 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2468, 2, 30, 'CIBITOKE/CLINIQUE UBUNTU', 'Ir Vincent  HATUNGIMANA ', 'Michel Manirakiza ', 'chantier', 1, 610000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 37, '2026-09-25 09:13:35', 'non_paye', NULL),
 (2469, 2, 18, 'FONCTIONNEMENT', 'Nelly Ange Ahishakiye', 'Nelly Ange Ahishakiye', 'chantier', 1, 39000.00, 'Serges Maniragaba', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 35, '2026-09-25 09:22:45', 'non_paye', NULL),
 (2470, 2, 31, 'BRARUDI', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 260000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 39, '2026-09-25 09:54:58', 'non_paye', NULL),
-(2471, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN', 'chantier', 1, 606000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 29, '2026-09-25 10:22:25', 'non_paye', NULL),
+(2471, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN', 'chantier', 1, 1939200.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-25', NULL, 'en_attente', 29, '2026-09-25 10:22:25', 'non_paye', NULL),
 (2472, 2, 39, 'ALCHEM CLOTURE', 'NZISABIRA Paul', 'NAHIMANA Ramla', 'chantier', 1, 250000.00, 'NKORERIMANA Emmanuel', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 44, '2026-09-25 10:33:21', 'non_paye', NULL),
 (2473, 2, 25, 'Bloque Ciment', 'TUYISABE Severin', 'NAHIMANA Ramla', 'chantier', 1, 156000.00, 'NKORERIMANA Emmanuel', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 44, '2026-09-25 10:35:50', 'non_paye', NULL),
 (2474, 2, 31, 'BRARUDI', 'ARAKAZA Arnaud', 'NAHIMANA Ramla', 'chantier', 1, 3280000.00, 'NKORERIMANA Emmanuel', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 44, '2026-09-25 10:36:58', 'non_paye', NULL),
@@ -7502,77 +7439,24 @@ INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destin
 (2492, 2, 2, 'TEMOINS DE JEHOVAH', 'NISHIMWE Olivier', 'NAHIMANA Ramla', 'chantier', 1, 2160000.00, 'NKORERIMANA Emmanuel', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 44, '2026-09-25 11:04:04', 'non_paye', NULL),
 (2493, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 440000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 39, '2026-09-25 11:13:11', 'non_paye', NULL),
 (2494, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 40000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 54, '2026-09-25 11:50:19', 'non_paye', NULL),
-(2495, 2, 7, 'GIHOSHA ZONE', 'NDUWAYO EMMANUEL', 'NAHAYO NORMAND', 'chantier', 1, 1500000.00, 'NIBITANGA FABRICE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 28, '2026-09-25 12:40:50', 'non_paye', NULL),
-(2496, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 1620000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 44, '2026-09-25 13:57:18', 'non_paye', NULL),
+(2495, 2, 7, 'GIHOSHA ZONE', 'NDUWAYO EMMANUEL', 'NAHAYO NORMAND', 'chantier', 1, 1500000.00, 'NIBITANGA FABRICE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-25', NULL, 'en_attente', 28, '2026-09-25 12:40:50', 'non_paye', NULL),
+(2496, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 3035000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-25', NULL, 'en_attente', 44, '2026-09-25 13:57:18', 'non_paye', NULL),
 (2497, 2, 18, 'FONCTIONNEMENT', 'NAHIMANA Ramla', 'NAHIMANA Ramla', 'chantier', 1, 898000.00, 'Serge MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 29, '2026-09-25 14:51:26', 'non_paye', NULL),
 (2498, 2, 18, 'FONCTIONNEMENT', 'KWIZERIMANA Emery ', 'KWIZERIMANA Emery ', 'chantier', 1, 34000.00, 'MANIRAGABA Serges,  chef comptable', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 37, '2026-09-25 15:01:11', 'non_paye', NULL),
 (2499, 2, 29, 'Contribution social', 'Nelly Ange Ahishakiye', 'Nelly Ange Ahishakiye', 'chantier', 1, 200000.00, 'Fabrice Nibitanga', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 35, '2026-09-25 15:26:57', 'non_paye', NULL),
-(2500, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 150000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-25', NULL, 'Valide', 54, '2026-09-25 15:41:26', 'non_paye', NULL),
+(2500, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 50000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-25', NULL, 'En Attente', 54, '2026-09-25 15:41:26', 'non_paye', NULL),
 (2501, 2, 24, 'Maramvya Brique Cute', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 1835000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 39, '2026-09-28 08:10:24', 'non_paye', NULL),
-(2502, 2, 19, 'Chantier Mirroir', 'NZISABIRA Paul ', 'Michel Manirakiza ', 'chantier', 1, 426000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 37, '2026-09-28 09:01:49', 'non_paye', NULL),
-(2503, 2, 18, 'FONCTIONNEMENT', 'NAHIMANA Ramla', 'NAHIMANA Ramla', 'chantier', 1, 187500.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 44, '2026-09-28 09:03:40', 'non_paye', NULL),
-(2504, 2, 31, 'BRARUDI', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 260000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 39, '2026-09-28 09:03:43', 'non_paye', NULL),
+(2502, 2, 19, 'Chantier Mirroir', 'NZISABIRA Paul ', 'Michel Manirakiza ', 'chantier', 1, 156200.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 37, '2026-09-28 09:01:49', 'non_paye', NULL),
+(2503, 2, 18, 'FONCTIONNEMENT', 'NAHIMANA Ramla', 'NAHIMANA Ramla', 'chantier', 1, 187500.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 44, '2026-09-28 09:03:40', 'non_paye', NULL),
+(2504, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 1040000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 39, '2026-09-28 09:03:43', 'non_paye', NULL),
 (2505, 2, 39, 'ALCHEM CLOTURE', 'NZISABIRA Paul ', 'Michel Manirakiza ', 'chantier', 1, 35000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 37, '2026-09-28 09:06:15', 'non_paye', NULL),
 (2506, 2, 18, 'FONCTIONNEMENT', 'NDEREYAHAYO  Manassé', 'NDEREYAHAYO  Manassé', 'chantier', 1, 150000.00, 'MANIRAGABA  Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 46, '2026-09-28 09:09:32', 'non_paye', NULL),
-(2507, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 740000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 39, '2026-09-28 09:13:03', 'non_paye', NULL),
+(2507, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 660000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 39, '2026-09-28 09:13:03', 'non_paye', NULL),
 (2508, 2, 31, 'BRARUDI', 'Ir claude ', 'Nizigama samson ', 'chantier', 1, 606000.00, 'Ir  Alexis Nkurunziza ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 54, '2026-09-28 09:13:56', 'non_paye', NULL),
 (2509, 2, 34, 'ROHERO CEDRIC', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 50000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 54, '2026-09-28 09:15:16', 'non_paye', NULL),
-(2510, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 331000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 38, '2026-09-28 09:32:10', 'non_paye', NULL),
+(2510, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 331000.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 38, '2026-09-28 09:32:10', 'non_paye', NULL),
 (2511, 2, 1, 'IBB entrepots', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 2000000.00, 'Ir  NIBITANGA Fabrice ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 44, '2026-09-28 09:47:19', 'non_paye', NULL),
-(2512, 2, 14, 'GATOKE CLAUDOIR', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 376500.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 44, '2026-09-28 10:13:19', 'non_paye', NULL),
-(2513, 2, 7, 'GIHOSHA ZONE', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 2000000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 44, '2026-09-28 11:13:31', 'non_paye', NULL),
-(2514, 2, 32, 'KIVOGA UNIVERSITY', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 600000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 44, '2026-09-28 11:20:06', 'non_paye', NULL),
-(2515, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 60000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 54, '2026-09-28 11:22:08', 'non_paye', NULL),
-(2516, 2, 29, 'Contribution social', 'NIBITANGA MELANCE', 'NIBITANGA MELANCE', 'chantier', 1, 100000.00, 'Chef Comptable / MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 22, '2026-09-28 11:30:08', 'non_paye', NULL),
-(2517, 2, 18, 'FONCTIONNEMENT', 'NKESHIMANA Come', 'NKESHIMANA Come', 'chantier', 1, 400000.00, 'MANIRAGABA  Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 46, '2026-09-28 11:30:15', 'non_paye', NULL),
-(2518, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 286800.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 28, '2026-09-28 11:35:37', 'non_paye', NULL),
-(2519, 2, 1, 'IBB entrepots', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 568000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 44, '2026-09-28 11:36:10', 'non_paye', NULL),
-(2520, 2, 32, 'KIVOGA UNIVERSITY', 'Michel Ndihokubwayo', 'Nizigama samson ', 'chantier', 1, 50000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 54, '2026-09-28 11:37:55', 'non_paye', NULL),
-(2521, 2, 36, 'Tanzanie ', 'James NGENDAKUMANA ', 'James NGENDAKUMANA ', 'chantier', 1, 350000.00, 'Chef comptable/Serges ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 50, '2026-09-28 11:38:42', 'non_paye', NULL),
-(2522, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 1320000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 28, '2026-09-28 11:42:06', 'non_paye', NULL),
-(2523, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 200000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'En Attente', 28, '2026-09-28 11:44:59', 'non_paye', NULL),
-(2524, 2, 18, 'FONCTIONNEMENT', 'NKESHIMANA Come', 'NKESHIMANA Come', 'chantier', 1, 100000.00, 'MANIRAGABA  Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 46, '2026-09-28 11:53:39', 'non_paye', NULL),
-(2527, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 15000.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'En Attente', 28, '2026-09-28 12:04:38', 'non_paye', NULL),
-(2528, 2, 4, 'KING\'S SCHOOL', 'Ir Michel', 'Nizigama samson ', 'chantier', 1, 27000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 54, '2026-09-28 12:13:02', 'non_paye', NULL),
-(2529, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 60000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 54, '2026-09-28 12:23:18', 'non_paye', NULL),
-(2530, 2, 16, 'GIHOSHA NDAYI', 'Munezero Claude ', 'Habonimana Anniella ', 'chantier', 1, 152280.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 38, '2026-09-28 12:35:02', 'non_paye', NULL),
-(2531, 2, 24, 'Maramvya Brique Cute', 'NIMBONA SAIDI', 'NIMBONA SAIDI', 'chantier', 1, 150000.00, 'Chef Comptable / MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 22, '2026-09-28 13:34:00', 'non_paye', NULL),
-(2532, 2, 18, 'FONCTIONNEMENT', 'Niyitegeka Jacques ', 'Niyitegeka Jacques ', 'chantier', 1, 2300000.00, 'Maniragaba Serge Chef comptable ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 45, '2026-09-28 13:39:13', 'non_paye', NULL),
-(2533, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 270000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 39, '2026-09-28 14:07:23', 'non_paye', NULL),
-(2535, 2, 18, 'FONCTIONNEMENT', 'NIYITEGEKA JACQUE', 'NIYITEGEKA JACQUE', 'chantier', 1, 400000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 39, '2026-09-28 15:08:15', 'non_paye', NULL),
-(2536, 2, 18, 'FONCTIONNEMENT', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 600000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 44, '2026-09-28 15:40:55', 'non_paye', NULL),
-(2537, 2, 18, 'FONCTIONNEMENT', 'KWIZERIMANA EMERY', 'KWIZERIMANA EMERY', 'chantier', 1, 112500.00, 'Serges Maniragaba', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'En Attente', 35, '2026-09-28 15:56:29', 'non_paye', NULL),
-(2538, 2, 3, 'KABEZI', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 270000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 39, '2026-09-28 16:34:01', 'non_paye', NULL),
-(2539, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 1415000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-28', NULL, 'Valide', 44, '2026-09-28 16:45:43', 'non_paye', NULL),
-(2540, 2, 25, 'Bloque Ciment', 'TUYISABE Severin', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 1212000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'en_attente', 29, '2026-09-29 08:55:38', 'non_paye', NULL),
-(2541, 2, 25, 'Bloque Ciment', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 450000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'en_attente', 29, '2026-09-29 09:01:21', 'non_paye', NULL),
-(2542, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 1939200.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'en_attente', 29, '2026-09-29 09:03:39', 'non_paye', NULL),
-(2543, 2, 18, 'FONCTIONNEMENT', 'Niyitegeka Jacques ', 'Niyitegeka Jacques ', 'chantier', 1, 400000.00, 'Maniragaba Serge Chef comptable ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 45, '2026-09-29 09:18:42', 'non_paye', NULL),
-(2544, 2, 23, 'PAVE', 'TUYISABE SÉVÉRIN ', 'TUYISABE SÉVÉRIN ', 'chantier', 1, 450000.00, 'Ir EMERUSABE David', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'en_attente', 29, '2026-09-29 09:19:01', 'non_paye', NULL),
-(2545, 2, 3, 'KABEZI', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 220000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 39, '2026-09-29 09:35:04', 'non_paye', NULL),
-(2546, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 1878000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'En Attente', 54, '2026-09-29 09:35:32', 'non_paye', NULL),
-(2547, 2, 18, 'FONCTIONNEMENT', 'NKESHIMANA Come', 'NKESHIMANA Come', 'chantier', 1, 400000.00, 'MANIRAGABA  Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 46, '2026-09-29 10:22:49', 'non_paye', NULL),
-(2548, 2, 31, 'BRARUDI', 'Ir Alexis Nkurunziza', 'Nizigama samson ', 'chantier', 1, 18000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 54, '2026-09-29 11:30:26', 'non_paye', NULL),
-(2549, 2, 17, 'KINANIRA 3', 'Vital Ndikumana', 'Habonimana Anniella ', 'chantier', 1, 187800.00, 'Nibitanga Fabrice', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 38, '2026-09-29 12:08:23', 'non_paye', NULL),
-(2550, 2, 18, 'FONCTIONNEMENT', 'NDUWAYO EMMANUEL', 'NDUWAYO EMMANUEL', 'chantier', 1, 8492335.00, 'MANIRAGABA SERGES', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'en_attente', 28, '2026-09-29 12:52:55', 'non_paye', NULL),
-(2551, 2, 24, 'Maramvya Brique Cute', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 500000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 39, '2026-09-29 13:55:29', 'non_paye', NULL),
-(2552, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 220000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 39, '2026-09-29 14:00:20', 'non_paye', NULL),
-(2553, 2, 14, 'GATOKE CLAUDOIR', 'CISHAHAYO ELIE  MOSES', 'CISHAHAYO ELIE  MOSES', 'chantier', 1, 1000000.00, 'DT ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-29', NULL, 'en_attente', 23, '2026-09-29 14:13:26', 'non_paye', NULL),
-(2554, 2, 30, 'CIBITOKE/CLINIQUE UBUNTU', 'Michel Manirakiza ', 'Michel Manirakiza ', 'chantier', 1, 79100.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 37, '2026-09-29 14:43:56', 'non_paye', NULL),
-(2555, 2, 18, 'FONCTIONNEMENT', 'KWIZERIMANA Emery ', 'KWIZERIMANA Emery ', 'chantier', 1, 142000.00, 'Manariyo Serges ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-29', NULL, 'Valide', 37, '2026-09-29 15:08:35', 'non_paye', NULL),
-(2557, 2, 30, 'CIBITOKE/CLINIQUE UBUNTU', 'Ir Vincent  HATUNGIMANA ', 'Michel Manirakiza ', 'chantier', 1, 610000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-30', NULL, 'Valide', 37, '2026-09-30 08:52:00', 'non_paye', NULL),
-(2558, 2, 18, 'FONCTIONNEMENT', 'Beline Irakoze', 'Beline Irakoze', 'chantier', 1, 100000.00, 'Chef Comptable/ Serges MANIRAGABA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-30', NULL, 'en_attente', 55, '2026-09-30 09:00:45', 'non_paye', NULL),
-(2559, 2, 31, 'BRARUDI', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 520000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-30', NULL, 'Valide', 39, '2026-09-30 09:02:54', 'non_paye', NULL),
-(2560, 2, 18, 'FONCTIONNEMENT', 'IGIRUMWETE Pischon', 'IGIRUMWETE Pischon', 'chantier', 1, 120000.00, 'MANIRAGABA Serges', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-30', NULL, 'Valide', 44, '2026-09-30 11:38:59', 'non_paye', NULL),
-(2561, 2, 18, 'FONCTIONNEMENT', 'Nelly Ange Ahishakiye', 'Nelly Ange Ahishakiye', 'chantier', 1, 20000.00, 'Serges Maniragaba', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-30', NULL, 'Valide', 35, '2026-09-30 11:49:14', 'non_paye', NULL),
-(2562, 2, 28, 'EDEN GARDEN III', 'NDAYISHIMIYE Didier ', 'Michel Manirakiza ', 'chantier', 1, 1000000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-30', NULL, 'en_attente', 37, '2026-09-30 12:04:02', 'non_paye', NULL),
-(2564, 2, 18, 'FONCTIONNEMENT', 'NIYONKURU J DE DIEU', 'NIYONKURU J DE DIEU', 'chantier', 1, 660000.00, 'MANARAGABA SERGES CHEF COMPTABLE', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-30', NULL, 'Valide', 39, '2026-09-30 12:34:58', 'non_paye', NULL),
-(2565, 2, 28, 'EDEN GARDEN III', 'Ir Janvier NDAYIZEYE', 'Michel Manirakiza ', 'chantier', 1, 140000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-30', NULL, 'en_attente', 37, '2026-09-30 12:52:35', 'non_paye', NULL),
-(2566, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 820000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-30', NULL, 'en_attente', 44, '2026-09-30 12:56:34', 'non_paye', NULL);
-INSERT INTO `purchase_request_forms` (`id`, `company_id`, `chantier_id`, `destination_chantier`, `requested_by`, `buyer_name`, `category_type`, `requires_validation`, `total_amount`, `verified_by`, `technical_approver`, `financial_approver`, `dg_approver`, `treasurer_name`, `verifier_status`, `technical_status`, `financial_status`, `dg_status`, `treasury_status`, `supplier_followup`, `request_date`, `notes`, `workflow_status`, `created_by`, `created_at`, `payment_status`, `payment_voucher_id`) VALUES
-(2567, 2, 3, 'KABEZI', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 400000.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-30', NULL, 'en_attente', 44, '2026-09-30 13:00:22', 'non_paye', NULL),
-(2568, 2, 18, 'FONCTIONNEMENT', 'Nelly Ange Ahishakiye', 'Nelly Ange Ahishakiye', 'chantier', 1, 8850000.00, 'Serges Maniragaba', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'valide', 'valide', 'valide', 'en_attente', 'valide', NULL, '2026-09-30', NULL, 'Valide', 35, '2026-09-30 17:27:47', 'non_paye', NULL),
-(2569, 2, 2, 'TEMOINS DE JEHOVAH', 'Ir olivier ', 'Nizigama samson ', 'chantier', 1, 200000.00, 'Ir Fabrice NIBITANGA', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-30', NULL, 'en_attente', 54, '2026-09-30 17:42:30', 'non_paye', NULL);
+(2512, 2, 14, 'GATOKE CLAUDOIR', 'Nkorerimana Emmanuel ', 'Nkorerimana Emmanuel ', 'chantier', 1, 376500.00, 'Ir Fabrice NIBITANGA ', 'Directeur Technique', 'Directrice Administrative et Financière', 'Directeur Général', 'Trésorier', 'en_attente', 'en_attente', 'en_attente', 'en_attente', 'en_attente', NULL, '2026-09-28', NULL, 'en_attente', 44, '2026-09-28 10:13:19', 'non_paye', NULL);
 
 -- --------------------------------------------------------
 
@@ -11328,6 +11212,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (12678, 1481, 'SACHET POUR EMBALLER LA PATTE', NULL, 2.00, 7000.00, 14000.00, ''),
 (12679, 1481, 'CAPATI (AJOUT )', NULL, 11.00, 1500.00, 16500.00, ''),
 (12680, 1481, 'BEIGNES (AJOUT )', NULL, 11.00, 1000.00, 11000.00, ''),
+(12686, 1483, 'Clous de 6cm', NULL, 15.00, 10000.00, 150000.00, ''),
+(12687, 1483, 'Clous de 8cm ', NULL, 2.00, 10000.00, 20000.00, ''),
 (12692, 1485, 'Ciment Kabimba ', NULL, 20.00, 59000.00, 1180000.00, ''),
 (12693, 1485, 'Chargement et déchargement ', NULL, 20.00, 300.00, 6000.00, ''),
 (12694, 1486, 'Chargement et déchargement du bétonnière ', NULL, 1.00, 80000.00, 80000.00, ''),
@@ -11414,6 +11300,13 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (12914, 1530, 'Chargement et déchargement  des blocs', NULL, 600.00, 200.00, 120000.00, ''),
 (12915, 1531, 'Chargement et déchargement  des blocs', NULL, 600.00, 200.00, 120000.00, ''),
 (12916, 1532, 'Botines de sécurité ', NULL, 1.00, 250000.00, 250000.00, ''),
+(12917, 1442, 'Chaussures de sécurité ', NULL, 1.00, 250000.00, 250000.00, ''),
+(12918, 1442, 'Botines de sécurité ', NULL, 30.00, 35000.00, 1050000.00, ''),
+(12919, 1442, 'Casque', NULL, 20.00, 15000.00, 300000.00, ''),
+(12920, 1442, 'Registre ', NULL, 2.00, 20000.00, 40000.00, ''),
+(12921, 1442, 'Torche ', NULL, 3.00, 70000.00, 210000.00, ''),
+(12922, 1442, 'Tank 3000l', NULL, 1.00, 2700000.00, 2700000.00, ''),
+(12923, 1442, 'Chargement et déchargement ', NULL, 1.00, 40000.00, 40000.00, ''),
 (12924, 1412, 'Huile moteur pour: petite benne basculante', NULL, 5.00, 30000.00, 150000.00, ''),
 (12925, 1412, 'Huile Frein pour petite benne basculante ', NULL, 3.00, 6000.00, 18000.00, ''),
 (12926, 1533, 'Unité pour DT', NULL, 1.00, 18000.00, 18000.00, ''),
@@ -11639,7 +11532,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (13363, 1645, 'Pains', NULL, 8.00, 5000.00, 40000.00, ''),
 (13364, 1645, 'Avocat', NULL, 5.00, 2000.00, 10000.00, ''),
 (13365, 1645, 'Samboussa', NULL, 12.00, 1000.00, 12000.00, ''),
-(13366, 1645, 'Savon', NULL, 1.00, 35000.00, 35000.00, ''),
+(13366, 1645, 'Savon', NULL, 1.00, 35000.00, 35000.00, '');
+INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `technical_specs`, `quantity`, `unit_price`, `total_price`, `observations`) VALUES
 (13367, 1645, 'Miel', NULL, 1.00, 35000.00, 35000.00, ''),
 (13380, 931, 'Tuyaux pvc110 pn10', NULL, 6.00, 95000.00, 570000.00, ''),
 (13381, 931, 'Tuyaux pvc 75 pn10', NULL, 9.00, 75000.00, 675000.00, ''),
@@ -11648,8 +11542,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (13384, 931, 'The pvc 75 pn10', NULL, 3.00, 15000.00, 45000.00, ''),
 (13385, 931, 'Coude pvc culotte 110pn10', NULL, 18.00, 25000.00, 450000.00, ''),
 (13386, 931, 'Coude pvc culotte 63pn10', NULL, 14.00, 12000.00, 168000.00, ''),
-(13387, 931, 'Coude pvc 50pn10', NULL, 4.00, 6000.00, 24000.00, '');
-INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `technical_specs`, `quantity`, `unit_price`, `total_price`, `observations`) VALUES
+(13387, 931, 'Coude pvc 50pn10', NULL, 4.00, 6000.00, 24000.00, ''),
 (13388, 931, 'Coude pvc63pn10', NULL, 26.00, 5000.00, 130000.00, ''),
 (13389, 931, 'Colle tengit henkhel', NULL, 4.00, 30000.00, 120000.00, ''),
 (13390, 931, 'Collier galvaniser110', NULL, 3.00, 5000.00, 15000.00, ''),
@@ -11925,6 +11818,15 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (13878, 1774, 'Urinoirs ', NULL, 1.00, 110000.00, 110000.00, ''),
 (13879, 1774, 'Réducteur pvc de 75/32', NULL, 2.00, 6000.00, 12000.00, ''),
 (13880, 1774, 'Mirroirs lavabo', NULL, 1.00, 50000.00, 50000.00, ''),
+(13885, 1777, 'Tube 30×30', NULL, 90.00, 30000.00, 2700000.00, ''),
+(13886, 1777, 'Pomelle ', NULL, 60.00, 30000.00, 1800000.00, ''),
+(13887, 1777, 'Verroux métallique  Kenya', NULL, 39.00, 100000.00, 3900000.00, ''),
+(13888, 1777, 'Antirouille', NULL, 6.00, 70000.00, 420000.00, ''),
+(13889, 1777, 'Petrol ', NULL, 6.00, 20000.00, 120000.00, ''),
+(13890, 1777, 'Mastique de fer', NULL, 2.00, 140000.00, 280000.00, ''),
+(13891, 1777, 'Disque à couper ', NULL, 10.00, 13000.00, 130000.00, ''),
+(13892, 1777, 'Baguette', NULL, 4.00, 27000.00, 108000.00, ''),
+(13893, 1777, 'Brosses no 2 ', NULL, 3.00, 3000.00, 9000.00, ''),
 (13895, 1779, 'FRAIS DU DOSSIER INSS-OBR ', NULL, 1.00, 150000.00, 150000.00, ''),
 (13897, 1780, 'Frais de nettoyage ', NULL, 1.00, 800000.00, 800000.00, ''),
 (13928, 1781, 'Tuyaux pvc pn10 75', NULL, 2.00, 70000.00, 140000.00, ''),
@@ -12290,7 +12192,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (14451, 1657, 'lunettes transparents', NULL, 20.00, 5000.00, 100000.00, ''),
 (14452, 1657, 'BOUCHON D\'OREILLE', NULL, 20.00, 5000.00, 100000.00, ''),
 (14453, 1899, 'Ciment ', NULL, 25.00, 60000.00, 1500000.00, ''),
-(14454, 1899, 'Chargement dechargement ', NULL, 25.00, 600.00, 15000.00, ''),
+(14454, 1899, 'Chargement dechargement ', NULL, 25.00, 600.00, 15000.00, '');
+INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `technical_specs`, `quantity`, `unit_price`, `total_price`, `observations`) VALUES
 (14455, 1910, 'Brouette ', NULL, 1.00, 250000.00, 250000.00, ''),
 (14456, 1898, 'Ciment ', NULL, 20.00, 60000.00, 1200000.00, ''),
 (14457, 1898, 'Chargement dechargement ', NULL, 20.00, 600.00, 12000.00, ''),
@@ -12307,8 +12210,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (14469, 1917, 'CARBURAT/MAZOUT HOWO D8152A', NULL, 2.00, 260000.00, 520000.00, ''),
 (14470, 1917, 'CARBURAT/MAZOUT DYNA E4178A ', NULL, 1.00, 260000.00, 260000.00, ''),
 (14471, 1917, 'CARBURAT/MAZOUT BENNE I4945A', NULL, 1.00, 260000.00, 260000.00, ''),
-(14472, 1917, 'CARBURAT/MAZOUT HILUX C1566A', NULL, 1.00, 260000.00, 260000.00, '');
-INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `technical_specs`, `quantity`, `unit_price`, `total_price`, `observations`) VALUES
+(14472, 1917, 'CARBURAT/MAZOUT HILUX C1566A', NULL, 1.00, 260000.00, 260000.00, ''),
 (14473, 1918, 'Pestile noir', NULL, 2.00, 25000.00, 50000.00, ''),
 (14474, 1918, 'Tuyau galvanisé ', NULL, 1.00, 10000.00, 10000.00, ''),
 (14475, 1918, 'Brosse', NULL, 1.00, 2000.00, 2000.00, ''),
@@ -12645,6 +12547,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (15002, 2107, 'Condasateur', NULL, 1.00, 60000.00, 60000.00, ''),
 (15003, 2107, 'Manomètre F16', NULL, 1.00, 165000.00, 165000.00, ''),
 (15004, 2107, 'Clarifiant flovil  en paquet', NULL, 1.00, 250000.00, 250000.00, ''),
+(15005, 2108, 'Chargeur Iphone', NULL, 1.00, 30000.00, 30000.00, ''),
 (15008, 2111, 'Vestes', NULL, 3.00, 120000.00, 360000.00, ''),
 (15011, 2112, 'Gazoil', NULL, 1.00, 320000.00, 320000.00, ''),
 (15012, 2113, 'BOULAGE', NULL, 1.00, 100000.00, 100000.00, ''),
@@ -12920,7 +12823,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (15458, 2057, 'CIMENT DANGOTE 42.5R', NULL, 25.00, 72000.00, 1800000.00, ''),
 (15459, 2057, 'Chargement dechargement ', NULL, 25.00, 600.00, 15000.00, ''),
 (15473, 2230, 'Sables (howo)', NULL, 1.00, 350000.00, 350000.00, ''),
-(15476, 2232, 'interrupteur va et vient ', NULL, 4.00, 20000.00, 80000.00, ''),
+(15476, 2232, 'interrupteur va et vient ', NULL, 4.00, 20000.00, 80000.00, '');
+INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `technical_specs`, `quantity`, `unit_price`, `total_price`, `observations`) VALUES
 (15477, 2232, 'interrupteur double va et vient', NULL, 1.00, 20000.00, 20000.00, ''),
 (15478, 2232, 'interrupteur etanche app', NULL, 1.00, 50000.00, 50000.00, ''),
 (15479, 2232, 'interrupteur app', NULL, 2.00, 35000.00, 70000.00, ''),
@@ -12937,8 +12841,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (15493, 2239, 'Chargement des placard', NULL, 1.00, 30000.00, 30000.00, ''),
 (15494, 2240, 'MOD des charpentiers ( montant de semaine passé) à TUYISENGE Dieudonné', NULL, 1.00, 500000.00, 500000.00, ''),
 (15495, 2241, 'Avance sur salaire', NULL, 1.00, 500000.00, 500000.00, ''),
-(15497, 2242, 'FRAIS DE CONTROLE TECHMIQUE POUR DYNA E4178A', NULL, 1.00, 68000.00, 68000.00, '');
-INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `technical_specs`, `quantity`, `unit_price`, `total_price`, `observations`) VALUES
+(15497, 2242, 'FRAIS DE CONTROLE TECHMIQUE POUR DYNA E4178A', NULL, 1.00, 68000.00, 68000.00, ''),
 (15503, 2245, 'Supplement a payer sur achat materiel n ⁰DA1894', NULL, 1.00, 30000.00, 30000.00, ''),
 (15504, 2246, 'Supplement a payer sur achat materiel n ⁰DA1820', NULL, 1.00, 1349600.00, 1349600.00, ''),
 (15517, 2189, 'guturira ifuru', NULL, 1.00, 300000.00, 300000.00, ''),
@@ -13040,6 +12943,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (15765, 2297, 'Sable ', NULL, 1.00, 350000.00, 350000.00, ''),
 (15766, 2297, 'Moillon de carrière ', NULL, 1.00, 150000.00, 150000.00, ''),
 (15767, 2298, 'Frais de Ration de rembourssable ', NULL, 1.00, 200000.00, 200000.00, ''),
+(15768, 2299, 'Frais d\'assurance maladie mois  de septembre ,nombre de 48.', NULL, 48.00, 40000.00, 1920000.00, ''),
 (15777, 2302, 'Snacke light', NULL, 1.00, 1000000.00, 1000000.00, ''),
 (15778, 2302, 'Lampe douche', NULL, 6.00, 220000.00, 1320000.00, ''),
 (15779, 2302, 'Paratonnerre ', NULL, 1.00, 380000.00, 380000.00, ''),
@@ -13113,6 +13017,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (15891, 2331, 'Mazout groupe électrogène', NULL, 3.00, 20000.00, 60000.00, ''),
 (15894, 2358, 'Chargement et déchargement  des blocs', NULL, 600.00, 200.00, 120000.00, ''),
 (15895, 2359, 'Chargement des placards ', NULL, 1.00, 60000.00, 60000.00, ''),
+(15896, 2360, 'Ciment ', NULL, 40.00, 60000.00, 2400000.00, ''),
+(15897, 2360, 'Chargement dechargement ', NULL, 40.00, 600.00, 24000.00, ''),
 (15905, 2362, 'Clous de 10,8 et 6', NULL, 3.00, 200000.00, 600000.00, ''),
 (15906, 2362, 'Fil à ligaturer', NULL, 1.00, 260000.00, 260000.00, ''),
 (15907, 2362, 'Toles pour barraque', NULL, 50.00, 35000.00, 1750000.00, ''),
@@ -13161,6 +13067,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (15989, 2350, 'Bouillon (benne)', NULL, 1.00, 220000.00, 220000.00, ''),
 (15990, 2381, 'Clous de 10cm (kg)', NULL, 5.00, 10000.00, 50000.00, ''),
 (15991, 2382, 'PAIEMENT DES BRIQUES CUITES', NULL, 5000.00, 200.00, 1000000.00, ''),
+(15992, 2383, 'Clous 10cm en kg', NULL, 5.00, 10000.00, 50000.00, ''),
 (16013, 2118, 'TANK KIBOKO', NULL, 2.00, 6250000.00, 12500000.00, ''),
 (16014, 2118, 'COUDE GALVANISE 3/4', NULL, 12.00, 4000.00, 48000.00, ''),
 (16015, 2118, 'MANCHON GALVANISE 3/4', NULL, 10.00, 2500.00, 25000.00, ''),
@@ -13196,6 +13103,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16053, 2300, 'Ciment kabimba ', NULL, 10.00, 60000.00, 600000.00, ''),
 (16054, 2300, 'Frais de transport ', NULL, 10.00, 1000.00, 10000.00, ''),
 (16055, 2392, 'Chargement des perches ', NULL, 300.00, 100.00, 30000.00, ''),
+(16057, 2393, 'Ciment ', NULL, 20.00, 59000.00, 1180000.00, ''),
+(16058, 2393, 'Chargement dechargement ', NULL, 20.00, 600.00, 12000.00, ''),
 (16059, 2394, 'RENOUVELLEMENT DU PLAQUE IT POUR MIXER TRUCK', NULL, 1.00, 400000.00, 400000.00, ''),
 (16060, 2394, 'MAIN D\'OEUVRE', NULL, 1.00, 200000.00, 200000.00, ''),
 (16061, 2395, 'reparation du PNEU pour dyna E4178A', NULL, 1.00, 15000.00, 15000.00, ''),
@@ -13337,6 +13246,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16278, 2447, 'Frais d assurance automobile (I4945A)', NULL, 1.00, 231200.00, 231200.00, ''),
 (16279, 2448, 'RAM PC4 de 8 GB  pour desktop DELL', NULL, 1.00, 300000.00, 300000.00, ''),
 (16280, 2449, 'Main d\'oeuvre(fouille de piscine)', NULL, 1.00, 500000.00, 500000.00, ''),
+(16283, 2450, 'lustre escalier', NULL, 1.00, 1000000.00, 1000000.00, ''),
+(16284, 2450, 'snack light', NULL, 1.00, 1000000.00, 1000000.00, ''),
 (16286, 2451, ' Mazout pour  groupe électrogène ', NULL, 1.00, 260000.00, 260000.00, ''),
 (16288, 2453, 'Frais de sécurité par GICICO', NULL, 2.00, 200000.00, 400000.00, ''),
 (16289, 2454, 'Frais de sécurité par GICICO', NULL, 3.00, 236000.00, 708000.00, ''),
@@ -13378,6 +13289,8 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16338, 2470, 'Mazout pour Benne I 4549A (nettoyage au brarudi)', NULL, 1.00, 260000.00, 260000.00, ''),
 (16339, 2379, 'Ciment dangote 42.5R ', NULL, 20.00, 75000.00, 1500000.00, ''),
 (16340, 2379, 'Chargement et déchargement ', NULL, 20.00, 600.00, 12000.00, ''),
+(16341, 2471, 'Ciment', NULL, 32.00, 60000.00, 1920000.00, ''),
+(16342, 2471, 'CHARGEMENT DECHARGEMENT ', NULL, 32.00, 600.00, 19200.00, ''),
 (16345, 2474, 'MOD DES OUVRIERS du 19/09 au 25/09/2026', NULL, 1.00, 3280000.00, 3280000.00, ''),
 (16346, 2473, 'MOD DES OUVRIERS du 19/09 au 25/09/2026', NULL, 1.00, 156000.00, 156000.00, ''),
 (16347, 2472, 'MOD DES OUVRIERS du 19/09 au 25/09/2026', NULL, 1.00, 250000.00, 250000.00, ''),
@@ -13402,6 +13315,20 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16368, 2467, 'Transfer Kenya ', NULL, 1.00, 1940000.00, 1940000.00, ''),
 (16369, 2494, 'Réparation de lavabo et traçage des filières sur un tuyaux galvanisé ', NULL, 1.00, 40000.00, 40000.00, ''),
 (16370, 2495, 'MAIN D OEUVRE DE FABRICATION CUISINE POUR GIHOSHA ZONE', NULL, 1.00, 1500000.00, 1500000.00, ''),
+(16372, 2496, 'lame de scie', NULL, 12.00, 5000.00, 60000.00, ''),
+(16373, 2496, 'porte scie', NULL, 2.00, 15000.00, 30000.00, ''),
+(16374, 2496, 'pelles', NULL, 5.00, 22000.00, 110000.00, ''),
+(16375, 2496, 'pioches', NULL, 5.00, 23000.00, 115000.00, ''),
+(16376, 2496, 'ibiziriko', NULL, 10.00, 2500.00, 25000.00, ''),
+(16377, 2496, 'baches', NULL, 2.00, 40000.00, 80000.00, ''),
+(16378, 2496, 'ciments', NULL, 1.00, 60000.00, 60000.00, ''),
+(16379, 2496, 'Indobo', NULL, 10.00, 15000.00, 150000.00, ''),
+(16380, 2496, 'bidons', NULL, 10.00, 15000.00, 150000.00, ''),
+(16381, 2496, 'Equere', NULL, 1.00, 20000.00, 20000.00, ''),
+(16382, 2496, 'Fil macons', NULL, 10.00, 12000.00, 120000.00, ''),
+(16383, 2496, 'Madriers', NULL, 50.00, 14000.00, 700000.00, ''),
+(16384, 2496, 'planches', NULL, 100.00, 14000.00, 1400000.00, ''),
+(16385, 2496, 'chargement des planches', NULL, 150.00, 100.00, 15000.00, ''),
 (16387, 2497, 'Frais de restauration du personnel pour 2 semaines (vendredi du 18/09/2026 et vendredi du 25/09/2026', NULL, 1.00, 898000.00, 898000.00, ''),
 (16389, 2399, 'Ciment Kabimba ', NULL, 5.00, 60000.00, 300000.00, ''),
 (16390, 2399, 'Chargement et  déchargement ', NULL, 5.00, 600.00, 3000.00, ''),
@@ -13412,6 +13339,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16401, 2498, 'Citrons ', NULL, 1.00, 2000.00, 2000.00, ''),
 (16403, 2499, 'Kwibarutsa Serges', NULL, 1.00, 200000.00, 200000.00, ''),
 (16404, 2465, 'Nettoyage ', NULL, 6.00, 20000.00, 120000.00, ''),
+(16406, 2500, 'Sables bennes', NULL, 1.00, 50000.00, 50000.00, ''),
 (16407, 2452, 'Frais de ration et routiers pour les chauffeurs', NULL, 4.00, 45000.00, 180000.00, ''),
 (16412, 2501, 'Kwikoreza amatafari', NULL, 45000.00, 9.00, 405000.00, ''),
 (16413, 2501, 'Kwubaka ifuru', NULL, 45000.00, 4.00, 180000.00, ''),
@@ -13422,12 +13350,21 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16418, 2369, 'Chargement et déchargement ', NULL, 800.00, 2500.00, 2000000.00, ''),
 (16419, 2368, 'Ciment kabimba ', NULL, 50.00, 60000.00, 3000000.00, ''),
 (16420, 2368, 'Chargement et déchargement de ciment kabimba ', NULL, 50.00, 600.00, 30000.00, ''),
+(16421, 2502, 'Planches ', NULL, 11.00, 14000.00, 154000.00, ''),
+(16422, 2502, 'Chargement et ', NULL, 11.00, 200.00, 2200.00, ''),
 (16423, 2503, 'Eagle mineral water/bidons', NULL, 10.00, 6000.00, 60000.00, ''),
 (16424, 2503, 'Eagle mineral water/Pa', NULL, 15.00, 8500.00, 127500.00, ''),
+(16425, 2504, 'Mazout pour Benne I4549A I 4549A', NULL, 1.00, 260000.00, 260000.00, ''),
+(16426, 2504, 'Mazout pour Dyna E4178A', NULL, 1.00, 260000.00, 260000.00, ''),
+(16427, 2504, 'Hillux C1566A', NULL, 1.00, 260000.00, 260000.00, ''),
+(16428, 2504, 'Gris élévateur E6809A', NULL, 1.00, 260000.00, 260000.00, ''),
 (16429, 2505, 'Cadenat', NULL, 1.00, 10000.00, 10000.00, ''),
 (16430, 2505, 'Verous métalique', NULL, 1.00, 5000.00, 5000.00, ''),
 (16431, 2505, 'Pomelles (paire)', NULL, 2.00, 10000.00, 20000.00, ''),
 (16432, 2506, 'Frais de suivis du dossier BIO KINGS', NULL, 1.00, 150000.00, 150000.00, ''),
+(16433, 2507, 'Essence pour succed L0501A', NULL, 1.00, 220000.00, 220000.00, ''),
+(16434, 2507, 'Essence pour Hillux  E 4923A', NULL, 1.00, 220000.00, 220000.00, ''),
+(16435, 2507, 'Essence pour Nissan E3757', NULL, 1.00, 220000.00, 220000.00, ''),
 (16438, 2509, 'Cheville métallique de 10 ', NULL, 10.00, 5000.00, 50000.00, ''),
 (16439, 2510, 'Tube 40x40', NULL, 6.00, 35000.00, 210000.00, ''),
 (16440, 2510, 'Antirouille ', NULL, 1.00, 65000.00, 65000.00, ''),
@@ -13441,143 +13378,7 @@ INSERT INTO `purchase_request_items` (`id`, `request_id`, `designation`, `techni
 (16448, 2512, 'Jexes', NULL, 1.00, 1500.00, 1500.00, ''),
 (16449, 2512, 'inzembe', NULL, 10.00, 500.00, 5000.00, ''),
 (16450, 2512, 'acide', NULL, 10.00, 10000.00, 100000.00, ''),
-(16451, 2512, 'Disque a béton ( petit', NULL, 2.00, 25000.00, 50000.00, ''),
-(16452, 2513, 'MOD de Fabrication des portes  ', NULL, 1.00, 2000000.00, 2000000.00, ''),
-(16453, 2514, 'AVance sur MOD de terrassement  ( NDIHOKUBWAYO Michell', NULL, 1.00, 600000.00, 600000.00, 'Très urgent'),
-(16454, 2515, 'Platresse ', NULL, 3.00, 20000.00, 60000.00, ''),
-(16461, 2516, 'Contribution Social pour Melance', NULL, 1.00, 100000.00, 100000.00, ''),
-(16470, 2518, 'paiement de l impot foncier pour GHIRINI GUIDO,NDAGIJE ALDO GEORGES,SUCCESSION JACQUES NDAGIJE', NULL, 1.00, 286800.00, 286800.00, ''),
-(16478, 2520, 'Cadenas ', NULL, 2.00, 10000.00, 20000.00, ''),
-(16479, 2520, 'Pomelle ', NULL, 3.00, 5000.00, 15000.00, ''),
-(16480, 2520, 'Verrou', NULL, 3.00, 5000.00, 15000.00, ''),
-(16481, 2521, 'M.O Tanzania ', NULL, 1.00, 350000.00, 350000.00, ''),
-(16482, 2522, 'TAXES SUR L ESPACE PUBLICITAIRE DE SATRACO CONSTRUCTION', NULL, 12.00, 110000.00, 1320000.00, ''),
-(16487, 2523, 'paiement d activite standard de Homes kings Travels', NULL, 1.00, 200000.00, 200000.00, ''),
-(16488, 2500, 'Sables bennes', NULL, 3.00, 50000.00, 150000.00, ''),
-(16489, 2524, 'Frais de ration et routiers pour les chauffeurs', NULL, 1.00, 100000.00, 100000.00, ''),
-(16490, 2471, 'Ciment', NULL, 10.00, 60000.00, 600000.00, ''),
-(16491, 2471, 'CHARGEMENT DECHARGEMENT ', NULL, 10.00, 600.00, 6000.00, ''),
-(16494, 2527, 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', NULL, 1.00, 15000.00, 15000.00, ''),
-(16495, 2528, 'Creoline', NULL, 1.00, 22000.00, 22000.00, ''),
-(16496, 2528, 'Kole ', NULL, 1.00, 5000.00, 5000.00, ''),
-(16497, 2529, 'Fil a liguatire en kg', NULL, 5.00, 12000.00, 60000.00, ''),
-(16498, 2530, 'Chargement dechargement des pavee ', NULL, 2538.00, 60.00, 152280.00, ''),
-(16499, 2507, 'Essence pour succed L0501A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16500, 2507, 'Essence pour Hillux  E 4923A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16501, 2507, 'Essence pour RAV4 L4521A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16502, 2507, 'ESSENCE POUR NISSAN K3757A', NULL, 20.00, 4000.00, 80000.00, ''),
-(16503, 2517, 'Frais de ration et routiers pour les chauffeurs', NULL, 4.00, 100000.00, 400000.00, ''),
-(16504, 2531, 'Inkwi ', NULL, 1.00, 150000.00, 150000.00, ''),
-(16505, 2532, 'Achat Boulot contre poids pour Howo E8152A ', NULL, 2.00, 80000.00, 160000.00, ''),
-(16506, 2532, 'Achat Roture pour Howo E8152A ', NULL, 2.00, 320000.00, 640000.00, ''),
-(16507, 2532, 'Coutre poid pour Howo D8152A ', NULL, 2.00, 480000.00, 960000.00, ''),
-(16508, 2532, 'Baude Frein pour Howo D8152A ', NULL, 2.00, 270000.00, 540000.00, ''),
-(16509, 2533, 'CARBURAT/MAZOUT POUR GROUPE ELECTRONIQUE', NULL, 1.00, 270000.00, 270000.00, ''),
-(16529, 2535, 'Hydraulique pour paucre cat ', NULL, 20.00, 20000.00, 400000.00, ''),
-(16534, 2536, 'Levé  et calcul des volumes ( quartier EX borabora', NULL, 1.00, 600000.00, 600000.00, ''),
-(16539, 2537, 'Ibitumbura', NULL, 45.00, 1000.00, 45000.00, ''),
-(16540, 2537, 'Capati', NULL, 45.00, 1500.00, 67500.00, ''),
-(16542, 2538, 'Mazout pour Dyna E4178A pour le transport de matériel', NULL, 1.00, 270000.00, 270000.00, ''),
-(16556, 2496, 'lame de scie', NULL, 12.00, 5000.00, 60000.00, ''),
-(16557, 2496, 'porte scie', NULL, 2.00, 15000.00, 30000.00, ''),
-(16558, 2496, 'pelles', NULL, 5.00, 22000.00, 110000.00, ''),
-(16559, 2496, 'pioches', NULL, 5.00, 23000.00, 115000.00, ''),
-(16560, 2496, 'ibiziriko', NULL, 10.00, 2500.00, 25000.00, ''),
-(16561, 2496, 'baches', NULL, 2.00, 40000.00, 80000.00, ''),
-(16562, 2496, 'ciments', NULL, 1.00, 60000.00, 60000.00, ''),
-(16563, 2496, 'Indobo', NULL, 10.00, 15000.00, 150000.00, ''),
-(16564, 2496, 'bidons', NULL, 10.00, 15000.00, 150000.00, ''),
-(16565, 2496, 'Equere', NULL, 1.00, 20000.00, 20000.00, ''),
-(16566, 2496, 'Ficelles rouleaux ', NULL, 10.00, 12000.00, 120000.00, ''),
-(16567, 2496, 'Madriers', NULL, 50.00, 14000.00, 700000.00, ''),
-(16568, 2539, 'planches', NULL, 100.00, 14000.00, 1400000.00, ''),
-(16569, 2539, 'chargement des planches et Madriers', NULL, 150.00, 100.00, 15000.00, ''),
-(16570, 2540, 'Ciment', NULL, 20.00, 60000.00, 1200000.00, ''),
-(16571, 2540, 'CHARGEMENT DECHARGEMENT ', NULL, 20.00, 600.00, 12000.00, ''),
-(16572, 2541, 'SABLE DE GROS CALIBRE', NULL, 1.00, 450000.00, 450000.00, ''),
-(16573, 2542, 'Ciment kabimba ', NULL, 32.00, 60000.00, 1920000.00, ''),
-(16574, 2542, 'CHARGEMENT DECHARGEMENT ', NULL, 32.00, 600.00, 19200.00, ''),
-(16575, 1442, 'Chaussures de sécurité ', NULL, 2.00, 250000.00, 500000.00, ''),
-(16576, 1442, 'Botines de sécurité ', NULL, 30.00, 35000.00, 1050000.00, ''),
-(16577, 1442, 'Casque', NULL, 20.00, 15000.00, 300000.00, ''),
-(16578, 1442, 'Registre ', NULL, 2.00, 20000.00, 40000.00, ''),
-(16579, 1442, 'Chargement et déchargement ', NULL, 1.00, 40000.00, 40000.00, ''),
-(16580, 1442, 'Julet ', NULL, 50.00, 8000.00, 400000.00, ''),
-(16583, 2393, 'Ciment ', NULL, 5.00, 60000.00, 300000.00, ''),
-(16584, 2393, 'Chargement dechargement ', NULL, 5.00, 600.00, 3000.00, ''),
-(16585, 2502, 'Planches ', NULL, 30.00, 14000.00, 420000.00, ''),
-(16586, 2502, 'Chargement et ', NULL, 30.00, 200.00, 6000.00, ''),
-(16589, 2360, 'Ciment ', NULL, 5.00, 60000.00, 300000.00, ''),
-(16590, 2360, 'Chargement dechargement ', NULL, 5.00, 600.00, 3000.00, ''),
-(16591, 2543, 'Main-d\'œuvre pour Howo D8152A ', NULL, 400000.00, 1.00, 400000.00, ''),
-(16592, 2544, 'SABLE DE GROS CALIBRE', NULL, 1.00, 450000.00, 450000.00, ''),
-(16599, 2545, 'Essence pour Hillux E4924A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16600, 2504, 'Hillux C1566A', NULL, 1.00, 260000.00, 260000.00, ''),
-(16610, 1777, 'Tube 30×30', NULL, 90.00, 30000.00, 2700000.00, ''),
-(16611, 1777, 'Pomelle ', NULL, 60.00, 30000.00, 1800000.00, ''),
-(16612, 1777, 'Tôles métallique  Kenya', NULL, 39.00, 100000.00, 3900000.00, ''),
-(16613, 1777, 'Antirouille', NULL, 6.00, 70000.00, 420000.00, ''),
-(16614, 1777, 'Petrol ', NULL, 6.00, 20000.00, 120000.00, ''),
-(16615, 1777, 'Mastique de fer', NULL, 2.00, 140000.00, 280000.00, ''),
-(16616, 1777, 'Disque à couper ', NULL, 10.00, 13000.00, 130000.00, ''),
-(16617, 1777, 'Baguette', NULL, 4.00, 27000.00, 108000.00, ''),
-(16618, 1777, 'Brosses no 2 ', NULL, 3.00, 3000.00, 9000.00, ''),
-(16619, 1777, 'Verroux métallique ', NULL, 60.00, 5000.00, 300000.00, ''),
-(16620, 2547, 'Frais de ration et routiers pour les chauffeurs', NULL, 8.00, 50000.00, 400000.00, ''),
-(16623, 2548, 'Coude de 40 pvc ', NULL, 1.00, 3000.00, 3000.00, ''),
-(16624, 2548, 'Tuyaux 40', NULL, 1.00, 7000.00, 7000.00, ''),
-(16625, 2548, 'Siphon gaine 40', NULL, 1.00, 8000.00, 8000.00, ''),
-(16626, 2549, 'Ciment', NULL, 3.00, 62000.00, 186000.00, ''),
-(16627, 2549, 'Chargement dechargement ', NULL, 3.00, 600.00, 1800.00, ''),
-(16628, 2550, 'paiement des accomptes deuxieme trimestre', NULL, 1.00, 8492335.00, 8492335.00, ''),
-(16631, 2552, 'ESSENCE POUR HIACE E2464A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16632, 2551, 'KUGURA INKWI', NULL, 1.00, 500000.00, 500000.00, ''),
-(16633, 2553, 'SNACK LIGHT', NULL, 1.00, 1000000.00, 1000000.00, ''),
-(16636, 2299, 'Frais d\'assurance maladie mois  de septembre ,nombre de 48.', NULL, 48.00, 40000.00, 1920000.00, ''),
-(16637, 2299, 'Frais de transfert', NULL, 1.00, 1500.00, 1500.00, ''),
-(16639, 2450, 'lustre escalier, Snack light', NULL, 1.00, 1000000.00, 1000000.00, ''),
-(16640, 2554, 'Supplément sur la demande num 1856, 1786', NULL, 1.00, 79100.00, 79100.00, ''),
-(16641, 2555, 'IMIKATE', NULL, 8.00, 5000.00, 40000.00, 'Ivya mercredi '),
-(16642, 2555, 'IVOKA ', NULL, 15.00, 1000.00, 15000.00, 'Ivya Jeudi '),
-(16643, 2555, 'IBITUMBURA', NULL, 45.00, 1000.00, 45000.00, ''),
-(16644, 2555, 'UBUYI (kg)', NULL, 3.00, 10000.00, 30000.00, ''),
-(16645, 2555, 'ISUKARI(kg)', NULL, 2.00, 6000.00, 12000.00, ''),
-(16647, 2557, 'Ciment kabimba ', NULL, 10.00, 60000.00, 600000.00, ''),
-(16648, 2557, 'Frais de transport ', NULL, 10.00, 1000.00, 10000.00, ''),
-(16649, 2558, 'Chargeur Iphone', NULL, 1.00, 100000.00, 100000.00, ''),
-(16651, 2559, 'CARBURAT/MAZOUT pour benne I4549A', NULL, 1.00, 260000.00, 260000.00, ''),
-(16652, 2559, 'POUR HILUX', NULL, 1.00, 260000.00, 260000.00, ''),
-(16653, 2519, 'Ciment kabimba ', NULL, 3.00, 60000.00, 180000.00, ''),
-(16654, 2519, 'Ficelles rouleaux', NULL, 2.00, 12000.00, 24000.00, ''),
-(16655, 2519, 'Toles planes 1,5mm de 2m', NULL, 1.00, 250000.00, 250000.00, ''),
-(16656, 2519, 'Silicone sosiso', NULL, 2.00, 25000.00, 50000.00, ''),
-(16657, 2519, 'Disque a couper', NULL, 2.00, 13000.00, 26000.00, ''),
-(16658, 2519, 'paquet de baguettes', NULL, 1.00, 28000.00, 28000.00, ''),
-(16659, 2519, 'Ciment blanc', NULL, 1.00, 10000.00, 10000.00, ''),
-(16660, 2560, 'ACHAT CARBURANT L4521A', NULL, 1.00, 120000.00, 120000.00, ''),
-(16661, 2561, 'Unité pour DG du 22/9', NULL, 1.00, 20000.00, 20000.00, ''),
-(16662, 2562, 'Separation etagère', NULL, 1.00, 1000000.00, 1000000.00, ''),
-(16666, 2564, 'Hillux E4923A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16667, 2564, 'Rav 4 E4521A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16668, 2564, 'Succed l0501A', NULL, 1.00, 220000.00, 220000.00, ''),
-(16669, 2565, 'Savon Multi-usage (5L)', NULL, 1.00, 45000.00, 45000.00, ''),
-(16670, 2565, 'Savon Nettoyant Vitres ', NULL, 1.00, 35000.00, 35000.00, ''),
-(16671, 2565, 'Esuis-mains pour le talochage ', NULL, 2.00, 20000.00, 40000.00, ''),
-(16672, 2565, 'Petits esuis-mains pour Nettoyer les vitres ', NULL, 2.00, 5000.00, 10000.00, ''),
-(16673, 2565, 'Balai moderne pour les arraignés ', NULL, 1.00, 10000.00, 10000.00, ''),
-(16674, 2566, 'Roofing', NULL, 15.00, 15000.00, 225000.00, ''),
-(16675, 2566, 'Botines', NULL, 5.00, 35000.00, 175000.00, ''),
-(16676, 2566, 'Clous de 3', NULL, 4.00, 12000.00, 48000.00, ''),
-(16677, 2566, 'Rouleau de fil a ligaturer', NULL, 1.00, 280000.00, 280000.00, ''),
-(16678, 2566, 'Houe', NULL, 4.00, 23000.00, 92000.00, ''),
-(16679, 2567, 'Avance sur MOD  des ferrailleurs ( MANIRAKIZA  ISAAC', NULL, 1.00, 200000.00, 200000.00, ''),
-(16680, 2567, 'Avance sur MOD des charpentiers (TUYISENGE Dieudonne ', NULL, 1.00, 200000.00, 200000.00, ''),
-(16681, 2568, 'Loyer HomesKings Septembre', NULL, 1.00, 8850000.00, 8850000.00, ''),
-(16682, 2569, 'Clous de 5cm en kg', NULL, 5.00, 12000.00, 60000.00, ''),
-(16683, 2569, 'Clous de 6cm', NULL, 6.00, 10000.00, 60000.00, ''),
-(16684, 2569, 'Clous de 10', NULL, 8.00, 10000.00, 80000.00, ''),
-(16685, 2546, 'Ciment Kabimba ', NULL, 30.00, 62000.00, 1860000.00, ''),
-(16686, 2546, 'Chargement et déchargement ', NULL, 30.00, 600.00, 18000.00, '');
+(16451, 2512, 'Disque a béton ( petit', NULL, 2.00, 25000.00, 50000.00, '');
 
 -- --------------------------------------------------------
 
@@ -13989,9 +13790,7 @@ CREATE TABLE `tbl_chantiers` (
 --
 
 INSERT INTO `tbl_chantiers` (`id`, `projet_id`, `name`, `location`, `chef_chantier`, `date_debut`, `date_fin_prevue`, `status`, `created_at`, `avancement`, `budget`, `deleted_at`) VALUES
-(1, 46, 'Alchem Cloture', 'ROHERO', 'Inconnu', '2026-09-23', '2026-10-23', 'En cours', '2026-09-24 15:05:01', 100.00, 0.00, NULL),
-(2, 8, 'DEMOLITION DES CONSTRUCTIONS', 'ROHERO', 'OLIVIER NISHIMWE', '2026-04-13', NULL, 'Suspendu', '2026-09-28 11:42:13', 30.00, 44230176.00, NULL),
-(3, 8, 'CLOTURE', 'ROHERO', 'OLIVIER NISHIMWE', '2026-07-06', '2026-10-30', 'En cours', '2026-09-28 12:23:18', 65.00, 306307387.00, NULL);
+(1, 46, 'Alchem Cloture', 'ROHERO', 'Inconnu', '2026-09-23', '2026-10-23', 'En cours', '2026-09-24 15:05:01', 0.00, 0.00, NULL);
 
 -- --------------------------------------------------------
 
@@ -14104,19 +13903,6 @@ CREATE TABLE `tbl_contrat_tranches` (
   `statut` enum('en_attente','paye','retard') DEFAULT 'en_attente'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Déchargement des données de la table `tbl_contrat_tranches`
---
-
-INSERT INTO `tbl_contrat_tranches` (`id`, `contrat_id`, `numero_tranche`, `pourcentage`, `avancement_requis`, `condition_paiement`, `montant`, `date_paiement`, `statut`) VALUES
-(1, 1, 1, 30.00, 0.00, 'avance', 13269052.80, NULL, 'en_attente'),
-(2, 1, 2, 70.00, 100.00, 'reception_provisoire', 30961123.20, NULL, 'en_attente'),
-(3, 2, 1, 30.00, 30.00, 'avancement', 91892216.10, NULL, 'en_attente'),
-(4, 2, 2, 30.00, 60.00, 'avancement', 91892216.10, NULL, 'en_attente'),
-(5, 2, 3, 30.00, 90.00, 'avancement', 91892216.10, NULL, 'en_attente'),
-(6, 2, 4, 8.00, 100.00, 'reception_provisoire', 24504590.96, NULL, 'en_attente'),
-(7, 2, 5, 2.00, 100.00, 'reception_definitive', 6126147.74, NULL, 'en_attente');
-
 -- --------------------------------------------------------
 
 --
@@ -14140,14 +13926,6 @@ CREATE TABLE `tbl_crm_contrats` (
   `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `deleted_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `tbl_crm_contrats`
---
-
-INSERT INTO `tbl_crm_contrats` (`id`, `projet_id`, `chantier_id`, `numero_contrat`, `type_contrat`, `montant`, `date_signature`, `date_fin_prevue`, `delai_realisation`, `fichier_contrat`, `clauses`, `statut`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 8, 2, 'TM-DEM 001', 'gre_a_gre', 44230176.00, '2026-03-27', '2026-05-13', -1, 'uploads/contrats/CNT_1790589028_6aba386461188.pdf', '', 'signe', '2026-09-28 11:50:28', '2026-09-28 11:50:28', NULL),
-(2, 8, 3, 'TM-CLO- 002', 'contrat_prive', 306307387.00, '2026-07-06', '2026-10-30', NULL, 'uploads/contrats/CNT_1790591413_6aba41b5da562.pdf', '', 'signe', '2026-09-28 12:30:13', '2026-09-28 12:30:13', NULL);
 
 -- --------------------------------------------------------
 
@@ -14177,9 +13955,7 @@ CREATE TABLE `tbl_devis` (
 --
 
 INSERT INTO `tbl_devis` (`id`, `projet_id`, `chantier_id`, `reference`, `montant`, `date_creation`, `date_signature`, `date_expiration`, `statut`, `fichier_devis`, `description`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 46, 1, '111', 2832944.00, '2026-09-24', '2026-09-18', '2026-10-18', 'signe', 'uploads/devis/devis_1790255966_6ab5235ecc1d3.pdf', '', '2026-09-24 15:19:26', '2026-09-24 15:19:26', NULL),
-(2, 8, 2, 'TJ-DEM-001', 44230176.00, '2026-09-28', NULL, '2026-05-13', 'en_attente', 'uploads/devis/devis_1790588715_6aba372b908e7.pdf', '', '2026-09-28 11:45:15', '2026-09-28 11:45:15', NULL),
-(3, 8, 3, 'TJ-CLO-002', 306307387.00, '2026-06-28', '2026-07-06', '2026-10-30', 'signe', 'uploads/devis/devis_1790591198_6aba40deaf0fd.pdf', '', '2026-09-28 12:26:38', '2026-09-28 12:26:38', NULL);
+(1, 46, 1, '111', 2832944.00, '2026-09-24', '2026-09-18', '2026-10-18', 'signe', 'uploads/devis/devis_1790255966_6ab5235ecc1d3.pdf', '', '2026-09-24 15:19:26', '2026-09-24 15:19:26', NULL);
 
 -- --------------------------------------------------------
 
@@ -14300,61 +14076,6 @@ INSERT INTO `tbl_employes` (`employe_id`, `matricule`, `nom`, `prenoms`, `sexe`,
 -- --------------------------------------------------------
 
 --
--- Structure de la table `tbl_engin_affectation`
---
-
-CREATE TABLE `tbl_engin_affectation` (
-  `id` int(11) NOT NULL,
-  `reference` varchar(30) DEFAULT NULL COMMENT 'Ex : AFF-2026-00001',
-  `engin_id` int(11) NOT NULL,
-  `chantier_id` int(11) DEFAULT NULL,
-  `localisation` varchar(150) DEFAULT NULL COMMENT 'Si pas de chantier : dépôt, atelier...',
-  `date_debut` date NOT NULL,
-  `date_fin` date DEFAULT NULL COMMENT 'NULL = affectation en cours',
-  `responsable` varchar(150) DEFAULT NULL,
-  `compteur_depart` decimal(15,2) DEFAULT NULL,
-  `compteur_retour` decimal(15,2) DEFAULT NULL,
-  `observation` text DEFAULT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  `created_by` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `tbl_engin_affectation`
---
-
-INSERT INTO `tbl_engin_affectation` (`id`, `reference`, `engin_id`, `chantier_id`, `localisation`, `date_debut`, `date_fin`, `responsable`, `compteur_depart`, `compteur_retour`, `observation`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'AFF-2026-00001', 12, 2, NULL, '2026-02-02', '2026-03-14', 'Fabrice Ndikumana', 144400.00, 145700.00, 'Mission terminée', 1, -1, '2026-09-30 10:46:07', NULL),
-(2, 'AFF-2026-00002', 16, 2, NULL, '2026-02-02', '2026-03-14', 'Serge Manirakiza', 187000.00, 188400.00, 'Mission terminée', 1, -1, '2026-09-30 10:46:07', NULL),
-(4, 'AFF-2026-00003', 2, NULL, 'Dépôt central', '2026-03-24', NULL, 'Jean Niyonzima', 84200.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(5, 'AFF-2026-00004', 3, 1, NULL, '2026-03-24', NULL, 'Eric Ndayishimiye', 132500.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(6, 'AFF-2026-00005', 4, NULL, 'Dépôt central', '2026-03-24', NULL, 'Alain Hakizimana', 61800.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(7, 'AFF-2026-00006', 5, 1, NULL, '2026-03-24', NULL, 'Chef chantier', 1850.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(8, 'AFF-2026-00007', 6, 1, NULL, '2026-03-24', NULL, 'Pascal Irakoze', 6420.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(9, 'AFF-2026-00008', 7, NULL, 'Dépôt central', '2026-03-24', NULL, 'Atelier', 9800.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(10, 'AFF-2026-00009', 8, NULL, 'Dépôt central', '2026-03-24', NULL, 'Claude Bizimana', 158300.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(11, 'AFF-2026-00010', 9, NULL, 'Dépôt central', '2026-03-24', NULL, 'Direction', 97400.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(12, 'AFF-2026-00011', 10, NULL, 'Dépôt central', '2026-03-24', NULL, 'Logistique', 176900.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(13, 'AFF-2026-00012', 11, 2, NULL, '2026-03-24', NULL, 'Désiré Nshimirimana', 312600.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(14, 'AFF-2026-00013', 12, 2, NULL, '2026-03-24', NULL, 'Fabrice Ndikumana', 145700.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(15, 'AFF-2026-00014', 13, 1, NULL, '2026-03-24', NULL, 'Gilbert Nzeyimana', 201300.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(16, 'AFF-2026-00015', 14, NULL, 'Dépôt central', '2026-03-24', NULL, 'Ramadhani Hassan', 268900.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(17, 'AFF-2026-00016', 15, 2, NULL, '2026-03-24', NULL, 'Emmanuel Nduwayo', 154200.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(18, 'AFF-2026-00017', 16, NULL, 'Dépôt central', '2026-03-24', NULL, 'Serge Manirakiza', 188400.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(19, 'AFF-2026-00018', 17, 1, NULL, '2026-03-24', NULL, 'Chef chantier', 1240.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(20, 'AFF-2026-00019', 18, NULL, 'Dépôt central', '2026-03-24', NULL, 'Coursier', 21800.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(21, 'AFF-2026-00020', 19, 2, NULL, '2026-03-24', NULL, 'Janvier Ntirampeba', 4380.00, NULL, 'Affectation chantier', 1, -1, '2026-09-30 10:46:08', NULL),
-(22, 'AFF-2026-00021', 20, NULL, 'Dépôt central', '2026-03-24', NULL, 'Coursier', 35600.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(23, 'AFF-2026-00022', 21, NULL, 'Dépôt central', '2026-03-24', '2026-09-20', 'Coursier', 48200.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(24, 'AFF-2026-00023', 22, NULL, 'Dépôt central', '2026-03-24', NULL, 'Atelier', 2150.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(25, 'AFF-2026-00024', 23, NULL, 'Dépôt central', '2026-03-24', NULL, 'Chef chantier', 980.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL),
-(26, 'AFF-2026-00025', 24, NULL, 'Dépôt central', '2026-03-24', NULL, 'Logistique', 42300.00, NULL, 'Retour au dépôt', 1, -1, '2026-09-30 10:46:08', NULL);
-
--- --------------------------------------------------------
-
---
 -- Structure de la table `tbl_engin_categorie`
 --
 
@@ -14364,42 +14085,56 @@ CREATE TABLE `tbl_engin_categorie` (
   `nom_categorie` varchar(150) NOT NULL,
   `description` text DEFAULT NULL,
   `icon` varchar(100) DEFAULT 'fas fa-truck',
-  `type_compteur_defaut` enum('km','heure','aucun') NOT NULL DEFAULT 'km' COMMENT 'Type de compteur proposé par défaut à la création d''un engin',
-  `status` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `status` tinyint(1) DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `tbl_engin_categorie`
 --
 
-INSERT INTO `tbl_engin_categorie` (`id`, `code`, `nom_categorie`, `description`, `icon`, `type_compteur_defaut`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'TER', 'Terrassement', 'Pelle hydraulique, bulldozer, chargeuse, tractopelle, niveleuse, mini-pelle', 'fas fa-truck-monster', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(2, 'LEV', 'Levage & manutention', 'Grue mobile, grue à tour, chariot élévateur, nacelle, palan, treuil', 'fas fa-dolly', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(3, 'CPT', 'Compactage', 'Rouleau compacteur, plaque vibrante, pilonneuse, dame sauteuse', 'fas fa-compress-arrows-alt', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(4, 'ROU', 'Travaux routiers', 'Finisseur, répandeuse de bitume, gravillonneur, fraiseuse, balayeuse', 'fas fa-road', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(5, 'FOR', 'Forage & fondations', 'Foreuse, sondeuse, batteuse de pieux, marteau-piqueur hydraulique', 'fas fa-screwdriver', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(6, 'BET', 'Béton & malaxage', 'Centrale à béton, camion malaxeur, pompe à béton, bétonnière, vibreur à béton', 'fas fa-blender', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(7, 'TRL', 'Transport lourd', 'Semi-remorque, porte-engins, tracteur routier, plateau', 'fas fa-truck-moving', 'km', 1, '2026-09-30 03:32:15', NULL),
-(8, 'CIT', 'Citernes', 'Camion-citerne à eau, citerne à carburant, arroseuse', 'fas fa-truck-pickup', 'km', 1, '2026-09-30 03:32:15', NULL),
-(9, 'BUS', 'Transport du personnel', 'Bus, minibus, Coaster', 'fas fa-bus', 'km', 1, '2026-09-30 03:32:15', NULL),
-(10, 'ENE', 'Énergie & air comprimé', 'Groupe électrogène, compresseur, poste de transformation mobile', 'fas fa-bolt', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(11, 'POM', 'Pompage & assainissement', 'Motopompe, pompe de relevage, pompe immergée, pompe à boue', 'fas fa-water', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(12, 'SOU', 'Soudage & découpe', 'Poste à souder, groupe de soudure, chalumeau, découpeuse thermique', 'fas fa-fire', 'heure', 1, '2026-09-30 03:32:15', NULL),
-(13, 'OUT', 'Outillage électroportatif', 'Perforateur, disqueuse, scie circulaire, carotteuse, meuleuse', 'fas fa-toolbox', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(14, 'COF', 'Coffrage & échafaudage', 'Banches, étais, échafaudage, tours d\'étaiement, coffrages métalliques', 'fas fa-th-large', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(15, 'TOP', 'Topographie & mesure', 'Station totale, niveau optique, GPS topographique, théodolite, laser', 'fas fa-ruler-combined', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(16, 'LAB', 'Laboratoire & essais', 'Presse à béton, cône d\'Abrams, étuve, tamis, scléromètre', 'fas fa-flask', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(17, 'ATL', 'Atelier & dépannage', 'Camion atelier, dépanneuse, pont élévateur, cric hydraulique', 'fas fa-wrench', 'km', 1, '2026-09-30 03:32:15', NULL),
-(18, 'SEC', 'Sécurité & signalisation', 'Barrières, feux de chantier, panneaux, extincteurs, éclairage mobile', 'fas fa-hard-hat', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(19, 'INF', 'Informatique & bureautique', 'Ordinateurs, imprimantes, traceurs, drones de chantier', 'fas fa-laptop', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(20, 'BAS', 'Bases vie & conteneurs', 'Bungalow, conteneur de stockage, sanitaires mobiles, citerne à eau fixe', 'fas fa-warehouse', 'aucun', 1, '2026-09-30 03:32:15', NULL),
-(21, 'VL', 'Véhicule léger', 'Voitures, pick-up, SUV', 'fas fa-car', 'km', 1, '2026-09-30 08:34:41', NULL),
-(22, 'CAM', 'Camion & benne', 'Camions, bennes, porteurs', 'fas fa-truck', 'km', 1, '2026-09-30 08:34:41', NULL),
-(23, 'ENG', 'Engin de chantier', 'Grues, compacteurs, engins lourds', 'fas fa-truck-monster', 'heure', 1, '2026-09-30 08:34:41', NULL),
-(24, 'MAT', 'Matériel & équipement', 'Bétonnières, groupes, pompes, vibreuses', 'fas fa-tools', 'heure', 1, '2026-09-30 08:34:41', NULL),
-(25, 'DRM', 'Deux / trois roues', 'Motos, vélomoteurs, tuktuks', 'fas fa-motorcycle', 'km', 1, '2026-09-30 08:34:41', NULL);
+INSERT INTO `tbl_engin_categorie` (`id`, `code`, `nom_categorie`, `description`, `icon`, `created_at`, `updated_at`, `status`) VALUES
+(1, 'CAT-001', 'Excavatrices', 'Pelles hydrauliques, excavatrices sur chenilles ou pneus utilisées pour le terrassement.', 'fas fa-truck-monster', '2026-07-09 07:10:49', NULL, 1),
+(2, 'CAT-002', 'Bulldozers', 'Engins de poussée utilisés pour le nivellement et le déblayage.', 'fas fa-tractor', '2026-07-09 07:10:49', NULL, 1),
+(3, 'CAT-003', 'Chargeuses', 'Chargeuses sur pneus ou chenilles pour le chargement des matériaux.', 'fas fa-dumpster', '2026-07-09 07:10:49', NULL, 1),
+(4, 'CAT-004', 'Niveleuses', 'Engins utilisés pour le nivellement précis des routes et plateformes.', 'fas fa-road', '2026-07-09 07:10:49', NULL, 1),
+(5, 'CAT-005', 'Compacteurs', 'Rouleaux compacteurs pour les travaux routiers et terrassements.', 'fas fa-circle', '2026-07-09 07:10:49', NULL, 1),
+(6, 'CAT-006', 'Camions bennes', 'Camions destinés au transport des matériaux et déblais.', 'fas fa-truck', '2026-07-09 07:10:49', NULL, 1),
+(7, 'CAT-007', 'Camions citernes', 'Transport de carburant, eau ou autres liquides.', 'fas fa-gas-pump', '2026-07-09 07:10:49', NULL, 1),
+(8, 'CAT-008', 'Camions malaxeurs', 'Camions toupies pour le transport du béton.', 'fas fa-truck-moving', '2026-07-09 07:10:49', NULL, 1),
+(9, 'CAT-009', 'Grues mobiles', 'Grues sur pneus ou chenilles pour levage lourd.', 'fas fa-dolly', '2026-07-09 07:10:49', NULL, 1),
+(10, 'CAT-010', 'Grues à tour', 'Grues fixes utilisées sur les grands chantiers.', 'fas fa-building', '2026-07-09 07:10:49', NULL, 1),
+(11, 'CAT-011', 'Chariots élévateurs', 'Manipulation des palettes et matériaux.', 'fas fa-people-carry', '2026-07-09 07:10:49', NULL, 1),
+(12, 'CAT-012', 'Nacelles élévatrices', 'Travaux en hauteur et maintenance.', 'fas fa-arrow-up', '2026-07-09 07:10:49', NULL, 1),
+(13, 'CAT-013', 'Finisseurs', 'Pose d\'enrobés sur les routes.', 'fas fa-road', '2026-07-09 07:10:49', NULL, 1),
+(14, 'CAT-014', 'Centrales à béton', 'Production du béton sur chantier.', 'fas fa-industry', '2026-07-09 07:10:49', NULL, 1),
+(15, 'CAT-015', 'Pompes à béton', 'Pompage du béton vers les zones difficiles d\'accès.', 'fas fa-water', '2026-07-09 07:10:49', NULL, 1),
+(16, 'CAT-016', 'Groupes électrogènes', 'Production électrique sur chantier.', 'fas fa-bolt', '2026-07-09 07:10:49', NULL, 1),
+(17, 'CAT-017', 'Compresseurs', 'Alimentation des outils pneumatiques.', 'fas fa-wind', '2026-07-09 07:10:49', NULL, 1),
+(18, 'CAT-018', 'Bétonnières', 'Mélange du béton à petite et moyenne capacité.', 'fas fa-sync', '2026-07-09 07:10:49', NULL, 1),
+(19, 'CAT-019', 'Vibreurs à béton', 'Compactage du béton.', 'fas fa-wave-square', '2026-07-09 07:10:49', NULL, 1),
+(20, 'CAT-020', 'Stations de concassage', 'Production des granulats.', 'fas fa-mountain', '2026-07-09 07:10:49', NULL, 1),
+(21, 'CAT-021', 'Foreuses', 'Forage des fondations profondes.', 'fas fa-crosshairs', '2026-07-09 07:10:49', NULL, 1),
+(22, 'CAT-022', 'Engins de forage minier', 'Forage dans les carrières et mines.', 'fas fa-hammer', '2026-07-09 07:10:49', NULL, 1),
+(23, 'CAT-023', 'Équipements de soudure', 'Postes à souder et accessoires.', 'fas fa-fire', '2026-07-09 07:10:49', NULL, 1),
+(24, 'CAT-024', 'Outillage électrique', 'Perceuses, meuleuses, marteaux piqueurs.', 'fas fa-tools', '2026-07-09 07:10:49', NULL, 1),
+(25, 'CAT-025', 'Outillage manuel', 'Pelles, pioches, clés et petits outils.', 'fas fa-toolbox', '2026-07-09 07:10:49', NULL, 1),
+(26, 'CAT-026', 'Véhicules utilitaires', 'Pick-up, véhicules de liaison et supervision.', 'fas fa-car', '2026-07-09 07:10:49', NULL, 1),
+(27, 'CAT-027', 'Bus et transport du personnel', 'Transport des ouvriers et techniciens.', 'fas fa-bus', '2026-07-09 07:10:49', NULL, 1),
+(28, 'CAT-028', 'Équipements topographiques', 'Stations totales, GPS, niveaux.', 'fas fa-map-marked-alt', '2026-07-09 07:10:49', NULL, 1),
+(29, 'CAT-029', 'Équipements de laboratoire', 'Essais béton, sols et granulats.', 'fas fa-flask', '2026-07-09 07:10:49', NULL, 1),
+(30, 'CAT-030', 'Équipements de sécurité', 'EPI, extincteurs, signalisation.', 'fas fa-hard-hat', '2026-07-09 07:10:49', NULL, 1),
+(31, 'CAT-031', 'Conteneurs et bases vie', 'Bureaux de chantier, logements et magasins.', 'fas fa-warehouse', '2026-07-09 07:10:49', NULL, 1),
+(32, 'CAT-032', 'Réservoirs et stockage carburant', 'Cuves et citernes de stockage.', 'fas fa-oil-can', '2026-07-09 07:10:49', NULL, 1),
+(33, 'CAT-033', 'Équipements de nettoyage', 'Balayeuses et équipements d\'entretien.', 'fas fa-broom', '2026-07-09 07:10:49', NULL, 1),
+(34, 'CAT-034', 'Équipements portuaires', 'Matériels de manutention lourde.', 'fas fa-anchor', '2026-07-09 07:10:49', NULL, 1),
+(35, 'CAT-035', 'Équipements de carrière', 'Concasseurs, cribles et convoyeurs.', 'fas fa-mountain', '2026-07-09 07:10:49', NULL, 1),
+(36, 'CAT-036', 'Équipements d’asphaltage', 'Centrales d\'enrobage et équipements associés.', 'fas fa-road', '2026-07-09 07:10:49', NULL, 1),
+(37, 'CAT-037', 'Matériel de coffrage', 'Coffrages métalliques et accessoires.', 'fas fa-border-all', '2026-07-09 07:10:49', NULL, 1),
+(38, 'CAT-038', 'Échafaudages', 'Structures temporaires de travail en hauteur.', 'fas fa-columns', '2026-07-09 07:10:49', NULL, 1),
+(39, 'CAT-039', 'Équipements hydrauliques', 'Pompes, tuyauteries et systèmes hydrauliques.', 'fas fa-tint', '2026-07-09 07:10:49', NULL, 1),
+(40, 'CAT-040', 'Divers matériels', 'Matériels ne rentrant dans aucune catégorie.', 'fas fa-boxes', '2026-07-09 07:10:49', NULL, 1);
 
 -- --------------------------------------------------------
 
@@ -14414,18 +14149,14 @@ CREATE TABLE `tbl_engin_code` (
   `dernier_numero` int(11) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `tbl_engin_code`
 --
 
 INSERT INTO `tbl_engin_code` (`id`, `prefixe`, `annee`, `dernier_numero`, `created_at`, `updated_at`) VALUES
-(1, 'ENG', 2026, 24, '2026-09-29 16:28:53', '2026-09-30 03:37:37'),
-(2, 'CARB', 2026, 277, '2026-09-29 16:28:53', '2026-09-30 03:54:06'),
-(3, 'MNT', 2026, 11, '2026-09-29 16:28:53', NULL),
-(4, 'PAN', 2026, 4, '2026-09-29 16:28:53', NULL),
-(5, 'AFF', 2026, 25, '2026-09-29 16:28:53', NULL);
+(1, 'ENG', 2026, 21, '2026-07-09 08:10:00', '2026-07-09 09:43:57');
 
 -- --------------------------------------------------------
 
@@ -14436,32 +14167,20 @@ INSERT INTO `tbl_engin_code` (`id`, `prefixe`, `annee`, `dernier_numero`, `creat
 CREATE TABLE `tbl_engin_document` (
   `id` int(11) NOT NULL,
   `engin_id` int(11) NOT NULL,
-  `type_document` enum('Carte grise','Assurance','Contrôle technique','Facture d''achat','Autorisation de circuler','Manuel / Notice','Autre') NOT NULL DEFAULT 'Autre',
-  `numero_document` varchar(100) DEFAULT NULL,
-  `date_emission` date DEFAULT NULL,
-  `date_expiration` date DEFAULT NULL,
-  `document` varchar(255) NOT NULL COMMENT 'Nom du fichier stocké dans uploads/engins/documents/',
-  `original_name` varchar(255) DEFAULT NULL,
-  `file_type` varchar(100) DEFAULT NULL,
-  `file_size` int(10) UNSIGNED DEFAULT NULL,
-  `created_by` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  `document` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `tbl_engin_document`
 --
 
-INSERT INTO `tbl_engin_document` (`id`, `engin_id`, `type_document`, `numero_document`, `date_emission`, `date_expiration`, `document`, `original_name`, `file_type`, `file_size`, `created_by`, `created_at`) VALUES
-(1, 16, 'Assurance', 'ASS-2025-7781', '2025-10-12', '2026-10-12', 'demo-document.pdf', 'Assurance - Hilux Vigo.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(2, 16, 'Carte grise', 'CG-E4923A', '2018-07-14', NULL, 'demo-document.pdf', 'Carte grise - Hilux Vigo.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(3, 11, 'Assurance', 'ASS-2025-6120', '2025-09-25', '2026-09-25', 'demo-document.pdf', 'Assurance - Mercedes Benz.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(4, 11, 'Carte grise', 'CG-H8837A', '2018-10-22', NULL, 'demo-document.pdf', 'Carte grise - Mercedes Benz.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(5, 13, 'Contrôle technique', 'CT-2026-0412', '2026-06-27', '2027-06-27', 'demo-document.pdf', 'Contrôle technique - Dyna.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(6, 9, 'Assurance', 'ASS-2025-9034', '2025-10-25', '2026-10-25', 'demo-document.pdf', 'Assurance - RAV4.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(7, 3, 'Assurance', 'ASS-2026-0155', '2026-06-02', '2027-06-02', 'demo-document.pdf', 'Assurance - Hilux simple cabine.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(8, 6, 'Autorisation de circuler', 'AUT-GRUE-2026', '2026-03-14', '2027-03-14', 'demo-document.pdf', 'Autorisation de circuler - Grue élévateur.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08'),
-(9, 15, 'Facture d\'achat', 'FAC-HOWO-2021-88', '2022-10-01', NULL, 'demo-document.pdf', 'Facture d\'achat - Benne 10 pneus.pdf', 'application/pdf', 245000, -1, '2026-09-30 10:46:08');
+INSERT INTO `tbl_engin_document` (`id`, `engin_id`, `document`, `created_at`) VALUES
+(4, 1, 'a46caf6d4ee919d1cc29d411e8170c95.pdf', '2026-07-09 11:26:18'),
+(5, 1, 'carte-grise-engin-01.pdf', '2026-07-09 12:53:38'),
+(6, 1, 'assurance-engin-01.pdf', '2026-07-09 12:53:38'),
+(7, 1, 'controle-technique-engin-01.pdf', '2026-07-09 12:53:38'),
+(8, 2, '2023c734461bfb24c306d4a68af1f2ae.pdf', '2026-07-10 11:09:19');
 
 -- --------------------------------------------------------
 
@@ -14471,24 +14190,18 @@ INSERT INTO `tbl_engin_document` (`id`, `engin_id`, `type_document`, `numero_doc
 
 CREATE TABLE `tbl_engin_fuel` (
   `id` int(11) NOT NULL,
-  `reference` varchar(30) DEFAULT NULL COMMENT 'Ex : CARB-2026-00001',
   `engin_id` int(11) NOT NULL,
   `chantier_id` int(11) DEFAULT NULL,
   `operation_date` date NOT NULL,
-  `type_carburant` enum('Diesel','Essence','Mélange 2T') NOT NULL DEFAULT 'Diesel',
-  `source` enum('Station','Stock interne','Fût chantier') NOT NULL DEFAULT 'Station',
-  `numero_bon` varchar(50) DEFAULT NULL COMMENT 'N° bon / ticket station',
   `quantity_litre` decimal(12,2) NOT NULL DEFAULT 0.00,
   `unit_price` decimal(18,2) NOT NULL DEFAULT 0.00,
-  `total_amount` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'Recalculé côté serveur : quantité × prix',
+  `total_amount` decimal(18,2) NOT NULL DEFAULT 0.00,
   `kilometrage` decimal(15,2) DEFAULT NULL,
   `hour_meter` decimal(15,2) DEFAULT NULL,
-  `plein_complet` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = plein fait : sert au calcul fiable de la consommation réelle',
   `operator_name` varchar(150) DEFAULT NULL,
   `supplier` varchar(180) DEFAULT NULL,
   `observation` text DEFAULT NULL,
   `status` tinyint(1) NOT NULL DEFAULT 1,
-  `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -14497,284 +14210,28 @@ CREATE TABLE `tbl_engin_fuel` (
 -- Déchargement des données de la table `tbl_engin_fuel`
 --
 
-INSERT INTO `tbl_engin_fuel` (`id`, `reference`, `engin_id`, `chantier_id`, `operation_date`, `type_carburant`, `source`, `numero_bon`, `quantity_litre`, `unit_price`, `total_amount`, `kilometrage`, `hour_meter`, `plein_complet`, `operator_name`, `supplier`, `observation`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'CARB-2026-00002', 2, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4021', 53.55, 4150.00, 222232.50, 84800.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(2, 'CARB-2026-00014', 3, 1, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4041', 77.77, 4250.00, 330522.50, 133200.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(3, 'CARB-2026-00026', 4, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4061', 48.50, 4150.00, 201275.00, 62300.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(4, 'CARB-2026-00038', 5, 1, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4081', 62.40, 4250.00, 265200.00, NULL, 1880.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(5, 'CARB-2026-00050', 6, 1, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4101', 240.00, 4250.00, 1020000.00, NULL, 6440.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(6, 'CARB-2026-00062', 7, NULL, '2026-04-15', 'Diesel', 'Station', 'BON-4121', 192.00, 4250.00, 816000.00, NULL, 9840.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(7, 'CARB-2026-00074', 8, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4141', 50.21, 4150.00, 208371.50, 158950.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(8, 'CARB-2026-00086', 9, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4161', 51.73, 4150.00, 214679.50, 97950.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(9, 'CARB-2026-00098', 10, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4181', 38.00, 4150.00, 157700.00, 177400.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(10, 'CARB-2026-00110', 11, 2, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4201', 293.76, 4250.00, 1248480.00, 313500.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(11, 'CARB-2026-00122', 12, 2, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4221', 73.26, 4250.00, 311355.00, 146350.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(12, 'CARB-2026-00134', 13, 1, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4241', 117.60, 4250.00, 499800.00, 202000.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(13, 'CARB-2026-00146', 14, NULL, '2026-04-15', 'Diesel', 'Station', 'BON-4261', 305.42, 4250.00, 1298035.00, 269700.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(14, 'CARB-2026-00158', 15, 2, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4281', 313.31, 4250.00, 1331567.50, 155050.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(15, 'CARB-2026-00170', 16, NULL, '2026-04-15', 'Diesel', 'Station', 'BON-4301', 80.08, 4250.00, 340340.00, 189100.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(16, 'CARB-2026-00182', 17, 1, '2026-04-15', 'Essence', 'Stock interne', 'BON-4321', 30.00, 4150.00, 124500.00, NULL, 1265.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(17, 'CARB-2026-00194', 18, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4341', 8.40, 4150.00, 34860.00, 22150.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(18, 'CARB-2026-00206', 19, 2, '2026-04-15', 'Diesel', 'Stock interne', 'BON-4361', 231.75, 4250.00, 984937.50, NULL, 4405.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(19, 'CARB-2026-00218', 20, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4381', 11.88, 4150.00, 49302.00, 36000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(20, 'CARB-2026-00230', 21, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4401', 11.40, 4150.00, 47310.00, 48600.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(21, 'CARB-2026-00242', 22, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4421', 51.00, 4150.00, 211650.00, NULL, 2170.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(22, 'CARB-2026-00254', 23, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4441', 22.05, 4150.00, 91507.50, NULL, 995.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(23, 'CARB-2026-00266', 24, NULL, '2026-04-15', 'Essence', 'Station', 'BON-4461', 18.90, 4150.00, 78435.00, 42750.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(24, 'CARB-2026-00003', 2, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4022', 49.47, 4150.00, 205300.50, 85400.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(25, 'CARB-2026-00015', 3, 1, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4042', 80.08, 4250.00, 340340.00, 133900.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(26, 'CARB-2026-00027', 4, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4062', 50.00, 4150.00, 207500.00, 62800.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(27, 'CARB-2026-00039', 5, 1, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4082', 57.60, 4250.00, 244800.00, NULL, 1910.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(28, 'CARB-2026-00051', 6, 1, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4102', 247.20, 4250.00, 1050600.00, NULL, 6460.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(29, 'CARB-2026-00063', 7, NULL, '2026-04-30', 'Diesel', 'Station', 'BON-4122', 198.00, 4250.00, 841500.00, NULL, 9880.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(30, 'CARB-2026-00075', 8, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4142', 46.31, 4150.00, 192186.50, 159600.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(31, 'CARB-2026-00087', 9, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4162', 53.30, 4150.00, 221195.00, 98500.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(32, 'CARB-2026-00099', 10, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4182', 39.20, 4150.00, 162680.00, 177900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(33, 'CARB-2026-00111', 11, 2, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4202', 302.40, 4250.00, 1285200.00, 314400.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(34, 'CARB-2026-00123', 12, 2, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4222', 75.50, 4250.00, 320875.00, 147000.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(35, 'CARB-2026-00135', 13, 1, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4242', 108.64, 4250.00, 461720.00, 202700.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(36, 'CARB-2026-00147', 14, NULL, '2026-04-30', 'Diesel', 'Station', 'BON-4262', 314.50, 4250.00, 1336625.00, 270500.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(37, 'CARB-2026-00159', 15, 2, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4282', 323.00, 4250.00, 1372750.00, 155900.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(38, 'CARB-2026-00171', 16, NULL, '2026-04-30', 'Diesel', 'Station', 'BON-4302', 73.92, 4250.00, 314160.00, 189800.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(39, 'CARB-2026-00183', 17, 1, '2026-04-30', 'Essence', 'Stock interne', 'BON-4322', 30.90, 4150.00, 128235.00, NULL, 1290.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(40, 'CARB-2026-00195', 18, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4342', 8.66, 4150.00, 35939.00, 22500.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(41, 'CARB-2026-00207', 19, 2, '2026-04-30', 'Diesel', 'Stock interne', 'BON-4362', 213.75, 4250.00, 908437.50, NULL, 4430.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(42, 'CARB-2026-00219', 20, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4382', 12.24, 4150.00, 50796.00, 36400.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(43, 'CARB-2026-00231', 21, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4402', 11.76, 4150.00, 48804.00, 49000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(44, 'CARB-2026-00243', 22, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4422', 52.50, 4150.00, 217875.00, NULL, 2190.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(45, 'CARB-2026-00255', 23, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4442', 22.73, 4150.00, 94329.50, NULL, 1010.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(46, 'CARB-2026-00267', 24, NULL, '2026-04-30', 'Essence', 'Station', 'BON-4462', 17.46, 4150.00, 72459.00, 43200.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(47, 'CARB-2026-00004', 2, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4023', 51.00, 4150.00, 211650.00, 86000.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(48, 'CARB-2026-00016', 3, 1, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4043', 73.92, 4250.00, 314160.00, 134600.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(49, 'CARB-2026-00028', 4, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4063', 51.50, 4150.00, 213725.00, 63300.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(50, 'CARB-2026-00040', 5, 1, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4083', 59.40, 4250.00, 252450.00, NULL, 1940.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(51, 'CARB-2026-00052', 6, 1, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4103', 228.00, 4250.00, 969000.00, NULL, 6480.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(52, 'CARB-2026-00064', 7, NULL, '2026-05-15', 'Diesel', 'Station', 'BON-4123', 204.00, 4250.00, 867000.00, NULL, 9920.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(53, 'CARB-2026-00076', 8, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4143', 47.78, 4150.00, 198287.00, 160250.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(54, 'CARB-2026-00088', 9, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4163', 54.86, 4150.00, 227669.00, 99050.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(55, 'CARB-2026-00100', 10, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4183', 40.40, 4150.00, 167660.00, 178400.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(56, 'CARB-2026-00112', 11, 2, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4203', 279.36, 4250.00, 1187280.00, 315300.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(57, 'CARB-2026-00124', 12, 2, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4223', 77.74, 4250.00, 330395.00, 147650.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(58, 'CARB-2026-00136', 13, 1, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4243', 112.00, 4250.00, 476000.00, 203400.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(59, 'CARB-2026-00148', 14, NULL, '2026-05-15', 'Diesel', 'Station', 'BON-4263', 290.30, 4250.00, 1233775.00, 271300.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(60, 'CARB-2026-00160', 15, 2, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4283', 332.69, 4250.00, 1413932.50, 156750.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(61, 'CARB-2026-00172', 16, NULL, '2026-05-15', 'Diesel', 'Station', 'BON-4303', 76.23, 4250.00, 323977.50, 190500.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(62, 'CARB-2026-00184', 17, 1, '2026-05-15', 'Essence', 'Fût chantier', 'BON-4323', 28.50, 4150.00, 118275.00, NULL, 1315.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(63, 'CARB-2026-00196', 18, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4343', 8.93, 4150.00, 37059.50, 22850.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(64, 'CARB-2026-00208', 19, 2, '2026-05-15', 'Diesel', 'Fût chantier', 'BON-4363', 220.50, 4250.00, 937125.00, NULL, 4455.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(65, 'CARB-2026-00220', 20, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4383', 12.60, 4150.00, 52290.00, 36800.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(66, 'CARB-2026-00232', 21, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4403', 12.12, 4150.00, 50298.00, 49400.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(67, 'CARB-2026-00244', 22, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4423', 48.50, 4150.00, 201275.00, NULL, 2210.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(68, 'CARB-2026-00256', 23, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4443', 23.40, 4150.00, 97110.00, NULL, 1025.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(69, 'CARB-2026-00268', 24, NULL, '2026-05-15', 'Essence', 'Station', 'BON-4463', 18.00, 4150.00, 74700.00, 43650.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(70, 'CARB-2026-00005', 2, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4024', 52.53, 4150.00, 217999.50, 86600.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(71, 'CARB-2026-00017', 3, 1, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4044', 76.23, 4250.00, 323977.50, 135300.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(72, 'CARB-2026-00029', 4, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4064', 47.50, 4150.00, 197125.00, 63800.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(73, 'CARB-2026-00041', 5, 1, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4084', 61.20, 4250.00, 260100.00, NULL, 1970.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(74, 'CARB-2026-00053', 6, 1, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4104', 235.20, 4250.00, 999600.00, NULL, 6500.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(75, 'CARB-2026-00065', 7, NULL, '2026-05-30', 'Diesel', 'Station', 'BON-4124', 210.00, 4250.00, 892500.00, NULL, 9960.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(76, 'CARB-2026-00077', 8, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4144', 49.24, 4150.00, 204346.00, 160900.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(77, 'CARB-2026-00089', 9, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4164', 50.68, 4150.00, 210322.00, 99600.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(78, 'CARB-2026-00101', 10, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4184', 41.60, 4150.00, 172640.00, 178900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(79, 'CARB-2026-00113', 11, 2, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4204', 288.00, 4250.00, 1224000.00, 316200.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(80, 'CARB-2026-00125', 12, 2, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4224', 71.76, 4250.00, 304980.00, 148300.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(81, 'CARB-2026-00137', 13, 1, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4244', 115.36, 4250.00, 490280.00, 204100.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(82, 'CARB-2026-00149', 14, NULL, '2026-05-30', 'Diesel', 'Station', 'BON-4264', 299.38, 4250.00, 1272365.00, 272100.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(83, 'CARB-2026-00161', 15, 2, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4284', 306.85, 4250.00, 1304112.50, 157600.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(84, 'CARB-2026-00173', 16, NULL, '2026-05-30', 'Diesel', 'Station', 'BON-4304', 78.54, 4250.00, 333795.00, 191200.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(85, 'CARB-2026-00185', 17, 1, '2026-05-30', 'Essence', 'Stock interne', 'BON-4324', 29.40, 4150.00, 122010.00, NULL, 1340.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(86, 'CARB-2026-00197', 18, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4344', 9.19, 4150.00, 38138.50, 23200.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(87, 'CARB-2026-00209', 19, 2, '2026-05-30', 'Diesel', 'Stock interne', 'BON-4364', 227.25, 4250.00, 965812.50, NULL, 4480.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(88, 'CARB-2026-00221', 20, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4384', 11.64, 4150.00, 48306.00, 37200.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(89, 'CARB-2026-00233', 21, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4404', 12.48, 4150.00, 51792.00, 49800.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(90, 'CARB-2026-00245', 22, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4424', 50.00, 4150.00, 207500.00, NULL, 2230.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(91, 'CARB-2026-00257', 23, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4444', 21.60, 4150.00, 89640.00, NULL, 1040.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(92, 'CARB-2026-00269', 24, NULL, '2026-05-30', 'Essence', 'Station', 'BON-4464', 18.54, 4150.00, 76941.00, 44100.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(93, 'CARB-2026-00006', 2, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4025', 48.45, 4150.00, 201067.50, 87200.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(94, 'CARB-2026-00018', 3, 1, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4045', 78.54, 4250.00, 333795.00, 136000.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(95, 'CARB-2026-00030', 4, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4065', 49.00, 4150.00, 203350.00, 64300.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(96, 'CARB-2026-00042', 5, 1, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4085', 63.00, 4250.00, 267750.00, NULL, 2000.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(97, 'CARB-2026-00054', 6, 1, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4105', 242.40, 4250.00, 1030200.00, NULL, 6520.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(98, 'CARB-2026-00066', 7, NULL, '2026-06-14', 'Diesel', 'Station', 'BON-4125', 194.00, 4250.00, 824500.00, NULL, 10000.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(99, 'CARB-2026-00078', 8, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4145', 50.70, 4150.00, 210405.00, 161550.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(100, 'CARB-2026-00090', 9, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4165', 52.25, 4150.00, 216837.50, 100150.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(101, 'CARB-2026-00102', 10, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4185', 38.40, 4150.00, 159360.00, 179400.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(102, 'CARB-2026-00114', 11, 2, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4205', 296.64, 4250.00, 1260720.00, 317100.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(103, 'CARB-2026-00126', 12, 2, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4225', 74.00, 4250.00, 314500.00, 148950.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(104, 'CARB-2026-00138', 13, 1, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4245', 106.40, 4250.00, 452200.00, 204800.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(105, 'CARB-2026-00150', 14, NULL, '2026-06-14', 'Diesel', 'Station', 'BON-4265', 308.45, 4250.00, 1310912.50, 272900.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(106, 'CARB-2026-00162', 15, 2, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4285', 316.54, 4250.00, 1345295.00, 158450.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(107, 'CARB-2026-00174', 16, NULL, '2026-06-14', 'Diesel', 'Station', 'BON-4305', 80.85, 4250.00, 343612.50, 191900.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(108, 'CARB-2026-00186', 17, 1, '2026-06-14', 'Essence', 'Stock interne', 'BON-4325', 30.30, 4150.00, 125745.00, NULL, 1365.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(109, 'CARB-2026-00198', 18, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4345', 8.49, 4150.00, 35233.50, 23550.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(110, 'CARB-2026-00210', 19, 2, '2026-06-14', 'Diesel', 'Stock interne', 'BON-4365', 234.00, 4250.00, 994500.00, NULL, 4505.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(111, 'CARB-2026-00222', 20, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4385', 12.00, 4150.00, 49800.00, 37600.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(112, 'CARB-2026-00234', 21, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4405', 11.52, 4150.00, 47808.00, 50200.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(113, 'CARB-2026-00246', 22, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4425', 51.50, 4150.00, 213725.00, NULL, 2250.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(114, 'CARB-2026-00258', 23, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4445', 22.28, 4150.00, 92462.00, NULL, 1055.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(115, 'CARB-2026-00270', 24, NULL, '2026-06-14', 'Essence', 'Station', 'BON-4465', 17.10, 4150.00, 70965.00, 44550.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(116, 'CARB-2026-00007', 2, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4026', 49.98, 4150.00, 207417.00, 87800.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(117, 'CARB-2026-00019', 3, 1, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4046', 80.85, 4250.00, 343612.50, 136700.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(118, 'CARB-2026-00031', 4, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4066', 50.50, 4150.00, 209575.00, 64800.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(119, 'CARB-2026-00043', 5, 1, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4086', 58.20, 4250.00, 247350.00, NULL, 2030.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(120, 'CARB-2026-00055', 6, 1, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4106', 249.60, 4250.00, 1060800.00, NULL, 6540.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(121, 'CARB-2026-00067', 7, NULL, '2026-06-29', 'Diesel', 'Station', 'BON-4126', 200.00, 4250.00, 850000.00, NULL, 10040.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(122, 'CARB-2026-00079', 8, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4146', 46.80, 4150.00, 194220.00, 162200.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(123, 'CARB-2026-00091', 9, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4166', 53.82, 4150.00, 223353.00, 100700.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(124, 'CARB-2026-00103', 10, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4186', 39.60, 4150.00, 164340.00, 179900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(125, 'CARB-2026-00115', 11, 2, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4206', 273.60, 4250.00, 1162800.00, 318000.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(126, 'CARB-2026-00127', 12, 2, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4226', 76.25, 4250.00, 324062.50, 149600.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(127, 'CARB-2026-00139', 13, 1, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4246', 109.76, 4250.00, 466480.00, 205500.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(128, 'CARB-2026-00151', 14, NULL, '2026-06-29', 'Diesel', 'Station', 'BON-4266', 317.52, 4250.00, 1349460.00, 273700.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(129, 'CARB-2026-00163', 15, 2, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4286', 326.23, 4250.00, 1386477.50, 159300.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(130, 'CARB-2026-00175', 16, NULL, '2026-06-29', 'Diesel', 'Station', 'BON-4306', 74.69, 4250.00, 317432.50, 192600.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(131, 'CARB-2026-00187', 17, 1, '2026-06-29', 'Essence', 'Fût chantier', 'BON-4326', 31.20, 4150.00, 129480.00, NULL, 1390.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(132, 'CARB-2026-00199', 18, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4346', 8.75, 4150.00, 36312.50, 23900.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(133, 'CARB-2026-00211', 19, 2, '2026-06-29', 'Diesel', 'Fût chantier', 'BON-4366', 216.00, 4250.00, 918000.00, NULL, 4530.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(134, 'CARB-2026-00223', 20, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4386', 12.36, 4150.00, 51294.00, 38000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(135, 'CARB-2026-00235', 21, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4406', 11.88, 4150.00, 49302.00, 50600.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(136, 'CARB-2026-00247', 22, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4426', 47.50, 4150.00, 197125.00, NULL, 2270.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(137, 'CARB-2026-00259', 23, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4446', 22.95, 4150.00, 95242.50, NULL, 1070.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(138, 'CARB-2026-00271', 24, NULL, '2026-06-29', 'Essence', 'Station', 'BON-4466', 17.64, 4150.00, 73206.00, 45000.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(139, 'CARB-2026-00008', 2, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4027', 51.51, 4150.00, 213766.50, 88400.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(140, 'CARB-2026-00020', 3, 1, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4047', 74.69, 4250.00, 317432.50, 137400.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(141, 'CARB-2026-00032', 4, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4067', 52.00, 4150.00, 215800.00, 65300.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(142, 'CARB-2026-00044', 5, 1, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4087', 60.00, 4250.00, 255000.00, NULL, 2060.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(143, 'CARB-2026-00056', 6, 1, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4107', 230.40, 4250.00, 979200.00, NULL, 6560.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(144, 'CARB-2026-00068', 7, NULL, '2026-07-14', 'Diesel', 'Station', 'BON-4127', 206.00, 4250.00, 875500.00, NULL, 10080.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(145, 'CARB-2026-00080', 8, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4147', 48.26, 4150.00, 200279.00, 162850.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(146, 'CARB-2026-00092', 9, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4167', 49.64, 4150.00, 206006.00, 101250.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(147, 'CARB-2026-00104', 10, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4187', 40.80, 4150.00, 169320.00, 180400.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(148, 'CARB-2026-00116', 11, 2, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4207', 282.24, 4250.00, 1199520.00, 318900.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(149, 'CARB-2026-00128', 12, 2, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4227', 78.49, 4250.00, 333582.50, 150250.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(150, 'CARB-2026-00140', 13, 1, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4247', 113.12, 4250.00, 480760.00, 206200.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(151, 'CARB-2026-00152', 14, NULL, '2026-07-14', 'Diesel', 'Station', 'BON-4267', 293.33, 4250.00, 1246652.50, 274500.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(152, 'CARB-2026-00164', 15, 2, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4287', 335.92, 4250.00, 1427660.00, 160150.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(153, 'CARB-2026-00176', 16, NULL, '2026-07-14', 'Diesel', 'Station', 'BON-4307', 77.00, 4250.00, 327250.00, 193300.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(154, 'CARB-2026-00188', 17, 1, '2026-07-14', 'Essence', 'Stock interne', 'BON-4327', 28.80, 4150.00, 119520.00, NULL, 1415.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(155, 'CARB-2026-00200', 18, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4347', 9.01, 4150.00, 37391.50, 24250.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(156, 'CARB-2026-00212', 19, 2, '2026-07-14', 'Diesel', 'Stock interne', 'BON-4367', 222.75, 4250.00, 946687.50, NULL, 4555.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(157, 'CARB-2026-00224', 20, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4387', 11.40, 4150.00, 47310.00, 38400.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(158, 'CARB-2026-00236', 21, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4407', 12.24, 4150.00, 50796.00, 51000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(159, 'CARB-2026-00248', 22, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4427', 49.00, 4150.00, 203350.00, NULL, 2290.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(160, 'CARB-2026-00260', 23, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4447', 23.63, 4150.00, 98064.50, NULL, 1085.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(161, 'CARB-2026-00272', 24, NULL, '2026-07-14', 'Essence', 'Station', 'BON-4467', 18.18, 4150.00, 75447.00, 45450.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(162, 'CARB-2026-00009', 2, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4028', 53.04, 4150.00, 220116.00, 89000.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(163, 'CARB-2026-00021', 3, 1, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4048', 77.00, 4250.00, 327250.00, 138100.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(164, 'CARB-2026-00033', 4, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4068', 48.00, 4150.00, 199200.00, 65800.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(165, 'CARB-2026-00045', 5, 1, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4088', 61.80, 4250.00, 262650.00, NULL, 2090.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(166, 'CARB-2026-00057', 6, 1, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4108', 237.60, 4250.00, 1009800.00, NULL, 6580.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(167, 'CARB-2026-00069', 7, NULL, '2026-07-29', 'Diesel', 'Station', 'BON-4128', 190.00, 4250.00, 807500.00, NULL, 10120.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(168, 'CARB-2026-00081', 8, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4148', 49.73, 4150.00, 206379.50, 163500.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(169, 'CARB-2026-00093', 9, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4168', 51.21, 4150.00, 212521.50, 101800.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(170, 'CARB-2026-00105', 10, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4188', 42.00, 4150.00, 174300.00, 180900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(171, 'CARB-2026-00117', 11, 2, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4208', 290.88, 4250.00, 1236240.00, 319800.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(172, 'CARB-2026-00129', 12, 2, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4228', 72.51, 4250.00, 308167.50, 150900.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(173, 'CARB-2026-00141', 13, 1, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4248', 116.48, 4250.00, 495040.00, 206900.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(174, 'CARB-2026-00153', 14, NULL, '2026-07-29', 'Diesel', 'Station', 'BON-4268', 302.40, 4250.00, 1285200.00, 275300.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(175, 'CARB-2026-00165', 15, 2, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4288', 310.08, 4250.00, 1317840.00, 161000.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(176, 'CARB-2026-00177', 16, NULL, '2026-07-29', 'Diesel', 'Station', 'BON-4308', 79.31, 4250.00, 337067.50, 194000.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(177, 'CARB-2026-00189', 17, 1, '2026-07-29', 'Essence', 'Stock interne', 'BON-4328', 29.70, 4150.00, 123255.00, NULL, 1440.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(178, 'CARB-2026-00201', 18, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4348', 8.31, 4150.00, 34486.50, 24600.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(179, 'CARB-2026-00213', 19, 2, '2026-07-29', 'Diesel', 'Stock interne', 'BON-4368', 229.50, 4250.00, 975375.00, NULL, 4580.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(180, 'CARB-2026-00225', 20, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4388', 11.76, 4150.00, 48804.00, 38800.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(181, 'CARB-2026-00237', 21, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4408', 12.60, 4150.00, 52290.00, 51400.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(182, 'CARB-2026-00249', 22, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4428', 50.50, 4150.00, 209575.00, NULL, 2310.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(183, 'CARB-2026-00261', 23, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4448', 21.83, 4150.00, 90594.50, NULL, 1100.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(184, 'CARB-2026-00273', 24, NULL, '2026-07-29', 'Essence', 'Station', 'BON-4468', 18.72, 4150.00, 77688.00, 45900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(185, 'CARB-2026-00010', 2, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4029', 48.96, 4150.00, 203184.00, 89600.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(186, 'CARB-2026-00022', 3, 1, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4049', 79.31, 4250.00, 337067.50, 138800.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(187, 'CARB-2026-00034', 4, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4069', 49.50, 4150.00, 205425.00, 66300.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(188, 'CARB-2026-00046', 5, 1, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4089', 57.00, 4250.00, 242250.00, NULL, 2120.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(189, 'CARB-2026-00058', 6, 1, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4109', 244.80, 4250.00, 1040400.00, NULL, 6600.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(190, 'CARB-2026-00070', 7, NULL, '2026-08-13', 'Diesel', 'Station', 'BON-4129', 196.00, 4250.00, 833000.00, NULL, 10160.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(191, 'CARB-2026-00082', 8, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4149', 51.19, 4150.00, 212438.50, 164150.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(192, 'CARB-2026-00094', 9, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4169', 52.77, 4150.00, 218995.50, 102350.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(193, 'CARB-2026-00106', 10, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4189', 38.80, 4150.00, 161020.00, 181400.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(194, 'CARB-2026-00118', 11, 2, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4209', 299.52, 4250.00, 1272960.00, 320700.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(195, 'CARB-2026-00130', 12, 2, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4229', 74.75, 4250.00, 317687.50, 151550.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(196, 'CARB-2026-00142', 13, 1, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4249', 107.52, 4250.00, 456960.00, 207600.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(197, 'CARB-2026-00154', 14, NULL, '2026-08-13', 'Diesel', 'Station', 'BON-4269', 311.47, 4250.00, 1323747.50, 276100.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(198, 'CARB-2026-00166', 15, 2, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4289', 319.77, 4250.00, 1359022.50, 161850.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(199, 'CARB-2026-00178', 16, NULL, '2026-08-13', 'Diesel', 'Station', 'BON-4309', 73.15, 4250.00, 310887.50, 194700.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(200, 'CARB-2026-00190', 17, 1, '2026-08-13', 'Essence', 'Fût chantier', 'BON-4329', 30.60, 4150.00, 126990.00, NULL, 1465.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(201, 'CARB-2026-00202', 18, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4349', 8.58, 4150.00, 35607.00, 24950.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(202, 'CARB-2026-00214', 19, 2, '2026-08-13', 'Diesel', 'Fût chantier', 'BON-4369', 236.25, 4250.00, 1004062.50, NULL, 4605.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(203, 'CARB-2026-00226', 20, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4389', 12.12, 4150.00, 50298.00, 39200.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(204, 'CARB-2026-00238', 21, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4409', 11.64, 4150.00, 48306.00, 51800.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(205, 'CARB-2026-00250', 22, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4429', 52.00, 4150.00, 215800.00, NULL, 2330.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(206, 'CARB-2026-00262', 23, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4449', 22.50, 4150.00, 93375.00, NULL, 1115.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(207, 'CARB-2026-00274', 24, NULL, '2026-08-13', 'Essence', 'Station', 'BON-4469', 17.28, 4150.00, 71712.00, 46350.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(208, 'CARB-2026-00011', 2, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4030', 50.49, 4150.00, 209533.50, 90200.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(209, 'CARB-2026-00023', 3, 1, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4050', 73.15, 4250.00, 310887.50, 139500.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(210, 'CARB-2026-00035', 4, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4070', 51.00, 4150.00, 211650.00, 66800.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(211, 'CARB-2026-00047', 5, 1, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4090', 58.80, 4250.00, 249900.00, NULL, 2150.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(212, 'CARB-2026-00059', 6, 1, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4110', 252.00, 4250.00, 1071000.00, NULL, 6620.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(213, 'CARB-2026-00071', 7, NULL, '2026-08-28', 'Diesel', 'Station', 'BON-4130', 202.00, 4250.00, 858500.00, NULL, 10200.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(214, 'CARB-2026-00083', 8, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4150', 47.29, 4150.00, 196253.50, 164800.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(215, 'CARB-2026-00095', 9, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4170', 54.34, 4150.00, 225511.00, 102900.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(216, 'CARB-2026-00107', 10, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4190', 40.00, 4150.00, 166000.00, 181900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(217, 'CARB-2026-00119', 11, 2, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4210', 276.48, 4250.00, 1175040.00, 321600.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(218, 'CARB-2026-00131', 12, 2, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4230', 76.99, 4250.00, 327207.50, 152200.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(219, 'CARB-2026-00143', 13, 1, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4250', 110.88, 4250.00, 471240.00, 208300.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(220, 'CARB-2026-00155', 14, NULL, '2026-08-28', 'Diesel', 'Station', 'BON-4270', 287.28, 4250.00, 1220940.00, 276900.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(221, 'CARB-2026-00167', 15, 2, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4290', 329.46, 4250.00, 1400205.00, 162700.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(222, 'CARB-2026-00179', 16, NULL, '2026-08-28', 'Diesel', 'Station', 'BON-4310', 75.46, 4250.00, 320705.00, 195400.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(223, 'CARB-2026-00191', 17, 1, '2026-08-28', 'Essence', 'Stock interne', 'BON-4330', 31.50, 4150.00, 130725.00, NULL, 1490.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(224, 'CARB-2026-00203', 18, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4350', 8.84, 4150.00, 36686.00, 25300.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(225, 'CARB-2026-00215', 19, 2, '2026-08-28', 'Diesel', 'Stock interne', 'BON-4370', 218.25, 4250.00, 927562.50, NULL, 4630.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(226, 'CARB-2026-00227', 20, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4390', 12.48, 4150.00, 51792.00, 39600.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(227, 'CARB-2026-00239', 21, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4410', 12.00, 4150.00, 49800.00, 52200.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(228, 'CARB-2026-00251', 22, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4430', 48.00, 4150.00, 199200.00, NULL, 2350.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(229, 'CARB-2026-00263', 23, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4450', 23.18, 4150.00, 96197.00, NULL, 1130.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(230, 'CARB-2026-00275', 24, NULL, '2026-08-28', 'Essence', 'Station', 'BON-4470', 17.82, 4150.00, 73953.00, 46800.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(231, 'CARB-2026-00012', 2, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4031', 52.02, 4150.00, 215883.00, 90800.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL);
-INSERT INTO `tbl_engin_fuel` (`id`, `reference`, `engin_id`, `chantier_id`, `operation_date`, `type_carburant`, `source`, `numero_bon`, `quantity_litre`, `unit_price`, `total_amount`, `kilometrage`, `hour_meter`, `plein_complet`, `operator_name`, `supplier`, `observation`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(232, 'CARB-2026-00024', 3, 1, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4051', 75.46, 4250.00, 320705.00, 140200.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(233, 'CARB-2026-00036', 4, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4071', 52.50, 4150.00, 217875.00, 67300.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(234, 'CARB-2026-00048', 5, 1, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4091', 60.60, 4250.00, 257550.00, NULL, 2180.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(235, 'CARB-2026-00060', 6, 1, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4111', 232.80, 4250.00, 989400.00, NULL, 6640.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(236, 'CARB-2026-00072', 7, NULL, '2026-09-12', 'Diesel', 'Station', 'BON-4131', 208.00, 4250.00, 884000.00, NULL, 10240.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(237, 'CARB-2026-00084', 8, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4151', 48.75, 4150.00, 202312.50, 165450.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(238, 'CARB-2026-00096', 9, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4171', 50.16, 4150.00, 208164.00, 103450.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(239, 'CARB-2026-00108', 10, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4191', 41.20, 4150.00, 170980.00, 182400.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(240, 'CARB-2026-00120', 11, 2, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4211', 285.12, 4250.00, 1211760.00, 322500.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(241, 'CARB-2026-00132', 12, 2, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4231', 71.01, 4250.00, 301792.50, 152850.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(242, 'CARB-2026-00144', 13, 1, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4251', 114.24, 4250.00, 485520.00, 209000.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(243, 'CARB-2026-00156', 14, NULL, '2026-09-12', 'Diesel', 'Station', 'BON-4271', 296.35, 4250.00, 1259487.50, 277700.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(244, 'CARB-2026-00168', 15, 2, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4291', 339.15, 4250.00, 1441387.50, 163550.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(245, 'CARB-2026-00180', 16, NULL, '2026-09-12', 'Diesel', 'Station', 'BON-4311', 77.77, 4250.00, 330522.50, 196100.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(246, 'CARB-2026-00192', 17, 1, '2026-09-12', 'Essence', 'Stock interne', 'BON-4331', 29.10, 4150.00, 120765.00, NULL, 1515.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(247, 'CARB-2026-00204', 18, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4351', 9.10, 4150.00, 37765.00, 25650.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(248, 'CARB-2026-00216', 19, 2, '2026-09-12', 'Diesel', 'Stock interne', 'BON-4371', 225.00, 4250.00, 956250.00, NULL, 4655.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(249, 'CARB-2026-00228', 20, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4391', 11.52, 4150.00, 47808.00, 40000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(250, 'CARB-2026-00240', 21, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4411', 12.36, 4150.00, 51294.00, 52600.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(251, 'CARB-2026-00252', 22, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4431', 49.50, 4150.00, 205425.00, NULL, 2370.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(252, 'CARB-2026-00264', 23, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4451', 21.38, 4150.00, 88727.00, NULL, 1145.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(253, 'CARB-2026-00276', 24, NULL, '2026-09-12', 'Essence', 'Station', 'BON-4471', 18.36, 4150.00, 76194.00, 47250.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(254, 'CARB-2026-00013', 2, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4032', 53.55, 4150.00, 222232.50, 91400.00, NULL, 1, 'Jean Niyonzima', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(255, 'CARB-2026-00025', 3, 1, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4052', 77.77, 4250.00, 330522.50, 140900.00, NULL, 1, 'Eric Ndayishimiye', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(256, 'CARB-2026-00037', 4, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4072', 48.50, 4150.00, 201275.00, 67800.00, NULL, 1, 'Alain Hakizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(257, 'CARB-2026-00049', 5, 1, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4092', 62.40, 4250.00, 265200.00, NULL, 2210.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(258, 'CARB-2026-00061', 6, 1, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4112', 240.00, 4250.00, 1020000.00, NULL, 6660.00, 1, 'Pascal Irakoze', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(259, 'CARB-2026-00073', 7, NULL, '2026-09-27', 'Diesel', 'Station', 'BON-4132', 192.00, 4250.00, 816000.00, NULL, 10280.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(260, 'CARB-2026-00085', 8, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4152', 50.21, 4150.00, 208371.50, 166100.00, NULL, 1, 'Claude Bizimana', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(261, 'CARB-2026-00097', 9, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4172', 51.73, 4150.00, 214679.50, 104000.00, NULL, 1, 'Direction', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(262, 'CARB-2026-00109', 10, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4192', 38.00, 4150.00, 157700.00, 182900.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(263, 'CARB-2026-00121', 11, 2, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4212', 293.76, 4250.00, 1248480.00, 323400.00, NULL, 1, 'Désiré Nshimirimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(264, 'CARB-2026-00133', 12, 2, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4232', 73.26, 4250.00, 311355.00, 153500.00, NULL, 1, 'Fabrice Ndikumana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(265, 'CARB-2026-00145', 13, 1, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4252', 117.60, 4250.00, 499800.00, 209700.00, NULL, 1, 'Gilbert Nzeyimana', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(266, 'CARB-2026-00157', 14, NULL, '2026-09-27', 'Diesel', 'Station', 'BON-4272', 305.42, 4250.00, 1298035.00, 278500.00, NULL, 1, 'Ramadhani Hassan', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(267, 'CARB-2026-00169', 15, 2, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4292', 313.31, 4250.00, 1331567.50, 164400.00, NULL, 1, 'Emmanuel Nduwayo', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(268, 'CARB-2026-00181', 16, NULL, '2026-09-27', 'Diesel', 'Station', 'BON-4312', 80.08, 4250.00, 340340.00, 196800.00, NULL, 1, 'Serge Manirakiza', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(269, 'CARB-2026-00193', 17, 1, '2026-09-27', 'Essence', 'Fût chantier', 'BON-4332', 30.00, 4150.00, 124500.00, NULL, 1540.00, 1, 'Chef chantier', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(270, 'CARB-2026-00205', 18, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4352', 8.40, 4150.00, 34860.00, 26000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(271, 'CARB-2026-00217', 19, 2, '2026-09-27', 'Diesel', 'Fût chantier', 'BON-4372', 231.75, 4250.00, 984937.50, NULL, 4680.00, 1, 'Janvier Ntirampeba', 'Dépôt carburant SATRACO', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(272, 'CARB-2026-00229', 20, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4392', 11.88, 4150.00, 49302.00, 40400.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(273, 'CARB-2026-00241', 21, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4412', 11.40, 4150.00, 47310.00, 53000.00, NULL, 1, 'Coursier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(274, 'CARB-2026-00253', 22, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4432', 51.00, 4150.00, 211650.00, NULL, 2390.00, 1, 'Atelier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(275, 'CARB-2026-00265', 23, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4452', 22.05, 4150.00, 91507.50, NULL, 1160.00, 1, 'Chef chantier', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(276, 'CARB-2026-00277', 24, NULL, '2026-09-27', 'Essence', 'Station', 'BON-4472', 18.90, 4150.00, 78435.00, 47700.00, NULL, 1, 'Logistique', 'Station Kobil Bujumbura', NULL, 1, -1, '2026-09-30 10:46:08', NULL);
+INSERT INTO `tbl_engin_fuel` (`id`, `engin_id`, `chantier_id`, `operation_date`, `quantity_litre`, `unit_price`, `total_amount`, `kilometrage`, `hour_meter`, `operator_name`, `supplier`, `observation`, `status`, `created_at`, `updated_at`) VALUES
+(1, 15, 3, '2026-07-10', 2000.00, 5500.00, 11000000.00, 150.00, 5.00, 'Jean Marie', 'StationService', 'Je teste', 1, '2026-07-10 13:30:02', NULL),
+(2, 1, 25, '2026-07-01', 250.00, 5500.00, 1375000.00, 120.00, 5.00, 'Jean Marie', 'StationService', 'Ravitaillement chantier bloc ciment', 1, '2026-07-10 13:39:27', NULL),
+(3, 2, 1, '2026-07-01', 180.00, 5500.00, 990000.00, 450.00, 12.00, 'Nduwimana Claude', 'Interpetrol', 'Approvisionnement dépôt central', 1, '2026-07-10 13:39:27', NULL),
+(4, 3, 2, '2026-07-02', 220.00, 5500.00, 1210000.00, 380.00, 18.00, 'Hakizimana Eric', 'Kobil Burundi', 'Travaux terrassement', 1, '2026-07-10 13:39:27', NULL),
+(5, 4, NULL, '2026-07-02', 150.00, 5500.00, 825000.00, 250.00, 10.00, 'Ndayisenga Alain', 'Interpetrol', 'Réserve atelier', 1, '2026-07-10 13:39:27', NULL),
+(6, 5, NULL, '2026-07-03', 120.00, 5500.00, 660000.00, 180.00, 7.00, 'Ndayiragije Bosco', 'StationService', 'Maintenance atelier', 1, '2026-07-10 13:39:27', NULL),
+(7, 6, NULL, '2026-07-03', 300.00, 5500.00, 1650000.00, 720.00, 24.00, 'Nshimirimana Aimé', 'Kobil Burundi', 'Chargeuse principale dépôt', 1, '2026-07-10 13:39:27', NULL),
+(8, 7, 3, '2026-07-04', 280.00, 5500.00, 1540000.00, 610.00, 21.00, 'Bigirimana David', 'Interpetrol', 'Travaux carrière Ngozi', 1, '2026-07-10 13:39:27', NULL),
+(9, 8, NULL, '2026-07-04', 130.00, 5500.00, 715000.00, 220.00, 8.00, 'Nkurunziza Gilbert', 'StationService', 'Nivellement route nationale', 1, '2026-07-10 13:39:27', NULL),
+(10, 9, NULL, '2026-07-05', 160.00, 5500.00, 880000.00, 340.00, 15.00, 'Nduwayo Pacifique', 'Interpetrol', 'Compactage chantier', 1, '2026-07-10 13:39:27', NULL),
+(11, 10, 4, '2026-07-05', 200.00, 5500.00, 1100000.00, 410.00, 16.00, 'Jean Claude', 'Kobil Burundi', 'Compactage Rumonge', 1, '2026-07-10 13:39:27', NULL),
+(12, 11, NULL, '2026-07-06', 350.00, 5500.00, 1925000.00, 950.00, 32.00, 'Hakizimana Eric', 'Interpetrol', 'Transport matériaux', 1, '2026-07-10 13:39:27', NULL),
+(13, 12, 2, '2026-07-06', 400.00, 5500.00, 2200000.00, 1100.00, 40.00, 'Nduwimana Claude', 'StationService', 'Transport carrière Gitega', 1, '2026-07-10 13:39:27', NULL),
+(14, 13, NULL, '2026-07-07', 500.00, 5500.00, 2750000.00, 1350.00, 48.00, 'Ndayisenga Alain', 'Kobil Burundi', 'Livraison agrégats', 1, '2026-07-10 13:39:27', NULL),
+(15, 14, NULL, '2026-07-07', 270.00, 5500.00, 1485000.00, 860.00, 27.00, 'Jean Marie', 'Interpetrol', 'Arrosage chantier', 1, '2026-07-10 13:39:27', NULL),
+(16, 15, 3, '2026-07-08', 2000.00, 5500.00, 11000000.00, 150.00, 5.00, 'Jean Marie', 'StationService', 'Je teste', 1, '2026-07-10 13:39:27', NULL),
+(17, 16, 1, '2026-07-08', 320.00, 5500.00, 1760000.00, 980.00, 35.00, 'Bigirimana David', 'Kobil Burundi', 'Transport ciment', 1, '2026-07-10 13:39:27', NULL),
+(18, 17, 25, '2026-07-08', 180.00, 5500.00, 990000.00, 260.00, 11.00, 'Nshimirimana Aimé', 'Interpetrol', 'Travaux usine', 1, '2026-07-10 13:39:27', NULL),
+(19, 18, 4, '2026-07-09', 240.00, 5500.00, 1320000.00, 530.00, 18.00, 'Ndayiragije Bosco', 'StationService', 'Travaux voirie', 1, '2026-07-10 13:39:27', NULL),
+(20, 19, NULL, '2026-07-09', 300.00, 5500.00, 1650000.00, 680.00, 25.00, 'Jean Claude', 'Kobil Burundi', 'Réserve dépôt central', 1, '2026-07-10 13:39:27', NULL),
+(21, 20, 2, '2026-07-10', 260.00, 5500.00, 1430000.00, 460.00, 20.00, 'Hakizimana Eric', 'Interpetrol', 'Excavation chantier Gitega', 1, '2026-07-10 13:39:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -14784,28 +14241,22 @@ INSERT INTO `tbl_engin_fuel` (`id`, `reference`, `engin_id`, `chantier_id`, `ope
 
 CREATE TABLE `tbl_engin_maintenance` (
   `id` int(11) NOT NULL,
-  `reference` varchar(30) DEFAULT NULL COMMENT 'Ex : MNT-2026-00001',
   `engin_id` int(11) NOT NULL,
   `chantier_id` int(11) DEFAULT NULL,
-  `panne_id` int(11) DEFAULT NULL COMMENT 'Panne à l''origine d''une maintenance corrective',
-  `maintenance_type` enum('Préventive','Corrective','Inspection','Révision générale') NOT NULL,
+  `maintenance_type` varchar(100) NOT NULL,
   `intervention` varchar(255) NOT NULL,
   `planned_date` date NOT NULL,
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
-  `compteur_intervention` decimal(15,2) DEFAULT NULL COMMENT 'km ou heures au moment de l''intervention',
   `next_maintenance_date` date DEFAULT NULL,
-  `next_maintenance_compteur` decimal(15,2) DEFAULT NULL COMMENT 'Prochaine échéance au compteur',
-  `immobilise` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = engin indisponible pendant l''intervention',
   `supplier` varchar(180) DEFAULT NULL,
   `technician` varchar(180) DEFAULT NULL,
-  `parts_cost` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT '= SUM(tbl_engin_maintenance_piece.montant)',
+  `parts_cost` decimal(18,2) NOT NULL DEFAULT 0.00,
   `labor_cost` decimal(18,2) NOT NULL DEFAULT 0.00,
-  `total_cost` decimal(18,2) NOT NULL DEFAULT 0.00 COMMENT 'Recalculé côté serveur',
+  `total_cost` decimal(18,2) NOT NULL DEFAULT 0.00,
   `description` text DEFAULT NULL,
-  `maintenance_status` enum('Programmé','En cours','Terminé','Annulé') NOT NULL DEFAULT 'Programmé',
+  `maintenance_status` varchar(50) NOT NULL DEFAULT 'Programmé',
   `record_status` tinyint(1) NOT NULL DEFAULT 1,
-  `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -14814,18 +14265,28 @@ CREATE TABLE `tbl_engin_maintenance` (
 -- Déchargement des données de la table `tbl_engin_maintenance`
 --
 
-INSERT INTO `tbl_engin_maintenance` (`id`, `reference`, `engin_id`, `chantier_id`, `panne_id`, `maintenance_type`, `intervention`, `planned_date`, `start_date`, `end_date`, `compteur_intervention`, `next_maintenance_date`, `next_maintenance_compteur`, `immobilise`, `supplier`, `technician`, `parts_cost`, `labor_cost`, `total_cost`, `description`, `maintenance_status`, `record_status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'MNT-2026-00001', 16, NULL, NULL, 'Préventive', 'Vidange moteur + filtres', '2026-05-03', '2026-05-03', '2026-05-03', 189800.00, '2026-10-10', NULL, 1, 'Garage Toyota Bujumbura', 'Olivier Nsabimana', 224000.00, 40000.00, 264000.00, 'Vidange 15W40, filtres huile et gasoil remplacés.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL),
-(2, 'MNT-2026-00002', 11, 2, NULL, 'Révision générale', 'Révision générale 300 000 km', '2026-09-10', '2026-09-10', '2026-09-13', 321600.00, '2026-12-29', 323650.00, 1, 'Atelier SATRACO', 'Marc Ndikuriyo', 1940000.00, 150000.00, 2090000.00, 'Révision complète : pneus avant, plaquettes, graissage général.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL),
-(3, 'MNT-2026-00003', 6, 1, NULL, 'Préventive', 'Graissage + contrôle circuit hydraulique', '2026-09-25', NULL, NULL, NULL, NULL, NULL, 1, 'Atelier SATRACO', 'Pascal Irakoze', 36000.00, 60000.00, 96000.00, 'Contrôle mensuel du circuit hydraulique.', 'Programmé', 1, -1, '2026-09-30 10:46:08', NULL),
-(4, 'MNT-2026-00004', 19, 2, 2, 'Corrective', 'Remplacement pompe hydraulique', '2026-09-27', '2026-09-27', NULL, 4655.00, NULL, NULL, 1, 'Bomag Service EA', 'Janvier Ntirampeba', 3400000.00, 350000.00, 3750000.00, 'Pompe commandée et en cours de montage.', 'En cours', 1, -1, '2026-09-30 10:46:08', NULL),
-(5, 'MNT-2026-00005', 7, NULL, NULL, 'Préventive', 'Vidange + filtre à air', '2026-10-05', NULL, NULL, NULL, NULL, NULL, 1, 'Atelier SATRACO', 'Atelier', 311000.00, 35000.00, 346000.00, 'Entretien toutes les 250 heures.', 'Programmé', 1, -1, '2026-09-30 10:46:08', NULL),
-(6, 'MNT-2026-00006', 9, NULL, 3, 'Corrective', 'Remplacement plaquettes de frein', '2026-08-30', '2026-08-30', '2026-08-31', 102350.00, NULL, NULL, 1, 'Garage Toyota Bujumbura', 'Olivier Nsabimana', 120000.00, 45000.00, 165000.00, 'Plaquettes avant usées, disques contrôlés.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL),
-(7, 'MNT-2026-00007', 13, 1, NULL, 'Inspection', 'Contrôle technique annuel', '2026-06-27', '2026-06-27', '2026-06-27', 204800.00, '2026-09-28', NULL, 0, 'Centre de contrôle OBR', 'Gilbert Nzeyimana', 0.00, 60000.00, 60000.00, 'Contrôle validé, prochain passage à planifier.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL),
-(8, 'MNT-2026-00008', 5, 1, NULL, 'Préventive', 'Changement courroie et graissage', '2026-08-16', '2026-08-16', '2026-08-16', 2120.00, '2027-01-28', NULL, 1, 'Atelier SATRACO', 'Chef chantier', 38000.00, 20000.00, 58000.00, 'Courroie de transmission remplacée.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL),
-(9, 'MNT-2026-00009', 15, 2, NULL, 'Corrective', 'Réparation boîte de vitesses', '2026-09-18', '2026-09-18', '2026-09-22', 163550.00, NULL, NULL, 1, 'Howo Trucks Burundi', 'Emmanuel Nduwayo', 1674000.00, 600000.00, 2274000.00, 'Synchros 3e et 4e remplacés, vidange boîte.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL),
-(10, 'MNT-2026-00010', 8, NULL, NULL, 'Préventive', 'Vidange moteur', '2026-08-01', NULL, NULL, NULL, NULL, NULL, 0, 'Garage Toyota Bujumbura', 'Claude Bizimana', 0.00, 0.00, 0.00, 'Annulée : véhicule en mission.', 'Annulé', 1, -1, '2026-09-30 10:46:08', NULL),
-(11, 'MNT-2026-00011', 3, 1, NULL, 'Préventive', 'Vidange moteur + filtres', '2026-09-05', '2026-09-05', '2026-09-05', 139500.00, '2027-03-04', 145900.00, 1, 'Garage Toyota Bujumbura', 'Olivier Nsabimana', 181000.00, 40000.00, 221000.00, 'Vidange + filtre à air.', 'Terminé', 1, -1, '2026-09-30 10:46:08', NULL);
+INSERT INTO `tbl_engin_maintenance` (`id`, `engin_id`, `chantier_id`, `maintenance_type`, `intervention`, `planned_date`, `start_date`, `end_date`, `next_maintenance_date`, `supplier`, `technician`, `parts_cost`, `labor_cost`, `total_cost`, `description`, `maintenance_status`, `record_status`, `created_at`, `updated_at`) VALUES
+(1, 18, 25, 'Inspection', 'asdsada', '2026-07-11', '2026-07-13', '2026-07-18', '2026-07-14', 'StationService', 'Jean', 9000.00, 300000.00, 309000.00, 'jettsss', 'En cours', 1, '2026-07-10 15:03:05', NULL),
+(2, 2, 25, 'Préventive', 'Vidange moteur', '2026-01-12', '2026-01-12', '2026-01-13', '2026-04-12', 'Station Service SATRACO', 'Jean Marie', 120000.00, 80000.00, 200000.00, 'Vidange complète moteur', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(3, 5, 25, 'Corrective', 'Remplacement batterie', '2026-01-20', '2026-01-20', '2026-01-21', '2026-07-20', 'Electro Diesel Burundi', 'Patrick N.', 350000.00, 100000.00, 450000.00, 'Batterie hors service remplacée', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(4, 9, 25, 'Inspection', 'Contrôle hydraulique', '2026-02-01', '2026-02-01', '2026-02-01', '2026-05-01', 'Hydro Service', 'Claude M.', 50000.00, 50000.00, 100000.00, 'Inspection du système hydraulique', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(5, 11, 25, 'Corrective', 'Réparation vérin', '2026-02-10', '2026-02-10', '2026-02-13', '2026-08-10', 'Garage Technique', 'Samuel K.', 800000.00, 350000.00, 1150000.00, 'Réparation du vérin principal', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(6, 15, 25, 'Préventive', 'Graissage général', '2026-02-22', '2026-02-22', '2026-02-22', '2026-05-22', 'SATRACO Atelier', 'Jean Marie', 20000.00, 30000.00, 50000.00, 'Graissage des articulations', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(7, 2, 25, 'Inspection', 'Inspection sécurité', '2026-03-05', '2026-03-05', '2026-03-05', '2026-06-05', 'Inspection Burundi', 'Patrick N.', 30000.00, 20000.00, 50000.00, 'Contrôle des systèmes de sécurité', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(8, 5, 25, 'Corrective', 'Remplacement filtre air', '2026-03-15', '2026-03-15', '2026-03-16', '2026-09-15', 'Diesel Center', 'Claude M.', 70000.00, 40000.00, 110000.00, 'Filtre fortement encrassé', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(9, 9, 25, 'Préventive', 'Vidange transmission', '2026-03-28', '2026-03-28', '2026-03-29', '2026-06-28', 'Garage SATRACO', 'Jean Marie', 180000.00, 120000.00, 300000.00, 'Vidange boîte de vitesse', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(10, 11, 25, 'Révision générale', 'Révision annuelle', '2026-04-10', '2026-04-10', '2026-04-15', '2027-04-10', 'Caterpillar Service', 'Samuel K.', 2500000.00, 800000.00, 3300000.00, 'Révision générale complète', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(11, 15, 25, 'Corrective', 'Réparation circuit électrique', '2026-04-18', '2026-04-18', '2026-04-20', '2026-10-18', 'Electro Diesel Burundi', 'Patrick N.', 500000.00, 200000.00, 700000.00, 'Court-circuit sur le faisceau principal', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(12, 2, 25, 'Préventive', 'Contrôle courroies', '2026-05-01', '2026-05-01', '2026-05-01', '2026-08-01', 'Garage SATRACO', 'Jean Marie', 25000.00, 25000.00, 50000.00, 'Contrôle des courroies moteur', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(13, 5, 25, 'Corrective', 'Remplacement injecteurs', '2026-05-12', '2026-05-12', '2026-05-15', '2026-11-12', 'Diesel Center', 'Samuel K.', 1200000.00, 450000.00, 1650000.00, 'Injecteurs défectueux remplacés', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(14, 9, 25, 'Inspection', 'Contrôle système freinage', '2026-05-25', '2026-05-25', '2026-05-25', '2026-08-25', 'Garage Technique', 'Claude M.', 40000.00, 40000.00, 80000.00, 'Contrôle complet du freinage', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(15, 11, 25, 'Préventive', 'Vidange hydraulique', '2026-06-05', '2026-06-05', '2026-06-06', '2026-09-05', 'Hydro Service', 'Jean Marie', 250000.00, 100000.00, 350000.00, 'Huile hydraulique remplacée', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(16, 15, 25, 'Corrective', 'Remplacement pompe hydraulique', '2026-06-18', '2026-06-18', '2026-06-22', '2027-06-18', 'Hydro Service', 'Samuel K.', 4500000.00, 1200000.00, 5700000.00, 'Pompe hydraulique remplacée', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(17, 18, 25, 'Inspection', 'Contrôle moteur', '2026-06-30', '2026-06-30', '2026-06-30', '2026-09-30', 'Garage SATRACO', 'Patrick N.', 50000.00, 50000.00, 100000.00, 'Inspection moteur trimestrielle', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(18, 18, 25, 'Préventive', 'Vidange moteur', '2026-07-05', '2026-07-05', '2026-07-05', '2026-10-05', 'Station Service SATRACO', 'Jean Marie', 120000.00, 70000.00, 190000.00, 'Vidange périodique', 'Terminé', 1, '2026-07-10 15:27:39', NULL),
+(19, 18, 25, 'Corrective', 'Réparation système refroidissement', '2026-07-10', '2026-07-10', '2026-07-13', '2027-01-10', 'Cooling Expert', 'Samuel K.', 850000.00, 300000.00, 1150000.00, 'Radiateur remplacé', 'En cours', 1, '2026-07-10 15:27:39', NULL),
+(20, 18, 25, 'Inspection', 'Inspection sécurité chantier', '2026-07-14', NULL, NULL, '2026-10-14', 'Inspection Burundi', 'Claude M.', 0.00, 50000.00, 50000.00, 'Inspection programmée', 'Programmé', 1, '2026-07-10 15:27:39', NULL),
+(21, 18, 25, 'Préventive', 'Contrôle général avant chantier', '2026-07-20', NULL, NULL, '2026-10-20', 'Garage SATRACO', 'Jean Marie', 0.00, 60000.00, 60000.00, 'Préparation avant affectation chantier', 'Programmé', 1, '2026-07-10 15:27:39', NULL);
 
 -- --------------------------------------------------------
 
@@ -14839,50 +14300,49 @@ CREATE TABLE `tbl_engin_maintenance_document` (
   `document` varchar(255) NOT NULL,
   `original_name` varchar(255) DEFAULT NULL,
   `file_type` varchar(100) DEFAULT NULL,
-  `file_size` int(10) UNSIGNED DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Structure de la table `tbl_engin_maintenance_piece`
---
-
-CREATE TABLE `tbl_engin_maintenance_piece` (
-  `id` int(11) NOT NULL,
-  `maintenance_id` int(11) NOT NULL,
-  `article_id` int(11) DEFAULT NULL,
-  `designation` varchar(255) NOT NULL,
-  `reference_piece` varchar(100) DEFAULT NULL,
-  `quantite` decimal(12,2) NOT NULL DEFAULT 1.00,
-  `prix_unitaire` decimal(18,2) NOT NULL DEFAULT 0.00,
-  `montant` decimal(18,2) GENERATED ALWAYS AS (`quantite` * `prix_unitaire`) STORED,
+  `file_size` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
--- Déchargement des données de la table `tbl_engin_maintenance_piece`
+-- Déchargement des données de la table `tbl_engin_maintenance_document`
 --
 
-INSERT INTO `tbl_engin_maintenance_piece` (`id`, `maintenance_id`, `article_id`, `designation`, `reference_piece`, `quantite`, `prix_unitaire`, `created_at`) VALUES
-(1, 1, NULL, 'Filtre à gasoil', '23390-0L041', 1.00, 45000.00, '2026-09-30 10:46:08'),
-(2, 1, NULL, 'Filtre à huile', '90915-YZZD2', 1.00, 35000.00, '2026-09-30 10:46:08'),
-(3, 1, NULL, 'Huile moteur 15W40', 'TOTAL-15W40', 8.00, 18000.00, '2026-09-30 10:46:08'),
-(4, 2, NULL, 'Graisse multi-usage (kg)', 'GR-EP2', 5.00, 12000.00, '2026-09-30 10:46:08'),
-(5, 2, NULL, 'Jeu de plaquettes de frein', 'MB-A0034209620', 1.00, 180000.00, '2026-09-30 10:46:08'),
-(6, 2, NULL, 'Pneu 315/80 R22.5', 'MICH-X-MULTI', 2.00, 850000.00, '2026-09-30 10:46:08'),
-(7, 3, NULL, 'Graisse multi-usage (kg)', 'GR-EP2', 3.00, 12000.00, '2026-09-30 10:46:08'),
-(8, 4, NULL, 'Huile hydraulique HV46 (L)', 'HV46', 40.00, 15000.00, '2026-09-30 10:46:08'),
-(9, 4, NULL, 'Pompe hydraulique', 'BOMAG-05816', 1.00, 2800000.00, '2026-09-30 10:46:08'),
-(10, 5, NULL, 'Filtre à air', 'SDMO-330300', 1.00, 95000.00, '2026-09-30 10:46:08'),
-(11, 5, NULL, 'Huile moteur 15W40', 'TOTAL-15W40', 12.00, 18000.00, '2026-09-30 10:46:08'),
-(12, 6, NULL, 'Plaquettes de frein avant', '04465-42160', 1.00, 120000.00, '2026-09-30 10:46:08'),
-(13, 8, NULL, 'Courroie de transmission', 'B-54', 1.00, 38000.00, '2026-09-30 10:46:08'),
-(14, 9, NULL, 'Huile de boîte 85W90 (L)', 'GL5-85W90', 14.00, 16000.00, '2026-09-30 10:46:08'),
-(15, 9, NULL, 'Kit synchroniseurs', 'HW-19710', 1.00, 1450000.00, '2026-09-30 10:46:08'),
-(16, 11, NULL, 'Filtre à air', '17801-0C010', 1.00, 55000.00, '2026-09-30 10:46:08'),
-(17, 11, NULL, 'Huile moteur 15W40', 'TOTAL-15W40', 7.00, 18000.00, '2026-09-30 10:46:08');
+INSERT INTO `tbl_engin_maintenance_document` (`id`, `maintenance_id`, `document`, `original_name`, `file_type`, `file_size`, `created_at`) VALUES
+(1, 1, '4c95987bb7f4874ad9dbd618529be2ea.jpg', 'DSC_0107.jpg', 'image/jpeg', 433207, '2026-07-10 15:03:05'),
+(2, 1, 'e64ca940dc6a709c8797713387d5f766.pdf', 'ticket-Fête_d’indépendances_(1).pdf', 'application/pdf', 1507030, '2026-07-10 15:03:05'),
+(3, 1, 'facture_vidange_001.pdf', 'facture_vidange_001.pdf', 'application/pdf', 854231, '2026-07-10 15:34:03'),
+(4, 1, 'photo_vidange_001.jpg', 'photo_vidange_001.jpg', 'image/jpeg', 423587, '2026-07-10 15:34:03'),
+(5, 2, 'facture_batterie.pdf', 'facture_batterie.pdf', 'application/pdf', 623587, '2026-07-10 15:34:03'),
+(6, 2, 'photo_batterie.jpg', 'photo_batterie.jpg', 'image/jpeg', 398741, '2026-07-10 15:34:03'),
+(7, 3, 'rapport_hydraulique.pdf', 'rapport_hydraulique.pdf', 'application/pdf', 735287, '2026-07-10 15:34:03'),
+(8, 4, 'photo_verin_01.jpg', 'photo_verin_01.jpg', 'image/jpeg', 562314, '2026-07-10 15:34:03'),
+(9, 4, 'photo_verin_02.jpg', 'photo_verin_02.jpg', 'image/jpeg', 489753, '2026-07-10 15:34:03'),
+(10, 4, 'devis_verin.pdf', 'devis_verin.pdf', 'application/pdf', 932741, '2026-07-10 15:34:03'),
+(11, 5, 'rapport_graissage.pdf', 'rapport_graissage.pdf', 'application/pdf', 324587, '2026-07-10 15:34:03'),
+(12, 6, 'inspection_securite.pdf', 'inspection_securite.pdf', 'application/pdf', 412365, '2026-07-10 15:34:03'),
+(13, 7, 'filtre_air_avant.jpg', 'filtre_air_avant.jpg', 'image/jpeg', 286521, '2026-07-10 15:34:03'),
+(14, 7, 'filtre_air_apres.jpg', 'filtre_air_apres.jpg', 'image/jpeg', 301244, '2026-07-10 15:34:03'),
+(15, 8, 'transmission.pdf', 'transmission.pdf', 'application/pdf', 512874, '2026-07-10 15:34:03'),
+(16, 9, 'revision_generale.pdf', 'revision_generale.pdf', 'application/pdf', 1452365, '2026-07-10 15:34:03'),
+(17, 9, 'moteur_revision.jpg', 'moteur_revision.jpg', 'image/jpeg', 512333, '2026-07-10 15:34:03'),
+(18, 9, 'pompe_revision.jpg', 'pompe_revision.jpg', 'image/jpeg', 458712, '2026-07-10 15:34:03'),
+(19, 10, 'schema_electrique.pdf', 'schema_electrique.pdf', 'application/pdf', 745231, '2026-07-10 15:34:03'),
+(20, 11, 'controle_courroies.pdf', 'controle_courroies.pdf', 'application/pdf', 302451, '2026-07-10 15:34:03'),
+(21, 12, 'injecteur_01.jpg', 'injecteur_01.jpg', 'image/jpeg', 356214, '2026-07-10 15:34:03'),
+(22, 12, 'injecteur_02.jpg', 'injecteur_02.jpg', 'image/jpeg', 378541, '2026-07-10 15:34:03'),
+(23, 12, 'facture_injecteurs.pdf', 'facture_injecteurs.pdf', 'application/pdf', 932154, '2026-07-10 15:34:03'),
+(24, 13, 'controle_freinage.pdf', 'controle_freinage.pdf', 'application/pdf', 415632, '2026-07-10 15:34:03'),
+(25, 14, 'huile_hydraulique.pdf', 'huile_hydraulique.pdf', 'application/pdf', 625874, '2026-07-10 15:34:03'),
+(26, 15, 'pompe_hydraulique.pdf', 'pompe_hydraulique.pdf', 'application/pdf', 1236547, '2026-07-10 15:34:03'),
+(27, 15, 'photo_pompe.jpg', 'photo_pompe.jpg', 'image/jpeg', 498745, '2026-07-10 15:34:03'),
+(28, 16, 'inspection_moteur.pdf', 'inspection_moteur.pdf', 'application/pdf', 412365, '2026-07-10 15:34:03'),
+(29, 17, 'vidange_juillet.pdf', 'vidange_juillet.pdf', 'application/pdf', 365214, '2026-07-10 15:34:03'),
+(30, 18, 'radiateur_01.jpg', 'radiateur_01.jpg', 'image/jpeg', 489745, '2026-07-10 15:34:03'),
+(31, 18, 'radiateur_02.jpg', 'radiateur_02.jpg', 'image/jpeg', 521365, '2026-07-10 15:34:03'),
+(32, 18, 'facture_radiateur.pdf', 'facture_radiateur.pdf', 'application/pdf', 865412, '2026-07-10 15:34:03'),
+(33, 19, 'inspection_chantier.pdf', 'inspection_chantier.pdf', 'application/pdf', 425874, '2026-07-10 15:34:03'),
+(34, 20, 'controle_general.pdf', 'controle_general.pdf', 'application/pdf', 365412, '2026-07-10 15:34:03');
 
 -- --------------------------------------------------------
 
@@ -14899,99 +14359,43 @@ CREATE TABLE `tbl_engin_materiel` (
   `modele` varchar(100) DEFAULT NULL,
   `plaque` varchar(50) DEFAULT NULL,
   `numero_serie` varchar(100) DEFAULT NULL,
-  `numero_chassis` varchar(100) DEFAULT NULL,
-  `numero_moteur` varchar(100) DEFAULT NULL,
-  `annee_fabrication` smallint(5) UNSIGNED DEFAULT NULL,
-  `type_carburant` enum('Diesel','Essence','Mélange 2T','Électrique','Aucun') NOT NULL DEFAULT 'Diesel',
-  `capacite_reservoir` decimal(10,2) DEFAULT NULL COMMENT 'Litres',
-  `type_compteur` enum('km','heure','aucun') NOT NULL DEFAULT 'km',
-  `compteur_initial` decimal(15,2) NOT NULL DEFAULT 0.00,
-  `compteur_actuel` decimal(15,2) NOT NULL DEFAULT 0.00 COMMENT 'Mis à jour à chaque ravitaillement / maintenance / retour d''affectation',
-  `consommation_reference` decimal(10,2) DEFAULT NULL COMMENT 'Norme constructeur : L/100 km ou L/heure selon type_compteur',
   `date_acquisition` date DEFAULT NULL,
-  `date_mise_service` date DEFAULT NULL,
   `valeur_achat` decimal(18,2) DEFAULT 0.00,
-  `fournisseur_id` int(11) DEFAULT NULL,
-  `duree_amortissement_mois` int(10) UNSIGNED DEFAULT NULL,
-  `valeur_residuelle` decimal(18,2) NOT NULL DEFAULT 0.00,
-  `date_reforme` date DEFAULT NULL COMMENT 'Date de sortie du parc (cession, casse...)',
-  `motif_reforme` varchar(255) DEFAULT NULL,
-  `etat` enum('Disponible','Sur chantier','Maintenance','En panne','Réformé') NOT NULL DEFAULT 'Disponible',
+  `etat` varchar(50) NOT NULL,
   `localisation` varchar(150) DEFAULT NULL,
   `chantier_id` int(11) DEFAULT NULL,
-  `responsable` varchar(150) DEFAULT NULL COMMENT 'Chauffeur / opérateur attitré',
   `observation` text DEFAULT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = actif, 0 = supprimé (soft delete)',
-  `created_by` int(11) DEFAULT NULL,
-  `updated_by` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `status` tinyint(1) DEFAULT 1,
+  `created_at` datetime DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `tbl_engin_materiel`
 --
 
-INSERT INTO `tbl_engin_materiel` (`id`, `code_engin`, `designation`, `categorie_id`, `marque`, `modele`, `plaque`, `numero_serie`, `numero_chassis`, `numero_moteur`, `annee_fabrication`, `type_carburant`, `capacite_reservoir`, `type_compteur`, `compteur_initial`, `compteur_actuel`, `consommation_reference`, `date_acquisition`, `date_mise_service`, `valeur_achat`, `fournisseur_id`, `duree_amortissement_mois`, `valeur_residuelle`, `date_reforme`, `motif_reforme`, `etat`, `localisation`, `chantier_id`, `responsable`, `observation`, `status`, `created_by`, `updated_by`, `created_at`, `updated_at`) VALUES
-(2, 'ENG-2026-00002', 'Succeed', 21, 'Toyota', 'Succeed', 'L0501A', 'SN-TOY-10137', NULL, NULL, 2021, 'Essence', 50.00, 'km', 84200.00, 91400.00, 8.50, '2021-03-15', '2021-03-22', 28000000.00, NULL, 60, 2800000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Jean Niyonzima', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(3, 'ENG-2026-00003', 'Hilux simple cabine', 21, 'Toyota', 'Hilux', 'C1566A', 'SN-TOY-10274', NULL, NULL, 2019, 'Diesel', 80.00, 'km', 132500.00, 140900.00, 11.00, '2019-06-10', '2019-06-17', 65000000.00, NULL, 60, 6500000.00, NULL, NULL, 'Sur chantier', NULL, 1, 'Eric Ndayishimiye', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(4, 'ENG-2026-00004', 'Volkswagen', 21, 'Volkswagen', 'Amarok', 'L5652A', 'SN-VOL-10411', NULL, NULL, 2022, 'Essence', 80.00, 'km', 61800.00, 67800.00, 10.00, '2022-01-20', '2022-01-27', 55000000.00, NULL, 60, 5500000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Alain Hakizimana', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(5, 'ENG-2026-00005', 'Bétonnière', 24, 'Altrad', 'B350', NULL, 'SN-ALT-10548', NULL, NULL, 2020, 'Diesel', 25.00, 'heure', 1850.00, 2210.00, 2.00, '2020-09-01', '2020-09-08', 9500000.00, NULL, 48, 950000.00, NULL, NULL, 'Sur chantier', NULL, 1, 'Chef chantier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(6, 'ENG-2026-00006', 'Grue élévateur', 23, 'Manitou', 'MT 1440', 'F6809A', 'SN-MAN-10685', NULL, NULL, 2018, 'Diesel', 150.00, 'heure', 6420.00, 6660.00, 12.00, '2018-04-12', '2018-04-19', 380000000.00, NULL, 96, 38000000.00, NULL, NULL, 'Sur chantier', NULL, 1, 'Pascal Irakoze', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(7, 'ENG-2026-00007', 'Groupe électrogène', 24, 'SDMO', 'J88K', NULL, 'SN-SDM-10822', NULL, NULL, 2019, 'Diesel', 200.00, 'heure', 9800.00, 10280.00, 5.00, '2019-11-05', '2019-11-12', 42000000.00, NULL, 60, 4200000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Atelier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(8, 'ENG-2026-00008', 'Probox', 21, 'Toyota', 'Probox', 'L5495A', 'SN-TOY-10959', NULL, NULL, 2017, 'Essence', 50.00, 'km', 158300.00, 166100.00, 7.50, '2017-02-28', '2017-03-07', 22000000.00, NULL, 60, 2200000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Claude Bizimana', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(9, 'ENG-2026-00009', 'RAV4', 21, 'Toyota', 'RAV4', 'L4521A', 'SN-TOY-11096', NULL, NULL, 2020, 'Essence', 60.00, 'km', 97400.00, 104000.00, 9.50, '2020-07-14', '2020-07-21', 48000000.00, NULL, 60, 4800000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Direction', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(10, 'ENG-2026-00010', 'Wish', 21, 'Toyota', 'Wish', 'J2818A', 'SN-TOY-11233', NULL, NULL, 2016, 'Essence', 60.00, 'km', 176900.00, 182900.00, 8.00, '2016-10-03', '2016-10-10', 18000000.00, NULL, 60, 1800000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Logistique', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(11, 'ENG-2026-00011', 'Mercedes Benz', 22, 'Mercedes-Benz', 'Actros 3341', 'H8837A', 'SN-MER-11370', NULL, NULL, 2018, 'Diesel', 400.00, 'km', 312600.00, 323400.00, 32.00, '2018-08-22', '2018-08-29', 210000000.00, NULL, 96, 21000000.00, NULL, NULL, 'Sur chantier', NULL, 2, 'Désiré Nshimirimana', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(12, 'ENG-2026-00012', 'Hilux Tacoma', 21, 'Toyota', 'Tacoma', 'J0696A', 'SN-TOY-11507', NULL, NULL, 2018, 'Diesel', 80.00, 'km', 145700.00, 153500.00, 11.50, '2018-12-11', '2018-12-18', 52000000.00, NULL, 60, 5200000.00, NULL, NULL, 'Sur chantier', NULL, 2, 'Fabrice Ndikumana', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(13, 'ENG-2026-00013', 'Dyna', 22, 'Toyota', 'Dyna 300', 'I4178A', 'SN-TOY-11644', NULL, NULL, 2017, 'Diesel', 100.00, 'km', 201300.00, 209700.00, 16.00, '2017-05-19', '2017-05-26', 60000000.00, NULL, 84, 6000000.00, NULL, NULL, 'Sur chantier', NULL, 1, 'Gilbert Nzeyimana', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(14, 'ENG-2026-00014', 'Benne Fuso', 22, 'Mitsubishi Fuso', 'Fighter', 'I4945A', 'SN-MIT-11781', NULL, NULL, 2019, 'Diesel', 200.00, 'km', 268900.00, 278500.00, 28.00, '2019-03-07', '2019-03-14', 150000000.00, NULL, 96, 15000000.00, NULL, NULL, 'En panne', 'Dépôt central', NULL, 'Ramadhani Hassan', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(15, 'ENG-2026-00015', 'Benne 10 pneus', 22, 'Howo', 'Sinotruk 371', 'E1070A', 'SN-HOW-11918', NULL, NULL, 2021, 'Diesel', 400.00, 'km', 154200.00, 164400.00, 38.00, '2021-09-30', '2021-10-07', 240000000.00, NULL, 96, 24000000.00, NULL, NULL, 'Sur chantier', NULL, 2, 'Emmanuel Nduwayo', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(16, 'ENG-2026-00016', 'Hilux Vigo', 21, 'Toyota', 'Hilux Vigo', 'E4923A', 'SN-TOY-12055', NULL, NULL, 2016, 'Diesel', 80.00, 'km', 188400.00, 196800.00, 11.00, '2016-06-01', '2016-06-08', 58000000.00, NULL, 60, 5800000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Serge Manirakiza', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(17, 'ENG-2026-00017', 'Vibreuse', 24, 'Wacker Neuson', 'IRFU 45', NULL, 'SN-WAC-12192', NULL, NULL, 2022, 'Essence', 5.00, 'heure', 1240.00, 1540.00, 1.20, '2022-04-18', '2022-04-25', 3200000.00, NULL, 36, 320000.00, NULL, NULL, 'Sur chantier', NULL, 1, 'Chef chantier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(18, 'ENG-2026-00018', 'Vélomoteur', 25, 'Yamaha', 'Crypton', NULL, 'SN-YAM-12329', NULL, NULL, 2022, 'Essence', 4.00, 'km', 21800.00, 26000.00, 2.50, '2022-02-10', '2022-02-17', 2800000.00, NULL, 36, 280000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Coursier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(19, 'ENG-2026-00019', 'Compacteur', 23, 'Bomag', 'BW 211 D', NULL, 'SN-BOM-12466', NULL, NULL, 2019, 'Diesel', 250.00, 'heure', 4380.00, 4680.00, 9.00, '2019-10-25', '2019-11-01', 165000000.00, NULL, 96, 16500000.00, NULL, NULL, 'Maintenance', NULL, 2, 'Janvier Ntirampeba', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(20, 'ENG-2026-00020', 'Moto', 25, 'TVS', 'Apache 150', 'A2499A', 'SN-TVS-12603', NULL, NULL, 2021, 'Essence', 12.00, 'km', 35600.00, 40400.00, 3.00, '2021-05-05', '2021-05-12', 4500000.00, NULL, 36, 450000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Coursier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(21, 'ENG-2026-00021', 'Moto', 25, 'Bajaj', 'Boxer 150', 'E6491A', 'SN-BAJ-12740', NULL, NULL, 2019, 'Essence', 11.00, 'km', 48200.00, 53000.00, 3.00, '2019-01-15', '2019-01-22', 3800000.00, NULL, 36, 380000.00, '2026-09-20', 'Vendue — moteur hors d\'usage', 'Réformé', 'Hors parc', NULL, 'Coursier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(22, 'ENG-2026-00022', 'Moto soudeuse', 24, 'Lincoln', 'Ranger 225', NULL, 'SN-LIN-12877', NULL, NULL, 2020, 'Essence', 45.00, 'heure', 2150.00, 2390.00, 2.50, '2020-03-03', '2020-03-10', 12500000.00, NULL, 60, 1250000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Atelier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(23, 'ENG-2026-00023', 'Motopompe', 24, 'Honda', 'WB30XT', NULL, 'SN-HON-13014', NULL, NULL, 2021, 'Essence', 4.00, 'heure', 980.00, 1160.00, 1.50, '2021-08-08', '2021-08-15', 1900000.00, NULL, 36, 190000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Chef chantier', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL),
-(24, 'ENG-2026-00024', 'Tuktuk', 25, 'Bajaj', 'RE 205', 'JA7209', 'SN-BAJ-13151', NULL, NULL, 2020, 'Essence', 8.00, 'km', 42300.00, 47700.00, 4.00, '2020-12-01', '2020-12-08', 6500000.00, NULL, 48, 650000.00, NULL, NULL, 'Disponible', 'Dépôt central', NULL, 'Logistique', NULL, 1, -1, NULL, '2026-09-30 10:46:07', NULL);
-
--- --------------------------------------------------------
-
---
--- Structure de la table `tbl_engin_panne`
---
-
-CREATE TABLE `tbl_engin_panne` (
-  `id` int(11) NOT NULL,
-  `reference` varchar(30) DEFAULT NULL COMMENT 'Ex : PAN-2026-00001',
-  `engin_id` int(11) NOT NULL,
-  `chantier_id` int(11) DEFAULT NULL,
-  `date_signalement` datetime NOT NULL,
-  `gravite` enum('Mineure','Majeure','Critique') NOT NULL DEFAULT 'Majeure',
-  `description` text NOT NULL,
-  `signale_par` varchar(150) DEFAULT NULL,
-  `compteur` decimal(15,2) DEFAULT NULL,
-  `immobilise` tinyint(1) NOT NULL DEFAULT 1,
-  `panne_status` enum('Signalée','En diagnostic','En réparation','Résolue','Annulée') NOT NULL DEFAULT 'Signalée',
-  `maintenance_id` int(11) DEFAULT NULL COMMENT 'Maintenance corrective ouverte pour cette panne',
-  `date_resolution` datetime DEFAULT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT 1,
-  `created_by` int(11) DEFAULT NULL,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `tbl_engin_panne`
---
-
-INSERT INTO `tbl_engin_panne` (`id`, `reference`, `engin_id`, `chantier_id`, `date_signalement`, `gravite`, `description`, `signale_par`, `compteur`, `immobilise`, `panne_status`, `maintenance_id`, `date_resolution`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'PAN-2026-00001', 14, NULL, '2026-09-29 10:46:08', 'Critique', 'Surchauffe moteur et fuite du liquide de refroidissement', 'Ramadhani Hassan', 278500.00, 1, 'Signalée', NULL, NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(2, 'PAN-2026-00002', 19, 2, '2026-09-26 10:46:08', 'Majeure', 'Pompe hydraulique hors service, perte de vibration', 'Janvier Ntirampeba', 4680.00, 1, 'En réparation', 4, NULL, 1, -1, '2026-09-30 10:46:08', NULL),
-(3, 'PAN-2026-00003', 9, NULL, '2026-08-29 10:46:08', 'Mineure', 'Bruit métallique au freinage', 'Direction', 104000.00, 0, 'Résolue', 6, '2026-08-31 10:46:08', 1, -1, '2026-09-30 10:46:08', NULL),
-(4, 'PAN-2026-00004', 23, NULL, '2026-09-28 10:46:08', 'Mineure', 'Démarrage difficile, perte de pression', 'Chef chantier', 1160.00, 0, 'En diagnostic', NULL, NULL, 1, -1, '2026-09-30 10:46:08', NULL);
+INSERT INTO `tbl_engin_materiel` (`id`, `code_engin`, `designation`, `categorie_id`, `marque`, `modele`, `plaque`, `numero_serie`, `date_acquisition`, `valeur_achat`, `etat`, `localisation`, `chantier_id`, `observation`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'ENG-2026-00001', 'Dina', 6, 'Mercedes', 'D6', 'L4844A', '334324242', '2025-01-15', 2500000000000.00, 'Disponible', 'Siege', 25, 'cbcbcvbcvbcv', 1, '2026-07-09 11:26:18', '2026-07-10 11:14:09'),
+(2, 'ENG-2026-00002', 'Excavatrice hydraulique', 1, 'Caterpillar', '320D', 'A101AA', 'CAT320001', '2023-01-15', 350000000.00, 'Disponible', 'Dépôt Central', 1, 'RAS', 1, '2026-07-09 11:43:23', '2026-07-10 11:09:19'),
+(3, 'ENG-2026-00003', 'Excavatrice chenille', 1, 'Komatsu', 'PC200', 'A102AA', 'KOM200001', '2022-11-10', 320000000.00, 'Sur chantier', 'Chantier Gitega', 2, 'Travaux terrassement', 1, '2026-07-09 11:43:23', NULL),
+(4, 'ENG-2026-00004', 'Bulldozer lourd', 2, 'Caterpillar', 'D8R', 'A103AA', 'CATD8R001', '2022-03-20', 450000000.00, 'Disponible', 'Dépôt Central', NULL, 'Bon état', 1, '2026-07-09 11:43:23', NULL),
+(5, 'ENG-2026-00005', 'Bulldozer moyen', 2, 'Shantui', 'SD16', 'A104AA', 'SHA16001', '2021-07-11', 210000000.00, 'Maintenance', 'Atelier', NULL, 'Vidange moteur', 1, '2026-07-09 11:43:23', NULL),
+(6, 'ENG-2026-00006', 'Chargeuse sur pneus', 3, 'Komatsu', 'WA380', 'A105AA', 'KWA380001', '2021-09-18', 270000000.00, 'Disponible', 'Dépôt Central', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(7, 'ENG-2026-00007', 'Chargeuse lourde', 3, 'Caterpillar', '950H', 'A106AA', 'CAT950001', '2020-05-21', 310000000.00, 'Sur chantier', 'Chantier Ngozi', 3, 'Travaux carrière', 1, '2026-07-09 11:43:23', NULL),
+(8, 'ENG-2026-00008', 'Niveleuse routière', 4, 'Caterpillar', '140K', 'A107AA', 'CAT140001', '2022-08-12', 390000000.00, 'Disponible', 'Dépôt Central', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(9, 'ENG-2026-00009', 'Compacteur vibrant', 5, 'Bomag', 'BW213', 'A108AA', 'BOM213001', '2021-04-05', 150000000.00, 'Disponible', 'Dépôt Central', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(10, 'ENG-2026-00010', 'Compacteur tandem', 5, 'Dynapac', 'CC2200', 'A109AA', 'DYN220001', '2021-06-14', 170000000.00, 'Sur chantier', 'Chantier Rumonge', 4, 'Compactage route', 1, '2026-07-09 11:43:23', NULL),
+(11, 'ENG-2026-00011', 'Camion benne 10 roues', 6, 'Mercedes', 'Actros', 'B110AA', 'MBA001', '2020-01-15', 180000000.00, 'Disponible', 'Garage SATRACO', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(12, 'ENG-2026-00012', 'Camion benne 12 roues', 6, 'Fuso', 'FV517', 'B111AA', 'FUS517001', '2021-02-10', 195000000.00, 'Sur chantier', 'Chantier Gitega', 2, 'Transport matériaux', 1, '2026-07-09 11:43:23', NULL),
+(13, 'ENG-2026-00013', 'Camion benne 16 roues', 6, 'Howo', '371', 'B112AA', 'HOW371001', '2022-06-25', 220000000.00, 'Disponible', 'Garage SATRACO', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(14, 'ENG-2026-00014', 'Camion citerne eau', 7, 'Sinotruk', 'Water Tank', 'B113AA', 'SIN001', '2021-08-11', 170000000.00, 'Disponible', 'Dépôt Central', NULL, 'Arrosage chantier', 1, '2026-07-09 11:43:23', NULL),
+(15, 'ENG-2026-00015', 'Camion malaxeur béton', 8, 'Mercedes', 'Mixer', 'B114AA', 'MIX001', '2022-09-14', 260000000.00, 'Sur chantier', 'Chantier Bujumbura', 5, 'Production béton', 1, '2026-07-09 11:43:23', NULL),
+(16, 'ENG-2026-00016', 'Grue mobile 25T', 9, 'Liebherr', 'LTM1025', 'B115AA', 'LTM001', '2019-05-01', 720000000.00, 'Disponible', 'Dépôt Central', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(17, 'ENG-2026-00017', 'Grue à tour', 10, 'Potain', 'MC85', 'B116AA', 'POT001', '2020-07-15', 950000000.00, 'Sur chantier', 'Chantier Immeuble', 6, 'Levage matériaux', 1, '2026-07-09 11:43:23', NULL),
+(18, 'ENG-2026-00018', 'Chariot élévateur', 11, 'Toyota', '8FD30', 'B117AA', 'TOY001', '2021-04-12', 90000000.00, 'Maintenance', 'Magasin Central', NULL, 'RAS', 1, '2026-07-09 11:43:23', '2026-07-10 15:03:05'),
+(19, 'ENG-2026-00019', 'Nacelle élévatrice', 12, 'JLG', '450AJ', 'B118AA', 'JLG001', '2020-11-02', 125000000.00, 'Disponible', 'Atelier', NULL, 'Travaux hauteur', 1, '2026-07-09 11:43:23', NULL),
+(20, 'ENG-2026-00020', 'Groupe électrogène 250KVA', 16, 'Perkins', '250KVA', 'GEN001', 'GEN250001', '2023-01-18', 85000000.00, 'Disponible', 'Dépôt Central', NULL, 'RAS', 1, '2026-07-09 11:43:23', NULL),
+(21, 'ENG-2026-00021', 'Compresseur industriel', 17, 'Atlas Copco', 'XAS186', 'COM001', 'ATL001', '2022-03-20', 55000000.00, 'En panne', 'Atelier', NULL, 'Réparation moteur', 1, '2026-07-09 11:43:23', NULL);
 
 -- --------------------------------------------------------
 
@@ -15002,44 +14406,26 @@ INSERT INTO `tbl_engin_panne` (`id`, `reference`, `engin_id`, `chantier_id`, `da
 CREATE TABLE `tbl_engin_photo` (
   `id` int(11) NOT NULL,
   `engin_id` int(11) NOT NULL,
-  `photo` varchar(255) NOT NULL COMMENT 'Nom du fichier stocké dans uploads/engins/photos/',
-  `original_name` varchar(255) DEFAULT NULL,
-  `file_size` int(10) UNSIGNED DEFAULT NULL,
-  `is_principale` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- --------------------------------------------------------
+  `photo` varchar(255) NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Structure de la table `tbl_engin_plan_entretien`
+-- Déchargement des données de la table `tbl_engin_photo`
 --
 
-CREATE TABLE `tbl_engin_plan_entretien` (
-  `id` int(11) NOT NULL,
-  `engin_id` int(11) DEFAULT NULL,
-  `categorie_id` int(11) DEFAULT NULL,
-  `libelle` varchar(255) NOT NULL,
-  `periodicite_jours` int(10) UNSIGNED DEFAULT NULL,
-  `periodicite_compteur` decimal(15,2) DEFAULT NULL COMMENT 'km ou heures',
-  `derniere_date` date DEFAULT NULL,
-  `dernier_compteur` decimal(15,2) DEFAULT NULL,
-  `actif` tinyint(1) NOT NULL DEFAULT 1,
-  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
-  `updated_at` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Déchargement des données de la table `tbl_engin_plan_entretien`
---
-
-INSERT INTO `tbl_engin_plan_entretien` (`id`, `engin_id`, `categorie_id`, `libelle`, `periodicite_jours`, `periodicite_compteur`, `derniere_date`, `dernier_compteur`, `actif`, `created_at`, `updated_at`) VALUES
-(1, NULL, 21, 'Vidange moteur + filtres', 180, 5000.00, NULL, NULL, 1, '2026-09-30 10:46:08', NULL),
-(2, NULL, 22, 'Vidange moteur + filtres', 90, 10000.00, NULL, NULL, 1, '2026-09-30 10:46:08', NULL),
-(3, NULL, 22, 'Contrôle technique annuel', 365, NULL, NULL, NULL, 1, '2026-09-30 10:46:08', NULL),
-(4, NULL, 23, 'Graissage + contrôle hydraulique', 30, 250.00, NULL, NULL, 1, '2026-09-30 10:46:08', NULL),
-(5, NULL, 24, 'Vidange + filtre à air', 90, 250.00, NULL, NULL, 1, '2026-09-30 10:46:08', NULL),
-(6, NULL, 25, 'Vidange + réglage chaîne', 60, 2000.00, NULL, NULL, 1, '2026-09-30 10:46:08', NULL);
+INSERT INTO `tbl_engin_photo` (`id`, `engin_id`, `photo`, `created_at`) VALUES
+(3, 1, 'cb3d004e1dc13d67c7169f218b71bafb.png', '2026-07-09 11:26:18'),
+(4, 1, 'centrale-beton-01.png', '2026-07-09 12:52:23'),
+(5, 2, 'malaxeur-beton-01.png', '2026-07-09 12:52:23'),
+(6, 3, 'camion-pompe-01.png', '2026-07-09 12:52:23'),
+(7, 4, 'nacelle-01.png', '2026-07-09 12:52:23'),
+(8, 5, 'echafaudage-01.png', '2026-07-09 12:52:23'),
+(9, 6, 'camion-benne-01.png', '2026-07-09 12:52:23'),
+(10, 7, 'pickup-hilux-01.png', '2026-07-09 12:52:23'),
+(11, 8, 'bus-personnel-01.png', '2026-07-09 12:52:23'),
+(12, 9, 'outillage-01.png', '2026-07-09 12:52:23'),
+(13, 2, '1a65f1db1b47dee9c2d586b3f8f7fde4.png', '2026-07-10 11:09:19');
 
 -- --------------------------------------------------------
 
@@ -15367,8 +14753,8 @@ CREATE TABLE `tbl_finance_cashbox` (
 --
 
 INSERT INTO `tbl_finance_cashbox` (`id`, `code`, `name`, `role`, `responsable`, `devise`, `opening_balance`, `current_balance`, `alert_threshold`, `observation`, `status`, `created_by`, `created_at`, `updated_at`) VALUES
-(1, 'CAI-2026-001', 'CAISSE PRINCIPALE', 'principale', 'Nelly Ange AHISHAKIYE', 'BIF', 4100000.00, 29349410.00, 0.00, 'Location proclé pour 2jrs à KARAMA', 'active', 35, '2026-09-09 10:34:42', '2026-09-30 17:30:28'),
-(2, 'CAI-2026-002', 'CAISSE SECONDAIRE', 'secondaire', 'CÖME NKESHIMANA', 'BIF', 0.00, 136151.00, 0.00, NULL, 'active', 35, '2026-09-09 10:36:31', '2026-09-30 12:55:07');
+(1, 'CAI-2026-001', 'CAISSE PRINCIPALE', 'principale', 'Nelly Ange AHISHAKIYE', 'BIF', 4100000.00, 3310.00, 0.00, 'Location proclé pour 2jrs à KARAMA', 'active', 35, '2026-09-09 10:34:42', '2026-09-25 15:25:31'),
+(2, 'CAI-2026-002', 'CAISSE SECONDAIRE', 'secondaire', 'CÖME NKESHIMANA', 'BIF', 0.00, 1031.00, 0.00, NULL, 'active', 35, '2026-09-09 10:36:31', '2026-09-25 15:57:40');
 
 -- --------------------------------------------------------
 
@@ -15646,35 +15032,7 @@ INSERT INTO `tbl_finance_mouvement_principale` (`id`, `reference`, `sens`, `natu
 (104, 'MVP-2026-0103', 'sortie', 'approvisionnement', '2026-09-25', 1000000.00, 2003310.00, 1003310.00, 'BIF', 'TRF-2026-0076', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'Vente des pavés', 'validated', 35, NULL, '2026-09-25 15:08:06', NULL),
 (105, 'MVP-2026-0104', 'sortie', '', '2026-09-25', 700000.00, 1003310.00, 303310.00, 'BIF', NULL, 'DG', 'Relation Publique', 'cash', 'SC-2026-020', NULL, 'Sortie RP - SC-2026-020', 'Relations publiques', 'validated', 35, NULL, '2026-09-25 15:10:20', NULL),
 (106, 'MVP-2026-0105', 'sortie', '', '2026-09-25', 30000.00, 303310.00, 273310.00, 'BIF', NULL, 'Nelly Ange', 'Relation Publique', 'cash', 'SC-2026-021', NULL, 'Sortie RP - SC-2026-021', 'Relations publiques', 'validated', 35, NULL, '2026-09-25 15:20:01', NULL),
-(107, 'MVP-2026-0106', 'sortie', 'approvisionnement', '2026-09-25', 270000.00, 273310.00, 3310.00, 'BIF', 'TRF-2026-7989', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'Vente des pavés', 'validated', 35, NULL, '2026-09-25 15:25:31', NULL),
-(108, 'MVP-2026-0107', 'entree', 'encaissement', '2026-09-28', 9500000.00, 3310.00, 9503310.00, 'BIF', NULL, 'TEMOINS DE JEHOVAH', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — TEMOINS DE JEHOVAH', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 11:32:42', NULL),
-(109, 'MVP-2026-0108', 'sortie', '', '2026-09-28', 500000.00, 9503310.00, 9003310.00, 'BIF', NULL, 'DG', 'Relation Publique', 'cash', 'SC-2026-022', NULL, 'Sortie RP - SC-2026-022', 'Relations publiques', 'validated', 35, NULL, '2026-09-28 11:33:30', NULL),
-(110, 'MVP-2026-0109', 'sortie', '', '2026-09-28', 2000000.00, 9003310.00, 7003310.00, 'BIF', NULL, 'Consultant', 'Relation Publique', 'cash', 'SC-2026-023', NULL, 'Sortie RP - SC-2026-023', 'Relations publiques', 'validated', 35, NULL, '2026-09-28 11:34:29', NULL),
-(111, 'MVP-2026-0110', 'sortie', 'approvisionnement', '2026-09-28', 5000000.00, 7003310.00, 2003310.00, 'BIF', 'TRF-2026-6291', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 11:35:04', NULL),
-(112, 'MVP-2026-0111', 'sortie', 'approvisionnement', '2026-09-28', 1500000.00, 2003310.00, 503310.00, 'BIF', 'TRF-2026-6072', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 13:01:11', NULL),
-(113, 'MVP-2026-0112', 'entree', 'encaissement', '2026-09-28', 1800000.00, 503310.00, 2303310.00, 'BIF', NULL, 'Location proclé pour 1jr ', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — Location proclé pour 1jr ', 'Location proclé pour 1jr ', 'validated', 35, NULL, '2026-09-28 14:09:31', NULL),
-(114, 'MVP-2026-0113', 'sortie', 'approvisionnement', '2026-09-28', 1800000.00, 2303310.00, 503310.00, 'BIF', 'TRF-2026-5304', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'Location proclé pour 1jr ', 'validated', 35, NULL, '2026-09-28 14:24:49', NULL),
-(115, 'MVP-2026-0114', 'entree', 'encaissement', '2026-09-28', 5000000.00, 503310.00, 5503310.00, 'BIF', NULL, 'TEMOINS DE JEHOVAH', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — TEMOINS DE JEHOVAH', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 16:35:14', NULL),
-(116, 'MVP-2026-0115', 'sortie', 'approvisionnement', '2026-09-28', 3000000.00, 5503310.00, 2503310.00, 'BIF', 'TRF-2026-2983', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 16:43:22', NULL),
-(117, 'MVP-2026-0116', 'sortie', 'approvisionnement', '2026-09-28', 2000000.00, 2503310.00, 503310.00, 'BIF', 'TRF-2026-0555', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 17:01:56', NULL),
-(118, 'MVP-2026-0117', 'sortie', 'approvisionnement', '2026-09-29', 500000.00, 503310.00, 3310.00, 'BIF', 'TRF-2026-5324', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 09:44:04', NULL),
-(119, 'MVP-2026-0118', 'sortie', '', '2026-09-29', 100000.00, 3310.00, -96690.00, 'BIF', NULL, 'Violette Uwizigiye', 'Relation Publique', 'cash', 'SC-2026-024', NULL, 'Sortie RP - SC-2026-024', 'Relations publiques MUCO', 'validated', 35, NULL, '2026-09-29 11:26:24', NULL),
-(120, 'MVP-2026-0119', 'entree', 'encaissement', '2026-09-29', 10000000.00, -96690.00, 9903310.00, 'BIF', NULL, 'TEMOINS DE JEHOVAH', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — TEMOINS DE JEHOVAH', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 14:00:00', NULL),
-(121, 'MVP-2026-0120', 'sortie', 'approvisionnement', '2026-09-29', 8000000.00, 9903310.00, 1903310.00, 'BIF', 'TRF-2026-7362', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 14:00:22', NULL),
-(122, 'MVP-2026-0121', 'sortie', 'approvisionnement', '2026-09-29', 1000000.00, 1903310.00, 903310.00, 'BIF', 'TRF-2026-3181', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 14:45:00', NULL),
-(123, 'MVP-2026-0122', 'sortie', 'approvisionnement', '2026-09-29', 400000.00, 903310.00, 503310.00, 'BIF', 'TRF-2026-7944', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', '', 'validated', 46, NULL, '2026-09-29 16:12:51', NULL),
-(124, 'MVP-2026-0123', 'entree', 'encaissement', '2026-09-30', 900000.00, 503310.00, 1403310.00, 'BIF', NULL, 'Location proclé pour 1/2 journée', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — Location proclé pour 1/2 journée', 'Location proclé pour 1/2 journée', 'validated', 35, NULL, '2026-09-30 09:37:05', NULL),
-(125, 'MVP-2026-0124', 'sortie', 'approvisionnement', '2026-09-30', 500000.00, 1403310.00, 903310.00, 'BIF', 'TRF-2026-6378', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', '', 'validated', 46, NULL, '2026-09-30 11:32:43', NULL),
-(126, 'MVP-2026-0125', 'sortie', 'approvisionnement', '2026-09-30', 900000.00, 903310.00, 3310.00, 'BIF', 'TRF-2026-5847', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', '', 'validated', 35, NULL, '2026-09-30 11:38:27', NULL),
-(127, 'MVP-2026-0126', 'entree', 'encaissement', '2026-09-30', 4000000.00, 3310.00, 4003310.00, 'BIF', NULL, 'TEMOINS DE JEHOVAH', '', 'cash', '', NULL, 'Encaissement — TEMOINS DE JEHOVAH', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-30 11:39:24', NULL),
-(128, 'MVP-2026-0127', 'sortie', 'approvisionnement', '2026-09-30', 1620000.00, 4003310.00, 2383310.00, 'BIF', 'TRF-2026-0067', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', '', 'validated', 35, NULL, '2026-09-30 11:40:21', NULL),
-(129, 'MVP-2026-0128', 'sortie', '', '2026-09-18', 32900.00, 2383310.00, 2350410.00, 'BIF', NULL, 'Fidèle 61697975', 'Relation Publique', 'cash', 'SC-2026-025', NULL, 'Sortie RP - SC-2026-025', 'Transfert via lumicash | payé le 30/9', 'validated', 35, NULL, '2026-09-30 12:31:26', NULL),
-(130, 'MVP-2026-0129', 'sortie', '', '2026-09-21', 208300.00, 2350410.00, 2142110.00, 'BIF', NULL, 'Aldo 68131313', 'Relation Publique', 'cash', 'SC-2026-026', NULL, 'Sortie RP - SC-2026-026', 'Transfert via lumicash | payé le 30/9', 'validated', 35, NULL, '2026-09-30 12:32:20', NULL),
-(131, 'MVP-2026-0130', 'sortie', '', '2026-09-22', 381300.00, 2142110.00, 1760810.00, 'BIF', NULL, 'Violette Uwizigiye', 'Relation Publique', 'cash', 'SC-2026-027', NULL, 'Sortie RP - SC-2026-027', 'Transfert via lumicash | payé le 30/9', 'validated', 35, NULL, '2026-09-30 12:37:09', NULL),
-(132, 'MVP-2026-0131', 'sortie', '', '2026-09-24', 32900.00, 1760810.00, 1727910.00, 'BIF', NULL, 'Fidèle 61697975', 'Relation Publique', 'cash', 'SC-2026-028', NULL, 'Sortie RP - SC-2026-028', 'Transfert via lumicash | payé le 30/9', 'validated', 35, NULL, '2026-09-30 12:38:16', NULL),
-(133, 'MVP-2026-0132', 'sortie', 'approvisionnement', '2026-09-30', 1000000.00, 1727910.00, 727910.00, 'BIF', 'TRF-2026-5139', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', '', 'validated', 35, NULL, '2026-09-30 12:42:07', NULL),
-(134, 'MVP-2026-0133', 'entree', 'encaissement', '2026-09-30', 20000000.00, 727910.00, 20727910.00, 'BIF', NULL, 'DAWE', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — DAWE', 'DAWE', 'validated', 35, NULL, '2026-09-30 17:29:46', NULL),
-(135, 'MVP-2026-0134', 'entree', 'encaissement', '2026-09-30', 8621500.00, 20727910.00, 29349410.00, 'BIF', NULL, 'KABEZI', 'Approvisionnement', 'cash', '', NULL, 'Encaissement — KABEZI', 'KABEZI', 'validated', 35, NULL, '2026-09-30 17:30:28', NULL);
+(107, 'MVP-2026-0106', 'sortie', 'approvisionnement', '2026-09-25', 270000.00, 273310.00, 3310.00, 'BIF', 'TRF-2026-7989', NULL, 'Approvisionnement', 'cash', '', NULL, 'Approvisionnement de la caisse secondaire', 'Vente des pavés', 'validated', 35, NULL, '2026-09-25 15:25:31', NULL);
 
 -- --------------------------------------------------------
 
@@ -16093,97 +15451,7 @@ INSERT INTO `tbl_finance_mouvement_secondaire` (`id`, `reference`, `sens`, `natu
 (376, 'MVS-2026-0375', 'entree', 'approvisionnement_recu', '2026-09-25', 270000.00, 231031.00, 501031.00, 'BIF', 'TRF-2026-7989', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'Vente des pavés', 'validated', 35, NULL, '2026-09-25 15:25:31', NULL),
 (377, 'MVS-2026-0376', 'sortie', 'paiement_da', '2026-09-25', 200000.00, 501031.00, 301031.00, 'BIF', NULL, 2499, 'DA-2026-2499', 'Contribution social', 'Paiement demande achat', 'cash', 'BP-2026-001350', NULL, 'Paiement DA-2026-2499', 'Kwibarutsa Serges', 'validated', 35, NULL, '2026-09-25 15:29:19', NULL),
 (378, 'MVS-2026-0377', 'sortie', 'paiement_da', '2026-09-25', 120000.00, 301031.00, 181031.00, 'BIF', NULL, 2465, 'DA-2026-2465', 'GIHOSHA ZONE', 'Paiement demande achat', 'cash', 'BP-2026-001316', NULL, 'Paiement DA-2026-2465', 'Nettoyage , Transaction', 'validated', 35, NULL, '2026-09-25 15:34:00', NULL),
-(379, 'MVS-2026-0378', 'sortie', 'paiement_da', '2026-09-25', 180000.00, 181031.00, 1031.00, 'BIF', NULL, 2452, 'DA-2026-2452', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001302', NULL, 'Paiement DA-2026-2452', 'Frais de ration et routiers pour les chauffeurs', 'validated', 35, NULL, '2026-09-25 15:57:40', NULL),
-(380, 'MVS-2026-0379', 'entree', 'approvisionnement_recu', '2026-09-28', 5000000.00, 1031.00, 5001031.00, 'BIF', 'TRF-2026-6291', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 11:35:04', NULL),
-(381, 'MVS-2026-0380', 'sortie', 'paiement_da', '2026-09-28', 100000.00, 5001031.00, 4901031.00, 'BIF', NULL, 2516, 'DA-2026-2516', 'Contribution social', 'Paiement demande achat', 'cash', 'BP-2026-001364', NULL, 'Paiement DA-2026-2516', 'Contribution Social pour Melance', 'validated', 35, NULL, '2026-09-28 11:35:25', NULL),
-(382, 'MVS-2026-0381', 'sortie', 'paiement_da', '2026-09-28', 187500.00, 4901031.00, 4713531.00, 'BIF', NULL, 2503, 'DA-2026-2503', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001363', NULL, 'Paiement DA-2026-2503', 'Eagle mineral water/bidons, Eagle mineral water/Pa', 'validated', 35, NULL, '2026-09-28 11:35:39', NULL),
-(383, 'MVS-2026-0382', 'sortie', 'paiement_da', '2026-09-28', 600000.00, 4713531.00, 4113531.00, 'BIF', NULL, 2514, 'DA-2026-2514', 'KIVOGA UNIVERSITY', 'Paiement demande achat', 'cash', 'BP-2026-001371', NULL, 'Paiement DA-2026-2514', 'AVance sur MOD de terrassement  ( NDIHOKUBWAYO Michell', 'validated', 35, NULL, '2026-09-28 11:52:40', NULL),
-(384, 'MVS-2026-0383', 'sortie', 'paiement_da', '2026-09-28', 417000.00, 4113531.00, 3696531.00, 'BIF', NULL, 2447, 'DA-2026-2447', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001294', NULL, 'Paiement DA-2026-2447', 'frais d assurance automobile (J2818A), Frais d assurance automobile (I4945A)', 'validated', 35, NULL, '2026-09-28 12:06:21', NULL),
-(385, 'MVS-2026-0384', 'sortie', 'paiement_da', '2026-09-28', 286800.00, 3696531.00, 3409731.00, 'BIF', NULL, 2518, 'DA-2026-2518', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001372', NULL, 'Paiement DA-2026-2518', 'paiement de l impot foncier pour GHIRINI GUIDO,NDAGIJE ALDO GEORGES,SUCCESSION JACQUES NDAGIJE', 'validated', 35, NULL, '2026-09-28 12:06:37', NULL),
-(386, 'MVS-2026-0385', 'sortie', 'paiement_da', '2026-09-28', 606000.00, 3409731.00, 2803731.00, 'BIF', NULL, 2471, 'DA-2026-2471', 'PAVE', 'Paiement demande achat', 'cash', 'BP-2026-001322', NULL, 'Paiement DA-2026-2471', 'Ciment, CHARGEMENT DECHARGEMENT', 'validated', 35, NULL, '2026-09-28 12:09:22', NULL),
-(387, 'MVS-2026-0386', 'sortie', 'paiement_da', '2026-09-28', 15000.00, 2803731.00, 2788731.00, 'BIF', NULL, 2527, 'DA-2026-2527', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001374', NULL, 'Paiement DA-2026-2527', 'FRAIS DE TRANSACTION CASHTEL POUR PYT IMPOT FONCIER', 'validated', 35, NULL, '2026-09-28 12:27:12', NULL),
-(388, 'MVS-2026-0387', 'sortie', 'paiement_da', '2026-09-28', 600000.00, 2788731.00, 2188731.00, 'BIF', NULL, 2394, 'DA-2026-2394', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001238', NULL, 'Paiement DA-2026-2394', 'RENOUVELLEMENT DU PLAQUE IT POUR MIXER TRUCK, MAIN D\'OEUVRE', 'validated', 35, NULL, '2026-09-28 12:38:24', NULL),
-(389, 'MVS-2026-0388', 'sortie', 'paiement_da', '2026-09-28', 740000.00, 2188731.00, 1448731.00, 'BIF', NULL, 2507, 'DA-2026-2507', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001358', NULL, 'Paiement DA-2026-2507', 'Essence pour succed L0501A, Essence pour Hillux  E 4923A, Essence pour Nissan E3757', 'validated', 35, NULL, '2026-09-28 12:42:32', NULL),
-(390, 'MVS-2026-0389', 'sortie', 'paiement_da', '2026-09-28', 100000.00, 1448731.00, 1348731.00, 'BIF', NULL, 2524, 'DA-2026-2524', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001373', NULL, 'Paiement DA-2026-2524', 'Frais de ration et routiers pour les chauffeurs', 'validated', 35, NULL, '2026-09-28 12:44:35', NULL),
-(391, 'MVS-2026-0390', 'sortie', 'paiement_da', '2026-09-28', 150000.00, 1348731.00, 1198731.00, 'BIF', NULL, 2506, 'DA-2026-2506', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001357', NULL, 'Paiement DA-2026-2506', 'Frais de suivis du dossier BIO KINGS', 'validated', 35, NULL, '2026-09-28 12:44:51', NULL),
-(392, 'MVS-2026-0391', 'sortie', 'paiement_da', '2026-09-28', 400000.00, 1198731.00, 798731.00, 'BIF', NULL, 2517, 'DA-2026-2517', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001365', NULL, 'Paiement DA-2026-2517', 'Frais de ration et routiers pour les chauffeurs', 'validated', 35, NULL, '2026-09-28 12:45:02', NULL),
-(393, 'MVS-2026-0392', 'sortie', 'paiement_da', '2026-09-28', 150000.00, 798731.00, 648731.00, 'BIF', NULL, 2500, 'DA-2026-2500', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001351', NULL, 'Paiement DA-2026-2500', 'Sables bennes', 'validated', 35, NULL, '2026-09-28 12:58:55', NULL),
-(394, 'MVS-2026-0393', 'sortie', 'paiement_da', '2026-09-28', 50000.00, 648731.00, 598731.00, 'BIF', NULL, 2520, 'DA-2026-2520', 'KIVOGA UNIVERSITY', 'Paiement demande achat', 'cash', 'BP-2026-001366', NULL, 'Paiement DA-2026-2520', 'Cadenas , Pomelle , Verrou', 'validated', 35, NULL, '2026-09-28 12:59:08', NULL),
-(395, 'MVS-2026-0394', 'sortie', 'paiement_da', '2026-09-28', 60000.00, 598731.00, 538731.00, 'BIF', NULL, 2515, 'DA-2026-2515', 'TEMOINS DE JEHOVAH', 'Paiement demande achat', 'cash', 'BP-2026-001362', NULL, 'Paiement DA-2026-2515', 'Platresse ', 'validated', 35, NULL, '2026-09-28 12:59:27', NULL),
-(396, 'MVS-2026-0395', 'sortie', 'paiement_da', '2026-09-28', 60000.00, 538731.00, 478731.00, 'BIF', NULL, 2529, 'DA-2026-2529', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001382', NULL, 'Paiement DA-2026-2529', 'Fil a liguatire en kg', 'validated', 35, NULL, '2026-09-28 12:59:39', NULL),
-(397, 'MVS-2026-0396', 'sortie', 'paiement_da', '2026-09-28', 60000.00, 478731.00, 418731.00, 'BIF', NULL, 2398, 'DA-2026-2398', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001241', NULL, 'Paiement DA-2026-2398', 'Location du Tuktuk Pour le déplacement des matériaux sur chantier ', 'validated', 35, NULL, '2026-09-28 12:59:58', NULL),
-(398, 'MVS-2026-0397', 'sortie', 'paiement_da', '2026-09-28', 50000.00, 418731.00, 368731.00, 'BIF', NULL, 2509, 'DA-2026-2509', 'ROHERO CEDRIC', 'Paiement demande achat', 'cash', 'BP-2026-001360', NULL, 'Paiement DA-2026-2509', 'Cheville métallique de 10 ', 'validated', 35, NULL, '2026-09-28 13:00:28', NULL),
-(399, 'MVS-2026-0398', 'sortie', 'paiement_da', '2026-09-28', 27000.00, 368731.00, 341731.00, 'BIF', NULL, 2528, 'DA-2026-2528', 'KING\'S SCHOOL', 'Paiement demande achat', 'cash', 'BP-2026-001381', NULL, 'Paiement DA-2026-2528', 'Creoline, Kole ', 'validated', 35, NULL, '2026-09-28 13:00:42', NULL),
-(400, 'MVS-2026-0399', 'entree', 'approvisionnement_recu', '2026-09-28', 1500000.00, 341731.00, 1841731.00, 'BIF', 'TRF-2026-6072', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 13:01:11', NULL),
-(401, 'MVS-2026-0400', 'sortie', 'paiement_da', '2026-09-28', 620000.00, 1841731.00, 1221731.00, 'BIF', NULL, 2408, 'DA-2026-2408', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001282', NULL, 'Paiement DA-2026-2408', ' Achat d\'une roulement pour Bétonnière , Achat d\'une pompe pour Bétonnière  ', 'validated', 35, NULL, '2026-09-28 13:04:04', NULL),
-(402, 'MVS-2026-0401', 'sortie', 'paiement_da', '2026-09-28', 35000.00, 1221731.00, 1186731.00, 'BIF', NULL, 2505, 'DA-2026-2505', 'ALCHEM CLOTURE', 'Paiement demande achat', 'cash', 'BP-2026-001356', NULL, 'Paiement DA-2026-2505', 'Cadenat, Verous métalique, Pomelles (paire)', 'validated', 35, NULL, '2026-09-28 13:04:16', NULL),
-(403, 'MVS-2026-0402', 'sortie', 'paiement_da', '2026-09-28', 606000.00, 1186731.00, 580731.00, 'BIF', NULL, 2508, 'DA-2026-2508', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001359', NULL, 'Paiement DA-2026-2508', 'Ciment Kabimba , Chargement et déchargement', 'validated', 35, NULL, '2026-09-28 13:05:37', NULL),
-(404, 'MVS-2026-0403', 'sortie', 'paiement_da', '2026-09-28', 350000.00, 580731.00, 230731.00, 'BIF', NULL, 2521, 'DA-2026-2521', 'Tanzanie ', 'Paiement demande achat', 'cash', 'BP-2026-001367', NULL, 'Paiement DA-2026-2521', 'M.O Tanzania ', 'validated', 35, NULL, '2026-09-28 13:09:31', NULL),
-(405, 'MVS-2026-0404', 'sortie', 'paiement_da', '2026-09-28', 150000.00, 230731.00, 80731.00, 'BIF', NULL, 2531, 'DA-2026-2531', 'Maramvya Brique Cute', 'Paiement demande achat', 'cash', 'BP-2026-001384', NULL, 'Paiement DA-2026-2531', 'Inkwi ', 'validated', 35, NULL, '2026-09-28 13:58:56', NULL),
-(406, 'MVS-2026-0405', 'entree', 'approvisionnement_recu', '2026-09-28', 1800000.00, 80731.00, 1880731.00, 'BIF', 'TRF-2026-5304', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'Location proclé pour 1jr ', 'validated', 35, NULL, '2026-09-28 14:24:49', NULL),
-(407, 'MVS-2026-0406', 'sortie', 'paiement_da', '2026-09-28', 270000.00, 1880731.00, 1610731.00, 'BIF', NULL, 2533, 'DA-2026-2533', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001385', NULL, 'Paiement DA-2026-2533', 'CARBURAT/MAZOUT POUR GROUPE ELECTRONIQUE', 'validated', 35, NULL, '2026-09-28 14:25:08', NULL),
-(408, 'MVS-2026-0407', 'entree', 'retour_caisse', '2026-09-28', 206500.00, 1610731.00, 1817231.00, 'BIF', NULL, 2156, 'DA-2026-2156', 'NDUWAYO  Emmanuel', 'Retour à la caisse', 'cash', NULL, NULL, 'Retour à la caisse — Retour de caisse', NULL, 'validated', 46, NULL, '2026-09-28 15:06:51', NULL),
-(409, 'MVS-2026-0408', 'sortie', 'paiement_da', '2026-09-28', 400000.00, 1817231.00, 1417231.00, 'BIF', NULL, 2535, 'DA-2026-2535', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001392', NULL, 'Paiement DA-2026-2535', 'Hydraulique pour paucre cat ', 'validated', 35, NULL, '2026-09-28 15:23:12', NULL),
-(410, 'MVS-2026-0409', 'sortie', 'paiement_da', '2026-09-28', 500000.00, 1417231.00, 917231.00, 'BIF', NULL, 2117, 'DA-2026-2117', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-000966', NULL, 'Paiement DA-2026-2117', 'MORTESSEUR POUR HILLUX E4924A', 'validated', 35, NULL, '2026-09-28 15:23:32', NULL),
-(411, 'MVS-2026-0410', 'sortie', 'paiement_da', '2026-09-28', 350000.00, 917231.00, 567231.00, 'BIF', NULL, 2423, 'DA-2026-2423', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001286', NULL, 'Paiement DA-2026-2423', 'POMPE A ESSENCE POUR HIACE E2464A, PLAQUETTE, MAIN D\'OEUVRE', 'validated', 35, NULL, '2026-09-28 15:27:11', NULL),
-(412, 'MVS-2026-0411', 'sortie', 'paiement_da', '2026-09-28', 150000.00, 567231.00, 417231.00, 'BIF', NULL, 2422, 'DA-2026-2422', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001284', NULL, 'Paiement DA-2026-2422', 'POMPE A EAU POUR SUCCED L0501A, MAIN D\'OEUVRE', 'validated', 35, NULL, '2026-09-28 15:27:36', NULL),
-(413, 'MVS-2026-0412', 'sortie', 'paiement_da', '2026-09-28', 170000.00, 417231.00, 247231.00, 'BIF', NULL, 2421, 'DA-2026-2421', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001283', NULL, 'Paiement DA-2026-2421', 'PLAQUETTE POUR PROBOX L5495A, HUILLE MOTEUR , MAIN D\'OEUVRE', 'validated', 35, NULL, '2026-09-28 15:28:03', NULL),
-(414, 'MVS-2026-0413', 'sortie', 'paiement_da', '2026-09-28', 75000.00, 247231.00, 172231.00, 'BIF', NULL, 2420, 'DA-2026-2420', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001266', NULL, 'Paiement DA-2026-2420', 'BOULON CENTRE pour DYNA E4178A, MAIN D\'OEUVRE', 'validated', 35, NULL, '2026-09-28 15:28:22', NULL),
-(415, 'MVS-2026-0414', 'sortie', 'paiement_da', '2026-09-28', 35000.00, 172231.00, 137231.00, 'BIF', NULL, 2440, 'DA-2026-2440', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001281', NULL, 'Paiement DA-2026-2440', 'GASOLINE TREATMENT POUR HILUX E4924A ', 'validated', 35, NULL, '2026-09-28 15:28:38', NULL),
-(416, 'MVS-2026-0415', 'entree', 'retour_caisse', '2026-09-28', 20000.00, 137231.00, 157231.00, 'BIF', NULL, 2146, 'DA-2026-2146', 'HABONIMANA  Anniella', 'Retour à la caisse', 'cash', NULL, NULL, 'Retour à la caisse — Retour de caisse', NULL, 'validated', 46, NULL, '2026-09-28 15:56:54', NULL),
-(417, 'MVS-2026-0416', 'sortie', 'paiement_da', '2026-09-28', 112500.00, 157231.00, 44731.00, 'BIF', NULL, 2537, 'DA-2026-2537', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001394', NULL, 'Paiement DA-2026-2537', 'Ibitumbura, Capati', 'validated', 35, NULL, '2026-09-28 15:57:51', NULL),
-(418, 'MVS-2026-0417', 'entree', 'retour_caisse', '2026-09-28', 5000.00, 44731.00, 49731.00, 'BIF', NULL, 2387, 'DA-2026-2387', 'HABONIMANA  Anniella', 'Retour à la caisse', 'cash', NULL, NULL, 'Retour à la caisse — Retour de caisse', NULL, 'validated', 46, NULL, '2026-09-28 16:03:06', NULL),
-(419, 'MVS-2026-0418', 'entree', 'approvisionnement_recu', '2026-09-28', 3000000.00, 49731.00, 3049731.00, 'BIF', 'TRF-2026-2983', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 16:43:22', NULL),
-(420, 'MVS-2026-0419', 'sortie', 'paiement_da', '2026-09-28', 600000.00, 3049731.00, 2449731.00, 'BIF', NULL, 2536, 'DA-2026-2536', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001393', NULL, 'Paiement DA-2026-2536', 'Levé  et calcul des volumes ( quartier EX borabora', 'validated', 35, NULL, '2026-09-28 16:43:33', NULL),
-(421, 'MVS-2026-0420', 'sortie', 'paiement_da', '2026-09-28', 270000.00, 2449731.00, 2179731.00, 'BIF', NULL, 2538, 'DA-2026-2538', 'KABEZI', 'Paiement demande achat', 'cash', 'BP-2026-001395', NULL, 'Paiement DA-2026-2538', 'Mazout pour Dyna E4178A  pour le transport de matériel vers kabezi', 'validated', 35, NULL, '2026-09-28 16:44:01', NULL),
-(422, 'MVS-2026-0421', 'entree', 'approvisionnement_recu', '2026-09-28', 2000000.00, 2179731.00, 4179731.00, 'BIF', 'TRF-2026-0555', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-28 17:01:56', NULL),
-(423, 'MVS-2026-0422', 'sortie', 'paiement_da', '2026-09-28', 1620000.00, 4179731.00, 2559731.00, 'BIF', NULL, 2496, 'DA-2026-2496', 'KABEZI', 'Paiement demande achat', 'cash', 'BP-2026-001391', NULL, 'Paiement DA-2026-2496', 'lame de scie, porte scie, pelles, pioches, ibiziriko, baches, ciments, Indobo, bidons, Equere, Fil macons, Madriers, planches, chargement des planches', 'validated', 35, NULL, '2026-09-28 17:02:55', NULL),
-(424, 'MVS-2026-0423', 'sortie', 'paiement_da', '2026-09-28', 1415000.00, 2559731.00, 1144731.00, 'BIF', NULL, 2539, 'DA-2026-2539', 'KABEZI', 'Paiement demande achat', 'cash', 'BP-2026-001396', NULL, 'Paiement DA-2026-2539', 'planches, chargement des planches et Madriers', 'validated', 35, NULL, '2026-09-28 17:03:13', NULL),
-(425, 'MVS-2026-0424', 'sortie', 'paiement_da', '2026-09-29', 303000.00, 1144731.00, 841731.00, 'BIF', NULL, 2360, 'DA-2026-2360', 'GIHOSHA ZONE', 'Paiement demande achat', 'cash', 'BP-2026-001400', NULL, 'Paiement DA-2026-2360', 'Ciment , Chargement dechargement ', 'validated', 35, NULL, '2026-09-29 09:25:29', NULL),
-(426, 'MVS-2026-0425', 'sortie', 'paiement_da', '2026-09-29', 331000.00, 841731.00, 510731.00, 'BIF', NULL, 2510, 'DA-2026-2510', 'GIHOSHA NDAYI', 'Paiement demande achat', 'cash', 'BP-2026-001361', NULL, 'Paiement DA-2026-2510', 'Tube 40x40, Antirouille , Baguette', 'validated', 35, NULL, '2026-09-29 09:25:46', NULL),
-(427, 'MVS-2026-0426', 'sortie', 'paiement_da', '2026-09-29', 303000.00, 510731.00, 207731.00, 'BIF', NULL, 2393, 'DA-2026-2393', 'GIHOSHA NDAYI', 'Paiement demande achat', 'cash', 'BP-2026-001237', NULL, 'Paiement DA-2026-2393', 'Ciment , Chargement dechargement', 'validated', 35, NULL, '2026-09-29 09:26:04', NULL),
-(428, 'MVS-2026-0427', 'entree', 'approvisionnement_recu', '2026-09-29', 500000.00, 207731.00, 707731.00, 'BIF', 'TRF-2026-5324', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 09:44:04', NULL),
-(429, 'MVS-2026-0428', 'sortie', 'paiement_da', '2026-09-29', 220000.00, 707731.00, 487731.00, 'BIF', NULL, 2545, 'DA-2026-2545', 'KABEZI', 'Paiement demande achat', 'cash', 'BP-2026-001403', NULL, 'Paiement DA-2026-2545', 'Essence pour Hillux E4924A', 'validated', 35, NULL, '2026-09-29 09:44:47', NULL),
-(430, 'MVS-2026-0429', 'sortie', 'paiement_da', '2026-09-29', 260000.00, 487731.00, 227731.00, 'BIF', NULL, 2504, 'DA-2026-2504', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001355', NULL, 'Paiement DA-2026-2504', 'Mazout pour Benne I4549A I 4549A, Mazout pour Dyna E4178A, Hillux C1566A, Gris élévateur E6809A', 'validated', 35, NULL, '2026-09-29 09:45:46', NULL),
-(431, 'MVS-2026-0430', 'entree', 'retour_caisse', '2026-09-29', 500000.00, 227731.00, 727731.00, 'BIF', NULL, 2117, 'DA-2026-2117', 'NIYITEGEKA Jacques', 'Retour à la caisse', 'cash', NULL, NULL, 'Retour à la caisse — Retour de caisse', NULL, 'validated', 46, NULL, '2026-09-29 09:47:58', NULL),
-(432, 'MVS-2026-0431', 'sortie', 'paiement_da', '2026-09-29', 400000.00, 727731.00, 327731.00, 'BIF', NULL, 2543, 'DA-2026-2543', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001402', NULL, 'Paiement DA-2026-2543', 'Main-d\'œuvre pour R2PARATIO Howo D8152A ', 'validated', 46, NULL, '2026-09-29 09:50:53', NULL),
-(433, 'MVS-2026-0432', 'sortie', 'paiement_da', '2026-09-29', 18000.00, 327731.00, 309731.00, 'BIF', NULL, 2548, 'DA-2026-2548', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001406', NULL, 'Paiement DA-2026-2548', 'Coude de 40 pvc , Tuyaux 40, Siphon gaine 40', 'validated', 35, NULL, '2026-09-29 11:39:24', NULL),
-(434, 'MVS-2026-0433', 'entree', 'retour_caisse', '2026-09-29', 15000.00, 309731.00, 324731.00, 'BIF', NULL, 2251, 'DA-2026-2251', 'NKESHIMANA  Come', 'Retour à la caisse', 'cash', NULL, NULL, 'Retour à la caisse — Retour de caisse', NULL, 'validated', 46, NULL, '2026-09-29 11:58:53', NULL),
-(435, 'MVS-2026-0434', 'entree', 'approvisionnement_recu', '2026-09-29', 8000000.00, 324731.00, 8324731.00, 'BIF', 'TRF-2026-7362', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 14:00:22', NULL),
-(436, 'MVS-2026-0435', 'sortie', 'paiement_da', '2026-09-29', 1415000.00, 8324731.00, 6909731.00, 'BIF', NULL, 2487, 'DA-2026-2487', 'KING\'S SCHOOL', 'Paiement demande achat', 'cash', 'BP-2026-001329', NULL, 'Paiement DA-2026-2487', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'validated', 35, NULL, '2026-09-29 14:10:03', NULL),
-(437, 'MVS-2026-0436', 'sortie', 'paiement_da', '2026-09-29', 890000.00, 6909731.00, 6019731.00, 'BIF', NULL, 2486, 'DA-2026-2486', 'KINANIRA 3', 'Paiement demande achat', 'cash', 'BP-2026-001330', NULL, 'Paiement DA-2026-2486', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'validated', 35, NULL, '2026-09-29 14:10:29', NULL),
-(438, 'MVS-2026-0437', 'sortie', 'paiement_da', '2026-09-29', 1100000.00, 6019731.00, 4919731.00, 'BIF', NULL, 2491, 'DA-2026-2491', 'ROHERO CEDRIC', 'Paiement demande achat', 'cash', 'BP-2026-001325', NULL, 'Paiement DA-2026-2491', 'MOD DES OUVRIERS du 19/09 au 25/09/2026', 'validated', 35, NULL, '2026-09-29 14:10:44', NULL),
-(439, 'MVS-2026-0438', 'sortie', 'paiement_da', '2026-09-29', 610000.00, 4919731.00, 4309731.00, 'BIF', NULL, 2468, 'DA-2026-2468', 'CIBITOKE/CLINIQUE UBUNTU', 'Paiement demande achat', 'cash', 'BP-2026-001319', NULL, 'Paiement DA-2026-2468', 'Ciment kabimba , Frais de transport', 'validated', 35, NULL, '2026-09-29 14:11:08', NULL),
-(440, 'MVS-2026-0439', 'sortie', 'paiement_da', '2026-09-29', 500000.00, 4309731.00, 3809731.00, 'BIF', NULL, 2551, 'DA-2026-2551', 'Maramvya Brique Cute', 'Paiement demande achat', 'cash', 'BP-2026-001409', NULL, 'Paiement DA-2026-2551', 'KUGURA INKWI', 'validated', 35, NULL, '2026-09-29 14:16:27', NULL),
-(441, 'MVS-2026-0440', 'sortie', 'paiement_da', '2026-09-29', 300000.00, 3809731.00, 3509731.00, 'BIF', NULL, 2448, 'DA-2026-2448', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001297', NULL, 'Paiement DA-2026-2448', 'RAM PC4 de 8 GB  pour desktop DELL', 'validated', 35, NULL, '2026-09-29 14:23:23', NULL),
-(442, 'MVS-2026-0441', 'sortie', 'paiement_da', '2026-09-29', 120000.00, 3509731.00, 3389731.00, 'BIF', NULL, 2402, 'DA-2026-2402', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001246', NULL, 'Paiement DA-2026-2402', 'Souris , Switch avec 8 ports ', 'validated', 35, NULL, '2026-09-29 14:23:46', NULL),
-(443, 'MVS-2026-0442', 'sortie', 'paiement_da', '2026-09-29', 1921500.00, 3389731.00, 1468231.00, 'BIF', NULL, 2299, 'DA-2026-2299', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001301', NULL, 'Paiement DA-2026-2299', 'Frais d\'assurance maladie mois  de septembre ,nombre de 48.', 'validated', 35, NULL, '2026-09-29 14:31:56', NULL),
-(444, 'MVS-2026-0443', 'sortie', 'paiement_da', '2026-09-29', 1000000.00, 1468231.00, 468231.00, 'BIF', NULL, 2450, 'DA-2026-2450', 'GATOKE CLAUDOIR', 'Paiement demande achat', 'cash', 'BP-2026-001298', NULL, 'Paiement DA-2026-2450', 'lustre escalier, snack light', 'validated', 35, NULL, '2026-09-29 14:37:26', NULL),
-(445, 'MVS-2026-0444', 'sortie', 'paiement_da', '2026-09-29', 152280.00, 468231.00, 315951.00, 'BIF', NULL, 2530, 'DA-2026-2530', 'GIHOSHA NDAYI', 'Paiement demande achat', 'cash', 'BP-2026-001383', NULL, 'Paiement DA-2026-2530', 'Chargement dechargement des pavee', 'validated', 35, NULL, '2026-09-29 14:42:31', NULL),
-(446, 'MVS-2026-0445', 'sortie', 'paiement_da', '2026-09-29', 187800.00, 315951.00, 128151.00, 'BIF', NULL, 2549, 'DA-2026-2549', 'KINANIRA 3', 'Paiement demande achat', 'cash', 'BP-2026-001407', NULL, 'Paiement DA-2026-2549', 'Ciment, Chargement dechargement', 'validated', 35, NULL, '2026-09-29 14:42:54', NULL),
-(447, 'MVS-2026-0446', 'entree', 'retour_caisse', '2026-09-29', 15000.00, 128151.00, 143151.00, 'BIF', NULL, 2236, 'DA-2026-2236', 'NKESHIMANA  Come', 'Retour à la caisse', 'cash', NULL, NULL, 'Retour à la caisse — Retour de caisse', NULL, 'validated', 46, NULL, '2026-09-29 14:43:26', NULL),
-(448, 'MVS-2026-0447', 'entree', 'approvisionnement_recu', '2026-09-29', 1000000.00, 143151.00, 1143151.00, 'BIF', 'TRF-2026-3181', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', 'TEMOINS DE JEHOVAH', 'validated', 35, NULL, '2026-09-29 14:45:00', NULL),
-(449, 'MVS-2026-0448', 'sortie', 'paiement_da', '2026-09-29', 100000.00, 1143151.00, 1043151.00, 'BIF', NULL, 2466, 'DA-2026-2466', 'ROHERO CEDRIC', 'Paiement demande achat', 'cash', 'BP-2026-001317', NULL, 'Paiement DA-2026-2466', 'Clous de 10 en kg', 'validated', 35, NULL, '2026-09-29 14:46:30', NULL),
-(450, 'MVS-2026-0449', 'sortie', 'paiement_da', '2026-09-29', 79100.00, 1043151.00, 964051.00, 'BIF', NULL, 2554, 'DA-2026-2554', 'CIBITOKE/CLINIQUE UBUNTU', 'Paiement demande achat', 'cash', 'BP-2026-001412', NULL, 'Paiement DA-2026-2554', 'Supplément sur la demande num 1856, 1786', 'validated', 35, NULL, '2026-09-29 14:51:34', NULL),
-(451, 'MVS-2026-0450', 'sortie', 'paiement_da', '2026-09-29', 400000.00, 964051.00, 564051.00, 'BIF', NULL, 2547, 'DA-2026-2547', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001405', NULL, 'Paiement DA-2026-2547', 'Frais de ration et routiers pour les chauffeurs', 'validated', 35, NULL, '2026-09-29 15:02:37', NULL),
-(452, 'MVS-2026-0451', 'sortie', 'paiement_da', '2026-09-29', 200000.00, 564051.00, 364051.00, 'BIF', NULL, 2523, 'DA-2026-2523', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001369', NULL, 'Paiement DA-2026-2523', 'paiement d activite standard de Homes kings Travels', 'validated', 35, NULL, '2026-09-29 15:04:44', NULL),
-(453, 'MVS-2026-0452', 'sortie', 'paiement_da', '2026-09-29', 142000.00, 364051.00, 222051.00, 'BIF', NULL, 2555, 'DA-2026-2555', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001413', NULL, 'Paiement DA-2026-2555', 'IMIKATE, IVOKA , IBITUMBURA, UBUYI (kg), ISUKARI(kg)', 'validated', 35, NULL, '2026-09-29 15:19:11', NULL),
-(454, 'MVS-2026-0453', 'entree', 'approvisionnement_recu', '2026-09-29', 400000.00, 222051.00, 622051.00, 'BIF', 'TRF-2026-7944', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', '', 'validated', 46, NULL, '2026-09-29 16:12:51', NULL),
-(455, 'MVS-2026-0454', 'sortie', 'paiement_da', '2026-09-29', 376500.00, 622051.00, 245551.00, 'BIF', NULL, 2512, 'DA-2026-2512', 'GATOKE CLAUDOIR', 'Paiement demande achat', 'cash', 'BP-2026-001414', NULL, 'Paiement DA-2026-2512', 'Thineur  (en bidon, Jexes, inzembe, acide, Disque a béton ( petit', 'validated', 46, NULL, '2026-09-29 16:14:33', NULL),
-(456, 'MVS-2026-0455', 'sortie', 'paiement_da', '2026-09-29', 220000.00, 245551.00, 25551.00, 'BIF', NULL, 2552, 'DA-2026-2552', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001410', NULL, 'Paiement DA-2026-2552', 'ESSENCE POUR HIACE E2464A', 'validated', 46, NULL, '2026-09-29 16:59:19', NULL);
-INSERT INTO `tbl_finance_mouvement_secondaire` (`id`, `reference`, `sens`, `nature`, `movement_date`, `amount`, `balance_before`, `balance_after`, `devise`, `transfer_reference`, `purchase_request_id`, `purchase_request_reference`, `third_party`, `category`, `payment_method`, `document_number`, `attachment`, `label`, `observation`, `status`, `created_by`, `validated_by`, `created_at`, `updated_at`) VALUES
-(457, 'MVS-2026-0456', 'entree', 'approvisionnement_recu', '2026-09-30', 500000.00, 25551.00, 525551.00, 'BIF', 'TRF-2026-6378', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', '', 'validated', 46, NULL, '2026-09-30 11:32:43', NULL),
-(458, 'MVS-2026-0457', 'entree', 'approvisionnement_recu', '2026-09-30', 900000.00, 525551.00, 1425551.00, 'BIF', 'TRF-2026-5847', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', '', 'validated', 35, NULL, '2026-09-30 11:38:27', NULL),
-(459, 'MVS-2026-0458', 'sortie', 'paiement_da', '2026-09-30', 568000.00, 1425551.00, 857551.00, 'BIF', NULL, 2519, 'DA-2026-2519', 'IBB entrepots', 'Paiement demande achat', 'cash', 'BP-2026-001418', NULL, 'Paiement DA-2026-2519', 'Ciment kabimba , Ficelles rouleaux, Toles planes 1,5mm de 2m, Silicone sosiso, Disque a couper, paquet de baguettes, Ciment blanc', 'validated', 35, NULL, '2026-09-30 11:38:41', NULL),
-(460, 'MVS-2026-0459', 'entree', 'approvisionnement_recu', '2026-09-30', 1620000.00, 857551.00, 2477551.00, 'BIF', 'TRF-2026-0067', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', '', 'validated', 35, NULL, '2026-09-30 11:40:21', NULL),
-(461, 'MVS-2026-0460', 'sortie', 'paiement_da', '2026-09-30', 20000.00, 2477551.00, 2457551.00, 'BIF', NULL, 2561, 'DA-2026-2561', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001421', NULL, 'Paiement DA-2026-2561', 'Unité pour DG du 22/9', 'validated', 35, NULL, '2026-09-30 11:52:30', NULL),
-(462, 'MVS-2026-0461', 'sortie', 'paiement_da', '2026-09-30', 120000.00, 2457551.00, 2337551.00, 'BIF', NULL, 2560, 'DA-2026-2560', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001420', NULL, 'Paiement DA-2026-2560', 'ACHAT CARBURANT L4521A', 'validated', 35, NULL, '2026-09-30 12:01:22', NULL),
-(463, 'MVS-2026-0462', 'sortie', 'paiement_da', '2026-09-30', 1500000.00, 2337551.00, 837551.00, 'BIF', NULL, 2495, 'DA-2026-2495', 'GIHOSHA ZONE', 'Paiement demande achat', 'cash', 'BP-2026-001347', NULL, 'Paiement DA-2026-2495', 'MAIN D OEUVRE DE FABRICATION CUISINE POUR GIHOSHA ZONE', 'validated', 35, NULL, '2026-09-30 12:22:20', NULL),
-(464, 'MVS-2026-0463', 'entree', 'approvisionnement_recu', '2026-09-30', 1000000.00, 837551.00, 1837551.00, 'BIF', 'TRF-2026-5139', NULL, NULL, NULL, 'Approvisionnement', 'cash', NULL, NULL, 'Approvisionnement reçu de la caisse principale', '', 'validated', 35, NULL, '2026-09-30 12:42:07', NULL),
-(465, 'MVS-2026-0464', 'sortie', 'paiement_da', '2026-09-30', 660000.00, 1837551.00, 1177551.00, 'BIF', NULL, 2564, 'DA-2026-2564', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001424', NULL, 'Paiement DA-2026-2564', 'Hillux E4923A, Rav 4 E4521A', 'validated', 35, NULL, '2026-09-30 12:42:27', NULL),
-(466, 'MVS-2026-0465', 'sortie', 'paiement_da', '2026-09-30', 520000.00, 1177551.00, 657551.00, 'BIF', NULL, 2559, 'DA-2026-2559', 'BRARUDI', 'Paiement demande achat', 'cash', 'BP-2026-001419', NULL, 'Paiement DA-2026-2559', 'CARBURAT/MAZOUT pour benne I4549A, POUR HILUX', 'validated', 35, NULL, '2026-09-30 12:42:39', NULL),
-(467, 'MVS-2026-0466', 'sortie', 'paiement_da', '2026-09-30', 491400.00, 657551.00, 166151.00, 'BIF', NULL, 2248, 'DA-2026-2248', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001102', NULL, 'Paiement DA-2026-2248', 'Paiement de l\'essance du Hilux E 4924 A, Frais de transfert  et de retrait via lumicash', 'validated', 35, NULL, '2026-09-30 12:50:50', NULL),
-(468, 'MVS-2026-0467', 'sortie', 'paiement_da', '2026-09-30', 30000.00, 166151.00, 136151.00, 'BIF', NULL, 2392, 'DA-2026-2392', 'ROHERO CEDRIC', 'Paiement demande achat', 'cash', 'BP-2026-001236', NULL, 'Paiement DA-2026-2392', 'Chargement des perches ', 'validated', 35, NULL, '2026-09-30 12:55:07', NULL);
+(379, 'MVS-2026-0378', 'sortie', 'paiement_da', '2026-09-25', 180000.00, 181031.00, 1031.00, 'BIF', NULL, 2452, 'DA-2026-2452', 'FONCTIONNEMENT', 'Paiement demande achat', 'cash', 'BP-2026-001302', NULL, 'Paiement DA-2026-2452', 'Frais de ration et routiers pour les chauffeurs', 'validated', 35, NULL, '2026-09-25 15:57:40', NULL);
 
 -- --------------------------------------------------------
 
@@ -16306,40 +15574,7 @@ INSERT INTO `tbl_finance_regularisations` (`id`, `company_id`, `reference`, `pur
 (89, 2, 'REG-2026-0089', 2149, 1001, 'retour', 13000.00, '2026-09-25', 'NIZIGAMA  Samson', 'FactureFN687', 'Retour de caisse', NULL, 'validated', 46, '2026-09-25 11:13:53', NULL),
 (90, 2, 'REG-2026-0090', 2425, 1267, 'retour', 1156000.00, '2026-09-25', 'NIZIGAMA  Samson', 'Facture 49676M/AT', 'Retour de caisse', NULL, 'validated', 46, '2026-09-25 11:18:00', NULL),
 (91, 2, 'REG-2026-0091', 2416, 1265, 'retour', 43000.00, '2026-09-25', 'NIZIGAMA  Samson', 'Facture no60', 'Retour de caisse', NULL, 'validated', 46, '2026-09-25 11:19:31', NULL),
-(92, 2, 'REG-2026-0092', 2309, 1160, 'retour', 150000.00, '2026-09-25', 'NIZIGAMA  Samson', 'Bon de paiement', 'Retour de caisse', NULL, 'validated', 46, '2026-09-25 11:21:05', NULL),
-(93, 2, 'REG-2026-0093', 2516, 1364, 'exact', 0.00, '2026-09-28', 'NIBITANGA Mélance', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 13:16:44', NULL),
-(94, 2, 'REG-2026-0094', 2467, 1318, 'exact', 0.00, '2026-09-28', 'NGENDAKUMANA James', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 13:24:55', NULL),
-(95, 2, 'REG-2026-0095', 2390, 1233, 'exact', 0.00, '2026-09-28', 'NKORERIMANA  Emmanuel', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 13:33:01', NULL),
-(96, 2, 'REG-2026-0096', 2363, 1209, 'exact', 0.00, '2026-09-28', 'NIZIGAMA  Samson', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 13:35:33', NULL),
-(97, 2, 'REG-2026-0097', 2372, 1234, 'exact', 0.00, '2026-09-28', 'NKORERIMANA  Emmanuel', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 13:37:00', NULL),
-(98, 2, 'REG-2026-0098', 2331, 1179, 'exact', 0.00, '2026-09-28', 'NIYONKURU J de Dieu', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 14:56:02', NULL),
-(99, 2, 'REG-2026-0099', 2380, 1224, 'exact', 0.00, '2026-09-28', 'UWIZIGIRA  Violette', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 14:57:51', NULL),
-(100, 2, 'REG-2026-0100', 2156, 1009, 'retour', 206500.00, '2026-09-28', 'NDUWAYO  Emmanuel', 'Bordereau de versement', 'Retour de caisse', NULL, 'validated', 46, '2026-09-28 15:06:51', NULL),
-(101, 2, 'REG-2026-0101', 2531, 1384, 'exact', 0.00, '2026-09-28', 'NIMBONA  Saidi', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 15:39:55', NULL),
-(102, 2, 'REG-2026-0102', 2319, 1172, 'exact', 0.00, '2026-09-28', 'HABONIMANA  Anniella', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 15:43:24', NULL),
-(103, 2, 'REG-2026-0103', 2318, 1170, 'exact', 0.00, '2026-09-28', 'HABONIMANA  Anniella', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 15:44:27', NULL),
-(104, 2, 'REG-2026-0104', 2146, 998, 'retour', 20000.00, '2026-09-28', 'HABONIMANA  Anniella', 'Bon de paiement', 'Retour de caisse', NULL, 'validated', 46, '2026-09-28 15:56:54', NULL),
-(105, 2, 'REG-2026-0105', 2387, 1232, 'retour', 5000.00, '2026-09-28', 'HABONIMANA  Anniella', 'Facture', 'Retour de caisse', NULL, 'validated', 46, '2026-09-28 16:03:06', NULL),
-(106, 2, 'REG-2026-0106', 2321, 1173, 'exact', 0.00, '2026-09-28', 'HABONIMANA  Anniella', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 16:04:28', NULL),
-(107, 2, 'REG-2026-0107', 2084, 939, 'exact', 0.00, '2026-09-28', 'HABONIMANA  Anniella', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 16:06:25', NULL),
-(108, 2, 'REG-2026-0108', 2403, 1247, 'exact', 0.00, '2026-09-28', 'HABONIMANA  Anniella', 'Facture', 'Montant exact', NULL, 'validated', 46, '2026-09-28 16:12:10', NULL),
-(109, 2, 'REG-2026-0109', 2329, 1177, 'exact', 0.00, '2026-09-28', 'HABONIMANA  Anniella', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-28 16:13:08', NULL),
-(110, 2, 'REG-2026-0110', 2117, 966, 'retour', 500000.00, '2026-09-29', 'NIYITEGEKA Jacques', 'Bon de paiement', 'Retour de caisse', NULL, 'validated', 46, '2026-09-29 09:47:58', NULL),
-(111, 2, 'REG-2026-0111', 2452, 1302, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:16:17', NULL),
-(112, 2, 'REG-2026-0112', 2401, 1245, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:17:55', NULL),
-(113, 2, 'REG-2026-0113', 2310, 1161, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:19:20', NULL),
-(114, 2, 'REG-2026-0114', 2353, 1201, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:20:30', NULL),
-(115, 2, 'REG-2026-0115', 2352, 1200, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:22:01', NULL),
-(116, 2, 'REG-2026-0116', 2524, 1373, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:23:02', NULL),
-(117, 2, 'REG-2026-0117', 2141, 992, 'exact', 0.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 11:57:22', NULL),
-(118, 2, 'REG-2026-0118', 2251, 1105, 'retour', 15000.00, '2026-09-29', 'NKESHIMANA  Come', 'Bon de paiement', 'Retour de caisse', NULL, 'validated', 46, '2026-09-29 11:58:53', NULL),
-(119, 2, 'REG-2026-0119', 2236, 1092, 'retour', 15000.00, '2026-09-29', 'NKESHIMANA  Come', 'Facture', 'Retour de caisse', NULL, 'validated', 46, '2026-09-29 14:43:26', NULL),
-(120, 2, 'REG-2026-0120', 2350, 1197, 'exact', 0.00, '2026-09-29', 'MANIRAKIZA Michel', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 15:08:35', NULL),
-(121, 2, 'REG-2026-0121', 2159, 1022, 'exact', 0.00, '2026-09-29', 'MANIRAKIZA Michel', 'Facture no10', 'Montant exact', NULL, 'validated', 46, '2026-09-29 15:10:27', NULL),
-(122, 2, 'REG-2026-0122', 2234, 1116, 'exact', 0.00, '2026-09-29', 'MANIRAKIZA Michel', 'Facture no007', 'Montant exact', NULL, 'validated', 46, '2026-09-29 15:15:08', NULL),
-(123, 2, 'REG-2026-0123', 2462, 1311, 'exact', 0.00, '2026-09-29', 'MANIRAKIZA Michel', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 15:27:17', NULL),
-(124, 2, 'REG-2026-0124', 2157, 1019, 'exact', 0.00, '2026-09-29', 'MANIRAKIZA Michel', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 15:31:04', NULL),
-(125, 2, 'REG-2026-0125', 2086, 955, 'exact', 0.00, '2026-09-29', 'MANIRAKIZA Michel', 'Bon de paiement', 'Montant exact', NULL, 'validated', 46, '2026-09-29 15:32:48', NULL);
+(92, 2, 'REG-2026-0092', 2309, 1160, 'retour', 150000.00, '2026-09-25', 'NIZIGAMA  Samson', 'Bon de paiement', 'Retour de caisse', NULL, 'validated', 46, '2026-09-25 11:21:05', NULL);
 
 -- --------------------------------------------------------
 
@@ -16532,14 +15767,7 @@ INSERT INTO `tbl_relation_publique` (`id`, `reference`, `beneficiaire`, `montant
 (18, 'SC-2026-018', 'DG', 300000.00, 'Relations publiques', '2026-09-25', 'dg', 'Directeur Général', 'SC-2026-018', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-25 12:20:16', NULL),
 (19, 'SC-2026-019', 'Mama Sade', 20000.00, 'Relations publiques', '2026-09-25', 'dg', 'Directeur Général', 'SC-2026-019', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-25 12:21:04', NULL),
 (20, 'SC-2026-020', 'DG', 700000.00, 'Relations publiques', '2026-09-25', 'dg', 'Directeur Général', 'SC-2026-020', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-25 15:10:20', NULL),
-(21, 'SC-2026-021', 'Nelly Ange', 30000.00, 'Relations publiques', '2026-09-25', 'dg', 'Directeur Général', 'SC-2026-021', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-25 15:20:01', NULL),
-(22, 'SC-2026-022', 'DG', 500000.00, 'Relations publiques', '2026-09-28', 'dg', 'Directeur Général', 'SC-2026-022', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-28 11:33:30', NULL),
-(23, 'SC-2026-023', 'Consultant', 2000000.00, 'Relations publiques', '2026-09-28', 'dg', 'Directeur Général', 'SC-2026-023', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-28 11:34:29', NULL),
-(24, 'SC-2026-024', 'Violette Uwizigiye', 100000.00, 'Relations publiques MUCO', '2026-09-29', 'dg', 'Directeur Général', 'SC-2026-024', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-29 11:26:24', NULL),
-(25, 'SC-2026-025', 'Fidèle 61697975', 32900.00, 'Transfert via lumicash', '2026-09-18', 'dg', 'Directeur Général', 'SC-2026-025', 'payé le 30/9', 'valide', 2, 35, 'Inconnu', '2026-09-30 12:31:26', NULL),
-(26, 'SC-2026-026', 'Aldo 68131313', 208300.00, 'Transfert via lumicash', '2026-09-21', 'dg', 'Directeur Général', 'SC-2026-026', 'payé le 30/9', 'valide', 2, 35, 'Inconnu', '2026-09-30 12:32:20', NULL),
-(27, 'SC-2026-027', 'Violette Uwizigiye', 381300.00, 'Transfert via lumicash', '2026-09-22', 'dg', 'Directeur Général', 'SC-2026-027', 'payé le 30/9', 'valide', 2, 35, 'Inconnu', '2026-09-30 12:37:09', NULL),
-(28, 'SC-2026-028', 'Fidèle 61697975', 32900.00, 'Transfert via lumicash', '2026-09-24', 'dg', 'Directeur Général', 'SC-2026-028', 'payé le 30/9', 'valide', 2, 35, 'Inconnu', '2026-09-30 12:38:16', NULL);
+(21, 'SC-2026-021', 'Nelly Ange', 30000.00, 'Relations publiques', '2026-09-25', 'dg', 'Directeur Général', 'SC-2026-021', NULL, 'valide', 2, 35, 'Inconnu', '2026-09-25 15:20:01', NULL);
 
 -- --------------------------------------------------------
 
@@ -16835,6 +16063,41 @@ INSERT INTO `user_permissions` (`id`, `user_id`, `module_code`, `permission_code
 (123, 22, 'admin', 'matrice-access', '2026-08-06 10:19:42'),
 (124, 22, 'admin', 'roles-permissions', '2026-08-06 10:19:42'),
 (125, 22, 'admin', 'settings', '2026-08-06 10:19:42'),
+(414, 23, 'dash', 'dashboard', '2026-09-08 13:59:26'),
+(415, 23, 'dg', 'direction-dashboard', '2026-09-08 13:59:26'),
+(416, 23, 'dg', 'direction-indicateurs', '2026-09-08 13:59:26'),
+(417, 23, 'dg', 'direction-reporting-general', '2026-09-08 13:59:26'),
+(418, 23, 'dg', 'direction-reporting-analytique', '2026-09-08 13:59:26'),
+(419, 23, 'dg', 'direction-statistiques', '2026-09-08 13:59:26'),
+(420, 23, 'dg', 'direction-validations', '2026-09-08 13:59:26'),
+(421, 23, 'dg', 'direction-projets', '2026-09-08 13:59:26'),
+(422, 23, 'dg', 'direction-notifications', '2026-09-08 13:59:26'),
+(423, 23, 'dg', 'direction-messagerie', '2026-09-08 13:59:26'),
+(424, 23, 'dg', 'synthese-demandes', '2026-09-08 13:59:26'),
+(425, 23, 'dg', 'direction-utilisateurs', '2026-09-08 13:59:26'),
+(426, 23, 'dg', 'direction-parametres', '2026-09-08 13:59:26'),
+(427, 23, 'dg', 'direction-archives', '2026-09-08 13:59:26'),
+(428, 23, 'tech', 'projects', '2026-09-08 13:59:26'),
+(429, 23, 'tech', 'chantiers', '2026-09-08 13:59:26'),
+(430, 23, 'tech', 'achat', '2026-09-08 13:59:26'),
+(431, 23, 'tech', 'fournisseurs', '2026-09-08 13:59:26'),
+(432, 23, 'tech', 'sous-traitant', '2026-09-08 13:59:26'),
+(433, 23, 'tech', 'stock-general', '2026-09-08 13:59:26'),
+(434, 23, 'tech', 'engin-materiel', '2026-09-08 13:59:26'),
+(435, 23, 'tech', 'maintenance-carburant', '2026-09-08 13:59:26'),
+(436, 23, 'tech', 'journal-production', '2026-09-08 13:59:26'),
+(437, 23, 'tech', 'cout-reelle-rentebilite', '2026-09-08 13:59:26'),
+(438, 23, 'tech', 'evaluation-chantier', '2026-09-08 13:59:26'),
+(439, 23, 'tech', 'personnel-chantier', '2026-09-08 13:59:26'),
+(440, 23, 'tech', 'suivie-paie-chantier', '2026-09-08 13:59:26'),
+(441, 23, 'tech', 'pointage', '2026-09-08 13:59:26'),
+(442, 23, 'tech', 'ordre-service', '2026-09-08 13:59:26'),
+(443, 23, 'crm', 'crm-dashboard', '2026-09-08 13:59:26'),
+(444, 23, 'crm', 'crm-clients', '2026-09-08 13:59:26'),
+(445, 23, 'crm', 'crm-devis', '2026-09-08 13:59:26'),
+(446, 23, 'crm', 'crm-projets', '2026-09-08 13:59:26'),
+(447, 23, 'crm', 'crm-chantiers', '2026-09-08 13:59:26'),
+(448, 23, 'crm', 'crm-reporting', '2026-09-08 13:59:26'),
 (569, 39, 'tech', 'achat', '2026-09-08 14:43:07'),
 (570, 39, 'tech', 'fournisseurs', '2026-09-08 14:43:07'),
 (571, 39, 'tech', 'stock-general', '2026-09-08 14:43:07'),
@@ -16883,6 +16146,20 @@ INSERT INTO `user_permissions` (`id`, `user_id`, `module_code`, `permission_code
 (614, 54, 'tech', 'achat', '2026-09-09 08:47:26'),
 (615, 54, 'tech', 'fournisseurs', '2026-09-09 08:47:26'),
 (616, 54, 'tech', 'sous-traitant', '2026-09-09 08:47:26'),
+(617, 55, 'dg', 'direction-dashboard', '2026-09-09 11:09:12'),
+(618, 55, 'dg', 'direction-indicateurs', '2026-09-09 11:09:12'),
+(619, 55, 'dg', 'direction-reporting-general', '2026-09-09 11:09:12'),
+(620, 55, 'dg', 'direction-reporting-analytique', '2026-09-09 11:09:12'),
+(621, 55, 'dg', 'direction-statistiques', '2026-09-09 11:09:12'),
+(622, 55, 'dg', 'direction-validations', '2026-09-09 11:09:12'),
+(623, 55, 'dg', 'direction-projets', '2026-09-09 11:09:12'),
+(624, 55, 'dg', 'direction-notifications', '2026-09-09 11:09:12'),
+(625, 55, 'dg', 'direction-messagerie', '2026-09-09 11:09:12'),
+(626, 55, 'dg', 'synthese-demandes', '2026-09-09 11:09:12'),
+(627, 55, 'dg', 'direction-utilisateurs', '2026-09-09 11:09:12'),
+(628, 55, 'dg', 'direction-parametres', '2026-09-09 11:09:12'),
+(629, 55, 'dg', 'direction-archives', '2026-09-09 11:09:12'),
+(630, 55, 'tech', 'achat', '2026-09-09 11:09:12'),
 (631, 38, 'tech', 'achat', '2026-09-09 12:15:11'),
 (632, 38, 'tech', 'fournisseurs', '2026-09-09 12:15:11'),
 (633, 38, 'tech', 'sous-traitant', '2026-09-09 12:15:11'),
@@ -17123,60 +16400,7 @@ INSERT INTO `user_permissions` (`id`, `user_id`, `module_code`, `permission_code
 (889, 50, 'crm', 'crm-clients', '2026-09-25 12:59:20'),
 (890, 50, 'crm', 'crm-devis', '2026-09-25 12:59:20'),
 (891, 50, 'crm', 'crm-projets', '2026-09-25 12:59:20'),
-(892, 50, 'crm', 'crm-reporting', '2026-09-25 12:59:20'),
-(893, 23, 'dash', 'dashboard', '2026-09-28 12:08:43'),
-(894, 23, 'dg', 'direction-dashboard', '2026-09-28 12:08:43'),
-(895, 23, 'dg', 'direction-indicateurs', '2026-09-28 12:08:43'),
-(896, 23, 'dg', 'direction-reporting-general', '2026-09-28 12:08:43'),
-(897, 23, 'dg', 'direction-reporting-analytique', '2026-09-28 12:08:43'),
-(898, 23, 'dg', 'direction-statistiques', '2026-09-28 12:08:43'),
-(899, 23, 'dg', 'direction-validations', '2026-09-28 12:08:43'),
-(900, 23, 'dg', 'direction-projets', '2026-09-28 12:08:43'),
-(901, 23, 'dg', 'direction-notifications', '2026-09-28 12:08:43'),
-(902, 23, 'dg', 'direction-messagerie', '2026-09-28 12:08:43'),
-(903, 23, 'dg', 'synthese-demandes', '2026-09-28 12:08:43'),
-(904, 23, 'dg', 'direction-utilisateurs', '2026-09-28 12:08:43'),
-(905, 23, 'dg', 'direction-parametres', '2026-09-28 12:08:43'),
-(906, 23, 'dg', 'direction-archives', '2026-09-28 12:08:43'),
-(907, 23, 'tech', 'projects', '2026-09-28 12:08:43'),
-(908, 23, 'tech', 'chantiers', '2026-09-28 12:08:43'),
-(909, 23, 'tech', 'achat', '2026-09-28 12:08:43'),
-(910, 23, 'tech', 'fournisseurs', '2026-09-28 12:08:43'),
-(911, 23, 'tech', 'sous-traitant', '2026-09-28 12:08:43'),
-(912, 23, 'tech', 'stock-general', '2026-09-28 12:08:43'),
-(913, 23, 'tech', 'engin-materiel', '2026-09-28 12:08:43'),
-(914, 23, 'tech', 'maintenance-carburant', '2026-09-28 12:08:43'),
-(915, 23, 'tech', 'journal-production', '2026-09-28 12:08:43'),
-(916, 23, 'tech', 'cout-reelle-rentebilite', '2026-09-28 12:08:43'),
-(917, 23, 'tech', 'evaluation-chantier', '2026-09-28 12:08:43'),
-(918, 23, 'tech', 'personnel-chantier', '2026-09-28 12:08:43'),
-(919, 23, 'tech', 'suivie-paie-chantier', '2026-09-28 12:08:43'),
-(920, 23, 'tech', 'pointage', '2026-09-28 12:08:43'),
-(921, 23, 'tech', 'ordre-service', '2026-09-28 12:08:43'),
-(922, 23, 'crm', 'crm-dashboard', '2026-09-28 12:08:43'),
-(923, 23, 'crm', 'crm-clients', '2026-09-28 12:08:43'),
-(924, 23, 'crm', 'crm-devis', '2026-09-28 12:08:43'),
-(925, 23, 'crm', 'crm-projets', '2026-09-28 12:08:43'),
-(926, 23, 'crm', 'crm-chantiers-avancement', '2026-09-28 12:08:43'),
-(927, 23, 'crm', 'crm-reporting', '2026-09-28 12:08:43'),
-(928, 55, 'dg', 'direction-dashboard', '2026-09-29 10:47:41'),
-(929, 55, 'dg', 'direction-indicateurs', '2026-09-29 10:47:41'),
-(930, 55, 'dg', 'direction-reporting-general', '2026-09-29 10:47:41'),
-(931, 55, 'dg', 'direction-reporting-analytique', '2026-09-29 10:47:41'),
-(932, 55, 'dg', 'direction-statistiques', '2026-09-29 10:47:41'),
-(933, 55, 'dg', 'direction-validations', '2026-09-29 10:47:41'),
-(934, 55, 'dg', 'direction-projets', '2026-09-29 10:47:41'),
-(935, 55, 'dg', 'synthese-demandes', '2026-09-29 10:47:41'),
-(936, 55, 'dg', 'direction-utilisateurs', '2026-09-29 10:47:41'),
-(937, 55, 'dg', 'direction-parametres', '2026-09-29 10:47:41'),
-(938, 55, 'dg', 'direction-archives', '2026-09-29 10:47:41'),
-(939, 55, 'tech', 'achat', '2026-09-29 10:47:41'),
-(940, 55, 'crm', 'crm-dashboard', '2026-09-29 10:47:41'),
-(941, 55, 'crm', 'crm-clients', '2026-09-29 10:47:41'),
-(942, 55, 'crm', 'crm-devis', '2026-09-29 10:47:41'),
-(943, 55, 'crm', 'crm-projets', '2026-09-29 10:47:41'),
-(944, 55, 'crm', 'crm-chantiers-avancement', '2026-09-29 10:47:41'),
-(945, 55, 'crm', 'crm-reporting', '2026-09-29 10:47:41');
+(892, 50, 'crm', 'crm-reporting', '2026-09-25 12:59:20');
 
 -- --------------------------------------------------------
 
@@ -20794,44 +20018,31 @@ ALTER TABLE `tbl_employes`
   ADD KEY `idx_statut` (`statut`);
 
 --
--- Index pour la table `tbl_engin_affectation`
---
-ALTER TABLE `tbl_engin_affectation`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_affectation_reference` (`reference`),
-  ADD KEY `idx_affectation_engin` (`engin_id`,`date_debut`),
-  ADD KEY `idx_affectation_chantier` (`chantier_id`),
-  ADD KEY `idx_affectation_encours` (`engin_id`,`date_fin`);
-
---
 -- Index pour la table `tbl_engin_categorie`
 --
 ALTER TABLE `tbl_engin_categorie`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_categorie_code` (`code`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Index pour la table `tbl_engin_code`
 --
 ALTER TABLE `tbl_engin_code`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_prefixe_annee` (`prefixe`,`annee`);
+  ADD UNIQUE KEY `unique_prefixe_annee` (`prefixe`,`annee`);
 
 --
 -- Index pour la table `tbl_engin_document`
 --
 ALTER TABLE `tbl_engin_document`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_document_engin` (`engin_id`),
-  ADD KEY `idx_document_expiration` (`date_expiration`);
+  ADD KEY `engin_id` (`engin_id`);
 
 --
 -- Index pour la table `tbl_engin_fuel`
 --
 ALTER TABLE `tbl_engin_fuel`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_fuel_reference` (`reference`),
-  ADD KEY `idx_fuel_engin_date` (`engin_id`,`operation_date`),
+  ADD KEY `idx_fuel_engin` (`engin_id`),
   ADD KEY `idx_fuel_chantier` (`chantier_id`),
   ADD KEY `idx_fuel_date` (`operation_date`);
 
@@ -20840,63 +20051,31 @@ ALTER TABLE `tbl_engin_fuel`
 --
 ALTER TABLE `tbl_engin_maintenance`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_maintenance_reference` (`reference`),
-  ADD KEY `idx_maintenance_engin_date` (`engin_id`,`planned_date`),
+  ADD KEY `idx_maintenance_engin` (`engin_id`),
   ADD KEY `idx_maintenance_chantier` (`chantier_id`),
-  ADD KEY `idx_maintenance_status` (`maintenance_status`),
-  ADD KEY `idx_maintenance_next` (`next_maintenance_date`),
-  ADD KEY `idx_maintenance_panne` (`panne_id`);
+  ADD KEY `idx_maintenance_planned_date` (`planned_date`),
+  ADD KEY `idx_maintenance_status` (`maintenance_status`);
 
 --
 -- Index pour la table `tbl_engin_maintenance_document`
 --
 ALTER TABLE `tbl_engin_maintenance_document`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_mdoc_maintenance` (`maintenance_id`);
-
---
--- Index pour la table `tbl_engin_maintenance_piece`
---
-ALTER TABLE `tbl_engin_maintenance_piece`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_piece_maintenance` (`maintenance_id`);
+  ADD KEY `idx_maintenance_document` (`maintenance_id`);
 
 --
 -- Index pour la table `tbl_engin_materiel`
 --
 ALTER TABLE `tbl_engin_materiel`
   ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_code_engin` (`code_engin`),
-  ADD KEY `idx_engin_plaque` (`plaque`),
-  ADD KEY `idx_engin_categorie` (`categorie_id`),
-  ADD KEY `idx_engin_etat` (`etat`),
-  ADD KEY `idx_engin_chantier` (`chantier_id`),
-  ADD KEY `idx_engin_status` (`status`);
-
---
--- Index pour la table `tbl_engin_panne`
---
-ALTER TABLE `tbl_engin_panne`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uk_panne_reference` (`reference`),
-  ADD KEY `idx_panne_engin` (`engin_id`,`date_signalement`),
-  ADD KEY `idx_panne_status` (`panne_status`),
-  ADD KEY `idx_panne_maintenance` (`maintenance_id`);
+  ADD UNIQUE KEY `code_engin` (`code_engin`);
 
 --
 -- Index pour la table `tbl_engin_photo`
 --
 ALTER TABLE `tbl_engin_photo`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_photo_engin` (`engin_id`,`is_principale`);
-
---
--- Index pour la table `tbl_engin_plan_entretien`
---
-ALTER TABLE `tbl_engin_plan_entretien`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_plan_engin` (`engin_id`),
-  ADD KEY `idx_plan_categorie` (`categorie_id`);
+  ADD KEY `engin_id` (`engin_id`);
 
 --
 -- Index pour la table `tbl_evaluations`
@@ -21455,7 +20634,7 @@ ALTER TABLE `purchases`
 -- AUTO_INCREMENT pour la table `purchase_payment_vouchers`
 --
 ALTER TABLE `purchase_payment_vouchers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1428;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1362;
 
 --
 -- AUTO_INCREMENT pour la table `purchase_requests`
@@ -21467,13 +20646,13 @@ ALTER TABLE `purchase_requests`
 -- AUTO_INCREMENT pour la table `purchase_request_forms`
 --
 ALTER TABLE `purchase_request_forms`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2570;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2513;
 
 --
 -- AUTO_INCREMENT pour la table `purchase_request_items`
 --
 ALTER TABLE `purchase_request_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16687;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16452;
 
 --
 -- AUTO_INCREMENT pour la table `quotes`
@@ -21545,7 +20724,7 @@ ALTER TABLE `suppliers`
 -- AUTO_INCREMENT pour la table `tbl_chantiers`
 --
 ALTER TABLE `tbl_chantiers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_clients`
@@ -21575,19 +20754,19 @@ ALTER TABLE `tbl_contrats`
 -- AUTO_INCREMENT pour la table `tbl_contrat_tranches`
 --
 ALTER TABLE `tbl_contrat_tranches`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_crm_contrats`
 --
 ALTER TABLE `tbl_crm_contrats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_devis`
 --
 ALTER TABLE `tbl_devis`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_discipline`
@@ -21602,76 +20781,52 @@ ALTER TABLE `tbl_employes`
   MODIFY `employe_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
--- AUTO_INCREMENT pour la table `tbl_engin_affectation`
---
-ALTER TABLE `tbl_engin_affectation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
-
---
 -- AUTO_INCREMENT pour la table `tbl_engin_categorie`
 --
 ALTER TABLE `tbl_engin_categorie`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_code`
 --
 ALTER TABLE `tbl_engin_code`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_document`
 --
 ALTER TABLE `tbl_engin_document`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_fuel`
 --
 ALTER TABLE `tbl_engin_fuel`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=277;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_maintenance`
 --
 ALTER TABLE `tbl_engin_maintenance`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_maintenance_document`
 --
 ALTER TABLE `tbl_engin_maintenance_document`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT pour la table `tbl_engin_maintenance_piece`
---
-ALTER TABLE `tbl_engin_maintenance_piece`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_materiel`
 --
 ALTER TABLE `tbl_engin_materiel`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-
---
--- AUTO_INCREMENT pour la table `tbl_engin_panne`
---
-ALTER TABLE `tbl_engin_panne`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_engin_photo`
 --
 ALTER TABLE `tbl_engin_photo`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT pour la table `tbl_engin_plan_entretien`
---
-ALTER TABLE `tbl_engin_plan_entretien`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_evaluations`
@@ -21743,19 +20898,19 @@ ALTER TABLE `tbl_finance_journal_code`
 -- AUTO_INCREMENT pour la table `tbl_finance_mouvement_principale`
 --
 ALTER TABLE `tbl_finance_mouvement_principale`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_finance_mouvement_secondaire`
 --
 ALTER TABLE `tbl_finance_mouvement_secondaire`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=469;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=380;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_finance_regularisations`
 --
 ALTER TABLE `tbl_finance_regularisations`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=126;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=93;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_journal_production`
@@ -21791,7 +20946,7 @@ ALTER TABLE `tbl_rapports`
 -- AUTO_INCREMENT pour la table `tbl_relation_publique`
 --
 ALTER TABLE `tbl_relation_publique`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT pour la table `tbl_stock_article`
@@ -21827,7 +20982,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT pour la table `user_permissions`
 --
 ALTER TABLE `user_permissions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=946;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=893;
 
 --
 -- AUTO_INCREMENT pour la table `user_permission_overrides`
@@ -22330,67 +21485,34 @@ ALTER TABLE `tbl_discipline`
   ADD CONSTRAINT `fk_discipline_employe` FOREIGN KEY (`employe_id`) REFERENCES `tbl_employes` (`employe_id`) ON DELETE CASCADE;
 
 --
--- Contraintes pour la table `tbl_engin_affectation`
---
-ALTER TABLE `tbl_engin_affectation`
-  ADD CONSTRAINT `fk_affectation_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`);
-
---
 -- Contraintes pour la table `tbl_engin_document`
 --
 ALTER TABLE `tbl_engin_document`
-  ADD CONSTRAINT `fk_document_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `tbl_engin_document_ibfk_1` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `tbl_engin_fuel`
 --
 ALTER TABLE `tbl_engin_fuel`
-  ADD CONSTRAINT `fk_fuel_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`);
+  ADD CONSTRAINT `fk_fuel_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `tbl_engin_maintenance`
 --
 ALTER TABLE `tbl_engin_maintenance`
-  ADD CONSTRAINT `fk_maintenance_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`),
-  ADD CONSTRAINT `fk_maintenance_panne` FOREIGN KEY (`panne_id`) REFERENCES `tbl_engin_panne` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_maintenance_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `tbl_engin_maintenance_document`
 --
 ALTER TABLE `tbl_engin_maintenance_document`
-  ADD CONSTRAINT `fk_mdoc_maintenance` FOREIGN KEY (`maintenance_id`) REFERENCES `tbl_engin_maintenance` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `tbl_engin_maintenance_piece`
---
-ALTER TABLE `tbl_engin_maintenance_piece`
-  ADD CONSTRAINT `fk_piece_maintenance` FOREIGN KEY (`maintenance_id`) REFERENCES `tbl_engin_maintenance` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `tbl_engin_materiel`
---
-ALTER TABLE `tbl_engin_materiel`
-  ADD CONSTRAINT `fk_engin_categorie` FOREIGN KEY (`categorie_id`) REFERENCES `tbl_engin_categorie` (`id`);
-
---
--- Contraintes pour la table `tbl_engin_panne`
---
-ALTER TABLE `tbl_engin_panne`
-  ADD CONSTRAINT `fk_panne_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`),
-  ADD CONSTRAINT `fk_panne_maintenance` FOREIGN KEY (`maintenance_id`) REFERENCES `tbl_engin_maintenance` (`id`) ON DELETE SET NULL;
+  ADD CONSTRAINT `fk_maintenance_document` FOREIGN KEY (`maintenance_id`) REFERENCES `tbl_engin_maintenance` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `tbl_engin_photo`
 --
 ALTER TABLE `tbl_engin_photo`
-  ADD CONSTRAINT `fk_photo_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON DELETE CASCADE;
-
---
--- Contraintes pour la table `tbl_engin_plan_entretien`
---
-ALTER TABLE `tbl_engin_plan_entretien`
-  ADD CONSTRAINT `fk_plan_categorie` FOREIGN KEY (`categorie_id`) REFERENCES `tbl_engin_categorie` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_plan_engin` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `tbl_engin_photo_ibfk_1` FOREIGN KEY (`engin_id`) REFERENCES `tbl_engin_materiel` (`id`) ON DELETE CASCADE;
 
 --
 -- Contraintes pour la table `tbl_evaluations`

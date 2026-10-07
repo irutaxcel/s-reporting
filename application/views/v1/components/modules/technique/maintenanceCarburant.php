@@ -1,2351 +1,1756 @@
-<!-- Content Wrapper. Contains page content -->
+<?php
+defined('BASEPATH') or exit('No direct script access allowed');
+
+/* ---------------------------------------------------------------------
+ |  Préparation de l'affichage
+ * --------------------------------------------------------------------- */
+$query = array_filter([
+    'q'           => $filters['q'],
+    'engin_id'    => $filters['engin_id'] ?: null,
+    'type'        => $filters['type'],
+    'chantier_id' => $filters['chantier_id'] ?: null,
+    'status'      => $filters['status'],
+    'date_debut'  => $filters['date_debut'],
+    'date_fin'    => $filters['date_fin'],
+]);
+$hasFilters = !empty($query);
+$sources = [
+    'fuel'        => ['Carburant', 'fas fa-gas-pump text-success'],
+    'maintenance' => ['Maintenance', 'fas fa-tools text-warning'],
+    'panne'       => ['Panne', 'fas fa-car-crash text-danger'],
+];
+
+// Options « engin » réutilisées par les 3 formulaires (avec les infos utiles à l'auto-remplissage)
+ob_start();
+foreach ($allEngins as $e): ?>
+<option value="<?= (int) $e->id ?>" data-compteur="<?= eq_e($e->type_compteur) ?>"
+    data-actuel="<?= eq_e($e->compteur_actuel) ?>" data-carburant="<?= eq_e($e->type_carburant) ?>"
+    data-capacite="<?= eq_e($e->capacite_reservoir) ?>" data-chantier="<?= (int) $e->chantier_id ?>"
+    data-responsable="<?= eq_e($e->responsable) ?>">
+    <?= eq_e($e->code_engin . ' — ' . $e->designation . ($e->plaque ? ' (' . $e->plaque . ')' : '')) ?>
+</option>
+<?php endforeach;
+$enginOptions = ob_get_clean();
+
+ob_start(); ?>
+<option value="">Aucun chantier</option>
+<?php foreach ($chantiers as $ch): ?>
+<option value="<?= (int) $ch->id ?>"><?= eq_e($ch->name) ?></option>
+<?php endforeach;
+$chantierOptions = ob_get_clean();
+
+// Pannes ouvertes pour lier une maintenance corrective
+$openPannesJs = array_map(function ($p) {
+    return [
+        'id'          => (int) $p->id,
+        'engin_id'    => (int) $p->engin_id,
+        'chantier_id' => (int) $p->chantier_id,
+        'reference'   => $p->reference,
+        'gravite'     => $p->gravite,
+        'description' => $p->description,
+        'compteur'    => $p->compteur,
+    ];
+}, $pannes);
+if ($prefillPanne && !in_array((int) $prefillPanne->id, array_column($openPannesJs, 'id'), true)) {
+    $prefillPanne = null; // panne déjà résolue ou annulée
+}
+
+$maxCost = !empty($expensive) ? (float) $expensive[0]->total_cost : 0;
+$barColors = ['bg-danger', 'bg-warning', 'bg-primary', 'bg-success', 'bg-info'];
+?>
+<link rel="stylesheet" href="<?= base_url('assets/v1/dist/css/module-engins.css?v=2') ?>">
+
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"><?= $title ?></h1>
-                </div><!-- /.col -->
+                    <h1 class="m-0"><?= eq_e($title) ?></h1>
+                </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active"><?= $title ?></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
+                        <li class="breadcrumb-item"><a href="<?= base_url('engin-materiel') ?>">Engin & Materiel</a>
+                        </li>
+                        <li class="breadcrumb-item active"><?= eq_e($title) ?></li>
                     </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /.content-header -->
 
-    <!-- Main content -->
     <section class="content">
-        <div class="container-fluid">
-
-            <!-- ici le contenu de la page -->
-
-            <style>
-            :root {
-                --mc-green: #0f766e;
-                --mc-green-light: #22c55e;
-                --mc-blue: #2563eb;
-                --mc-orange: #f59e0b;
-                --mc-red: #dc2626;
-                --mc-dark: #0f172a;
-                --mc-muted: #64748b;
-                --mc-border: #e2e8f0;
-                --mc-bg: #f8fafc;
-            }
-
-            .mc-page {
-                font-family: "Segoe UI", sans-serif;
-            }
-
-            .mc-stat-card {
-                border: 0;
-                border-radius: 18px;
-                color: #fff;
-                overflow: hidden;
-                position: relative;
-                min-height: 125px;
-                box-shadow: 0 12px 28px rgba(15, 23, 42, .10);
-            }
-
-            .mc-stat-card .card-body {
-                position: relative;
-                z-index: 2;
-            }
-
-            .mc-stat-card h3 {
-                margin-bottom: 3px;
-                font-weight: 800;
-                font-size: 28px;
-            }
-
-            .mc-stat-card p {
-                margin-bottom: 0;
-                font-size: 13px;
-                opacity: .92;
-            }
-
-            .mc-stat-card .mc-stat-icon {
-                position: absolute;
-                right: 20px;
-                bottom: 12px;
-                font-size: 58px;
-                opacity: .18;
-            }
-
-            .mc-gradient-green {
-                background: linear-gradient(135deg, #047857, #22c55e);
-            }
-
-            .mc-gradient-orange {
-                background: linear-gradient(135deg, #b45309, #f59e0b);
-            }
-
-            .mc-gradient-blue {
-                background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            }
-
-            .mc-gradient-red {
-                background: linear-gradient(135deg, #991b1b, #ef4444);
-            }
-
-            .mc-card {
-                border: 0;
-                border-radius: 18px;
-                overflow: hidden;
-                box-shadow: 0 10px 26px rgba(15, 23, 42, .08);
-            }
-
-            .mc-card .card-header {
-                background: #fff;
-                border-bottom: 1px solid var(--mc-border);
-                padding: 18px 22px;
-            }
-
-            .mc-title {
-                margin: 0;
-                color: var(--mc-dark);
-                font-size: 18px;
-                font-weight: 800;
-            }
-
-            .mc-subtitle {
-                display: block;
-                color: var(--mc-muted);
-                font-size: 12px;
-                margin-top: 3px;
-            }
-
-            .mc-action-card {
-                height: 100%;
-                background: #fff;
-                border: 1px dashed #cbd5e1;
-                border-radius: 16px;
-                padding: 18px 15px;
-                text-align: center;
-                cursor: pointer;
-                transition: .25s ease;
-            }
-
-            .mc-action-card:hover {
-                transform: translateY(-3px);
-                border-color: var(--mc-green);
-                background: #ecfdf5;
-                box-shadow: 0 10px 20px rgba(15, 118, 110, .12);
-            }
-
-            .mc-action-icon {
-                width: 50px;
-                height: 50px;
-                margin: 0 auto 10px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 14px;
-                background: #d1fae5;
-                color: var(--mc-green);
-                font-size: 22px;
-            }
-
-            .mc-action-card h6 {
-                color: var(--mc-dark);
-                font-weight: 700;
-                margin-bottom: 4px;
-            }
-
-            .mc-action-card small {
-                color: var(--mc-muted);
-            }
-
-            .mc-filter-box {
-                padding: 18px;
-                background: var(--mc-bg);
-                border: 1px solid var(--mc-border);
-                border-radius: 15px;
-            }
-
-            .mc-filter-box label {
-                font-size: 12px;
-                font-weight: 700;
-                color: #334155;
-            }
-
-            .mc-btn-primary {
-                background: linear-gradient(135deg, var(--mc-green), var(--mc-green-light));
-                color: #fff;
-                border: 0;
-                border-radius: 9px;
-                font-weight: 600;
-                box-shadow: 0 7px 16px rgba(34, 197, 94, .22);
-            }
-
-            .mc-btn-primary:hover {
-                color: #fff;
-                opacity: .92;
-            }
-
-            .mc-table thead th {
-                background: #f1f5f9;
-                color: #334155;
-                border-top: 0;
-                border-bottom: 1px solid var(--mc-border);
-                font-size: 11px;
-                text-transform: uppercase;
-                white-space: nowrap;
-            }
-
-            .mc-table tbody td {
-                vertical-align: middle;
-                font-size: 13px;
-                border-color: #edf2f7;
-            }
-
-            .mc-badge {
-                display: inline-block;
-                padding: 6px 10px;
-                border-radius: 30px;
-                font-size: 10px;
-                font-weight: 700;
-                white-space: nowrap;
-            }
-
-            .mc-badge-success {
-                background: #dcfce7;
-                color: #166534;
-            }
-
-            .mc-badge-warning {
-                background: #fef3c7;
-                color: #92400e;
-            }
-
-            .mc-badge-danger {
-                background: #fee2e2;
-                color: #991b1b;
-            }
-
-            .mc-badge-info {
-                background: #dbeafe;
-                color: #1d4ed8;
-            }
-
-            .mc-alert-item {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 13px;
-                border-radius: 13px;
-                margin-bottom: 12px;
-                border: 1px solid transparent;
-            }
-
-            .mc-alert-icon {
-                width: 38px;
-                height: 38px;
-                min-width: 38px;
-                border-radius: 11px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .mc-alert-warning {
-                background: #fffbeb;
-                border-color: #fde68a;
-            }
-
-            .mc-alert-warning .mc-alert-icon {
-                background: #fef3c7;
-                color: #d97706;
-            }
-
-            .mc-alert-danger {
-                background: #fef2f2;
-                border-color: #fecaca;
-            }
-
-            .mc-alert-danger .mc-alert-icon {
-                background: #fee2e2;
-                color: #dc2626;
-            }
-
-            .mc-alert-info {
-                background: #eff6ff;
-                border-color: #bfdbfe;
-            }
-
-            .mc-alert-info .mc-alert-icon {
-                background: #dbeafe;
-                color: #2563eb;
-            }
-
-            .mc-alert-item strong {
-                color: var(--mc-dark);
-                font-size: 13px;
-            }
-
-            .mc-alert-item p {
-                margin: 2px 0 0;
-                font-size: 12px;
-                color: var(--mc-muted);
-            }
-
-            .mc-engin-line {
-                margin-bottom: 17px;
-            }
-
-            .mc-engin-line:last-child {
-                margin-bottom: 0;
-            }
-
-            .mc-engin-line .progress {
-                height: 8px;
-                border-radius: 30px;
-                background: #e2e8f0;
-            }
-
-            .mc-progress-label {
-                display: flex;
-                justify-content: space-between;
-                font-size: 12px;
-                margin-bottom: 5px;
-            }
-
-            .mc-cost-value {
-                font-weight: 800;
-                color: var(--mc-dark);
-            }
-
-            .mc-modal-header {
-                background: linear-gradient(135deg, #0f766e, #22c55e);
-                color: #fff;
-            }
-
-            .mc-modal-header-warning {
-                background: linear-gradient(135deg, #b45309, #f59e0b);
-                color: #fff;
-            }
-
-            #maintenanceDocumentsPreview {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 10px;
-                width: 100%;
-            }
-
-            .maintenance-image-preview {
-                width: 110px;
-                padding: 6px;
-                background: #fff;
-                border: 1px solid #e2e8f0;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(15, 23, 42, .08);
-                text-align: center;
-            }
-
-            .maintenance-image-preview img {
-                display: block;
-                width: 100%;
-                height: 80px;
-                object-fit: cover;
-                border-radius: 8px;
-            }
-
-            .maintenance-doc-preview {
-                width: 100%;
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 11px 13px;
-                background: #f8fafc;
-                border: 1px solid #e2e8f0;
-                border-radius: 10px;
-            }
-
-            .maintenance-doc-icon {
-                width: 38px;
-                height: 38px;
-                min-width: 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #fff;
-                border-radius: 9px;
-            }
-
-            .maintenance-doc-icon i {
-                font-size: 23px;
-            }
-
-            .maintenance-preview-name {
-                max-width: 100%;
-                color: #334155;
-                font-size: 12px;
-                font-weight: 700;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-
-            @media (max-width: 767px) {
-                .mc-stat-card {
-                    min-height: 105px;
-                }
-
-                .mc-stat-card h3 {
-                    font-size: 23px;
-                }
-            }
-
-            .mc-alert-item {
-                position: relative;
-                transition: all .2s ease;
-            }
-
-            .mc-alert-item:hover {
-                transform: translateX(3px);
-                box-shadow: 0 5px 14px rgba(15, 23, 42, .08);
-            }
-
-            .mc-engin-line {
-                padding: 8px 0;
-            }
-
-            .mc-engin-line:not(:last-child) {
-                border-bottom: 1px dashed #e2e8f0;
-                padding-bottom: 15px;
-            }
-
-            .mc-progress-label strong {
-                color: #1e293b;
-            }
-
-            .mc-cost-value {
-                white-space: nowrap;
-            }
-
-            .mc-engin-line .progress {
-                overflow: hidden;
-            }
-
-            .mc-engin-line .progress-bar {
-                border-radius: 30px;
-                transition: width .5s ease;
-            }
-
-            .mc-table tbody tr {
-                transition: background-color .2s ease;
-            }
-
-            .mc-table tbody tr:hover {
-                background: #f8fafc;
-            }
-
-            .mc-table td strong {
-                color: #1e293b;
-            }
-
-            .mc-table .btn-xs {
-                margin: 1px;
-            }
-            </style>
-
-            <div class="mc-page">
-
-                <!-- Statistiques -->
-                <div class="row">
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card mc-stat-card mc-gradient-green">
-
-                            <div class="card-body">
-
-                                <h3>
-                                    <?= number_format(
-                                        (float) (
-                                            $maintenanceFuelStats->total_litres ?? 0
-                                        ),
-                                        2,
-                                        ',',
-                                        ' '
-                                    ) ?>
-                                    L
-                                </h3>
-
-                                <p>Carburant consommé ce mois</p>
-
-                                <i class="fas fa-gas-pump mc-stat-icon"></i>
-
-                            </div>
-
-                        </div>
+        <div class="container-fluid eq-page">
+
+            <!-- Messages -->
+            <?php foreach (['success' => 'check-circle', 'warning' => 'exclamation-triangle', 'error' => 'exclamation-circle'] as $type => $icon): ?>
+            <?php if ($msg = $this->session->flashdata($type)): ?>
+            <div class="alert alert-<?= $type === 'error' ? 'danger' : $type ?> alert-dismissible fade show">
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                <i class="fas fa-<?= $icon ?> mr-1"></i><?= eq_e($msg) ?>
+            </div>
+            <?php endif; ?>
+            <?php endforeach; ?>
+
+            <!-- Statistiques du mois -->
+            <div class="row">
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="eq-stat is-green">
+                        <p class="eq-stat-value"><?= eq_num($stats->fuel_litres, 0) ?> L</p>
+                        <p class="eq-stat-label">Carburant consommé ce mois</p>
+                        <span class="eq-stat-sub"><?= eq_money($stats->fuel_montant) ?> · <?= $stats->fuel_nb ?>
+                            plein(s)</span>
+                        <i class="fas fa-gas-pump eq-stat-icon"></i>
                     </div>
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card mc-stat-card mc-gradient-orange">
-
-                            <div class="card-body">
-
-                                <h3>
-                                    <?= (int) (
-                                        $maintenanceFuelStats->programmed_maintenance
-                                        ?? 0
-                                    ) ?>
-                                </h3>
-
-                                <p>Maintenances programmées</p>
-
-                                <i class="fas fa-tools mc-stat-icon"></i>
-
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card mc-stat-card mc-gradient-blue">
-
-                            <div class="card-body">
-
-                                <h3>
-                                    <?= (int) (
-                                        $maintenanceFuelStats->engins_in_workshop
-                                        ?? 0
-                                    ) ?>
-                                </h3>
-
-                                <p>Engins actuellement en atelier</p>
-
-                                <i class="fas fa-wrench mc-stat-icon"></i>
-
-                            </div>
-
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="card mc-stat-card mc-gradient-red">
-
-                            <div class="card-body">
-
-                                <h3>
-                                    <?= number_format(
-                                        (float) (
-                                            $maintenanceFuelStats->total_operation_cost
-                                            ?? 0
-                                        ),
-                                        0,
-                                        ',',
-                                        ' '
-                                    ) ?>
-                                </h3>
-
-                                <p>Coût d’exploitation du mois</p>
-
-                                <i class="fas fa-coins mc-stat-icon"></i>
-
-                            </div>
-
-                        </div>
-                    </div>
-
                 </div>
-
-                <!-- Actions rapides -->
-                <div class="row mb-4">
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="mc-action-card" data-toggle="modal" data-target="#addFuelModal">
-                            <div class="mc-action-icon">
-                                <i class="fas fa-gas-pump"></i>
-                            </div>
-                            <h6>Nouveau ravitaillement</h6>
-                            <small>Enregistrer une consommation</small>
-                        </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="eq-stat is-orange">
+                        <p class="eq-stat-value"><?= $stats->programmees ?></p>
+                        <p class="eq-stat-label">Maintenances programmées</p>
+                        <span
+                            class="eq-stat-sub"><?= $stats->en_retard ? 'dont ' . $stats->en_retard . ' en retard' : 'Aucune en retard' ?></span>
+                        <i class="fas fa-calendar-check eq-stat-icon"></i>
                     </div>
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="mc-action-card" data-toggle="modal" data-target="#addMaintenanceModal">
-                            <div class="mc-action-icon">
-                                <i class="fas fa-tools"></i>
-                            </div>
-                            <h6>Nouvelle maintenance</h6>
-                            <small>Préventive ou corrective</small>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="mc-action-card">
-                            <div class="mc-action-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <h6>Signaler une panne</h6>
-                            <small>Déclarer un engin indisponible</small>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-3 col-md-6 mb-3">
-                        <div class="mc-action-card">
-                            <div class="mc-action-icon">
-                                <i class="fas fa-history"></i>
-                            </div>
-                            <h6>Historique complet</h6>
-                            <small>Consulter toutes les opérations</small>
-                        </div>
-                    </div>
-
                 </div>
-
-                <?php if ($this->session->flashdata('success')): ?>
-                <div class="alert alert-success alert-dismissible fade show">
-                    <button type="button" class="close" data-dismiss="alert">
-                        &times;
-                    </button>
-
-                    <i class="fas fa-check-circle mr-1"></i>
-                    <?= $this->session->flashdata('success') ?>
-                </div>
-                <?php endif; ?>
-
-                <?php if ($this->session->flashdata('error')): ?>
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <button type="button" class="close" data-dismiss="alert">
-                        &times;
-                    </button>
-
-                    <i class="fas fa-exclamation-circle mr-1"></i>
-                    <?= $this->session->flashdata('error') ?>
-                </div>
-                <?php endif; ?>
-
-                <!-- Filtres -->
-                <div class="card mc-card mb-4">
-
-                    <div class="card-header">
-                        <h5 class="mc-title">
-                            <i class="fas fa-filter text-success mr-2"></i>
-                            Filtres de recherche
-                        </h5>
-                        <span class="mc-subtitle">
-                            Filtrer les consommations, maintenances et interventions par engin ou chantier.
-                        </span>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="eq-stat is-blue">
+                        <p class="eq-stat-value"><?= $stats->en_atelier ?></p>
+                        <p class="eq-stat-label">Engins en atelier</p>
+                        <span class="eq-stat-sub">Pannes ouvertes : <?= $stats->pannes_ouvertes ?></span>
+                        <i class="fas fa-wrench eq-stat-icon"></i>
                     </div>
-
-                    <div class="card-body">
-                        <div class="mc-filter-box">
-
-                            <div class="row">
-
-                                <div class="col-lg-3 col-md-6 mb-3">
-                                    <label>Recherche</label>
-                                    <input type="text" class="form-control" placeholder="Code, plaque, désignation...">
-                                </div>
-
-                                <div class="col-lg-3 col-md-6 mb-3">
-                                    <label>Engin / Matériel</label>
-                                    <select class="form-control">
-                                        <option value="">Tous les engins</option>
-                                        <option>ENG-2026-00002 - Excavatrice CAT320</option>
-                                        <option>ENG-2026-00011 - Camion Actros</option>
-                                        <option>ENG-2026-00015 - Camion malaxeur</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-lg-2 col-md-6 mb-3">
-                                    <label>Type d’opération</label>
-                                    <select class="form-control">
-                                        <option value="">Toutes</option>
-                                        <option>Carburant</option>
-                                        <option>Maintenance</option>
-                                        <option>Panne</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-lg-2 col-md-6 mb-3">
-                                    <label>Chantier</label>
-                                    <select class="form-control">
-                                        <option value="">Tous les chantiers</option>
-                                        <option>Chantier Gitega</option>
-                                        <option>Chantier Rumonge</option>
-                                        <option>Dépôt central</option>
-                                    </select>
-                                </div>
-
-                                <div class="col-lg-2 col-md-6 mb-3">
-                                    <label>État</label>
-                                    <select class="form-control">
-                                        <option value="">Tous les états</option>
-                                        <option>Programmé</option>
-                                        <option>En cours</option>
-                                        <option>Terminé</option>
-                                        <option>Annulé</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                            <div class="row">
-
-                                <div class="col-md-3 mb-3">
-                                    <label>Date début</label>
-                                    <input type="date" class="form-control">
-                                </div>
-
-                                <div class="col-md-3 mb-3">
-                                    <label>Date fin</label>
-                                    <input type="date" class="form-control">
-                                </div>
-
-                                <div class="col-md-6 d-flex align-items-end justify-content-end mb-3">
-                                    <button type="button" class="btn btn-secondary mr-2">
-                                        <i class="fas fa-redo mr-1"></i>
-                                        Réinitialiser
-                                    </button>
-
-                                    <button type="button" class="btn mc-btn-primary">
-                                        <i class="fas fa-search mr-1"></i>
-                                        Rechercher
-                                    </button>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div>
-
                 </div>
+                <div class="col-xl-3 col-md-6 mb-3">
+                    <div class="eq-stat is-red">
+                        <p class="eq-stat-value"><?= eq_num($stats->cout_exploitation) ?></p>
+                        <p class="eq-stat-label">Coût d'exploitation du mois (BIF)</p>
+                        <span class="eq-stat-sub">Maintenance : <?= eq_num($stats->maint_cout) ?></span>
+                        <i class="fas fa-coins eq-stat-icon"></i>
+                    </div>
+                </div>
+            </div>
 
-                <!-- Carburant et maintenance -->
-                <div class="row">
+            <!-- Actions rapides -->
+            <div class="row mb-2">
+                <div class="col-lg-3 col-6 mb-3">
+                    <a href="#" class="eq-action" data-action="new-fuel">
+                        <div class="eq-action-icon"><i class="fas fa-gas-pump"></i></div>
+                        <h6>Nouveau ravitaillement</h6><small>Enregistrer une consommation</small>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-6 mb-3">
+                    <a href="#" class="eq-action" data-action="new-maintenance">
+                        <div class="eq-action-icon"><i class="fas fa-tools"></i></div>
+                        <h6>Nouvelle maintenance</h6><small>Préventive ou corrective</small>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-6 mb-3">
+                    <a href="#" class="eq-action" data-action="new-panne">
+                        <div class="eq-action-icon" style="background:#fee2e2;color:#dc2626"><i
+                                class="fas fa-car-crash"></i></div>
+                        <h6>Signaler une panne</h6><small>Déclarer un engin indisponible</small>
+                    </a>
+                </div>
+                <div class="col-lg-3 col-6 mb-3">
+                    <a href="<?= base_url('maintenance-carburant-export' . ($query ? '?' . http_build_query($query) : '')) ?>"
+                        class="eq-action">
+                        <div class="eq-action-icon"><i class="fas fa-file-excel"></i></div>
+                        <h6>Exporter l'historique</h6><small>Fichier Excel (filtres appliqués)</small>
+                    </a>
+                </div>
+            </div>
 
-                    <!-- Carburant -->
-                    <div class="col-xl-7 mb-4">
-
-                        <div class="card mc-card h-100">
-
-                            <div class="card-header d-flex justify-content-between align-items-center">
-
-                                <div>
-                                    <h5 class="mc-title">
-                                        <i class="fas fa-gas-pump text-success mr-2"></i>
-                                        Derniers ravitaillements
-                                    </h5>
-                                    <span class="mc-subtitle">
-                                        Suivi des quantités et coûts de carburant.
-                                    </span>
-                                </div>
-
-                                <button type="button" class="btn btn-sm mc-btn-primary" data-toggle="modal"
-                                    data-target="#addFuelModal">
-                                    <i class="fas fa-plus mr-1"></i>
-                                    Nouveau
-                                </button>
-
+            <!-- Filtres -->
+            <div class="eq-card mb-4">
+                <div class="eq-card-head">
+                    <div>
+                        <h5 class="eq-title"><i class="fas fa-filter text-success"></i>Filtres de recherche</h5>
+                        <span class="eq-sub">S'appliquent aux ravitaillements, maintenances et à l'historique.</span>
+                    </div>
+                    <?php if ($hasFilters): ?><span class="eq-chip"><i class="fas fa-filter"></i>Filtres
+                        actifs</span><?php endif; ?>
+                </div>
+                <div class="eq-card-body">
+                    <form method="get" action="<?= base_url('maintenance-carburant') ?>" class="eq-filter">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <label for="f_q">Recherche</label>
+                                <input type="search" name="q" id="f_q" class="form-control"
+                                    value="<?= eq_e($filters['q']) ?>" placeholder="Référence, code, plaque…">
                             </div>
-
-                            <div class="card-body table-responsive p-0">
-
-                                <table class="table table-hover mc-table mb-0">
-
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Engin</th>
-                                            <th>Chantier</th>
-                                            <th class="text-right">Litres</th>
-                                            <th class="text-right">Prix/L</th>
-                                            <th class="text-right">Montant</th>
-                                            <th>Responsable</th>
-                                            <th class="text-center">Action</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-
-                                        <?php if (!empty($allEnginsWithFuel)): ?>
-
-                                        <?php foreach ($allEnginsWithFuel as $fuel): ?>
-
-                                        <tr>
-
-                                            <td>
-                                                <?= !empty($fuel->operation_date)
-                                                            ? date('d/m/Y', strtotime($fuel->operation_date))
-                                                            : '-'
-                                                        ?>
-                                            </td>
-
-                                            <td>
-                                                <strong>
-                                                    <?= html_escape($fuel->designation ?: '-') ?>
-                                                </strong>
-
-                                                <br>
-
-                                                <small class="text-muted">
-                                                    <?= html_escape($fuel->code_engin ?: '-') ?>
-                                                </small>
-                                            </td>
-
-                                            <td>
-                                                <?= html_escape(
-                                                            $fuel->chantier_name ?: 'Aucun chantier'
-                                                        ) ?>
-                                            </td>
-
-                                            <td class="text-right">
-                                                <?= number_format(
-                                                            (float) $fuel->quantity_litre,
-                                                            2,
-                                                            ',',
-                                                            ' '
-                                                        ) ?>
-                                                L
-                                            </td>
-
-                                            <td class="text-right">
-                                                <?= number_format(
-                                                            (float) $fuel->unit_price,
-                                                            0,
-                                                            ',',
-                                                            ' '
-                                                        ) ?>
-                                            </td>
-
-                                            <td class="text-right font-weight-bold">
-                                                <?= number_format(
-                                                            (float) $fuel->total_amount,
-                                                            0,
-                                                            ',',
-                                                            ' '
-                                                        ) ?>
-                                            </td>
-
-                                            <td>
-                                                <?= !empty($fuel->operator_name)
-                                                            ? html_escape($fuel->operator_name)
-                                                            : '-'
-                                                        ?>
-                                            </td>
-
-                                            <td class="text-center">
-
-                                                <button type="button" class="btn btn-xs btn-info"
-                                                    title="Voir le ravitaillement" onclick="viewFuel(
-                                                        <?= (int) $fuel->id ?>,
-                                                        '<?= html_escape(
-                                                                $fuel->code_engin
-                                                            ) ?>',
-                                                        '<?= html_escape(
-                                                                addslashes($fuel->designation)
-                                                            ) ?>',
-                                                        '<?= html_escape(
-                                                                addslashes($fuel->chantier_name ?: '')
-                                                            ) ?>',
-                                                        '<?= $fuel->operation_date ?>',
-                                                        '<?= $fuel->quantity_litre ?>',
-                                                        '<?= $fuel->unit_price ?>',
-                                                        '<?= $fuel->total_amount ?>',
-                                                        '<?= $fuel->kilometrage ?>',
-                                                        '<?= $fuel->hour_meter ?>',
-                                                        '<?= html_escape(
-                                                                addslashes($fuel->operator_name ?: '')
-                                                            ) ?>',
-                                                        '<?= html_escape(
-                                                                addslashes($fuel->supplier ?: '')
-                                                            ) ?>',
-                                                        '<?= html_escape(
-                                                                addslashes($fuel->observation ?: '')
-                                                            ) ?>'
-                                                    )">
-
-                                                    <i class="fas fa-eye"></i>
-
-                                                </button>
-
-                                            </td>
-
-                                        </tr>
-
+                            <div class="col-lg-3 col-md-6 mb-2">
+                                <label for="f_engin">Engin / matériel</label>
+                                <select name="engin_id" id="f_engin" class="form-control">
+                                    <option value="">Tous les engins</option>
+                                    <?php foreach ($allEngins as $e): ?>
+                                    <option value="<?= (int) $e->id ?>"
+                                        <?= (int) $filters['engin_id'] === (int) $e->id ? 'selected' : '' ?>>
+                                        <?= eq_e($e->code_engin . ' — ' . $e->designation) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-4 mb-2">
+                                <label for="f_type">Type d'opération</label>
+                                <select name="type" id="f_type" class="form-control">
+                                    <option value="">Toutes</option>
+                                    <?php foreach ($sources as $k => $s): ?>
+                                    <option value="<?= $k ?>" <?= $filters['type'] === $k ? 'selected' : '' ?>>
+                                        <?= $s[0] ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-4 mb-2">
+                                <label for="f_ch">Chantier</label>
+                                <select name="chantier_id" id="f_ch" class="form-control">
+                                    <option value="">Tous les chantiers</option>
+                                    <?php foreach ($chantiers as $ch): ?>
+                                    <option value="<?= (int) $ch->id ?>"
+                                        <?= (int) $filters['chantier_id'] === (int) $ch->id ? 'selected' : '' ?>>
+                                        <?= eq_e($ch->name) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-lg-2 col-md-4 mb-2">
+                                <label for="f_status">Statut</label>
+                                <select name="status" id="f_status" class="form-control">
+                                    <option value="">Tous</option>
+                                    <optgroup label="Carburant">
+                                        <option value="Validé" <?= $filters['status'] === 'Validé' ? 'selected' : '' ?>>
+                                            Validé</option>
+                                    </optgroup>
+                                    <optgroup label="Maintenance">
+                                        <?php foreach (TechModel::MAINT_STATUS as $s): ?>
+                                        <option value="<?= eq_e($s) ?>"
+                                            <?= $filters['status'] === $s ? 'selected' : '' ?>><?= eq_e($s) ?></option>
                                         <?php endforeach; ?>
-
-                                        <?php else: ?>
-
-                                        <tr>
-                                            <td colspan="8" class="text-center py-4 text-muted">
-
-                                                <i class="fas fa-gas-pump fa-2x mb-2 d-block"></i>
-
-                                                Aucun ravitaillement enregistré.
-
-                                            </td>
-                                        </tr>
-
-                                        <?php endif; ?>
-
-                                    </tbody>
-
-                                </table>
-
+                                    </optgroup>
+                                    <optgroup label="Panne">
+                                        <?php foreach (TechModel::PANNE_STATUS as $s): ?>
+                                        <option value="<?= eq_e($s) ?>"
+                                            <?= $filters['status'] === $s ? 'selected' : '' ?>><?= eq_e($s) ?></option>
+                                        <?php endforeach; ?>
+                                    </optgroup>
+                                </select>
                             </div>
-
-                            <div class="card-footer bg-white text-right">
-                                <button class="btn btn-sm btn-outline-success">
-                                    Voir tout l’historique
-                                    <i class="fas fa-arrow-right ml-1"></i>
-                                </button>
-                            </div>
-
                         </div>
-
-                    </div>
-
-                    <!-- Maintenance -->
-                    <div class="col-xl-5 mb-4">
-
-                        <div class="card mc-card h-100">
-
-                            <div class="card-header d-flex justify-content-between align-items-center">
-
-                                <div>
-                                    <h5 class="mc-title">
-                                        <i class="fas fa-tools text-warning mr-2"></i>
-                                        Maintenances récentes
-                                    </h5>
-                                    <span class="mc-subtitle">
-                                        Interventions préventives et correctives.
-                                    </span>
-                                </div>
-
-                                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                                    data-target="#addMaintenanceModal">
-                                    <i class="fas fa-plus mr-1"></i>
-                                    Nouvelle
-                                </button>
-
+                        <div class="row align-items-end">
+                            <div class="col-md-3 mb-2">
+                                <label for="f_du">Date début</label>
+                                <input type="date" name="date_debut" id="f_du" class="form-control"
+                                    value="<?= eq_e($filters['date_debut']) ?>">
                             </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="f_au">Date fin</label>
+                                <input type="date" name="date_fin" id="f_au" class="form-control"
+                                    value="<?= eq_e($filters['date_fin']) ?>">
+                            </div>
+                            <div class="col-md-6 mb-2 d-flex flex-wrap justify-content-end" style="gap:8px">
+                                <a href="<?= base_url('maintenance-carburant') ?>" class="btn btn-secondary"><i
+                                        class="fas fa-redo mr-1"></i>Réinitialiser</a>
+                                <button type="submit" class="btn eq-btn"><i
+                                        class="fas fa-search mr-1"></i>Rechercher</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-                            <div class="card-body p-0">
+            <!-- Carburant & maintenances -->
+            <div class="row">
+                <div class="col-xl-7 mb-4" id="fuel-section">
+                    <div class="eq-card h-100">
+                        <div class="eq-card-head">
+                            <div>
+                                <h5 class="eq-title"><i class="fas fa-gas-pump text-success"></i>Derniers
+                                    ravitaillements</h5>
+                                <span class="eq-sub">Quantités, coûts et relevés de compteur.</span>
+                            </div>
+                            <button type="button" class="btn btn-sm eq-btn" data-action="new-fuel"><i
+                                    class="fas fa-plus mr-1"></i>Nouveau</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover eq-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Engin</th>
+                                        <th>Chantier</th>
+                                        <th class="text-right">Litres</th>
+                                        <th class="text-right">Montant</th>
+                                        <th class="text-right">Compteur</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($fuels)): ?>
+                                    <tr>
+                                        <td colspan="7">
+                                            <div class="eq-empty"><i class="fas fa-gas-pump"></i>Aucun
+                                                ravitaillement<?= $hasFilters ? ' pour ces filtres' : ' enregistré' ?>.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endif; ?>
+                                    <?php foreach ($fuels as $f):
+                                        $cpt = $f->type_compteur === 'heure' ? $f->hour_meter : $f->kilometrage; ?>
+                                    <tr>
+                                        <td><?= eq_date($f->operation_date) ?><br><span
+                                                class="eq-ref"><?= eq_e($f->reference) ?></span></td>
+                                        <td><strong><?= eq_e($f->designation) ?></strong><br><small
+                                                class="text-muted"><?= eq_e($f->code_engin) ?></small></td>
+                                        <td><?= eq_e($f->chantier_name ?: '-') ?></td>
+                                        <td class="text-right"><?= eq_num($f->quantity_litre, 2) ?> L<br><small
+                                                class="text-muted"><?= eq_num($f->unit_price) ?>/L</small></td>
+                                        <td class="text-right font-weight-bold"><?= eq_num($f->total_amount) ?></td>
+                                        <td class="text-right">
+                                            <?= $cpt !== null ? eq_num($cpt) . ' ' . eq_unit($f->type_compteur) : '-' ?>
+                                            <?php if (!(int) $f->plein_complet): ?><br><small class="text-muted">plein
+                                                partiel</small><?php endif; ?>
+                                        </td>
+                                        <td class="text-right text-nowrap">
+                                            <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                                data-action="view-fuel" data-id="<?= (int) $f->id ?>" title="Voir"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                                data-action="edit-fuel" data-id="<?= (int) $f->id ?>"
+                                                title="Modifier"><i class="fas fa-pen"></i></button>
+                                            <button type="button"
+                                                class="btn btn-sm eq-btn-light eq-icon-btn text-danger"
+                                                data-action="cancel-fuel" data-id="<?= (int) $f->id ?>"
+                                                data-ref="<?= eq_e($f->reference) ?>" title="Annuler"><i
+                                                    class="fas fa-ban"></i></button>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
-                                <div class="table-responsive">
-
-                                    <table class="table table-hover mc-table mb-0">
-
-                                        <thead>
-                                            <tr>
-                                                <th>Date</th>
-                                                <th>Engin</th>
-                                                <th>Intervention</th>
-                                                <th class="text-right">Coût</th>
-                                                <th>Statut</th>
-                                                <th class="text-center">Action</th>
-                                            </tr>
-                                        </thead>
-
-                                        <tbody>
-
-                                            <?php if (!empty($allMaintenances)): ?>
-
-                                            <?php foreach ($allMaintenances as $maintenance): ?>
-
-                                            <?php
-                                                    $badgeClass = 'mc-badge-info';
-
-                                                    switch ($maintenance->maintenance_status) {
-                                                        case 'Terminé':
-                                                            $badgeClass = 'mc-badge-success';
-                                                            break;
-
-                                                        case 'En cours':
-                                                            $badgeClass = 'mc-badge-warning';
-                                                            break;
-
-                                                        case 'Annulé':
-                                                            $badgeClass = 'mc-badge-danger';
-                                                            break;
-
-                                                        case 'Programmé':
-                                                        default:
-                                                            $badgeClass = 'mc-badge-info';
-                                                            break;
-                                                    }
-                                                    ?>
-
-                                            <tr>
-
-                                                <td>
-                                                    <?= !empty($maintenance->planned_date)
-                                                                ? date(
-                                                                    'd/m/Y',
-                                                                    strtotime($maintenance->planned_date)
-                                                                )
-                                                                : '-'
-                                                            ?>
-                                                </td>
-
-                                                <td>
-                                                    <strong>
-                                                        <?= html_escape(
-                                                                    $maintenance->designation ?: '-'
-                                                                ) ?>
-                                                    </strong>
-
-                                                    <br>
-
-                                                    <small class="text-muted">
-                                                        <?= html_escape(
-                                                                    $maintenance->code_engin ?: '-'
-                                                                ) ?>
-                                                    </small>
-                                                </td>
-
-                                                <td>
-                                                    <strong>
-                                                        <?= html_escape(
-                                                                    $maintenance->intervention ?: '-'
-                                                                ) ?>
-                                                    </strong>
-
-                                                    <br>
-
-                                                    <small class="text-muted">
-                                                        <?= html_escape(
-                                                                    $maintenance->maintenance_type ?: '-'
-                                                                ) ?>
-                                                    </small>
-                                                </td>
-
-                                                <td class="text-right font-weight-bold">
-                                                    <?= number_format(
-                                                                (float) $maintenance->total_cost,
-                                                                0,
-                                                                ',',
-                                                                ' '
-                                                            ) ?>
-                                                </td>
-
-                                                <td>
-
-                                                    <span class="mc-badge <?= $badgeClass ?>">
-                                                        <?= html_escape(
-                                                                    $maintenance->maintenance_status
-                                                                ) ?>
-                                                    </span>
-
-                                                    <?php if ((int) $maintenance->documents_count > 0): ?>
-
-                                                    <div class="mt-1">
-
-                                                        <small class="text-muted">
-
-                                                            <i class="fas fa-paperclip mr-1"></i>
-
-                                                            <?= (int) $maintenance->documents_count ?>
-
-                                                            fichier<?= (int) $maintenance->documents_count > 1
-                                                                                    ? 's'
-                                                                                    : ''
-                                                                                ?>
-
-                                                        </small>
-
-                                                    </div>
-
+                <div class="col-xl-5 mb-4" id="maintenance-section">
+                    <div class="eq-card h-100">
+                        <div class="eq-card-head">
+                            <div>
+                                <h5 class="eq-title"><i class="fas fa-tools text-warning"></i>Maintenances récentes</h5>
+                                <span class="eq-sub">Interventions préventives et correctives.</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-warning" data-action="new-maintenance"><i
+                                    class="fas fa-plus mr-1"></i>Nouvelle</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover eq-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Engin / intervention</th>
+                                        <th class="text-right">Coût</th>
+                                        <th>Statut</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($maintenances)): ?>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="eq-empty"><i class="fas fa-tools"></i>Aucune
+                                                maintenance<?= $hasFilters ? ' pour ces filtres' : ' enregistrée' ?>.
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endif; ?>
+                                    <?php foreach ($maintenances as $m): ?>
+                                    <tr>
+                                        <td><?= eq_date($m->planned_date) ?><br><span
+                                                class="eq-ref"><?= eq_e($m->reference) ?></span></td>
+                                        <td>
+                                            <strong><?= eq_e($m->designation) ?></strong> <small
+                                                class="text-muted"><?= eq_e($m->code_engin) ?></small><br>
+                                            <small><?= eq_e($m->intervention) ?> · <span
+                                                    class="text-muted"><?= eq_e($m->maintenance_type) ?></span></small>
+                                            <?php if ((int) $m->documents_count > 0): ?><small
+                                                class="text-muted ml-1"><i class="fas fa-paperclip"></i>
+                                                <?= (int) $m->documents_count ?></small><?php endif; ?>
+                                        </td>
+                                        <td class="text-right font-weight-bold"><?= eq_num($m->total_cost) ?></td>
+                                        <td><span
+                                                class="eq-badge <?= eq_badge($m->maintenance_status) ?>"><?= eq_e($m->maintenance_status) ?></span>
+                                        </td>
+                                        <td class="text-right text-nowrap">
+                                            <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                                data-action="view-maintenance" data-id="<?= (int) $m->id ?>"
+                                                title="Voir"><i class="fas fa-eye"></i></button>
+                                            <div class="dropdown d-inline-block">
+                                                <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                                    data-toggle="dropdown" title="Actions"><i
+                                                        class="fas fa-ellipsis-v"></i></button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <a class="dropdown-item" href="#" data-action="edit-maintenance"
+                                                        data-id="<?= (int) $m->id ?>"><i
+                                                            class="fas fa-pen fa-fw mr-2"></i>Modifier</a>
+                                                    <?php if ($m->maintenance_status === 'Programmé'): ?>
+                                                    <a class="dropdown-item" href="#" data-action="maint-status"
+                                                        data-status="En cours" data-id="<?= (int) $m->id ?>"><i
+                                                            class="fas fa-play fa-fw mr-2 text-warning"></i>Démarrer</a>
                                                     <?php endif; ?>
-
-                                                </td>
-
-                                                <td class="text-center">
-
-                                                    <button type="button" class="btn btn-xs btn-info"
-                                                        title="Voir la maintenance" onclick="viewMaintenance(
-                                                                        <?= (int) $maintenance->id ?>
-                                                                    )">
-
-                                                        <i class="fas fa-eye"></i>
-
-                                                    </button>
-
-                                                    <button type="button" class="btn btn-xs btn-warning"
-                                                        title="Modifier">
-
-                                                        <i class="fas fa-edit"></i>
-
-                                                    </button>
-
-                                                </td>
-
-                                            </tr>
-
-                                            <?php endforeach; ?>
-
-                                            <?php else: ?>
-
-                                            <tr>
-                                                <td colspan="5" class="text-center py-4 text-muted">
-
-                                                    <i class="fas fa-tools fa-2x mb-2 d-block"></i>
-
-                                                    Aucune maintenance enregistrée.
-
-                                                </td>
-                                            </tr>
-
-                                            <?php endif; ?>
-
-                                        </tbody>
-
-                                    </table>
-
-                                </div>
-
-                            </div>
-
+                                                    <?php if (in_array($m->maintenance_status, ['Programmé', 'En cours'], true)): ?>
+                                                    <a class="dropdown-item" href="#" data-action="maint-status"
+                                                        data-status="Terminé" data-id="<?= (int) $m->id ?>"><i
+                                                            class="fas fa-check fa-fw mr-2 text-success"></i>Terminer</a>
+                                                    <div class="dropdown-divider"></div>
+                                                    <a class="dropdown-item text-danger" href="#"
+                                                        data-action="maint-status" data-status="Annulé"
+                                                        data-id="<?= (int) $m->id ?>"><i
+                                                            class="fas fa-ban fa-fw mr-2"></i>Annuler</a>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
                         </div>
-
                     </div>
-
                 </div>
-
-                <!-- Alertes et coût par engin -->
-                <div class="row">
-
-                    <!-- Alertes -->
-                    <div class="col-lg-5 mb-4">
-
-                        <div class="card mc-card h-100">
-
-                            <div class="card-header">
-                                <h5 class="mc-title">
-                                    <i class="fas fa-bell text-warning mr-2"></i>
-                                    Alertes et échéances
-                                </h5>
-                                <span class="mc-subtitle">
-                                    Éléments nécessitant une attention rapide.
-                                </span>
-                            </div>
-
-                            <div class="card-body">
-
-                                <?php if (!empty($maintenanceAlerts)): ?>
-
-                                <?php foreach ($maintenanceAlerts as $alert): ?>
-
-                                <?php
-                                        $daysRemaining = (int) $alert->days_remaining;
-
-                                        $alertClass = 'mc-alert-info';
-                                        $iconClass  = 'fas fa-calendar-alt';
-                                        $title      = 'Maintenance programmée';
-
-                                        if ($alert->maintenance_status === 'En cours') {
-                                            $alertClass = 'mc-alert-warning';
-                                            $iconClass  = 'fas fa-tools';
-                                            $title      = 'Maintenance en cours';
-                                        }
-
-                                        if ($daysRemaining < 0) {
-                                            $alertClass = 'mc-alert-danger';
-                                            $iconClass  = 'fas fa-exclamation-triangle';
-                                            $title      = 'Maintenance en retard';
-                                        } elseif ($daysRemaining === 0) {
-                                            $alertClass = 'mc-alert-danger';
-                                            $iconClass  = 'fas fa-bell';
-                                            $title      = 'Maintenance prévue aujourd’hui';
-                                        } elseif ($daysRemaining <= 7) {
-                                            $alertClass = 'mc-alert-warning';
-                                            $iconClass  = 'fas fa-clock';
-                                            $title      = 'Maintenance proche';
-                                        }
-
-                                        $maintenanceDate =
-                                            !empty($alert->next_maintenance_date)
-                                            ? $alert->next_maintenance_date
-                                            : $alert->planned_date;
-                                        ?>
-
-                                <div class="mc-alert-item <?= $alertClass ?>">
-
-                                    <div class="mc-alert-icon">
-                                        <i class="<?= $iconClass ?>"></i>
-                                    </div>
-
-                                    <div class="flex-fill">
-
-                                        <strong>
-                                            <?= html_escape($title) ?>
-                                        </strong>
-
-                                        <p class="mb-1">
-
-                                            <strong>
-                                                <?= html_escape(
-                                                            $alert->designation ?: 'Engin'
-                                                        ) ?>
-                                            </strong>
-
-                                            <small class="text-muted">
-                                                <?= html_escape(
-                                                            $alert->code_engin ?: ''
-                                                        ) ?>
-                                            </small>
-
-                                            :
-                                            <?= html_escape(
-                                                        $alert->intervention ?: $alert->maintenance_type
-                                                    ) ?>.
-
-                                        </p>
-
-                                        <small class="text-muted">
-
-                                            <i class="far fa-calendar-alt mr-1"></i>
-
-                                            <?= !empty($maintenanceDate)
-                                                        ? date(
-                                                            'd/m/Y',
-                                                            strtotime($maintenanceDate)
-                                                        )
-                                                        : '-'
-                                                    ?>
-
-                                            <?php if ($daysRemaining < 0): ?>
-
-                                            <span class="text-danger font-weight-bold ml-1">
-                                                Retard de
-                                                <?= abs($daysRemaining) ?>
-                                                jour<?= abs($daysRemaining) > 1 ? 's' : '' ?>
-                                            </span>
-
-                                            <?php elseif ($daysRemaining === 0): ?>
-
-                                            <span class="text-danger font-weight-bold ml-1">
-                                                Aujourd’hui
-                                            </span>
-
-                                            <?php else: ?>
-
-                                            <span class="ml-1">
-                                                Dans
-                                                <?= $daysRemaining ?>
-                                                jour<?= $daysRemaining > 1 ? 's' : '' ?>
-                                            </span>
-
-                                            <?php endif; ?>
-
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                                <?php endforeach; ?>
-
-                                <?php else: ?>
-
-                                <div class="text-center text-muted py-4">
-
-                                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-
-                                    <h6 class="font-weight-bold">
-                                        Aucune alerte urgente
-                                    </h6>
-
-                                    <p class="mb-0">
-                                        Aucune maintenance n’est prévue dans les 30 prochains jours.
-                                    </p>
-
-                                </div>
-
-                                <?php endif; ?>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Engins les plus coûteux -->
-                    <div class="col-lg-7 mb-4">
-
-                        <div class="card mc-card h-100">
-
-                            <div class="card-header">
-                                <h5 class="mc-title">
-                                    <i class="fas fa-chart-bar text-success mr-2"></i>
-                                    Engins les plus coûteux ce mois
-                                </h5>
-                                <span class="mc-subtitle">
-                                    Carburant et maintenance cumulés par équipement.
-                                </span>
-                            </div>
-
-                            <div class="card-body">
-
-                                <?php
-                                $maximumCost = 0;
-
-                                if (!empty($mostExpensiveEngins)) {
-                                    $maximumCost = (float) $mostExpensiveEngins[0]->total_cost;
-                                }
-
-                                $progressClasses = [
-                                    'bg-danger',
-                                    'bg-warning',
-                                    'bg-primary',
-                                    'bg-success',
-                                    'bg-info'
-                                ];
-                                ?>
-
-                                <?php if (!empty($mostExpensiveEngins)): ?>
-
-                                <?php foreach ($mostExpensiveEngins as $index => $enginCost): ?>
-
-                                <?php
-                                        $totalCost = (float) $enginCost->total_cost;
-
-                                        $percentage = $maximumCost > 0
-                                            ? ($totalCost / $maximumCost) * 100
-                                            : 0;
-
-                                        $percentage = min(
-                                            100,
-                                            max(5, $percentage)
-                                        );
-
-                                        $progressClass =
-                                            $progressClasses[$index]
-                                            ?? 'bg-secondary';
-                                        ?>
-
-                                <div class="mc-engin-line">
-
-                                    <div class="mc-progress-label">
-
-                                        <span>
-
-                                            <strong>
-                                                <?= html_escape(
-                                                            $enginCost->designation ?: '-'
-                                                        ) ?>
-                                            </strong>
-
-                                            <small class="text-muted ml-1">
-                                                <?= html_escape(
-                                                            $enginCost->code_engin ?: '-'
-                                                        ) ?>
-                                            </small>
-
-                                        </span>
-
-                                        <span class="mc-cost-value">
-                                            <?= number_format(
-                                                        $totalCost,
-                                                        0,
-                                                        ',',
-                                                        ' '
-                                                    ) ?>
-                                            BIF
-                                        </span>
-
-                                    </div>
-
-                                    <div class="progress">
-
-                                        <div class="progress-bar <?= $progressClass ?>" role="progressbar"
-                                            style="width: <?= round($percentage, 2) ?>%"
-                                            aria-valuenow="<?= round($percentage) ?>" aria-valuemin="0"
-                                            aria-valuemax="100">
-                                        </div>
-
-                                    </div>
-
-                                    <div class="d-flex justify-content-between mt-1">
-
-                                        <small class="text-muted">
-
-                                            <i class="fas fa-gas-pump text-success mr-1"></i>
-
-                                            Carburant :
-
-                                            <?= number_format(
-                                                        (float) $enginCost->fuel_cost,
-                                                        0,
-                                                        ',',
-                                                        ' '
-                                                    ) ?>
-                                            BIF
-
-                                        </small>
-
-                                        <small class="text-muted">
-
-                                            <i class="fas fa-tools text-warning mr-1"></i>
-
-                                            Maintenance :
-
-                                            <?= number_format(
-                                                        (float) $enginCost->maintenance_cost,
-                                                        0,
-                                                        ',',
-                                                        ' '
-                                                    ) ?>
-                                            BIF
-
-                                        </small>
-
-                                    </div>
-
-                                </div>
-
-                                <?php endforeach; ?>
-
-                                <?php else: ?>
-
-                                <div class="text-center text-muted py-4">
-
-                                    <i class="fas fa-chart-bar fa-3x mb-3"></i>
-
-                                    <h6 class="font-weight-bold">
-                                        Aucune dépense enregistrée
-                                    </h6>
-
-                                    <p class="mb-0">
-                                        Aucun coût de carburant ou de maintenance pour ce mois.
-                                    </p>
-
-                                </div>
-
-                                <?php endif; ?>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- Historique global -->
-                <div class="card mc-card mb-4">
-
-                    <div class="card-header">
-                        <h5 class="mc-title">
-                            <i class="fas fa-history text-success mr-2"></i>
-                            Historique récent des opérations
-                        </h5>
-                        <span class="mc-subtitle">
-                            Derniers ravitaillements, maintenances et pannes enregistrés.
-                        </span>
-                    </div>
-
-                    <div class="card-body table-responsive p-0">
-
-                        <table class="table table-hover mc-table mb-0">
-
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Référence</th>
-                                    <th>Engin / Matériel</th>
-                                    <th>Opération</th>
-                                    <th>Chantier</th>
-                                    <th class="text-right">Montant</th>
-                                    <th>Responsable</th>
-                                    <th>Statut</th>
-                                    <th class="text-center">Action</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <?php if (!empty($recentOperations)): ?>
-
-                                <?php foreach ($recentOperations as $operation): ?>
-
-                                <?php
-                                        /*
-                |--------------------------------------------------------------------------
-                | Badge du statut
-                |--------------------------------------------------------------------------
-                */
-
-                                        $badgeClass = 'mc-badge-info';
-
-                                        switch ($operation->operation_status) {
-
-                                            case 'Validé':
-                                            case 'Terminé':
-                                                $badgeClass = 'mc-badge-success';
-                                                break;
-
-                                            case 'En cours':
-                                            case 'Programmé':
-                                                $badgeClass = 'mc-badge-warning';
-                                                break;
-
-                                            case 'Annulé':
-                                            case 'Immobilisé':
-                                                $badgeClass = 'mc-badge-danger';
-                                                break;
-                                        }
-
-                                        /*
-                |--------------------------------------------------------------------------
-                | Icône de l’opération
-                |--------------------------------------------------------------------------
-                */
-
-                                        $operationIcon = 'fas fa-tools text-warning';
-
-                                        if ($operation->operation_source === 'fuel') {
-                                            $operationIcon = 'fas fa-gas-pump text-success';
-                                        }
-                                        ?>
-
-                                <tr>
-
-                                    <!-- Date -->
-                                    <td>
-                                        <?= !empty($operation->operation_date)
-                                                    ? date(
-                                                        'd/m/Y',
-                                                        strtotime($operation->operation_date)
-                                                    )
-                                                    : '-'
-                                                ?>
-                                    </td>
-
-                                    <!-- Référence -->
-                                    <td>
-                                        <strong>
-                                            <?= html_escape($operation->reference) ?>
-                                        </strong>
-                                    </td>
-
-                                    <!-- Engin -->
-                                    <td>
-
-                                        <strong>
-                                            <?= html_escape(
-                                                        $operation->designation ?: 'Engin inconnu'
-                                                    ) ?>
-                                        </strong>
-
-                                        <br>
-
-                                        <small class="text-muted">
-                                            <?= html_escape(
-                                                        $operation->code_engin ?: '-'
-                                                    ) ?>
-                                        </small>
-
-                                    </td>
-
-                                    <!-- Opération -->
-                                    <td>
-
-                                        <i class="<?= $operationIcon ?> mr-1"></i>
-
-                                        <strong>
-                                            <?= html_escape(
-                                                        $operation->operation_name ?: '-'
-                                                    ) ?>
-                                        </strong>
-
-                                        <br>
-
-                                        <small class="text-muted">
-                                            <?= html_escape(
-                                                        $operation->operation_type ?: '-'
-                                                    ) ?>
-                                        </small>
-
-                                    </td>
-
-                                    <!-- Chantier -->
-                                    <td>
-                                        <?= html_escape(
-                                                    $operation->chantier_name ?: 'Aucun chantier'
-                                                ) ?>
-                                    </td>
-
-                                    <!-- Montant -->
-                                    <td class="text-right font-weight-bold">
-
-                                        <?= number_format(
-                                                    (float) $operation->amount,
-                                                    0,
-                                                    ',',
-                                                    ' '
-                                                ) ?>
-
-                                        BIF
-
-                                    </td>
-
-                                    <!-- Responsable -->
-                                    <td>
-                                        <?= !empty($operation->responsible)
-                                                    ? html_escape($operation->responsible)
-                                                    : '-'
-                                                ?>
-                                    </td>
-
-                                    <!-- Statut -->
-                                    <td>
-
-                                        <span class="mc-badge <?= $badgeClass ?>">
-                                            <?= html_escape(
-                                                        $operation->operation_status ?: '-'
-                                                    ) ?>
-                                        </span>
-
-                                        <?php if (
-                                                    $operation->operation_source === 'maintenance'
-                                                    && (int) $operation->documents_count > 0
-                                                ): ?>
-
-                                        <div class="mt-1">
-
-                                            <small class="text-muted">
-
-                                                <i class="fas fa-paperclip mr-1"></i>
-
-                                                <?= (int) $operation->documents_count ?>
-
-                                                fichier<?= (int) $operation->documents_count > 1
-                                                                        ? 's'
-                                                                        : ''
-                                                                    ?>
-
-                                            </small>
-
-                                        </div>
-
-                                        <?php endif; ?>
-
-                                    </td>
-
-                                    <!-- Actions -->
-                                    <td class="text-center">
-
-                                        <?php if ($operation->operation_source === 'fuel'): ?>
-
-                                        <button type="button" class="btn btn-xs btn-info" title="Voir le ravitaillement"
-                                            onclick="viewFuelOperation(
-                                                            <?= (int) $operation->operation_id ?>
-                                                        )">
-
-                                            <i class="fas fa-eye"></i>
-
-                                        </button>
-
-                                        <button type="button" class="btn btn-xs btn-warning"
-                                            title="Modifier le ravitaillement" onclick="editFuelOperation(
-                                                            <?= (int) $operation->operation_id ?>
-                                                        )">
-
-                                            <i class="fas fa-edit"></i>
-
-                                        </button>
-
-                                        <?php else: ?>
-
-                                        <button type="button" class="btn btn-xs btn-info" title="Voir la maintenance"
-                                            onclick="viewMaintenanceOperation(
-                                                            <?= (int) $operation->operation_id ?>
-                                                        )">
-
-                                            <i class="fas fa-eye"></i>
-
-                                        </button>
-
-                                        <button type="button" class="btn btn-xs btn-warning"
-                                            title="Modifier la maintenance" onclick="editMaintenanceOperation(
-                                                            <?= (int) $operation->operation_id ?>
-                                                        )">
-
-                                            <i class="fas fa-edit"></i>
-
-                                        </button>
-
-                                        <?php endif; ?>
-
-                                    </td>
-
-                                </tr>
-
-                                <?php endforeach; ?>
-
-                                <?php else: ?>
-
-                                <tr>
-
-                                    <td colspan="9" class="text-center text-muted py-5">
-
-                                        <i class="fas fa-history fa-3x mb-3 d-block"></i>
-
-                                        <h6 class="font-weight-bold">
-                                            Aucun historique disponible
-                                        </h6>
-
-                                        <p class="mb-0">
-                                            Les ravitaillements et maintenances enregistrés
-                                            apparaîtront ici.
-                                        </p>
-
-                                    </td>
-
-                                </tr>
-
-                                <?php endif; ?>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
             </div>
 
-        </div><!-- /.container-fluid -->
+            <!-- Pannes & alertes -->
+            <div class="row">
+                <div class="col-xl-7 mb-4">
+                    <div class="eq-card h-100">
+                        <div class="eq-card-head">
+                            <div>
+                                <h5 class="eq-title"><i class="fas fa-car-crash text-danger"></i>Pannes en cours</h5>
+                                <span class="eq-sub">Signalées, en diagnostic ou en réparation.</span>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger" data-action="new-panne"><i
+                                    class="fas fa-plus mr-1"></i>Signaler</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover eq-table">
+                                <thead>
+                                    <tr>
+                                        <th>Signalée le</th>
+                                        <th>Engin</th>
+                                        <th>Description</th>
+                                        <th>Gravité</th>
+                                        <th>Statut</th>
+                                        <th class="text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if (empty($pannes)): ?>
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="eq-empty"><i class="fas fa-check-circle text-success"></i>Aucune
+                                                panne en cours.</div>
+                                        </td>
+                                    </tr>
+                                    <?php endif; ?>
+                                    <?php foreach ($pannes as $p): ?>
+                                    <tr>
+                                        <td><?= eq_date($p->date_signalement, true) ?><br><span
+                                                class="eq-ref"><?= eq_e($p->reference) ?></span></td>
+                                        <td><strong><?= eq_e($p->designation) ?></strong><br><small
+                                                class="text-muted"><?= eq_e($p->code_engin) ?><?= $p->immobilise ? ' · immobilisé' : '' ?></small>
+                                        </td>
+                                        <td><small><?= eq_e(mb_strimwidth((string) $p->description, 0, 90, '…')) ?></small><?= $p->signale_par ? '<br><small class="text-muted">par ' . eq_e($p->signale_par) . '</small>' : '' ?>
+                                        </td>
+                                        <td><span
+                                                class="eq-badge <?= eq_badge($p->gravite) ?>"><?= eq_e($p->gravite) ?></span>
+                                        </td>
+                                        <td><span
+                                                class="eq-badge <?= eq_badge($p->panne_status) ?>"><?= eq_e($p->panne_status) ?></span>
+                                        </td>
+                                        <td class="text-right text-nowrap">
+                                            <?php if (!$p->maintenance_id): ?>
+                                            <button type="button" class="btn btn-sm btn-warning"
+                                                data-action="panne-maintenance" data-id="<?= (int) $p->id ?>"
+                                                title="Ouvrir une maintenance corrective"><i
+                                                    class="fas fa-tools mr-1"></i>Réparer</button>
+                                            <?php else: ?>
+                                            <button type="button" class="btn btn-sm eq-btn-light"
+                                                data-action="view-maintenance" data-id="<?= (int) $p->maintenance_id ?>"
+                                                title="Voir la maintenance"><i class="fas fa-tools"></i></button>
+                                            <?php endif; ?>
+                                            <div class="dropdown d-inline-block">
+                                                <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                                    data-toggle="dropdown"><i class="fas fa-ellipsis-v"></i></button>
+                                                <div class="dropdown-menu dropdown-menu-right">
+                                                    <?php if ($p->panne_status === 'Signalée'): ?>
+                                                    <a class="dropdown-item" href="#" data-action="panne-status"
+                                                        data-status="En diagnostic" data-id="<?= (int) $p->id ?>"><i
+                                                            class="fas fa-stethoscope fa-fw mr-2"></i>En diagnostic</a>
+                                                    <?php endif; ?>
+                                                    <a class="dropdown-item" href="#" data-action="panne-status"
+                                                        data-status="Résolue" data-id="<?= (int) $p->id ?>"><i
+                                                            class="fas fa-check fa-fw mr-2 text-success"></i>Marquer
+                                                        résolue</a>
+                                                    <a class="dropdown-item text-danger" href="#"
+                                                        data-action="panne-status" data-status="Annulée"
+                                                        data-id="<?= (int) $p->id ?>"><i
+                                                            class="fas fa-ban fa-fw mr-2"></i>Annuler (erreur)</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-5 mb-4">
+                    <div class="eq-card h-100">
+                        <div class="eq-card-head">
+                            <div>
+                                <h5 class="eq-title"><i class="fas fa-bell text-warning"></i>Alertes et échéances</h5>
+                                <span class="eq-sub">Entretiens, documents, pannes et consommations anormales.</span>
+                            </div>
+                        </div>
+                        <div class="eq-card-body">
+                            <?php if (empty($alerts)): ?>
+                            <div class="eq-empty py-3">
+                                <i class="fas fa-check-circle text-success"></i>
+                                <h6>Aucune alerte</h6>
+                                <p class="mb-0 small">Rien à signaler dans les 30 prochains jours.</p>
+                            </div>
+                            <?php endif; ?>
+                            <?php foreach ($alerts as $a): ?>
+                            <div class="eq-alert eq-alert-<?= $a->level ?>">
+                                <div class="eq-alert-icon"><i class="<?= $a->icon ?>"></i></div>
+                                <div class="flex-fill" style="min-width:0">
+                                    <strong><?= eq_e($a->title) ?></strong>
+                                    <p><b><?= eq_e($a->designation) ?></b> <small><?= eq_e($a->code_engin) ?></small> —
+                                        <?= eq_e($a->text) ?></p>
+                                    <?php if ($a->date): ?>
+                                    <p><i class="far fa-calendar-alt mr-1"></i><?= eq_date($a->date) ?>
+                                        <?php if ($a->days !== null && $a->kind !== 'panne'): ?>
+                                        ·
+                                        <?= $a->days < 0 ? '<span class="text-danger font-weight-bold">retard de ' . abs($a->days) . ' j</span>' : ($a->days === 0 ? "<span class=\"text-danger font-weight-bold\">aujourd'hui</span>" : 'dans ' . $a->days . ' j') ?>
+                                        <?php endif; ?>
+                                    </p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Évolution & engins coûteux -->
+            <div class="row">
+                <div class="col-xl-6 mb-4">
+                    <div class="eq-card h-100">
+                        <div class="eq-card-head">
+                            <div>
+                                <h5 class="eq-title"><i class="fas fa-chart-bar text-success"></i>Évolution des coûts
+                                </h5>
+                                <span class="eq-sub">Carburant et maintenance, 6 derniers mois (BIF).</span>
+                            </div>
+                        </div>
+                        <div class="eq-card-body">
+                            <div class="eq-chart-box"><canvas id="costChart"
+                                    aria-label="Évolution des coûts mensuels"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-6 mb-4">
+                    <div class="eq-card h-100">
+                        <div class="eq-card-head">
+                            <div>
+                                <h5 class="eq-title"><i class="fas fa-sort-amount-down text-danger"></i>Engins les plus
+                                    coûteux ce mois</h5>
+                                <span class="eq-sub">Avec la consommation réelle mesurée sur 90 jours.</span>
+                            </div>
+                        </div>
+                        <div class="eq-card-body">
+                            <?php if (empty($expensive)): ?>
+                            <div class="eq-empty py-3"><i class="fas fa-chart-bar"></i>
+                                <h6>Aucune dépense ce mois</h6>
+                            </div>
+                            <?php endif; ?>
+                            <?php foreach ($expensive as $i => $x):
+                                $width = $maxCost > 0 ? max(4, $x->total_cost / $maxCost * 100) : 0;
+                                $c = isset($conso[(int) $x->id]) ? $conso[(int) $x->id] : null; ?>
+                            <div class="eq-cost-line">
+                                <div class="d-flex justify-content-between align-items-baseline mb-1" style="gap:8px">
+                                    <span><strong><?= eq_e($x->designation) ?></strong> <small
+                                            class="text-muted"><?= eq_e($x->code_engin) ?></small></span>
+                                    <strong class="text-nowrap"><?= eq_money($x->total_cost) ?></strong>
+                                </div>
+                                <div class="progress" style="height:7px">
+                                    <div class="progress-bar <?= $barColors[$i] ?? 'bg-secondary' ?>"
+                                        style="width:<?= round($width, 1) ?>%"></div>
+                                </div>
+                                <div class="d-flex flex-wrap justify-content-between mt-1 small text-muted"
+                                    style="gap:4px 12px">
+                                    <span><i
+                                            class="fas fa-gas-pump text-success mr-1"></i><?= eq_num($x->fuel_cost) ?></span>
+                                    <span><i
+                                            class="fas fa-tools text-warning mr-1"></i><?= eq_num($x->maintenance_cost) ?></span>
+                                    <?php if ($c && $c->conso !== null): ?>
+                                    <span>
+                                        Conso. <?= eq_num($c->conso, 1) . ' ' . $c->unite ?>
+                                        <?php if ($c->ecart !== null): ?>
+                                        <span
+                                            class="eq-badge <?= $c->ecart > 20 ? 'eq-badge-danger' : ($c->ecart > 0 ? 'eq-badge-warning' : 'eq-badge-success') ?>"><?= ($c->ecart > 0 ? '+' : '') . eq_num($c->ecart, 0) ?>
+                                            %</span>
+                                        <?php endif; ?>
+                                    </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historique -->
+            <div class="eq-card mb-4">
+                <div class="eq-card-head">
+                    <div>
+                        <h5 class="eq-title"><i class="fas fa-history text-success"></i>Historique des opérations</h5>
+                        <span class="eq-sub"><?= count($operations) ?> dernière(s)
+                            opération(s)<?= $hasFilters ? ' correspondant aux filtres' : '' ?> — l'export contient tout
+                            l'historique.</span>
+                    </div>
+                    <a href="<?= base_url('maintenance-carburant-export' . ($query ? '?' . http_build_query($query) : '')) ?>"
+                        class="btn btn-sm eq-btn-light"><i class="fas fa-file-excel text-success mr-1"></i>Exporter</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover eq-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Référence</th>
+                                <th>Engin</th>
+                                <th>Opération</th>
+                                <th>Chantier</th>
+                                <th class="text-right">Montant</th>
+                                <th>Responsable</th>
+                                <th>Statut</th>
+                                <th class="text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($operations)): ?>
+                            <tr>
+                                <td colspan="9">
+                                    <div class="eq-empty"><i class="fas fa-history"></i>
+                                        <h6>Aucune opération</h6>
+                                        <p class="mb-0 small">Les ravitaillements, maintenances et pannes apparaîtront
+                                            ici.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endif; ?>
+                            <?php foreach ($operations as $o): ?>
+                            <tr>
+                                <td><?= eq_date($o->operation_date) ?></td>
+                                <td class="eq-ref"><?= eq_e($o->reference) ?></td>
+                                <td><strong><?= eq_e($o->designation) ?></strong><br><small
+                                        class="text-muted"><?= eq_e($o->code_engin) ?></small></td>
+                                <td><i
+                                        class="<?= $sources[$o->source][1] ?> mr-1"></i><strong><?= eq_e($o->operation_name) ?></strong><br><small
+                                        class="text-muted"><?= eq_e($o->operation_type) ?></small></td>
+                                <td><?= eq_e($o->chantier_name ?: '-') ?></td>
+                                <td class="text-right font-weight-bold">
+                                    <?= $o->source === 'panne' ? '-' : eq_num($o->amount) ?></td>
+                                <td><?= eq_e($o->responsible ?: '-') ?></td>
+                                <td>
+                                    <span
+                                        class="eq-badge <?= eq_badge($o->operation_status) ?>"><?= eq_e($o->operation_status) ?></span>
+                                    <?php if ((int) $o->documents_count > 0): ?><small class="text-muted ml-1"><i
+                                            class="fas fa-paperclip"></i>
+                                        <?= (int) $o->documents_count ?></small><?php endif; ?>
+                                </td>
+                                <td class="text-right text-nowrap">
+                                    <?php if ($o->source === 'fuel'): ?>
+                                    <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                        data-action="view-fuel" data-id="<?= (int) $o->operation_id ?>" title="Voir"><i
+                                            class="fas fa-eye"></i></button>
+                                    <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                        data-action="edit-fuel" data-id="<?= (int) $o->operation_id ?>"
+                                        title="Modifier"><i class="fas fa-pen"></i></button>
+                                    <?php elseif ($o->source === 'maintenance'): ?>
+                                    <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                        data-action="view-maintenance" data-id="<?= (int) $o->operation_id ?>"
+                                        title="Voir"><i class="fas fa-eye"></i></button>
+                                    <button type="button" class="btn btn-sm eq-btn-light eq-icon-btn"
+                                        data-action="edit-maintenance" data-id="<?= (int) $o->operation_id ?>"
+                                        title="Modifier"><i class="fas fa-pen"></i></button>
+                                    <?php else: ?>
+                                    <span class="text-muted small">—</span>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
     </section>
-    <!-- /.content -->
 </div>
-<!-- /.content-wrapper -->
 
-<div class="modal fade" id="addFuelModal" tabindex="-1">
+<!-- =====================================================================
+     MODALE : RAVITAILLEMENT (ajout / modification)
+     ===================================================================== -->
+<div class="modal fade" id="fuelModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <form id="fuelForm" class="modal-content eq-modal" method="post"
+            action="<?= base_url('add-new-ravitaillement') ?>" data-store="<?= base_url('add-new-ravitaillement') ?>"
+            data-update="<?= base_url('engin-fuel-update') ?>">
+            <input type="hidden" name="<?= eq_e($csrfName) ?>" value="<?= eq_e($csrfHash) ?>">
+            <input type="hidden" name="id" id="fu_id">
+            <div class="modal-header eq-modal-head">
+                <h5 class="modal-title"><i class="fas fa-gas-pump mr-2"></i><span id="fuelModalTitle">Nouveau
+                        ravitaillement</span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-7 form-group">
+                        <label for="fu_engin">Engin / matériel *</label>
+                        <select name="engin_id" id="fu_engin" class="form-control" required>
+                            <option value="">Sélectionner…</option>
+                            <?= $enginOptions ?>
+                        </select>
+                    </div>
+                    <div class="col-md-5 form-group">
+                        <label for="fu_chantier">Chantier</label>
+                        <select name="chantier_id" id="fu_chantier"
+                            class="form-control"><?= $chantierOptions ?></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>Date *</label>
+                        <input type="date" name="operation_date" id="fu_date" class="form-control"
+                            max="<?= date('Y-m-d') ?>" value="<?= date('Y-m-d') ?>" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Carburant</label>
+                        <select name="type_carburant" id="fu_type" class="form-control">
+                            <?php foreach (TechModel::FUEL_TYPES as $t): ?><option value="<?= eq_e($t) ?>">
+                                <?= eq_e($t) ?></option><?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Source</label>
+                        <select name="source" id="fu_source" class="form-control">
+                            <?php foreach (TechModel::FUEL_SOURCES as $s): ?><option value="<?= eq_e($s) ?>">
+                                <?= eq_e($s) ?></option><?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>Quantité (L) *</label>
+                        <input type="number" name="quantity_litre" id="fu_qty" class="form-control" min="0.01"
+                            step="0.01" required>
+                        <small class="eq-hint text-warning d-none" id="fu_qty_warn"></small>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Prix par litre (BIF) *</label>
+                        <input type="number" name="unit_price" id="fu_pu" class="form-control" min="0" step="0.01"
+                            required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Montant total</label>
+                        <input type="text" id="fu_total" class="form-control eq-readonly" value="0 BIF" readonly>
+                        <small class="eq-hint">Calculé automatiquement.</small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group" id="fu_compteur_wrap">
+                        <label><span id="fu_compteur_label">Kilométrage</span> (<span
+                                id="fu_compteur_unit">km</span>)</label>
+                        <input type="number" name="compteur" id="fu_compteur" class="form-control" min="0" step="0.01">
+                        <small class="eq-hint" id="fu_compteur_hint"></small>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>N° bon / ticket</label>
+                        <input type="text" name="numero_bon" id="fu_bon" class="form-control" maxlength="50">
+                    </div>
+                    <div class="col-md-4 form-group d-flex align-items-end">
+                        <div class="custom-control custom-switch mb-2">
+                            <input type="checkbox" class="custom-control-input" name="plein_complet" id="fu_plein"
+                                value="1" checked>
+                            <label class="custom-control-label" for="fu_plein">Plein complet</label>
+                            <small class="eq-hint">Nécessaire pour mesurer la consommation.</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Chauffeur / opérateur</label>
+                        <input type="text" name="operator_name" id="fu_operator" class="form-control" maxlength="150">
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label>Station / fournisseur</label>
+                        <input type="text" name="supplier" id="fu_supplier" class="form-control" maxlength="180">
+                    </div>
+                </div>
+                <div class="form-group mb-0">
+                    <label>Observation</label>
+                    <textarea name="observation" id="fu_obs" class="form-control" rows="2"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn eq-btn"><i class="fas fa-save mr-1"></i>Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- =====================================================================
+     MODALE : MAINTENANCE (ajout / modification)
+     ===================================================================== -->
+<div class="modal fade" id="maintenanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <form id="maintForm" class="modal-content eq-modal" method="post" enctype="multipart/form-data"
+            action="<?= base_url('new-technique-maintenance') ?>"
+            data-store="<?= base_url('new-technique-maintenance') ?>"
+            data-update="<?= base_url('engin-maintenance-update') ?>">
+            <input type="hidden" name="<?= eq_e($csrfName) ?>" value="<?= eq_e($csrfHash) ?>">
+            <input type="hidden" name="id" id="mt_id">
+            <div class="modal-header eq-modal-head is-orange">
+                <h5 class="modal-title"><i class="fas fa-tools mr-2"></i><span id="maintModalTitle">Nouvelle
+                        maintenance</span></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="eq-section"><i class="fas fa-info-circle"></i>Intervention</div>
+                <div class="row">
+                    <div class="col-md-5 form-group">
+                        <label for="mt_engin">Engin / matériel *</label>
+                        <select name="engin_id" id="mt_engin" class="form-control" required>
+                            <option value="">Sélectionner…</option>
+                            <?= $enginOptions ?>
+                        </select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Type *</label>
+                        <select name="maintenance_type" id="mt_type" class="form-control" required>
+                            <option value="">Sélectionner…</option>
+                            <?php foreach (TechModel::MAINT_TYPES as $t): ?><option value="<?= eq_e($t) ?>">
+                                <?= eq_e($t) ?></option><?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Nature de l'intervention *</label>
+                        <input type="text" name="intervention" id="mt_intervention" class="form-control" maxlength="255"
+                            placeholder="Ex : Vidange moteur" list="mt_interventions" required>
+                        <datalist id="mt_interventions">
+                            <option value="Vidange moteur">
+                            <option value="Remplacement filtres">
+                            <option value="Révision générale">
+                            <option value="Freinage">
+                            <option value="Pneumatiques">
+                            <option value="Batterie">
+                            <option value="Circuit hydraulique">
+                            <option value="Embrayage">
+                            <option value="Électricité">
+                            <option value="Graissage">
+                        </datalist>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5 form-group">
+                        <label for="mt_panne">Panne à l'origine</label>
+                        <select name="panne_id" id="mt_panne" class="form-control">
+                            <option value="">Aucune</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Chantier</label>
+                        <select name="chantier_id" id="mt_chantier"
+                            class="form-control"><?= $chantierOptions ?></select>
+                    </div>
+                    <div class="col-md-3 form-group">
+                        <label>Statut *</label>
+                        <select name="maintenance_status" id="mt_status" class="form-control" required>
+                            <?php foreach (TechModel::MAINT_STATUS as $s): ?><option value="<?= eq_e($s) ?>">
+                                <?= eq_e($s) ?></option><?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group"><label>Date prévue *</label><input type="date" name="planned_date"
+                            id="mt_planned" class="form-control" required></div>
+                    <div class="col-md-3 form-group"><label>Date début</label><input type="date" name="start_date"
+                            id="mt_start" class="form-control"></div>
+                    <div class="col-md-3 form-group"><label>Date fin</label><input type="date" name="end_date"
+                            id="mt_end" class="form-control"></div>
+                    <div class="col-md-3 form-group js-compteur">
+                        <label>Compteur (<span class="js-mt-unit">km</span>)</label>
+                        <input type="number" name="compteur_intervention" id="mt_compteur" class="form-control" min="0"
+                            step="0.01">
+                        <small class="eq-hint" id="mt_compteur_hint"></small>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group"><label>Garage / fournisseur</label><input type="text"
+                            name="supplier" id="mt_supplier" class="form-control" maxlength="180"></div>
+                    <div class="col-md-4 form-group"><label>Technicien responsable</label><input type="text"
+                            name="technician" id="mt_technician" class="form-control" maxlength="180"></div>
+                    <div class="col-md-4 form-group d-flex align-items-end">
+                        <div class="custom-control custom-switch mb-2">
+                            <input type="checkbox" class="custom-control-input" name="immobilise" id="mt_immobilise"
+                                value="1" checked>
+                            <label class="custom-control-label" for="mt_immobilise">Engin immobilisé pendant
+                                l'intervention</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="eq-section"><i class="fas fa-cogs"></i>Pièces remplacées</div>
+                <div id="pieceRows"></div>
+                <button type="button" class="btn btn-sm eq-btn-light" id="addPieceRow"><i
+                        class="fas fa-plus mr-1"></i>Ajouter une pièce</button>
+
+                <div class="row mt-3">
+                    <div class="col-md-4 form-group">
+                        <label>Total pièces</label>
+                        <input type="text" id="mt_parts" class="form-control eq-readonly" value="0 BIF" readonly>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Main-d'œuvre (BIF)</label>
+                        <input type="number" name="labor_cost" id="mt_labor" class="form-control" min="0" step="1"
+                            value="0">
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Coût total</label>
+                        <input type="text" id="mt_total" class="form-control eq-readonly" value="0 BIF" readonly>
+                    </div>
+                </div>
+
+                <div class="eq-section"><i class="fas fa-calendar-plus"></i>Prochaine échéance</div>
+                <div class="row">
+                    <div class="col-md-6 form-group"><label>Prochaine maintenance (date)</label><input type="date"
+                            name="next_maintenance_date" id="mt_next_date" class="form-control"></div>
+                    <div class="col-md-6 form-group js-compteur">
+                        <label>Ou au compteur (<span class="js-mt-unit">km</span>)</label>
+                        <input type="number" name="next_maintenance_compteur" id="mt_next_cpt" class="form-control"
+                            min="0" step="0.01">
+                        <small class="eq-hint">Une alerte sera levée à l'approche de l'échéance.</small>
+                    </div>
+                </div>
+
+                <div class="eq-section"><i class="fas fa-paperclip"></i>Pièces jointes & description</div>
+                <div id="mt_docs_existing" class="d-flex flex-column mb-2" style="gap:6px"></div>
+                <input type="file" name="documents[]" id="mt_docs" class="form-control"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" multiple>
+                <small class="eq-hint">Facture, devis, bon de travail, photos… (10 Mo max par fichier)</small>
+                <div id="mt_docs_preview" class="eq-files mt-2"></div>
+                <div class="form-group mt-3 mb-0">
+                    <label>Description des travaux</label>
+                    <textarea name="description" id="mt_description" class="form-control" rows="3"
+                        placeholder="Diagnostic, travaux effectués, recommandations…"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-warning"><i class="fas fa-save mr-1"></i>Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<template id="pieceRowTpl">
+    <div class="eq-repeat-row js-piece">
+        <div class="row no-gutters" style="gap:6px 0">
+            <div class="col-md-4 pr-md-1"><input type="text" name="piece_designation[]"
+                    class="form-control form-control-sm" placeholder="Désignation de la pièce" maxlength="255"></div>
+            <div class="col-md-2 px-md-1"><input type="text" name="piece_reference[]"
+                    class="form-control form-control-sm" placeholder="Référence" maxlength="100"></div>
+            <div class="col-md-1 px-md-1"><input type="number" name="piece_quantite[]"
+                    class="form-control form-control-sm js-qty" min="0.01" step="0.01" value="1" title="Quantité"></div>
+            <div class="col-md-2 px-md-1"><input type="number" name="piece_prix[]"
+                    class="form-control form-control-sm js-pu" min="0" step="1" placeholder="Prix unitaire"></div>
+            <div class="col-md-2 px-md-1"><input type="text" class="form-control form-control-sm eq-readonly js-amount"
+                    value="0" readonly tabindex="-1"></div>
+            <div class="col-md-1 pl-md-1 text-right"><button type="button" class="btn btn-sm btn-outline-danger"
+                    data-action="remove-row" title="Retirer"><i class="fas fa-times"></i></button></div>
+        </div>
+    </div>
+</template>
+
+<!-- =====================================================================
+     MODALE : PANNE
+     ===================================================================== -->
+<div class="modal fade" id="panneModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-
-        <form action="<?= base_url('add-new-ravitaillement') ?>" method="post" id="fuelForm">
-
-            <div class="modal-content" style="border-radius:18px; overflow:hidden;">
-
-                <div class="modal-header mc-modal-header">
-
-                    <h5 class="modal-title">
-                        <i class="fas fa-gas-pump mr-2"></i>
-                        Nouveau ravitaillement
-                    </h5>
-
-                    <button type="button" class="close text-white" data-dismiss="modal">
-                        &times;
-                    </button>
-
-                </div>
-
-                <div class="modal-body">
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Engin / Matériel *</label>
-                                <select name="engin_id" class="form-control" required>
-                                    <option value="">Sélectionner un engin</option>
-                                    <?php if (!empty($allEngins)): ?>
-                                    <?php foreach ($allEngins as $engin): ?>
-                                    <option value="<?= $engin->id ?>">
-                                        <?= $engin->code_engin ?> -
-                                        <?= $engin->designation ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Chantier</label>
-                                <select name="chantier_id" class="form-control">
-                                    <option value="">Aucun chantier</option>
-                                    <?php if (!empty($chantiers)): ?>
-                                    <?php foreach ($chantiers as $chantier): ?>
-                                    <option value="<?= $chantier->id ?>">
-                                        <?= $chantier->name ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Date *</label>
-                                <input type="date" name="operation_date" class="form-control"
-                                    value="<?= date('Y-m-d') ?>" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Quantité en litres *</label>
-
-                                <input type="number" name="quantity_litre" id="fuelQuantity" class="form-control"
-                                    min="0" step="0.01" oninput="calculateFuelTotal()" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Prix par litre *</label>
-
-                                <input type="number" name="unit_price" id="fuelUnitPrice" class="form-control" min="0"
-                                    step="0.01" oninput="calculateFuelTotal()" required>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Montant total</label>
-
-                                <input type="number" name="total_amount" id="fuelTotal" class="form-control" step="0.01"
-                                    readonly>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Kilométrage</label>
-                                <input type="number" name="kilometrage" class="form-control" min="0">
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Compteur horaire</label>
-                                <input type="number" name="hour_meter" class="form-control" min="0" step="0.01">
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Chauffeur / Opérateur</label>
-                                <input type="text" name="operator_name" class="form-control"
-                                    placeholder="Nom du chauffeur ou opérateur">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Station / Fournisseur</label>
-                                <input type="text" name="supplier" class="form-control"
-                                    placeholder="Nom du fournisseur">
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="form-group">
-                        <label>Observation</label>
-                        <textarea name="observation" class="form-control" rows="3"
-                            placeholder="Informations supplémentaires..."></textarea>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times mr-1"></i>
-                        Annuler
-                    </button>
-
-                    <button type="submit" class="btn mc-btn-primary">
-                        <i class="fas fa-save mr-1"></i>
-                        Enregistrer
-                    </button>
-
-                </div>
-
+        <form id="panneForm" class="modal-content eq-modal" method="post" action="<?= base_url('engin-panne-store') ?>">
+            <input type="hidden" name="<?= eq_e($csrfName) ?>" value="<?= eq_e($csrfHash) ?>">
+            <input type="hidden" name="redirect" value="maintenance-carburant">
+            <div class="modal-header eq-modal-head is-red">
+                <h5 class="modal-title"><i class="fas fa-car-crash mr-2"></i>Signaler une panne</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Fermer">&times;</button>
             </div>
-
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-7 form-group">
+                        <label for="pa_engin">Engin / matériel *</label>
+                        <select name="engin_id" id="pa_engin" class="form-control" required>
+                            <option value="">Sélectionner…</option>
+                            <?= $enginOptions ?>
+                        </select>
+                    </div>
+                    <div class="col-md-5 form-group">
+                        <label>Chantier</label>
+                        <select name="chantier_id" id="pa_chantier"
+                            class="form-control"><?= $chantierOptions ?></select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 form-group">
+                        <label>Date et heure *</label>
+                        <input type="datetime-local" name="date_signalement" id="pa_date" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 form-group">
+                        <label>Gravité *</label>
+                        <select name="gravite" class="form-control">
+                            <option value="Mineure">Mineure — l'engin peut rouler</option>
+                            <option value="Majeure" selected>Majeure — réparation nécessaire</option>
+                            <option value="Critique">Critique — arrêt immédiat</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 form-group js-pa-compteur">
+                        <label>Compteur (<span id="pa_unit">km</span>)</label>
+                        <input type="number" name="compteur" id="pa_compteur" class="form-control" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Description de la panne *</label>
+                    <textarea name="description" class="form-control" rows="3"
+                        placeholder="Symptômes constatés, circonstances…" required></textarea>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label>Signalée par</label>
+                        <input type="text" name="signale_par" id="pa_par" class="form-control" maxlength="150">
+                    </div>
+                    <div class="col-md-6 form-group d-flex flex-column justify-content-end">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" name="immobilise" id="pa_immobilise"
+                                value="1" checked>
+                            <label class="custom-control-label" for="pa_immobilise">L'engin est immobilisé</label>
+                        </div>
+                        <div class="custom-control custom-switch mt-1">
+                            <input type="checkbox" class="custom-control-input" name="open_maintenance" id="pa_open"
+                                value="1">
+                            <label class="custom-control-label" for="pa_open">Ouvrir ensuite une maintenance
+                                corrective</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-paper-plane mr-1"></i>Signaler</button>
+            </div>
         </form>
-
     </div>
 </div>
 
-<div class="modal fade" id="addMaintenanceModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-
-        <form action="<?= base_url('new-technique-maintenance') ?>" method="post" enctype="multipart/form-data">
-
-            <div class="modal-content" style="border-radius:18px; overflow:hidden;">
-
-                <div class="modal-header mc-modal-header-warning">
-
-                    <h5 class="modal-title">
-                        <i class="fas fa-tools mr-2"></i>
-                        Nouvelle maintenance
-                    </h5>
-
-                    <button type="button" class="close text-white" data-dismiss="modal">
-                        &times;
-                    </button>
-
+<!-- =====================================================================
+     MODALE : DÉTAIL (ravitaillement / maintenance)
+     ===================================================================== -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content eq-modal">
+            <div class="modal-header eq-modal-head is-dark">
+                <h5 class="modal-title" id="detailTitle">Détail</h5>
+                <div class="ml-auto d-flex align-items-center" style="gap:6px">
+                    <button type="button" class="btn btn-sm btn-light" id="detailPrint"><i
+                            class="fas fa-print mr-1"></i>Imprimer</button>
+                    <button type="button" class="close ml-1" data-dismiss="modal" aria-label="Fermer">&times;</button>
                 </div>
-
-                <div class="modal-body">
-
-                    <div class="row">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Engin / Matériel *</label>
-                                <select name="engin_id" class="form-control" required>
-                                    <option value="">Sélectionner un engin</option>
-                                    <?php if (!empty($allEngins)): ?>
-                                    <?php foreach ($allEngins as $engin): ?>
-                                    <option value="<?= $engin->id ?>">
-                                        <?= $engin->code_engin ?> -
-                                        <?= $engin->designation ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Type de maintenance *</label>
-                                <select name="maintenance_type" class="form-control" required>
-                                    <option value="">Sélectionner</option>
-                                    <option value="Préventive">Préventive</option>
-                                    <option value="Corrective">Corrective</option>
-                                    <option value="Inspection">Inspection</option>
-                                    <option value="Révision générale">Révision générale</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Nature de l’intervention *</label>
-                                <input type="text" name="intervention" class="form-control"
-                                    placeholder="Ex : Vidange moteur" required>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Date prévue *</label>
-                                <input type="date" name="planned_date" class="form-control" required>
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Date début</label>
-                                <input type="date" name="start_date" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Date fin</label>
-                                <input type="date" name="end_date" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <div class="form-group">
-                                <label>Statut *</label>
-                                <select name="status" class="form-control" required>
-                                    <option value="Programmé">Programmé</option>
-                                    <option value="En cours">En cours</option>
-                                    <option value="Terminé">Terminé</option>
-                                    <option value="Annulé">Annulé</option>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Garage / Fournisseur</label>
-                                <input type="text" name="supplier" class="form-control" placeholder="Nom du garage">
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Technicien responsable</label>
-                                <input type="text" name="technician" class="form-control"
-                                    placeholder="Nom du technicien">
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Chantier</label>
-                                <select name="chantier_id" class="form-control">
-                                    <option value="">Aucun chantier</option>
-                                    <?php if (!empty($chantiers)): ?>
-                                    <?php foreach ($chantiers as $chantier): ?>
-                                    <option value="<?= $chantier->id ?>">
-                                        <?= $chantier->name ?>
-                                    </option>
-                                    <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Coût des pièces</label>
-
-                                <input type="number" name="parts_cost" id="partsCost" class="form-control" value="0"
-                                    min="0" step="0.01" oninput="calculateMaintenanceTotal()">
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Coût main-d’œuvre</label>
-
-                                <input type="number" name="labor_cost" id="laborCost" class="form-control" value="0"
-                                    min="0" step="0.01" oninput="calculateMaintenanceTotal()">
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-group">
-                                <label>Coût total</label>
-
-                                <input type="number" name="total_cost" id="maintenanceTotal" class="form-control"
-                                    value="0" step="0.01" readonly>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div class="row">
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Prochaine maintenance</label>
-                                <input type="date" name="next_maintenance_date" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Pièces jointes</label>
-
-                                <input type="file" name="documents[]" id="maintenanceDocumentsInput"
-                                    class="form-control" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx" multiple>
-
-                                <div id="maintenanceDocumentsPreview" class="mt-3"></div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Description des travaux</label>
-                        <textarea name="description" class="form-control" rows="4"
-                            placeholder="Description de la panne, pièces remplacées et travaux effectués..."></textarea>
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
-                        onclick="resetMaintenanceDocuments()">
-
-                        <i class="fas fa-times mr-1"></i>
-                        Annuler
-
-                    </button>
-
-                    <button type="submit" class="btn btn-warning">
-                        <i class="fas fa-save mr-1"></i>
-                        Enregistrer
-                    </button>
-
-                </div>
-
             </div>
-
-        </form>
-
+            <div class="modal-body" id="detailBody"></div>
+        </div>
     </div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('maintenanceDocumentsInput');
-    const preview = document.getElementById('maintenanceDocumentsPreview');
+window.EQChart = window.Chart; // conserve Chart.js v4 même si une autre version est chargée plus tard
+/* Attend que jQuery + Bootstrap soient chargés (ils peuvent l'être dans footer.php, après cette vue) */
+window.eqOnReady = function(fn) {
+    var tries = 0;
 
-    if (!input || !preview) {
-        console.error(
-            'Champ ou zone d’aperçu de maintenance introuvable.', {
-                input: input,
-                preview: preview
-            }
-        );
+    function run() {
+        if (window.jQuery && window.jQuery.fn && window.jQuery.fn.modal) {
+            fn(window.jQuery);
+        } else if (tries++ < 200) {
+            setTimeout(run, 50);
+        } else {
+            console.error('[Engins] jQuery/Bootstrap introuvable : vérifiez header.php / footer.php.');
+        }
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', run);
+    } else {
+        run();
+    }
+};
+window.EQ = {
+    baseUrl: <?= eq_json(base_url()) ?>,
+    csrfName: <?= eq_json($csrfName) ?>,
+    csrfHash: <?= eq_json($csrfHash) ?>
+};
+</script>
+<script src="<?= base_url('assets/v1/dist/js/module-engins.js?v=2') ?>"></script>
+<script>
+eqOnReady(function($) {
+    'use strict';
 
-        return;
+    var OPEN_PANNES = <?= eq_json($openPannesJs) ?>;
+    var MONTHLY = <?= eq_json($monthly) ?>;
+    var PREFILL_PANNE = <?= eq_json($prefillPanne ? (int) $prefillPanne->id : null) ?>;
+    var PREFILL_ENGIN = <?= eq_json($prefillEngin ?: null) ?>;
+    var TODAY = <?= eq_json(date('Y-m-d')) ?>;
+
+    function enginInfo($select) {
+        var $o = $select.find('option:selected');
+        if (!$o.val()) {
+            return null;
+        }
+        return {
+            type: $o.data('compteur'),
+            actuel: parseFloat($o.data('actuel')) || 0,
+            carburant: $o.data('carburant'),
+            capacite: parseFloat($o.data('capacite')) || 0,
+            chantier: parseInt($o.data('chantier'), 10) || '',
+            responsable: $o.data('responsable') || ''
+        };
     }
 
-    input.addEventListener('change', function() {
-        preview.innerHTML = '';
+    function prepareForm($form, mode) {
+        $form[0].reset();
+        $form.data('mode', mode);
+        $form.attr('action', $form.data(mode === 'create' ? 'store' : 'update'));
+        $form.find('button[type="submit"]').prop('disabled', false).find('.fa-spinner').remove();
+    }
 
-        const files = Array.from(input.files || []);
+    $('form.eq-modal').on('submit', function() {
+        $(this).find('button[type="submit"]').prop('disabled', true)
+            .prepend('<i class="fas fa-spinner fa-spin mr-1"></i>');
+    });
 
-        if (files.length === 0) {
-            preview.innerHTML = `
-                <small class="text-muted">
-                    Aucun fichier sélectionné.
-                </small>
-            `;
+    /* =================================================================
+     |  CARBURANT
+     * ================================================================= */
+    var $fuelForm = $('#fuelForm');
 
+    function calcFuel() {
+        var q = parseFloat($('#fu_qty').val()) || 0;
+        var pu = parseFloat($('#fu_pu').val()) || 0;
+        $('#fu_total').val(EQ.money(q * pu));
+        var info = enginInfo($('#fu_engin'));
+        var over = info && info.capacite > 0 && q > info.capacite;
+        $('#fu_qty_warn').toggleClass('d-none', !over)
+            .text(over ? 'Supérieur à la capacité du réservoir (' + EQ.num(info.capacite) + ' L).' : '');
+    }
+
+    function onFuelEngin() {
+        var info = enginInfo($('#fu_engin'));
+        if (!info) {
+            $('#fu_compteur_hint').text('');
             return;
         }
-
-        files.forEach(function(file) {
-            const extension = file.name.includes('.') ?
-                file.name.split('.').pop().toLowerCase() :
-                '';
-
-            const size = formatFileSize(file.size);
-
-            if (['jpg', 'jpeg', 'png'].includes(extension)) {
-                showImagePreview(file, size, preview);
-            } else {
-                showDocumentPreview(file, extension, size, preview);
+        if ($fuelForm.data('mode') === 'create') {
+            if (['Diesel', 'Essence', 'Mélange 2T'].indexOf(info.carburant) >= 0) {
+                $('#fu_type').val(info.carburant);
             }
+            $('#fu_chantier').val(info.chantier);
+            if (!$('#fu_operator').val()) {
+                $('#fu_operator').val(info.responsable);
+            }
+        }
+        $('#fu_compteur_wrap').toggleClass('d-none', info.type === 'aucun');
+        $('#fu_compteur_label').text(info.type === 'heure' ? 'Compteur horaire' : 'Kilométrage');
+        $('#fu_compteur_unit').text(EQ.unit(info.type));
+        $('#fu_compteur_hint').text('Dernier relevé connu : ' + EQ.num(info.actuel) + ' ' + EQ.unit(info.type));
+        calcFuel();
+    }
+
+    function openFuel(enginId) {
+        prepareForm($fuelForm, 'create');
+        $('#fu_id').val('');
+        $('#fuelModalTitle').text('Nouveau ravitaillement');
+        $('#fu_date').val(TODAY);
+        $('#fu_engin').val(enginId || '');
+        onFuelEngin();
+        calcFuel();
+        $('#fuelModal').modal('show');
+    }
+
+    $('#fu_engin').on('change', onFuelEngin);
+    $('#fu_qty, #fu_pu').on('input', calcFuel);
+    $(document).on('click', '[data-action="new-fuel"]', function(e) {
+        e.preventDefault();
+        openFuel();
+    });
+
+    $fuelForm.on('submit', function(e) {
+        var info = enginInfo($('#fu_engin'));
+        var cpt = parseFloat($('#fu_compteur').val());
+        if ($fuelForm.data('mode') === 'create' && info && info.type !== 'aucun' && !isNaN(cpt) && cpt <
+            info.actuel &&
+            $('#fu_date').val() === TODAY) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            $fuelForm.find('button[type="submit"]').prop('disabled', false).find('.fa-spinner')
+                .remove();
+            Swal.fire('Compteur incohérent', 'Le relevé saisi est inférieur au dernier relevé connu (' +
+                EQ.num(info.actuel) + ' ' + EQ.unit(info.type) + ').', 'warning');
+        }
+    });
+
+    $(document).on('click', '[data-action="edit-fuel"]', function() {
+        EQ.get('engin-fuel-get/' + $(this).data('id')).done(function(r) {
+            var f = r.fuel;
+            prepareForm($fuelForm, 'edit');
+            $('#fuelModalTitle').text('Modifier ' + f.reference);
+            $('#fu_id').val(f.id);
+            $('#fu_engin').val(f.engin_id);
+            onFuelEngin();
+            $('#fu_chantier').val(f.chantier_id || '');
+            $('#fu_date').val(f.operation_date);
+            $('#fu_type').val(f.type_carburant);
+            $('#fu_source').val(f.source);
+            $('#fu_qty').val(f.quantity_litre);
+            $('#fu_pu').val(f.unit_price);
+            $('#fu_compteur').val(f.type_compteur === 'heure' ? (f.hour_meter || '') : (f
+                .kilometrage || ''));
+            $('#fu_bon').val(f.numero_bon || '');
+            $('#fu_plein').prop('checked', parseInt(f.plein_complet, 10) === 1);
+            $('#fu_operator').val(f.operator_name || '');
+            $('#fu_supplier').val(f.supplier || '');
+            $('#fu_obs').val(f.observation || '');
+            calcFuel();
+            $('#fuelModal').modal('show');
+        }).fail(EQ.fail);
+    });
+
+    $(document).on('click', '[data-action="cancel-fuel"]', function() {
+        var id = $(this).data('id');
+        EQ.confirm({
+            titleText: 'Annuler le ravitaillement ' + $(this).data('ref') + ' ?',
+            text: 'Il sera retiré des statistiques et des coûts.',
+            confirmButtonText: 'Annuler le ravitaillement'
+        }).then(function(res) {
+            if (!res.isConfirmed) {
+                return;
+            }
+            EQ.post('engin-fuel-cancel', {
+                id: id
+            }).done(function() {
+                location.reload();
+            }).fail(EQ.fail);
         });
     });
+
+    $(document).on('click', '[data-action="view-fuel"]', function() {
+        EQ.get('engin-fuel-get/' + $(this).data('id')).done(function(r) {
+            var f = r.fuel;
+            var cpt = f.type_compteur === 'heure' ? f.hour_meter : f.kilometrage;
+            $('#detailTitle').html('<i class="fas fa-gas-pump mr-2"></i>Ravitaillement ' + EQ
+                .esc(f.reference));
+            $('#detailBody').html(
+                '<dl class="eq-dl">' +
+                '<dt>Engin</dt><dd><strong>' + EQ.esc(f.designation) + '</strong> · ' + EQ
+                .esc(f.code_engin) + (f.plaque ? ' · ' + EQ.esc(f.plaque) : '') + '</dd>' +
+                '<dt>Date</dt><dd>' + EQ.date(f.operation_date) + '</dd>' +
+                '<dt>Chantier</dt><dd>' + EQ.esc(f.chantier_name || '-') + '</dd>' +
+                '<dt>Carburant</dt><dd>' + EQ.esc(f.type_carburant) + ' · ' + EQ.esc(f
+                    .source) + (f.numero_bon ? ' · bon n° ' + EQ.esc(f.numero_bon) : '') +
+                '</dd>' +
+                '<dt>Quantité</dt><dd>' + EQ.num(f.quantity_litre, 2) + ' L × ' + EQ.num(f
+                    .unit_price) + ' BIF</dd>' +
+                '<dt>Montant</dt><dd><strong>' + EQ.money(f.total_amount) +
+                '</strong></dd>' +
+                '<dt>Compteur</dt><dd>' + (cpt !== null ? EQ.num(cpt) + ' ' + EQ.unit(f
+                    .type_compteur) : '-') + (parseInt(f.plein_complet, 10) ?
+                    ' · plein complet' : ' · plein partiel') + '</dd>' +
+                '<dt>Chauffeur</dt><dd>' + EQ.esc(f.operator_name || '-') + '</dd>' +
+                '<dt>Fournisseur</dt><dd>' + EQ.esc(f.supplier || '-') + '</dd>' +
+                '<dt>Observation</dt><dd>' + EQ.esc(f.observation || '-') + '</dd>' +
+                '<dt>Saisi le</dt><dd>' + EQ.esc(f.created_at || '-') + '</dd>' +
+                '</dl>'
+            );
+            $('#detailModal').modal('show');
+        }).fail(EQ.fail);
+    });
+
+    /* =================================================================
+     |  MAINTENANCE
+     * ================================================================= */
+    var $maintForm = $('#maintForm');
+
+    function addPieceRow(p) {
+        var $row = $($.parseHTML(document.getElementById('pieceRowTpl').innerHTML.trim()));
+        if (p) {
+            $row.find('[name="piece_designation[]"]').val(p.designation);
+            $row.find('[name="piece_reference[]"]').val(p.reference_piece || '');
+            $row.find('[name="piece_quantite[]"]').val(p.quantite);
+            $row.find('[name="piece_prix[]"]').val(p.prix_unitaire);
+        }
+        $('#pieceRows').append($row);
+        calcMaint();
+    }
+
+    function calcMaint() {
+        var parts = 0;
+        $('#pieceRows .js-piece').each(function() {
+            var q = parseFloat($(this).find('.js-qty').val()) || 0;
+            var pu = parseFloat($(this).find('.js-pu').val()) || 0;
+            $(this).find('.js-amount').val(EQ.num(q * pu));
+            parts += q * pu;
+        });
+        var labor = parseFloat($('#mt_labor').val()) || 0;
+        $('#mt_parts').val(EQ.money(parts));
+        $('#mt_total').val(EQ.money(parts + labor));
+    }
+
+    function fillPannes(enginId, selected) {
+        var $sel = $('#mt_panne').empty().append('<option value="">Aucune</option>');
+        OPEN_PANNES.filter(function(p) {
+            return p.engin_id === parseInt(enginId, 10);
+        }).forEach(function(p) {
+            $sel.append($('<option>').val(p.id).text(p.reference + ' — ' + p.gravite + ' : ' + String(p
+                .description).substr(0, 60)));
+        });
+        if (selected && !$sel.find('option[value="' + selected.id + '"]').length) {
+            $sel.append($('<option>').val(selected.id).text(selected.label));
+        }
+        $sel.val(selected ? selected.id : '');
+    }
+
+    function onMaintEngin() {
+        var info = enginInfo($('#mt_engin'));
+        fillPannes($('#mt_engin').val(), null);
+        if (!info) {
+            return;
+        }
+        $('.js-compteur').toggleClass('d-none', info.type === 'aucun');
+        $('.js-mt-unit').text(EQ.unit(info.type));
+        $('#mt_compteur_hint').text('Actuel : ' + EQ.num(info.actuel) + ' ' + EQ.unit(info.type));
+        if ($maintForm.data('mode') === 'create') {
+            $('#mt_chantier').val(info.chantier);
+        }
+    }
+
+    function openMaintenance(enginId) {
+        prepareForm($maintForm, 'create');
+        $('#mt_id').val('');
+        $('#maintModalTitle').text('Nouvelle maintenance');
+        $('#pieceRows, #mt_docs_existing, #mt_docs_preview').empty();
+        $('#mt_planned').val(TODAY);
+        $('#mt_engin').val(enginId || '');
+        onMaintEngin();
+        addPieceRow();
+        $('#maintenanceModal').modal('show');
+    }
+
+    $('#mt_engin').on('change', onMaintEngin);
+    $('#addPieceRow').on('click', function() {
+        addPieceRow();
+    });
+    $('#pieceRows').on('input', '.js-qty, .js-pu', calcMaint);
+    $('#pieceRows').on('click', '[data-action="remove-row"]', function() {
+        $(this).closest('.js-piece').remove();
+        calcMaint();
+    });
+    $('#mt_labor').on('input', calcMaint);
+    $('#mt_docs').on('change', function() {
+        EQ.previewFiles(this, document.getElementById('mt_docs_preview'));
+    });
+    $('#mt_status').on('change', function() {
+        var s = $(this).val();
+        if ((s === 'En cours' || s === 'Terminé') && !$('#mt_start').val()) {
+            $('#mt_start').val(TODAY);
+        }
+        if (s === 'Terminé' && !$('#mt_end').val()) {
+            $('#mt_end').val(TODAY);
+        }
+    });
+    $('#mt_panne').on('change', function() {
+        if ($(this).val() && !$('#mt_type').val()) {
+            $('#mt_type').val('Corrective');
+        }
+    });
+
+    $(document).on('click', '[data-action="new-maintenance"]', function(e) {
+        e.preventDefault();
+        openMaintenance();
+    });
+
+    $(document).on('click', '[data-action="panne-maintenance"]', function() {
+        openFromPanne(parseInt($(this).data('id'), 10));
+    });
+
+    function openFromPanne(panneId) {
+        var p = OPEN_PANNES.filter(function(x) {
+            return x.id === panneId;
+        })[0];
+        if (!p) {
+            return openMaintenance();
+        }
+        openMaintenance(p.engin_id);
+        fillPannes(p.engin_id, {
+            id: p.id,
+            label: p.reference
+        });
+        $('#mt_type').val('Corrective');
+        $('#mt_status').val('En cours').trigger('change');
+        $('#mt_intervention').val('Réparation : ' + String(p.description).substr(0, 200));
+        if (p.chantier_id) {
+            $('#mt_chantier').val(p.chantier_id);
+        }
+        if (p.compteur) {
+            $('#mt_compteur').val(p.compteur);
+        }
+    }
+
+    function renderMaintDocs(docs) {
+        var $box = $('#mt_docs_existing').empty();
+        (docs || []).forEach(function(d) {
+            $box.append(
+                '<div class="eq-doc"><i class="' + EQ.fileIcon(d.document) + ' fa-lg"></i>' +
+                '<a class="eq-doc-name" href="' + EQ.esc(d.url) +
+                '" target="_blank" rel="noopener">' + EQ.esc(d.original_name || d.document) +
+                '</a>' +
+                '<small class="text-muted">' + EQ.size(d.file_size) + '</small>' +
+                '<button type="button" class="btn btn-sm btn-outline-danger eq-icon-btn" data-action="mdoc-delete" data-id="' +
+                d.id + '"><i class="fas fa-trash-alt"></i></button></div>'
+            );
+        });
+    }
+
+    $('#mt_docs_existing').on('click', '[data-action="mdoc-delete"]', function() {
+        var id = $(this).data('id');
+        var $row = $(this).closest('.eq-doc');
+        EQ.confirm({
+            titleText: 'Supprimer cette pièce jointe ?',
+            confirmButtonText: 'Supprimer'
+        }).then(function(res) {
+            if (!res.isConfirmed) {
+                return;
+            }
+            EQ.post('engin-maintenance-document-delete', {
+                id: id
+            }).done(function() {
+                $row.remove();
+                EQ.toast('success', 'Pièce jointe supprimée');
+            }).fail(EQ.fail);
+        });
+    });
+
+    $(document).on('click', '[data-action="edit-maintenance"]', function(e) {
+        e.preventDefault();
+        EQ.get('engin-maintenance-get/' + $(this).data('id')).done(function(r) {
+            var m = r.maintenance;
+            prepareForm($maintForm, 'edit');
+            $('#maintModalTitle').text('Modifier ' + m.reference);
+            $('#mt_id').val(m.id);
+            $('#pieceRows, #mt_docs_preview').empty();
+            $('#mt_engin').val(m.engin_id);
+            onMaintEngin();
+            fillPannes(m.engin_id, m.panne_id ? {
+                id: m.panne_id,
+                label: m.panne_reference || ('Panne #' + m.panne_id)
+            } : null);
+            $('#mt_type').val(m.maintenance_type);
+            $('#mt_intervention').val(m.intervention);
+            $('#mt_chantier').val(m.chantier_id || '');
+            $('#mt_status').val(m.maintenance_status);
+            $('#mt_planned').val(m.planned_date);
+            $('#mt_start').val(m.start_date || '');
+            $('#mt_end').val(m.end_date || '');
+            $('#mt_compteur').val(m.compteur_intervention || '');
+            $('#mt_supplier').val(m.supplier || '');
+            $('#mt_technician').val(m.technician || '');
+            $('#mt_immobilise').prop('checked', parseInt(m.immobilise, 10) === 1);
+            $('#mt_labor').val(m.labor_cost);
+            $('#mt_next_date').val(m.next_maintenance_date || '');
+            $('#mt_next_cpt').val(m.next_maintenance_compteur || '');
+            $('#mt_description').val(m.description || '');
+            if (m.pieces.length) {
+                m.pieces.forEach(function(p) {
+                    addPieceRow(p);
+                });
+            } else if (parseFloat(m.parts_cost) > 0) {
+                addPieceRow({
+                    designation: 'Pièces (montant global)',
+                    quantite: 1,
+                    prix_unitaire: m.parts_cost
+                });
+            } else {
+                addPieceRow();
+            }
+            renderMaintDocs(m.documents);
+            calcMaint();
+            $('#maintenanceModal').modal('show');
+        }).fail(EQ.fail);
+    });
+
+    $(document).on('click', '[data-action="maint-status"]', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var status = $(this).data('status');
+        var labels = {
+            'En cours': 'Démarrer cette maintenance ?',
+            'Terminé': 'Marquer cette maintenance comme terminée ?',
+            'Annulé': 'Annuler cette maintenance ?'
+        };
+        EQ.confirm({
+            titleText: labels[status],
+            text: status === 'Terminé' ?
+                'L\'engin redeviendra disponible et la panne liée sera résolue.' : '',
+            icon: status === 'Annulé' ? 'warning' : 'question',
+            confirmButtonColor: status === 'Annulé' ? '#dc3545' : '#0f766e'
+        }).then(function(res) {
+            if (!res.isConfirmed) {
+                return;
+            }
+            EQ.post('engin-maintenance-status', {
+                id: id,
+                status: status
+            }).done(function() {
+                location.reload();
+            }).fail(EQ.fail);
+        });
+    });
+
+    $(document).on('click', '[data-action="view-maintenance"]', function(e) {
+        e.preventDefault();
+        EQ.get('engin-maintenance-get/' + $(this).data('id')).done(function(r) {
+            var m = r.maintenance;
+            var rows = m.pieces.map(function(p) {
+                return '<tr><td>' + EQ.esc(p.designation) + (p.reference_piece ?
+                        ' <small class="text-muted">' + EQ.esc(p.reference_piece) +
+                        '</small>' : '') +
+                    '</td><td class="text-right">' + EQ.num(p.quantite, 2) +
+                    '</td><td class="text-right">' + EQ.num(p.prix_unitaire) +
+                    '</td><td class="text-right">' + EQ.num(p.montant) + '</td></tr>';
+            }).join('');
+            var docs = m.documents.map(function(d) {
+                return '<a class="d-block small" href="' + EQ.esc(d.url) +
+                    '" target="_blank" rel="noopener"><i class="' + EQ.fileIcon(d
+                        .document) + ' mr-1"></i>' + EQ.esc(d.original_name || d
+                        .document) + '</a>';
+            }).join('');
+            var unit = EQ.unit(m.type_compteur);
+
+            $('#detailTitle').html('<i class="fas fa-tools mr-2"></i>Maintenance ' + EQ.esc(m
+                .reference));
+            $('#detailBody').html(
+                '<div class="d-flex justify-content-between align-items-start mb-3"><div><h5 class="mb-0">' +
+                EQ.esc(m.intervention) + '</h5>' +
+                '<small class="text-muted">' + EQ.esc(m.maintenance_type) + ' · ' + EQ.esc(m
+                    .designation) + ' (' + EQ.esc(m.code_engin) + ')</small></div>' +
+                '<span class="eq-badge ' + ({
+                    'Terminé': 'eq-badge-success',
+                    'En cours': 'eq-badge-warning',
+                    'Annulé': 'eq-badge-danger'
+                } [m.maintenance_status] || 'eq-badge-info') + '">' + EQ.esc(m
+                    .maintenance_status) + '</span></div>' +
+                '<dl class="eq-dl">' +
+                '<dt>Dates</dt><dd>Prévue ' + EQ.date(m.planned_date) + ' · début ' + EQ
+                .date(m.start_date) + ' · fin ' + EQ.date(m.end_date) + '</dd>' +
+                '<dt>Chantier</dt><dd>' + EQ.esc(m.chantier_name || '-') + '</dd>' +
+                (m.panne_reference ? '<dt>Panne liée</dt><dd>' + EQ.esc(m.panne_reference) +
+                    ' — ' + EQ.esc(m.panne_description) + '</dd>' : '') +
+                '<dt>Compteur</dt><dd>' + (m.compteur_intervention ? EQ.num(m
+                    .compteur_intervention) + ' ' + unit : '-') + '</dd>' +
+                '<dt>Garage / technicien</dt><dd>' + EQ.esc(m.supplier || '-') + ' / ' + EQ
+                .esc(m.technician || '-') + '</dd>' +
+                '<dt>Immobilisation</dt><dd>' + (parseInt(m.immobilise, 10) ? 'Oui' :
+                    'Non') + '</dd>' +
+                '<dt>Prochaine échéance</dt><dd>' + EQ.date(m.next_maintenance_date) + (m
+                    .next_maintenance_compteur ? ' ou ' + EQ.num(m
+                        .next_maintenance_compteur) + ' ' + unit : '') + '</dd>' +
+                '</dl>' +
+                '<div class="eq-block-title">Pièces remplacées</div>' +
+                (rows ?
+                    '<table class="table table-sm eq-table"><thead><tr><th>Pièce</th><th class="text-right">Qté</th><th class="text-right">P.U.</th><th class="text-right">Montant</th></tr></thead><tbody>' +
+                    rows + '</tbody></table>' :
+                    '<p class="small text-muted">Aucune pièce détaillée.</p>') +
+                '<table class="table table-sm mb-0"><tr><td>Pièces</td><td class="text-right">' +
+                EQ.money(m.parts_cost) + '</td></tr>' +
+                '<tr><td>Main-d\'œuvre</td><td class="text-right">' + EQ.money(m
+                    .labor_cost) + '</td></tr>' +
+                '<tr class="font-weight-bold"><td>Total</td><td class="text-right">' + EQ
+                .money(m.total_cost) + '</td></tr></table>' +
+                (m.description ?
+                    '<div class="eq-block-title">Description</div><p class="small" style="white-space:pre-line">' +
+                    EQ.esc(m.description) + '</p>' : '') +
+                (docs ? '<div class="eq-block-title">Pièces jointes</div>' + docs : '')
+            );
+            $('#detailModal').modal('show');
+        }).fail(EQ.fail);
+    });
+
+    $('#detailPrint').on('click', function() {
+        EQ.printElement('detailBody', $('#detailTitle').text());
+    });
+
+    /* =================================================================
+     |  PANNES
+     * ================================================================= */
+    function nowLocal() {
+        var d = new Date();
+        d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+        return d.toISOString().substr(0, 16);
+    }
+
+    function onPanneEngin() {
+        var info = enginInfo($('#pa_engin'));
+        if (!info) {
+            return;
+        }
+        $('#pa_chantier').val(info.chantier);
+        $('.js-pa-compteur').toggleClass('d-none', info.type === 'aucun');
+        $('#pa_unit').text(EQ.unit(info.type));
+        $('#pa_compteur').attr('placeholder', EQ.num(info.actuel));
+    }
+
+    function openPanne(enginId) {
+        $('#panneForm')[0].reset();
+        $('#panneForm button[type="submit"]').prop('disabled', false).find('.fa-spinner').remove();
+        $('#pa_date').val(nowLocal());
+        $('#pa_engin').val(enginId || '');
+        onPanneEngin();
+        $('#panneModal').modal('show');
+    }
+
+    $('#pa_engin').on('change', onPanneEngin);
+    $(document).on('click', '[data-action="new-panne"]', function(e) {
+        e.preventDefault();
+        openPanne();
+    });
+
+    $(document).on('click', '[data-action="panne-status"]', function(e) {
+        e.preventDefault();
+        var id = $(this).data('id');
+        var status = $(this).data('status');
+        EQ.confirm({
+            titleText: 'Passer la panne en « ' + status + ' » ?',
+            icon: status === 'Annulée' ? 'warning' : 'question',
+            confirmButtonColor: status === 'Annulée' ? '#dc3545' : '#0f766e'
+        }).then(function(res) {
+            if (!res.isConfirmed) {
+                return;
+            }
+            EQ.post('engin-panne-status', {
+                id: id,
+                status: status
+            }).done(function() {
+                location.reload();
+            }).fail(EQ.fail);
+        });
+    });
+
+    /* =================================================================
+     |  GRAPHIQUE DES COÛTS
+     * ================================================================= */
+    var ChartJs = window.EQChart;
+    var canvas = document.getElementById('costChart');
+    if (ChartJs && canvas) {
+        var keys = Object.keys(MONTHLY);
+        new ChartJs(canvas, {
+            type: 'bar',
+            data: {
+                labels: keys.map(function(k) {
+                    return new Date(k + '-01T00:00:00').toLocaleDateString('fr-FR', {
+                        month: 'short',
+                        year: '2-digit'
+                    });
+                }),
+                datasets: [{
+                        label: 'Carburant',
+                        data: keys.map(function(k) {
+                            return MONTHLY[k].fuel;
+                        }),
+                        backgroundColor: '#22c55e',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Maintenance',
+                        data: keys.map(function(k) {
+                            return MONTHLY[k].maintenance;
+                        }),
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true,
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(v) {
+                                return EQ.num(v);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(c) {
+                                return c.dataset.label + ' : ' + EQ.money(c.parsed.y);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    /* =================================================================
+     |  OUVERTURE DIRECTE (liens depuis la page Engin & Materiel)
+     |  maintenance-carburant?engin_id=5#fuel | #maintenance | #panne
+     |  maintenance-carburant?panne=12#maintenance
+     * ================================================================= */
+    var hash = window.location.hash;
+    if (PREFILL_PANNE) {
+        openFromPanne(PREFILL_PANNE);
+    } else if (hash === '#fuel') {
+        openFuel(PREFILL_ENGIN);
+    } else if (hash === '#maintenance') {
+        openMaintenance(PREFILL_ENGIN);
+    } else if (hash === '#panne') {
+        openPanne(PREFILL_ENGIN);
+    }
+    if (hash || PREFILL_PANNE) {
+        history.replaceState(null, '', window.location.pathname);
+    }
 });
-
-function showImagePreview(file, size, preview) {
-    const reader = new FileReader();
-
-    reader.onload = function(event) {
-        const card = document.createElement('div');
-        card.className = 'maintenance-image-preview';
-
-        const image = document.createElement('img');
-        image.src = event.target.result;
-        image.alt = file.name;
-
-        const name = document.createElement('div');
-        name.className = 'maintenance-preview-name mt-1';
-        name.textContent = file.name;
-        name.title = file.name;
-
-        const sizeElement = document.createElement('small');
-        sizeElement.className = 'text-muted';
-        sizeElement.textContent = size;
-
-        card.appendChild(image);
-        card.appendChild(name);
-        card.appendChild(sizeElement);
-
-        preview.appendChild(card);
-    };
-
-    reader.onerror = function() {
-        console.error('Impossible de lire cette image :', file.name);
-    };
-
-    reader.readAsDataURL(file);
-}
-
-function showDocumentPreview(file, extension, size, preview) {
-    let iconClass = 'fas fa-file text-secondary';
-
-    if (extension === 'pdf') {
-        iconClass = 'fas fa-file-pdf text-danger';
-    } else if (['doc', 'docx'].includes(extension)) {
-        iconClass = 'fas fa-file-word text-primary';
-    } else if (['xls', 'xlsx'].includes(extension)) {
-        iconClass = 'fas fa-file-excel text-success';
-    }
-
-    const card = document.createElement('div');
-    card.className = 'maintenance-doc-preview';
-
-    const iconBox = document.createElement('div');
-    iconBox.className = 'maintenance-doc-icon';
-
-    const icon = document.createElement('i');
-    icon.className = iconClass;
-
-    const content = document.createElement('div');
-    content.className = 'flex-fill';
-    content.style.minWidth = '0';
-
-    const name = document.createElement('div');
-    name.className = 'maintenance-preview-name';
-    name.textContent = file.name;
-    name.title = file.name;
-
-    const sizeElement = document.createElement('small');
-    sizeElement.className = 'text-muted';
-    sizeElement.textContent = size;
-
-    iconBox.appendChild(icon);
-
-    content.appendChild(name);
-    content.appendChild(sizeElement);
-
-    card.appendChild(iconBox);
-    card.appendChild(content);
-
-    preview.appendChild(card);
-}
-
-function formatFileSize(bytes) {
-    if (!bytes) {
-        return '0 KB';
-    }
-
-    if (bytes < 1024 * 1024) {
-        return (bytes / 1024).toFixed(1) + ' KB';
-    }
-
-    return (bytes / (1024 * 1024)).toFixed(2) + ' MB';
-}
-</script>
-
-
-<script>
-function resetMaintenanceDocuments() {
-    const input = document.getElementById('maintenanceDocumentsInput');
-    const preview = document.getElementById('maintenanceDocumentsPreview');
-
-    if (input) {
-        input.value = '';
-    }
-
-    if (preview) {
-        preview.innerHTML = '';
-    }
-}
-</script>
-
-
-<script>
-$(document).on('hidden.bs.modal', '#addMaintenanceModal', function() {
-    document.getElementById('maintenanceDocumentsInput').value = '';
-    document.getElementById('maintenanceDocumentsPreview').innerHTML = '';
-});
-</script>
-
-<script>
-function calculateFuelTotal() {
-    const quantityInput = document.getElementById('fuelQuantity');
-    const priceInput = document.getElementById('fuelUnitPrice');
-    const totalInput = document.getElementById('fuelTotal');
-
-    if (!quantityInput || !priceInput || !totalInput) {
-        console.error('Un des champs du calcul carburant est introuvable.');
-        return;
-    }
-
-    const quantity = parseFloat(quantityInput.value) || 0;
-    const unitPrice = parseFloat(priceInput.value) || 0;
-    const total = quantity * unitPrice;
-
-    totalInput.value = total.toFixed(2);
-}
-</script>
-
-<script>
-function calculateMaintenanceTotal() {
-    const partsInput = document.getElementById('partsCost');
-    const laborInput = document.getElementById('laborCost');
-    const totalInput = document.getElementById('maintenanceTotal');
-
-    if (!partsInput || !laborInput || !totalInput) {
-        console.error('Un des champs de maintenance est introuvable.');
-        return;
-    }
-
-    const partsCost = parseFloat(partsInput.value) || 0;
-    const laborCost = parseFloat(laborInput.value) || 0;
-
-    const total = partsCost + laborCost;
-
-    totalInput.value = total.toFixed(2);
-}
-</script>
-
-<script>
-function viewFuelOperation(id) {
-    console.log('Voir le ravitaillement :', id);
-
-    Swal.fire({
-        title: 'Ravitaillement',
-        text: 'Ouverture du ravitaillement numéro ' + id,
-        icon: 'info'
-    });
-}
-
-function editFuelOperation(id) {
-    console.log('Modifier le ravitaillement :', id);
-
-    Swal.fire({
-        title: 'Modification',
-        text: 'Modification du ravitaillement numéro ' + id,
-        icon: 'info'
-    });
-}
-
-function viewMaintenanceOperation(id) {
-    console.log('Voir la maintenance :', id);
-
-    Swal.fire({
-        title: 'Maintenance',
-        text: 'Ouverture de la maintenance numéro ' + id,
-        icon: 'info'
-    });
-}
-
-function editMaintenanceOperation(id) {
-    console.log('Modifier la maintenance :', id);
-
-    Swal.fire({
-        title: 'Modification',
-        text: 'Modification de la maintenance numéro ' + id,
-        icon: 'info'
-    });
-}
 </script>

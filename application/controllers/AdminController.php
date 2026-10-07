@@ -610,7 +610,7 @@ class AdminController extends CI_Controller
 
             /* ---------- DIRECTION GÉNÉRALE ---------- */
             ['code' => 'dg', 'label' => 'Direction Générale', 'icon' => 'fa-building', 'permissions' => [
-                ['code' => 'direction-dashboard', 'label' => 'Tableau de bord', 'icon' => 'fa-tachometer-alt'],
+                ['code' => 'direction-dashboard', 'label' => 'Tableau de bord General', 'icon' => 'fa-tachometer-alt'],
                 ['code' => 'direction-indicateurs', 'label' => 'Indicateurs de performance', 'icon' => 'fa-chart-line'],
                 ['code' => 'direction-reporting-general', 'label' => 'Reporting général', 'icon' => 'fa-file-alt'],
                 ['code' => 'direction-reporting-analytique', 'label' => 'Analytique', 'icon' => 'fa-chart-pie'],

@@ -60,7 +60,15 @@ class Authentication extends CI_Controller
             'logged_in'  => TRUE
         ]);
 
-        redirect('main-dashboard');
+        // Page d'accueil selon le rôle (les autres rôles vont sur le dashboard général)
+        $landingByRole = [
+            'DIRECTEUR_GENERAL' => 'direction-dashboard',
+            // 'RESPONSABLE_ADMIN_FINANCIER' => 'finance-dashboard',
+            // 'RESPONSABLE_RH'              => 'rh-dashboard',
+        ];
+
+        $code = $roleCode ? $roleCode->code : '';
+        redirect($landingByRole[$code] ?? 'main-dashboard');
     }
 
     public function logout()

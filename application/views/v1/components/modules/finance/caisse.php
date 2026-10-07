@@ -35,940 +35,940 @@ PAGE : GESTION DES CAISSES (PRINCIPALE + SECONDAIRE UNIQUES)
 MODULE : DAF / FINANCE / TRESORERIE
 ========================================================== -->
 <style>
-:root {
-    --caisse-primary: #0f766e;
-    --caisse-primary-dark: #115e59;
-    --caisse-secondary: #102033;
-    --caisse-success: #16a34a;
-    --caisse-warning: #f59e0b;
-    --caisse-danger: #dc2626;
-    --caisse-info: #0284c7;
-    --caisse-purple: #7c3aed;
-    --caisse-border: #e2e8f0;
-    --caisse-text: #334155;
-    --caisse-muted: #64748b;
-}
-
-.content-wrapper {
-    background: #f4f7f6;
-}
-
-.caisse-page {
-    font-family: "Segoe UI", Arial, sans-serif;
-    color: var(--caisse-text);
-}
-
-/* ============ EN-TÊTE ============ */
-.caisse-hero {
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 22px;
-    padding: 24px 26px;
-    color: #fff;
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(15, 118, 110, .98), rgba(16, 32, 51, .98));
-    box-shadow: 0 10px 30px rgba(15, 118, 110, .18);
-}
-
-.caisse-hero::before {
-    position: absolute;
-    top: -80px;
-    right: -50px;
-    width: 220px;
-    height: 220px;
-    content: "";
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .08);
-}
-
-.caisse-hero-content {
-    position: relative;
-    z-index: 2;
-}
-
-.caisse-hero-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 7px;
-    font-size: 25px;
-    font-weight: 800;
-}
-
-.caisse-hero-title-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 45px;
-    height: 45px;
-    margin-right: 13px;
-    border-radius: 13px;
-    background: rgba(255, 255, 255, .16);
-}
-
-.caisse-hero p {
-    max-width: 780px;
-    margin: 0;
-    color: rgba(255, 255, 255, .85);
-    font-size: 14px;
-}
-
-.caisse-date-box {
-    min-width: 190px;
-    padding: 12px 15px;
-    text-align: right;
-    border: 1px solid rgba(255, 255, 255, .18);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, .10);
-}
-
-.caisse-date-box small {
-    display: block;
-    margin-bottom: 3px;
-    color: rgba(255, 255, 255, .75);
-}
-
-.caisse-date-box strong {
-    font-size: 14px;
-    font-weight: 700;
-}
-
-/* ============ BOUTONS ============ */
-.btn-caisse-primary,
-.btn-caisse-outline {
-    min-height: 40px;
-    padding: 9px 15px;
-    border-radius: 9px;
-    font-size: 13px;
-    font-weight: 700;
-    transition: all .2s ease;
-}
-
-.btn-caisse-primary {
-    color: #fff;
-    border: 1px solid var(--caisse-primary);
-    background: var(--caisse-primary);
-}
-
-.btn-caisse-primary:hover {
-    color: #fff;
-    border-color: var(--caisse-primary-dark);
-    background: var(--caisse-primary-dark);
-    transform: translateY(-1px);
-}
-
-.btn-caisse-outline {
-    color: var(--caisse-primary);
-    border: 1px solid #b8d8d4;
-    background: #fff;
-}
-
-.btn-caisse-outline:hover {
-    color: #fff;
-    border-color: var(--caisse-primary);
-    background: var(--caisse-primary);
-}
-
-/* ============ KPI ============ */
-.caisse-stat-card {
-    position: relative;
-    overflow: hidden;
-    min-height: 148px;
-    margin-bottom: 20px;
-    padding: 20px;
-    border: 1px solid var(--caisse-border);
-    border-radius: 15px;
-    background: #fff;
-    box-shadow: 0 7px 25px rgba(15, 23, 42, .06);
-    transition: all .2s ease;
-}
-
-.caisse-stat-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 30px rgba(15, 23, 42, .10);
-}
-
-.caisse-stat-card::after {
-    position: absolute;
-    right: -32px;
-    bottom: -35px;
-    width: 110px;
-    height: 110px;
-    content: "";
-    border-radius: 50%;
-    background: rgba(15, 118, 110, .06);
-}
-
-.caisse-stat-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 14px;
-}
-
-.caisse-stat-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 13px;
-    font-size: 19px;
-}
-
-.icon-green {
-    color: #15803d;
-    background: #dcfce7;
-}
-
-.icon-blue {
-    color: #0369a1;
-    background: #e0f2fe;
-}
-
-.icon-orange {
-    color: #b45309;
-    background: #fef3c7;
-}
-
-.icon-red {
-    color: #b91c1c;
-    background: #fee2e2;
-}
-
-.icon-purple {
-    color: #6d28d9;
-    background: #ede9fe;
-}
-
-.caisse-stat-badge {
-    padding: 5px 9px;
-    border-radius: 30px;
-    font-size: 10px;
-    font-weight: 800;
-}
-
-.badge-positive {
-    color: #15803d;
-    background: #dcfce7;
-}
-
-.badge-neutral {
-    color: #0369a1;
-    background: #e0f2fe;
-}
-
-.badge-negative {
-    color: #b91c1c;
-    background: #fee2e2;
-}
-
-.caisse-stat-label {
-    margin-bottom: 5px;
-    color: var(--caisse-muted);
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .4px;
-}
-
-.caisse-stat-value {
-    margin-bottom: 4px;
-    color: var(--caisse-secondary);
-    font-size: 22px;
-    font-weight: 800;
-    line-height: 1.2;
-}
-
-.caisse-stat-footer {
-    color: var(--caisse-muted);
-    font-size: 11px;
-}
-
-/* ============ CARTES ============ */
-.caisse-card {
-    margin-bottom: 22px;
-    border: 1px solid var(--caisse-border);
-    border-radius: 15px;
-    background: #fff;
-    box-shadow: 0 7px 24px rgba(15, 23, 42, .05);
-}
-
-.caisse-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 64px;
-    padding: 15px 20px;
-    border-bottom: 1px solid #edf2f7;
-}
-
-.caisse-card-title {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    color: var(--caisse-secondary);
-    font-size: 15px;
-    font-weight: 800;
-}
-
-.caisse-card-title i {
-    margin-right: 9px;
-    color: var(--caisse-primary);
-}
-
-.caisse-card-subtitle {
-    display: block;
-    margin-top: 3px;
-    color: var(--caisse-muted);
-    font-size: 11px;
-}
-
-.caisse-card-body {
-    padding: 20px;
-}
-
-/* ============ SCHÉMA DU FLUX ============ */
-.flux-steps {
-    display: grid;
-    grid-template-columns: 1fr 40px 1fr 40px 1fr;
-    align-items: stretch;
-}
-
-.flux-step {
-    padding: 18px;
-    border: 1px solid var(--caisse-border);
-    border-radius: 13px;
-    background: #f8fafc;
-    text-align: center;
-}
-
-.flux-step-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 46px;
-    height: 46px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    font-size: 18px;
-}
-
-.flux-step h6 {
-    margin: 0 0 5px;
-    color: var(--caisse-secondary);
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.flux-step p {
-    margin: 0;
-    color: var(--caisse-muted);
-    font-size: 10px;
-    line-height: 1.5;
-}
-
-.flux-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #94a3b8;
-    font-size: 18px;
-}
-
-@media (max-width: 991px) {
-    .flux-steps {
-        grid-template-columns: 1fr;
+    :root {
+        --caisse-primary: #0f766e;
+        --caisse-primary-dark: #115e59;
+        --caisse-secondary: #102033;
+        --caisse-success: #16a34a;
+        --caisse-warning: #f59e0b;
+        --caisse-danger: #dc2626;
+        --caisse-info: #0284c7;
+        --caisse-purple: #7c3aed;
+        --caisse-border: #e2e8f0;
+        --caisse-text: #334155;
+        --caisse-muted: #64748b;
     }
 
-    .flux-arrow {
-        transform: rotate(90deg);
-        padding: 6px 0;
+    .content-wrapper {
+        background: #f4f7f6;
     }
-}
 
-/* ============ CARTES CAISSE PRINCIPALE / SECONDAIRE ============ */
-.principal-box {
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 22px;
-    border: 1px solid rgba(124, 58, 237, .25);
-    border-radius: 15px;
-    background: linear-gradient(135deg, #fdfcff, #f3efff);
-}
+    .caisse-page {
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: var(--caisse-text);
+    }
 
-.principal-box.secondary-box {
-    border-color: rgba(2, 132, 199, .25);
-    background: linear-gradient(135deg, #fbfdff, #eff8ff);
-}
-
-.principal-box-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 18px 20px 8px;
-}
-
-.principal-box-name {
-    display: flex;
-    align-items: center;
-}
-
-.principal-box-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    margin-right: 12px;
-    color: #6d28d9;
-    border-radius: 13px;
-    background: #ede9fe;
-    font-size: 19px;
-}
-
-.secondary-box .principal-box-icon {
-    color: #0369a1;
-    background: #e0f2fe;
-}
-
-.principal-box-name h5 {
-    margin: 0 0 3px;
-    color: var(--caisse-secondary);
-    font-size: 15px;
-    font-weight: 800;
-}
-
-.principal-box-name small {
-    color: var(--caisse-muted);
-    font-size: 10px;
-    font-weight: 700;
-}
-
-.role-badge {
-    padding: 6px 11px;
-    border-radius: 30px;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
-.role-principale {
-    color: #6d28d9;
-    background: #ede9fe;
-}
-
-.role-secondaire {
-    color: #0369a1;
-    background: #e0f2fe;
-}
-
-.principal-box-balance {
-    padding: 6px 20px 14px;
-}
-
-.principal-box-balance span {
-    display: block;
-    margin-bottom: 2px;
-    color: var(--caisse-muted);
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.principal-box-balance strong {
-    color: var(--caisse-secondary);
-    font-size: 28px;
-    font-weight: 800;
-}
-
-.principal-box-stats {
-    display: flex;
-    flex-wrap: wrap;
-    border-top: 1px solid #ece6fb;
-    background: #fbfaff;
-}
-
-.secondary-box .principal-box-stats {
-    border-top-color: #e3f2fd;
-    background: #f8fcff;
-}
-
-.principal-stat {
-    flex: 1;
-    min-width: 140px;
-    padding: 12px 8px;
-    text-align: center;
-    border-right: 1px solid #ece6fb;
-}
-
-.secondary-box .principal-stat {
-    border-right-color: #e3f2fd;
-}
-
-.principal-stat:last-child {
-    border-right: none;
-}
-
-.principal-stat span {
-    display: block;
-    margin-bottom: 2px;
-    color: var(--caisse-muted);
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.principal-stat strong {
-    color: var(--caisse-secondary);
-    font-size: 12px;
-}
-
-.amount-in {
-    color: #15803d;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.amount-out {
-    color: #b91c1c;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-/* ============ ACTIONS RAPIDES ============ */
-.quick-action {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    min-height: 104px;
-    padding: 16px;
-    overflow: hidden;
-    background: #fff;
-    border: 1px solid #d9e3ec;
-    border-radius: 14px;
-    color: #1e293b;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    transition: all .2s ease;
-}
-
-button.quick-action {
-    appearance: none;
-    font-family: inherit;
-}
-
-.quick-action:hover,
-.quick-action:focus {
-    color: #0f766e;
-    text-decoration: none;
-    border-color: rgba(15, 118, 110, .38);
-    box-shadow: 0 10px 24px rgba(15, 23, 42, .09);
-    transform: translateY(-3px);
-    outline: none;
-}
-
-.quick-action-icon {
-    position: relative;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 48px;
-    width: 48px;
-    height: 48px;
-    margin-right: 13px;
-    border-radius: 13px;
-    font-size: 19px;
-}
-
-.quick-action-content {
-    position: relative;
-    z-index: 2;
-    min-width: 0;
-}
-
-.quick-action-title {
-    display: block;
-    margin-bottom: 5px;
-    color: #243247;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-.quick-action-text {
-    display: block;
-    color: #64748b;
-    font-size: 11px;
-    line-height: 1.5;
-}
-
-/* ============ TABLEAU ============ */
-.caisse-table {
-    width: 100%;
-    margin-bottom: 0;
-}
-
-.caisse-table thead th {
-    padding: 12px 10px;
-    color: #475569;
-    border-top: none;
-    border-bottom: 1px solid #dfe7ed;
-    background: #f8fafc;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.caisse-table tbody td {
-    padding: 12px 10px;
-    vertical-align: middle;
-    border-top: 1px solid #edf2f7;
-    color: #475569;
-    font-size: 11px;
-}
-
-.caisse-table tbody tr:hover {
-    background: #f8fffd;
-}
-
-.operation-reference {
-    color: var(--caisse-secondary);
-    font-weight: 800;
-}
-
-.operation-label {
-    max-width: 230px;
-}
-
-.operation-label strong {
-    display: block;
-    margin-bottom: 2px;
-    color: var(--caisse-secondary);
-    font-size: 11px;
-}
-
-.operation-label small {
-    color: var(--caisse-muted);
-    font-size: 9px;
-}
-
-.badge-operation {
-    display: inline-flex;
-    align-items: center;
-    padding: 5px 8px;
-    border-radius: 30px;
-    font-size: 9px;
-    font-weight: 800;
-}
-
-.badge-entree {
-    color: #15803d;
-    background: #dcfce7;
-}
-
-.badge-sortie {
-    color: #b91c1c;
-    background: #fee2e2;
-}
-
-.badge-transfert {
-    color: #0369a1;
-    background: #e0f2fe;
-}
-
-.btn-table-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 31px;
-    height: 31px;
-    margin: 1px;
-    border: 1px solid #dbe4ea;
-    border-radius: 8px;
-    background: #fff;
-    font-size: 11px;
-}
-
-.btn-table-view {
-    color: #0369a1;
-}
-
-.btn-table-print {
-    color: #475569;
-}
-
-/* ============ ALERTES ============ */
-.treasury-alert {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 12px;
-    padding: 12px;
-    border: 1px solid;
-    border-radius: 11px;
-}
-
-.treasury-alert:last-child {
-    margin-bottom: 0;
-}
-
-.treasury-alert-icon {
-    display: flex;
-    flex: 0 0 36px;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    margin-right: 10px;
-    border-radius: 9px;
-}
-
-.treasury-alert h6 {
-    margin: 0 0 3px;
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.treasury-alert p {
-    margin: 0;
-    font-size: 10px;
-    line-height: 1.4;
-}
-
-.alert-danger-soft {
-    color: #991b1b;
-    border-color: #fecaca;
-    background: #fff7f7;
-}
-
-.alert-danger-soft .treasury-alert-icon {
-    background: #fee2e2;
-}
-
-.alert-warning-soft {
-    color: #92400e;
-    border-color: #fde68a;
-    background: #fffbeb;
-}
-
-.alert-warning-soft .treasury-alert-icon {
-    background: #fef3c7;
-}
-
-.alert-info-soft {
-    color: #075985;
-    border-color: #bae6fd;
-    background: #f0f9ff;
-}
-
-.alert-info-soft .treasury-alert-icon {
-    background: #e0f2fe;
-}
-
-/* ============ DÉPENSES / CHANTIERS ============ */
-.expense-item {
-    margin-bottom: 18px;
-}
-
-.expense-item:last-child {
-    margin-bottom: 0;
-}
-
-.expense-item-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 7px;
-}
-
-.expense-item-title {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    color: #334155;
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.expense-item-title i {
-    flex: 0 0 25px;
-    width: 25px;
-    color: #0f766e;
-}
-
-.expense-item-value {
-    margin-left: 10px;
-    color: #102033;
-    font-size: 11px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.expense-progress {
-    width: 100%;
-    height: 7px;
-    overflow: hidden;
-    border-radius: 20px;
-    background: #e9eef3;
-}
-
-.expense-progress span {
-    display: block;
-    height: 100%;
-    border-radius: 20px;
-    background: linear-gradient(90deg, #14b8a6, #0f766e);
-}
-
-.expense-progress span.bar-orange {
-    background: linear-gradient(90deg, #fbbf24, #f59e0b);
-}
-
-.expense-progress span.bar-blue {
-    background: linear-gradient(90deg, #38bdf8, #0284c7);
-}
-
-.expense-progress span.bar-red {
-    background: linear-gradient(90deg, #f87171, #dc2626);
-}
-
-/* ============ GRAPHIQUE ============ */
-.cashflow-summary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 18px;
-}
-
-.cashflow-summary-item {
-    padding: 11px 13px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    background: #f8fafc;
-}
-
-.cashflow-summary-item span {
-    display: block;
-    margin-bottom: 4px;
-    color: #64748b;
-    font-size: 9px;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-.cashflow-summary-item strong {
-    display: block;
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.cashflow-chart-wrapper {
-    position: relative;
-    width: 100%;
-    height: 305px;
-}
-
-.cashflow-chart-wrapper canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* ============ MODALES ============ */
-.modal-caisse .modal-content {
-    overflow: hidden;
-    border: none;
-    border-radius: 15px;
-    box-shadow: 0 20px 45px rgba(15, 23, 42, .20);
-}
-
-.modal-caisse .modal-header {
-    color: #fff;
-    border-bottom: none;
-    background: linear-gradient(135deg, #0f766e, #102033);
-}
-
-.modal-caisse .modal-title {
-    font-size: 16px;
-    font-weight: 800;
-}
-
-.modal-caisse .close {
-    color: #fff;
-    opacity: .9;
-}
-
-.modal-caisse label {
-    margin-bottom: 6px;
-    color: #475569;
-    font-size: 11px;
-    font-weight: 800;
-}
-
-.modal-caisse .form-control {
-    min-height: 42px;
-    border: 1px solid #dbe4ea;
-    border-radius: 8px;
-    font-size: 12px;
-}
-
-.modal-caisse textarea.form-control {
-    min-height: 90px;
-}
-
-.required-star {
-    color: #dc2626;
-}
-
-.cashbox-selected-balance {
-    margin-top: 8px;
-    padding: 8px 12px;
-    border: 1px solid #99d5ce;
-    border-radius: 9px;
-    background: #f0fdfa;
-}
-
-.cashbox-selected-balance small {
-    display: block;
-    color: #0f766e;
-    font-size: 9px;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-
-.cashbox-selected-balance strong {
-    color: var(--caisse-secondary);
-    font-size: 13px;
-}
-
-@media (max-width: 767px) {
+    /* ============ EN-TÊTE ============ */
     .caisse-hero {
-        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 22px;
+        padding: 24px 26px;
+        color: #fff;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(15, 118, 110, .98), rgba(16, 32, 51, .98));
+        box-shadow: 0 10px 30px rgba(15, 118, 110, .18);
+    }
+
+    .caisse-hero::before {
+        position: absolute;
+        top: -80px;
+        right: -50px;
+        width: 220px;
+        height: 220px;
+        content: "";
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .08);
+    }
+
+    .caisse-hero-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .caisse-hero-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 7px;
+        font-size: 25px;
+        font-weight: 800;
+    }
+
+    .caisse-hero-title-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 45px;
+        height: 45px;
+        margin-right: 13px;
+        border-radius: 13px;
+        background: rgba(255, 255, 255, .16);
+    }
+
+    .caisse-hero p {
+        max-width: 780px;
+        margin: 0;
+        color: rgba(255, 255, 255, .85);
+        font-size: 14px;
     }
 
     .caisse-date-box {
-        margin-top: 15px;
-        text-align: left;
+        min-width: 190px;
+        padding: 12px 15px;
+        text-align: right;
+        border: 1px solid rgba(255, 255, 255, .18);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, .10);
     }
 
-    .caisse-card-header {
+    .caisse-date-box small {
         display: block;
+        margin-bottom: 3px;
+        color: rgba(255, 255, 255, .75);
     }
 
-    .caisse-stat-value {
+    .caisse-date-box strong {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    /* ============ BOUTONS ============ */
+    .btn-caisse-primary,
+    .btn-caisse-outline {
+        min-height: 40px;
+        padding: 9px 15px;
+        border-radius: 9px;
+        font-size: 13px;
+        font-weight: 700;
+        transition: all .2s ease;
+    }
+
+    .btn-caisse-primary {
+        color: #fff;
+        border: 1px solid var(--caisse-primary);
+        background: var(--caisse-primary);
+    }
+
+    .btn-caisse-primary:hover {
+        color: #fff;
+        border-color: var(--caisse-primary-dark);
+        background: var(--caisse-primary-dark);
+        transform: translateY(-1px);
+    }
+
+    .btn-caisse-outline {
+        color: var(--caisse-primary);
+        border: 1px solid #b8d8d4;
+        background: #fff;
+    }
+
+    .btn-caisse-outline:hover {
+        color: #fff;
+        border-color: var(--caisse-primary);
+        background: var(--caisse-primary);
+    }
+
+    /* ============ KPI ============ */
+    .caisse-stat-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 148px;
+        margin-bottom: 20px;
+        padding: 20px;
+        border: 1px solid var(--caisse-border);
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 7px 25px rgba(15, 23, 42, .06);
+        transition: all .2s ease;
+    }
+
+    .caisse-stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(15, 23, 42, .10);
+    }
+
+    .caisse-stat-card::after {
+        position: absolute;
+        right: -32px;
+        bottom: -35px;
+        width: 110px;
+        height: 110px;
+        content: "";
+        border-radius: 50%;
+        background: rgba(15, 118, 110, .06);
+    }
+
+    .caisse-stat-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 14px;
+    }
+
+    .caisse-stat-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 13px;
         font-size: 19px;
     }
 
+    .icon-green {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    .icon-blue {
+        color: #0369a1;
+        background: #e0f2fe;
+    }
+
+    .icon-orange {
+        color: #b45309;
+        background: #fef3c7;
+    }
+
+    .icon-red {
+        color: #b91c1c;
+        background: #fee2e2;
+    }
+
+    .icon-purple {
+        color: #6d28d9;
+        background: #ede9fe;
+    }
+
+    .caisse-stat-badge {
+        padding: 5px 9px;
+        border-radius: 30px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .badge-positive {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    .badge-neutral {
+        color: #0369a1;
+        background: #e0f2fe;
+    }
+
+    .badge-negative {
+        color: #b91c1c;
+        background: #fee2e2;
+    }
+
+    .caisse-stat-label {
+        margin-bottom: 5px;
+        color: var(--caisse-muted);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+    }
+
+    .caisse-stat-value {
+        margin-bottom: 4px;
+        color: var(--caisse-secondary);
+        font-size: 22px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    .caisse-stat-footer {
+        color: var(--caisse-muted);
+        font-size: 11px;
+    }
+
+    /* ============ CARTES ============ */
+    .caisse-card {
+        margin-bottom: 22px;
+        border: 1px solid var(--caisse-border);
+        border-radius: 15px;
+        background: #fff;
+        box-shadow: 0 7px 24px rgba(15, 23, 42, .05);
+    }
+
+    .caisse-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 64px;
+        padding: 15px 20px;
+        border-bottom: 1px solid #edf2f7;
+    }
+
+    .caisse-card-title {
+        display: flex;
+        align-items: center;
+        margin: 0;
+        color: var(--caisse-secondary);
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .caisse-card-title i {
+        margin-right: 9px;
+        color: var(--caisse-primary);
+    }
+
+    .caisse-card-subtitle {
+        display: block;
+        margin-top: 3px;
+        color: var(--caisse-muted);
+        font-size: 11px;
+    }
+
+    .caisse-card-body {
+        padding: 20px;
+    }
+
+    /* ============ SCHÉMA DU FLUX ============ */
+    .flux-steps {
+        display: grid;
+        grid-template-columns: 1fr 40px 1fr 40px 1fr;
+        align-items: stretch;
+    }
+
+    .flux-step {
+        padding: 18px;
+        border: 1px solid var(--caisse-border);
+        border-radius: 13px;
+        background: #f8fafc;
+        text-align: center;
+    }
+
+    .flux-step-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 46px;
+        height: 46px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+        font-size: 18px;
+    }
+
+    .flux-step h6 {
+        margin: 0 0 5px;
+        color: var(--caisse-secondary);
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    .flux-step p {
+        margin: 0;
+        color: var(--caisse-muted);
+        font-size: 10px;
+        line-height: 1.5;
+    }
+
+    .flux-arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 18px;
+    }
+
+    @media (max-width: 991px) {
+        .flux-steps {
+            grid-template-columns: 1fr;
+        }
+
+        .flux-arrow {
+            transform: rotate(90deg);
+            padding: 6px 0;
+        }
+    }
+
+    /* ============ CARTES CAISSE PRINCIPALE / SECONDAIRE ============ */
+    .principal-box {
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 22px;
+        border: 1px solid rgba(124, 58, 237, .25);
+        border-radius: 15px;
+        background: linear-gradient(135deg, #fdfcff, #f3efff);
+    }
+
+    .principal-box.secondary-box {
+        border-color: rgba(2, 132, 199, .25);
+        background: linear-gradient(135deg, #fbfdff, #eff8ff);
+    }
+
+    .principal-box-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 18px 20px 8px;
+    }
+
+    .principal-box-name {
+        display: flex;
+        align-items: center;
+    }
+
+    .principal-box-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        margin-right: 12px;
+        color: #6d28d9;
+        border-radius: 13px;
+        background: #ede9fe;
+        font-size: 19px;
+    }
+
+    .secondary-box .principal-box-icon {
+        color: #0369a1;
+        background: #e0f2fe;
+    }
+
+    .principal-box-name h5 {
+        margin: 0 0 3px;
+        color: var(--caisse-secondary);
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .principal-box-name small {
+        color: var(--caisse-muted);
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+    .role-badge {
+        padding: 6px 11px;
+        border-radius: 30px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .role-principale {
+        color: #6d28d9;
+        background: #ede9fe;
+    }
+
+    .role-secondaire {
+        color: #0369a1;
+        background: #e0f2fe;
+    }
+
+    .principal-box-balance {
+        padding: 6px 20px 14px;
+    }
+
+    .principal-box-balance span {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--caisse-muted);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .principal-box-balance strong {
+        color: var(--caisse-secondary);
+        font-size: 28px;
+        font-weight: 800;
+    }
+
+    .principal-box-stats {
+        display: flex;
+        flex-wrap: wrap;
+        border-top: 1px solid #ece6fb;
+        background: #fbfaff;
+    }
+
+    .secondary-box .principal-box-stats {
+        border-top-color: #e3f2fd;
+        background: #f8fcff;
+    }
+
+    .principal-stat {
+        flex: 1;
+        min-width: 140px;
+        padding: 12px 8px;
+        text-align: center;
+        border-right: 1px solid #ece6fb;
+    }
+
+    .secondary-box .principal-stat {
+        border-right-color: #e3f2fd;
+    }
+
+    .principal-stat:last-child {
+        border-right: none;
+    }
+
+    .principal-stat span {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--caisse-muted);
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .principal-stat strong {
+        color: var(--caisse-secondary);
+        font-size: 12px;
+    }
+
+    .amount-in {
+        color: #15803d;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .amount-out {
+        color: #b91c1c;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    /* ============ ACTIONS RAPIDES ============ */
+    .quick-action {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 104px;
+        padding: 16px;
+        overflow: hidden;
+        background: #fff;
+        border: 1px solid #d9e3ec;
+        border-radius: 14px;
+        color: #1e293b;
+        text-align: left;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all .2s ease;
+    }
+
+    button.quick-action {
+        appearance: none;
+        font-family: inherit;
+    }
+
+    .quick-action:hover,
+    .quick-action:focus {
+        color: #0f766e;
+        text-decoration: none;
+        border-color: rgba(15, 118, 110, .38);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, .09);
+        transform: translateY(-3px);
+        outline: none;
+    }
+
+    .quick-action-icon {
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 48px;
+        width: 48px;
+        height: 48px;
+        margin-right: 13px;
+        border-radius: 13px;
+        font-size: 19px;
+    }
+
+    .quick-action-content {
+        position: relative;
+        z-index: 2;
+        min-width: 0;
+    }
+
+    .quick-action-title {
+        display: block;
+        margin-bottom: 5px;
+        color: #243247;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .quick-action-text {
+        display: block;
+        color: #64748b;
+        font-size: 11px;
+        line-height: 1.5;
+    }
+
+    /* ============ TABLEAU ============ */
+    .caisse-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .caisse-table thead th {
+        padding: 12px 10px;
+        color: #475569;
+        border-top: none;
+        border-bottom: 1px solid #dfe7ed;
+        background: #f8fafc;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .caisse-table tbody td {
+        padding: 12px 10px;
+        vertical-align: middle;
+        border-top: 1px solid #edf2f7;
+        color: #475569;
+        font-size: 11px;
+    }
+
+    .caisse-table tbody tr:hover {
+        background: #f8fffd;
+    }
+
+    .operation-reference {
+        color: var(--caisse-secondary);
+        font-weight: 800;
+    }
+
+    .operation-label {
+        max-width: 230px;
+    }
+
+    .operation-label strong {
+        display: block;
+        margin-bottom: 2px;
+        color: var(--caisse-secondary);
+        font-size: 11px;
+    }
+
+    .operation-label small {
+        color: var(--caisse-muted);
+        font-size: 9px;
+    }
+
+    .badge-operation {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 8px;
+        border-radius: 30px;
+        font-size: 9px;
+        font-weight: 800;
+    }
+
+    .badge-entree {
+        color: #15803d;
+        background: #dcfce7;
+    }
+
+    .badge-sortie {
+        color: #b91c1c;
+        background: #fee2e2;
+    }
+
+    .badge-transfert {
+        color: #0369a1;
+        background: #e0f2fe;
+    }
+
+    .btn-table-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 31px;
+        height: 31px;
+        margin: 1px;
+        border: 1px solid #dbe4ea;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 11px;
+    }
+
+    .btn-table-view {
+        color: #0369a1;
+    }
+
+    .btn-table-print {
+        color: #475569;
+    }
+
+    /* ============ ALERTES ============ */
+    .treasury-alert {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 12px;
+        padding: 12px;
+        border: 1px solid;
+        border-radius: 11px;
+    }
+
+    .treasury-alert:last-child {
+        margin-bottom: 0;
+    }
+
+    .treasury-alert-icon {
+        display: flex;
+        flex: 0 0 36px;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        margin-right: 10px;
+        border-radius: 9px;
+    }
+
+    .treasury-alert h6 {
+        margin: 0 0 3px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .treasury-alert p {
+        margin: 0;
+        font-size: 10px;
+        line-height: 1.4;
+    }
+
+    .alert-danger-soft {
+        color: #991b1b;
+        border-color: #fecaca;
+        background: #fff7f7;
+    }
+
+    .alert-danger-soft .treasury-alert-icon {
+        background: #fee2e2;
+    }
+
+    .alert-warning-soft {
+        color: #92400e;
+        border-color: #fde68a;
+        background: #fffbeb;
+    }
+
+    .alert-warning-soft .treasury-alert-icon {
+        background: #fef3c7;
+    }
+
+    .alert-info-soft {
+        color: #075985;
+        border-color: #bae6fd;
+        background: #f0f9ff;
+    }
+
+    .alert-info-soft .treasury-alert-icon {
+        background: #e0f2fe;
+    }
+
+    /* ============ DÉPENSES / CHANTIERS ============ */
+    .expense-item {
+        margin-bottom: 18px;
+    }
+
+    .expense-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .expense-item-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 7px;
+    }
+
+    .expense-item-title {
+        display: flex;
+        align-items: center;
+        min-width: 0;
+        color: #334155;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .expense-item-title i {
+        flex: 0 0 25px;
+        width: 25px;
+        color: #0f766e;
+    }
+
+    .expense-item-value {
+        margin-left: 10px;
+        color: #102033;
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .expense-progress {
+        width: 100%;
+        height: 7px;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #e9eef3;
+    }
+
+    .expense-progress span {
+        display: block;
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, #14b8a6, #0f766e);
+    }
+
+    .expense-progress span.bar-orange {
+        background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    }
+
+    .expense-progress span.bar-blue {
+        background: linear-gradient(90deg, #38bdf8, #0284c7);
+    }
+
+    .expense-progress span.bar-red {
+        background: linear-gradient(90deg, #f87171, #dc2626);
+    }
+
+    /* ============ GRAPHIQUE ============ */
     .cashflow-summary {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .cashflow-summary-item {
+        padding: 11px 13px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+    }
+
+    .cashflow-summary-item span {
+        display: block;
+        margin-bottom: 4px;
+        color: #64748b;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .cashflow-summary-item strong {
+        display: block;
+        font-size: 13px;
+        font-weight: 800;
     }
 
     .cashflow-chart-wrapper {
-        height: 260px;
+        position: relative;
+        width: 100%;
+        height: 305px;
     }
-}
+
+    .cashflow-chart-wrapper canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    /* ============ MODALES ============ */
+    .modal-caisse .modal-content {
+        overflow: hidden;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, .20);
+    }
+
+    .modal-caisse .modal-header {
+        color: #fff;
+        border-bottom: none;
+        background: linear-gradient(135deg, #0f766e, #102033);
+    }
+
+    .modal-caisse .modal-title {
+        font-size: 16px;
+        font-weight: 800;
+    }
+
+    .modal-caisse .close {
+        color: #fff;
+        opacity: .9;
+    }
+
+    .modal-caisse label {
+        margin-bottom: 6px;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .modal-caisse .form-control {
+        min-height: 42px;
+        border: 1px solid #dbe4ea;
+        border-radius: 8px;
+        font-size: 12px;
+    }
+
+    .modal-caisse textarea.form-control {
+        min-height: 90px;
+    }
+
+    .required-star {
+        color: #dc2626;
+    }
+
+    .cashbox-selected-balance {
+        margin-top: 8px;
+        padding: 8px 12px;
+        border: 1px solid #99d5ce;
+        border-radius: 9px;
+        background: #f0fdfa;
+    }
+
+    .cashbox-selected-balance small {
+        display: block;
+        color: #0f766e;
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+    }
+
+    .cashbox-selected-balance strong {
+        color: var(--caisse-secondary);
+        font-size: 13px;
+    }
+
+    @media (max-width: 767px) {
+        .caisse-hero {
+            padding: 20px;
+        }
+
+        .caisse-date-box {
+            margin-top: 15px;
+            text-align: left;
+        }
+
+        .caisse-card-header {
+            display: block;
+        }
+
+        .caisse-stat-value {
+            font-size: 19px;
+        }
+
+        .cashflow-summary {
+            grid-template-columns: 1fr;
+        }
+
+        .cashflow-chart-wrapper {
+            height: 260px;
+        }
+    }
 </style>
 
 <div class="content-wrapper caisse-page">
@@ -1157,7 +1157,7 @@ button.quick-action {
                         <div class="caisse-stat-footer">
                             <?= number_format($sPercentage, 1, ',', ' ') ?> % du solde global
                             <?php if ($sThreshold > 0): ?> — seuil
-                            <?= formatCashboxAmount($sThreshold) ?><?php endif; ?>
+                                <?= formatCashboxAmount($sThreshold) ?><?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1223,10 +1223,10 @@ button.quick-action {
                         <i class="fas fa-arrow-down mr-1"></i> Encaisser
                     </button>
                     <?php if ($principal): ?>
-                    <a href="<?= base_url('finance-cashbox/' . (int) $principal->id) ?>"
-                        class="btn btn-caisse-outline mb-2">
-                        <i class="fas fa-book mr-1"></i> Livre de la caisse principale
-                    </a>
+                        <a href="<?= base_url('finance-cashbox/' . (int) $principal->id) ?>"
+                            class="btn btn-caisse-outline mb-2">
+                            <i class="fas fa-book mr-1"></i> Livre de la caisse principale
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1275,10 +1275,10 @@ button.quick-action {
                         <i class="fas fa-exchange-alt mr-1"></i> Demander un approvisionnement
                     </button>
                     <?php if ($secondary): ?>
-                    <a href="<?= base_url('finance-cashbox/' . (int) $secondary->id) ?>"
-                        class="btn btn-caisse-outline mb-2">
-                        <i class="fas fa-book mr-1"></i> Livre de la caisse secondaire
-                    </a>
+                        <a href="<?= base_url('finance-cashbox/' . (int) $secondary->id) ?>"
+                            class="btn btn-caisse-outline mb-2">
+                            <i class="fas fa-book mr-1"></i> Livre de la caisse secondaire
+                        </a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -1454,16 +1454,16 @@ button.quick-action {
                                 <span class="caisse-card-subtitle">Situations nécessitant une intervention.</span>
                             </div>
                             <?php if ($alertsCount > 0): ?>
-                            <span class="badge badge-danger"><?= $alertsCount ?>
-                                alerte<?= $alertsCount > 1 ? 's' : '' ?></span>
+                                <span class="badge badge-danger"><?= $alertsCount ?>
+                                    alerte<?= $alertsCount > 1 ? 's' : '' ?></span>
                             <?php else: ?>
-                            <span class="badge badge-success">Aucune alerte</span>
+                                <span class="badge badge-success">Aucune alerte</span>
                             <?php endif; ?>
                         </div>
                         <div class="caisse-card-body">
                             <?php if (!empty($alerts)): ?>
-                            <?php foreach ($alerts as $alert): ?>
-                            <?php
+                                <?php foreach ($alerts as $alert): ?>
+                                    <?php
                                     $alertClass = 'alert-info-soft';
                                     if ($alert['type'] === 'danger') {
                                         $alertClass = 'alert-danger-soft';
@@ -1471,24 +1471,24 @@ button.quick-action {
                                         $alertClass = 'alert-warning-soft';
                                     }
                                     ?>
-                            <div class="treasury-alert <?= $alertClass ?>">
-                                <div class="treasury-alert-icon"><i class="<?= html_escape($alert['icon']) ?>"></i>
-                                </div>
-                                <div>
-                                    <h6><?= html_escape($alert['title']) ?></h6>
-                                    <p><?= html_escape($alert['message']) ?></p>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
+                                    <div class="treasury-alert <?= $alertClass ?>">
+                                        <div class="treasury-alert-icon"><i class="<?= html_escape($alert['icon']) ?>"></i>
+                                        </div>
+                                        <div>
+                                            <h6><?= html_escape($alert['title']) ?></h6>
+                                            <p><?= html_escape($alert['message']) ?></p>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                            <div class="text-center py-4">
-                                <div class="mb-3" style="color:#16a34a; font-size:40px;"><i
-                                        class="fas fa-check-circle"></i></div>
-                                <h6 style="color:#102033; font-weight:800;">Trésorerie sous contrôle</h6>
-                                <p class="text-muted mb-0" style="font-size:10px;">
-                                    Aucun solde critique ni paiement en attente.
-                                </p>
-                            </div>
+                                <div class="text-center py-4">
+                                    <div class="mb-3" style="color:#16a34a; font-size:40px;"><i
+                                            class="fas fa-check-circle"></i></div>
+                                    <h6 style="color:#102033; font-weight:800;">Trésorerie sous contrôle</h6>
+                                    <p class="text-muted mb-0" style="font-size:10px;">
+                                        Aucun solde critique ni paiement en attente.
+                                    </p>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -1532,8 +1532,8 @@ button.quick-action {
                         </thead>
                         <tbody>
                             <?php if (!empty($recentMovements)): ?>
-                            <?php foreach ($recentMovements as $index => $movement): ?>
-                            <?php
+                                <?php foreach ($recentMovements as $index => $movement): ?>
+                                    <?php
                                     /* Type d'opération */
                                     $typeLabel = 'Opération';
                                     $typeClass = 'badge-transfert';
@@ -1559,80 +1559,80 @@ button.quick-action {
                                         $statusClass = 'badge-danger';
                                     }
                                     ?>
-                            <tr>
-                                <td><?= $index + 1 ?></td>
-                                <td>
-                                    <?= formatCashboxDate($movement['movement_date']) ?>
-                                    <small
-                                        class="d-block text-muted"><?= formatCashboxTime($movement['created_at']) ?></small>
-                                </td>
-                                <td><span class="operation-reference"><?= html_escape($movement['reference']) ?></span>
-                                </td>
-                                <td>
-                                    <strong><?= html_escape($movement['cashbox_name']) ?></strong>
-                                    <small
-                                        class="d-block text-muted"><?= html_escape($movement['cashbox_code']) ?></small>
-                                </td>
-                                <td>
-                                    <span class="badge-operation <?= $typeClass ?>">
-                                        <i class="<?= $typeIcon ?> mr-1"></i> <?= $typeLabel ?>
-                                    </span>
-                                </td>
-                                <td class="operation-label">
-                                    <strong title="<?= html_escape($movement['label']) ?>">
-                                        <?= html_escape($movement['label']) ?>
-                                    </strong>
-                                    <?php if ($movement['secondary_label'] !== ''): ?>
-                                    <small><?= html_escape($movement['secondary_label']) ?></small>
-                                    <?php elseif (!empty($movement['category'])): ?>
-                                    <small>Catégorie : <?= html_escape($movement['category']) ?></small>
-                                    <?php endif; ?>
-                                </td>
-                                <td
-                                    class="text-right <?= $movement['entry_amount'] !== null ? 'amount-in' : 'text-muted' ?>">
-                                    <?php if ($movement['entry_amount'] !== null): ?>
-                                    + <?= formatCashboxAmount($movement['entry_amount']) ?>
-                                    <?php else: ?>
-                                    —
-                                    <?php endif; ?>
-                                </td>
-                                <td
-                                    class="text-right <?= $movement['output_amount'] !== null ? 'amount-out' : 'text-muted' ?>">
-                                    <?php if ($movement['output_amount'] !== null): ?>
-                                    - <?= formatCashboxAmount($movement['output_amount']) ?>
-                                    <?php else: ?>
-                                    —
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-right">
-                                    <strong><?= formatCashboxAmount($movement['balance_after']) ?></strong>
-                                    <small class="d-block text-muted"><?= html_escape($movement['currency']) ?></small>
-                                </td>
-                                <td><span class="badge <?= $statusClass ?>"><?= $statusLabel ?></span></td>
-                                <td class="text-center">
-                                    <button class="btn-table-action btn-table-view" title="Voir"><i
-                                            class="fas fa-eye"></i></button>
-                                    <button class="btn-table-action btn-table-print" title="Imprimer"><i
-                                            class="fas fa-print"></i></button>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
+                                    <tr>
+                                        <td><?= $index + 1 ?></td>
+                                        <td>
+                                            <?= formatCashboxDate($movement['movement_date']) ?>
+                                            <small
+                                                class="d-block text-muted"><?= formatCashboxTime($movement['created_at']) ?></small>
+                                        </td>
+                                        <td><span class="operation-reference"><?= html_escape($movement['reference']) ?></span>
+                                        </td>
+                                        <td>
+                                            <strong><?= html_escape($movement['cashbox_name']) ?></strong>
+                                            <small
+                                                class="d-block text-muted"><?= html_escape($movement['cashbox_code']) ?></small>
+                                        </td>
+                                        <td>
+                                            <span class="badge-operation <?= $typeClass ?>">
+                                                <i class="<?= $typeIcon ?> mr-1"></i> <?= $typeLabel ?>
+                                            </span>
+                                        </td>
+                                        <td class="operation-label">
+                                            <strong title="<?= html_escape($movement['label']) ?>">
+                                                <?= html_escape($movement['label']) ?>
+                                            </strong>
+                                            <?php if ($movement['secondary_label'] !== ''): ?>
+                                                <small><?= html_escape($movement['secondary_label']) ?></small>
+                                            <?php elseif (!empty($movement['category'])): ?>
+                                                <small>Catégorie : <?= html_escape($movement['category']) ?></small>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td
+                                            class="text-right <?= $movement['entry_amount'] !== null ? 'amount-in' : 'text-muted' ?>">
+                                            <?php if ($movement['entry_amount'] !== null): ?>
+                                                + <?= formatCashboxAmount($movement['entry_amount']) ?>
+                                            <?php else: ?>
+                                                —
+                                            <?php endif; ?>
+                                        </td>
+                                        <td
+                                            class="text-right <?= $movement['output_amount'] !== null ? 'amount-out' : 'text-muted' ?>">
+                                            <?php if ($movement['output_amount'] !== null): ?>
+                                                - <?= formatCashboxAmount($movement['output_amount']) ?>
+                                            <?php else: ?>
+                                                —
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-right">
+                                            <strong><?= formatCashboxAmount($movement['balance_after']) ?></strong>
+                                            <small class="d-block text-muted"><?= html_escape($movement['currency']) ?></small>
+                                        </td>
+                                        <td><span class="badge <?= $statusClass ?>"><?= $statusLabel ?></span></td>
+                                        <td class="text-center">
+                                            <button class="btn-table-action btn-table-view" title="Voir"><i
+                                                    class="fas fa-eye"></i></button>
+                                            <button class="btn-table-action btn-table-print" title="Imprimer"><i
+                                                    class="fas fa-print"></i></button>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                            <tr>
-                                <td colspan="11" class="text-center py-5">
-                                    <div class="mb-3" style="color:#cbd5e1; font-size:42px;">
-                                        <i class="fas fa-exchange-alt"></i>
-                                    </div>
-                                    <h6 style="color:#334155; font-weight:800;">Aucun mouvement enregistré</h6>
-                                    <p class="text-muted mb-3">
-                                        Les encaissements, approvisionnements et paiements DA apparaîtront ici.
-                                    </p>
-                                    <button type="button" class="btn btn-caisse-primary" data-toggle="modal"
-                                        data-target="#addOperationModal" onclick="prepareOperation('encaissement')">
-                                        <i class="fas fa-plus mr-1"></i> Enregistrer une opération
-                                    </button>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td colspan="11" class="text-center py-5">
+                                        <div class="mb-3" style="color:#cbd5e1; font-size:42px;">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                        <h6 style="color:#334155; font-weight:800;">Aucun mouvement enregistré</h6>
+                                        <p class="text-muted mb-3">
+                                            Les encaissements, approvisionnements et paiements DA apparaîtront ici.
+                                        </p>
+                                        <button type="button" class="btn btn-caisse-primary" data-toggle="modal"
+                                            data-target="#addOperationModal" onclick="prepareOperation('encaissement')">
+                                            <i class="fas fa-plus mr-1"></i> Enregistrer une opération
+                                        </button>
+                                    </td>
+                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
@@ -1688,61 +1688,149 @@ button.quick-action {
             }
             ?>
             <!-- =================================================
-     DÉPENSES PAR CATÉGORIE + CONSOMMATION PAR CHANTIER
-================================================== -->
+            DÉPENSES PAR CATÉGORIE + CONSOMMATION PAR CHANTIER
+        ================================================== -->
+            <?php
+            $expenseRange = isset($expenseRange) ? $expenseRange : [
+                'key' => 'month',
+                'label' => 'Ce mois',
+                'display' => '',
+                'options' => ['month' => 'Ce mois'],
+            ];
+            $baseQuery = $this->input->get() ?: [];
+            ?>
+            <style>
+                .period-filter-bar {
+                    display: flex;
+                    flex-wrap: wrap;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 16px;
+                    padding: 12px 16px;
+                    background: #fff;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                }
+
+                .period-filter-bar .pf-label {
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: #102033;
+                }
+
+                .period-filter-bar .pf-label small {
+                    display: block;
+                    font-weight: 500;
+                    color: #64748b;
+                    font-size: 12px;
+                }
+
+                .period-filter-pills {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 6px;
+                }
+
+                .period-filter-pills a {
+                    padding: 6px 14px;
+                    border-radius: 999px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: #475569;
+                    background: #f1f5f9;
+                    border: 1px solid transparent;
+                    text-decoration: none;
+                    transition: all .15s ease;
+                }
+
+                .period-filter-pills a:hover {
+                    background: #e2e8f0;
+                    color: #102033;
+                }
+
+                .period-filter-pills a.active {
+                    background: var(--caisse-primary, #2f6f68);
+                    color: #fff;
+                    border-color: var(--caisse-primary, #2f6f68);
+                }
+            </style>
+
+            <div id="depenses-chantier" class="period-filter-bar">
+                <div class="pf-label">
+                    <i class="fas fa-filter mr-1"></i> Période d'analyse
+                    <small><?= html_escape($expenseRange['label']) ?> ·
+                        <?= html_escape($expenseRange['display']) ?></small>
+                </div>
+                <div class="period-filter-pills">
+                    <?php foreach ($expenseRange['options'] as $key => $label): ?>
+                        <?php
+                        $q = $baseQuery;
+                        $q['expense_period'] = $key;
+                        $href = site_url('caisse') . '?' . http_build_query($q) . '#depenses-chantier';
+                        ?>
+                        <a href="<?= html_escape($href) ?>" class="<?= $key === $expenseRange['key'] ? 'active' : '' ?>">
+                            <?= html_escape($label) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
             <div class="row">
-                <!-- DÉPENSES DE LA SECONDAIRE (MOIS) -->
+                <!-- DÉPENSES DE LA SECONDAIRE -->
                 <div class="col-xl-5 col-lg-5">
                     <div class="caisse-card">
                         <div class="caisse-card-header">
                             <div>
                                 <h5 class="caisse-card-title"><i class="fas fa-chart-bar"></i> Dépenses de la secondaire
-                                    (mois)</h5>
+                                    <small
+                                        class="text-muted">(<?= html_escape(mb_strtolower($expenseRange['label'])) ?>)</small>
+                                </h5>
                                 <span class="caisse-card-subtitle">Répartition des paiements DA par catégorie.</span>
                             </div>
                             <?php if (!empty($categoryExpenses)): ?>
-                            <span class="badge badge-light">
-                                <?= count($categoryExpenses) ?> catégorie<?= count($categoryExpenses) > 1 ? 's' : '' ?>
-                            </span>
+                                <span class="badge badge-light">
+                                    <?= count($categoryExpenses) ?> catégorie<?= count($categoryExpenses) > 1 ? 's' : '' ?>
+                                </span>
                             <?php endif; ?>
                         </div>
                         <div class="caisse-card-body">
                             <?php if (!empty($categoryExpenses)): ?>
-                            <?php foreach ($categoryExpenses as $index => $expense): ?>
-                            <?php
+                                <?php foreach ($categoryExpenses as $index => $expense): ?>
+                                    <?php
                                     $barClass = isset($barClasses[$index % 4]) ? $barClasses[$index % 4] : '';
                                     $width = max(0, min(100, (float) $expense->percentage));
                                     if ($expense->total_amount > 0 && $width < 4) {
                                         $width = 4;
                                     }
                                     ?>
-                            <div class="expense-item">
-                                <div class="expense-item-header">
-                                    <span class="expense-item-title">
-                                        <i class="<?= html_escape(expenseCategoryIcon($expense->category_name)) ?>"></i>
-                                        <?= html_escape($expense->category_name) ?>
-                                        <small class="text-muted ml-1">(<?= $expense->total_operations ?>)</small>
-                                    </span>
-                                    <span class="expense-item-value">
-                                        <?= formatCashboxAmount($expense->total_amount) ?> BIF
-                                    </span>
-                                </div>
-                                <div class="expense-progress">
-                                    <span class="<?= $barClass ?>"
-                                        style="width: <?= number_format($width, 2, '.', '') ?>%;"></span>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
+                                    <div class="expense-item">
+                                        <div class="expense-item-header">
+                                            <span class="expense-item-title">
+                                                <i class="<?= html_escape(expenseCategoryIcon($expense->category_name)) ?>"></i>
+                                                <?= html_escape($expense->category_name) ?>
+                                                <small class="text-muted ml-1">(<?= $expense->total_operations ?>)</small>
+                                            </span>
+                                            <span class="expense-item-value">
+                                                <?= formatCashboxAmount($expense->total_amount) ?> BIF
+                                            </span>
+                                        </div>
+                                        <div class="expense-progress">
+                                            <span class="<?= $barClass ?>"
+                                                style="width: <?= number_format($width, 2, '.', '') ?>%;"></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                            <div class="text-center py-4">
-                                <div class="mb-3" style="color:#cbd5e1; font-size:40px;"><i
-                                        class="fas fa-chart-bar"></i></div>
-                                <h6 style="color:#334155; font-weight:800;">Aucune dépense ce mois</h6>
-                                <p class="text-muted mb-0">
-                                    Les paiements DA validés de la caisse secondaire
-                                    apparaîtront automatiquement ici.
-                                </p>
-                            </div>
+                                <div class="text-center py-4">
+                                    <div class="mb-3" style="color:#cbd5e1; font-size:40px;"><i
+                                            class="fas fa-chart-bar"></i></div>
+                                    <h6 style="color:#334155; font-weight:800;">Aucune dépense sur cette période</h6>
+                                    <p class="text-muted mb-0">
+                                        Aucun paiement DA validé de la caisse secondaire
+                                        entre le <?= html_escape($expenseRange['display']) ?>.
+                                    </p>
+                                </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -1754,54 +1842,57 @@ button.quick-action {
                         <div class="caisse-card-header">
                             <div>
                                 <h5 class="caisse-card-title"><i class="fas fa-project-diagram"></i> Consommation par
-                                    chantier</h5>
+                                    chantier
+                                    <small
+                                        class="text-muted">(<?= html_escape(mb_strtolower($expenseRange['label'])) ?>)</small>
+                                </h5>
                                 <span class="caisse-card-subtitle">DA payées par la caisse secondaire, par
                                     chantier.</span>
                             </div>
                             <?php if (!empty($chantierConsumption)): ?>
-                            <span class="badge badge-success">
-                                <?= count($chantierConsumption) ?>
-                                chantier<?= count($chantierConsumption) > 1 ? 's' : '' ?>
-                            </span>
+                                <span class="badge badge-success">
+                                    <?= count($chantierConsumption) ?>
+                                    chantier<?= count($chantierConsumption) > 1 ? 's' : '' ?>
+                                </span>
                             <?php endif; ?>
                         </div>
                         <div class="caisse-card-body">
                             <?php if (!empty($chantierConsumption)): ?>
-                            <?php foreach ($chantierConsumption as $index => $chantier): ?>
-                            <?php
+                                <?php foreach ($chantierConsumption as $index => $chantier): ?>
+                                    <?php
                                     $barClass = isset($barClasses[$index % 4]) ? $barClasses[$index % 4] : '';
                                     $width = max(0, min(100, (float) $chantier->percentage));
                                     if ($chantier->total_consumed > 0 && $width < 4) {
                                         $width = 4;
                                     }
                                     ?>
-                            <div class="expense-item">
-                                <div class="expense-item-header">
-                                    <span class="expense-item-title">
-                                        <i class="fas fa-hard-hat"></i>
-                                        <?= html_escape($chantier->display_name) ?>
-                                        <small class="text-muted ml-1">(<?= $chantier->da_count ?> DA)</small>
-                                    </span>
-                                    <span class="expense-item-value">
-                                        <?= formatCashboxAmount($chantier->total_consumed) ?> BIF
-                                    </span>
-                                </div>
-                                <div class="expense-progress">
-                                    <span class="<?= $barClass ?>"
-                                        style="width: <?= number_format($width, 2, '.', '') ?>%;"></span>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
+                                    <div class="expense-item">
+                                        <div class="expense-item-header">
+                                            <span class="expense-item-title">
+                                                <i class="fas fa-hard-hat"></i>
+                                                <?= html_escape($chantier->display_name) ?>
+                                                <small class="text-muted ml-1">(<?= $chantier->da_count ?> DA)</small>
+                                            </span>
+                                            <span class="expense-item-value">
+                                                <?= formatCashboxAmount($chantier->total_consumed) ?> BIF
+                                            </span>
+                                        </div>
+                                        <div class="expense-progress">
+                                            <span class="<?= $barClass ?>"
+                                                style="width: <?= number_format($width, 2, '.', '') ?>%;"></span>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
                             <?php else: ?>
-                            <div class="text-center py-4">
-                                <div class="mb-3" style="color:#cbd5e1; font-size:40px;"><i
-                                        class="fas fa-project-diagram"></i></div>
-                                <h6 style="color:#334155; font-weight:800;">Aucune consommation ce mois</h6>
-                                <p class="text-muted mb-0">
-                                    Les chantiers des demandes d'achat payées
-                                    apparaîtront automatiquement ici.
-                                </p>
-                            </div>
+                                <div class="text-center py-4">
+                                    <div class="mb-3" style="color:#cbd5e1; font-size:40px;"><i
+                                            class="fas fa-project-diagram"></i></div>
+                                    <h6 style="color:#334155; font-weight:800;">Aucune consommation sur cette période</h6>
+                                    <p class="text-muted mb-0">
+                                        Aucune demande d'achat payée
+                                        entre le <?= html_escape($expenseRange['display']) ?>.
+                                    </p>
+                                </div>
                             <?php endif; ?>
                             <div class="livre-note"
                                 style="margin-top: 18px; padding: 13px 16px; border: 1px dashed #cbd5e1; border-radius: 10px; background: #f8fafc; color: #64748b; font-size: 10px;">
@@ -1861,11 +1952,11 @@ MODALE : CRÉER UNE CAISSE (PRINCIPALE OU SECONDAIRE)
                                 </select>
                                 <small class="text-muted">
                                     <?php if (!empty($hasPrincipale) && !empty($hasSecondaire)): ?>
-                                    Les deux caisses existent déjà (unicité).
+                                        Les deux caisses existent déjà (unicité).
                                     <?php elseif (empty($hasPrincipale)): ?>
-                                    Commencez par créer la caisse principale.
+                                        Commencez par créer la caisse principale.
                                     <?php else: ?>
-                                    Créez maintenant la caisse secondaire.
+                                        Créez maintenant la caisse secondaire.
                                     <?php endif; ?>
                                 </small>
                             </div>
@@ -1954,17 +2045,17 @@ MODALE : NOUVELLE OPÉRATION (RÔLES VERROUILLÉS)
                                 <select name="cashbox_id" id="operationCashboxId" class="form-control" required>
                                     <option value="">Sélectionner la caisse</option>
                                     <?php if (!empty($allCashboxes)): ?>
-                                    <?php foreach ($allCashboxes as $cashboxOption): ?>
-                                    <option value="<?= (int) $cashboxOption->id ?>"
-                                        data-role="<?= html_escape($cashboxOption->role) ?>"
-                                        data-currency="<?= html_escape($cashboxOption->devise) ?>"
-                                        data-balance="<?= (float) $cashboxOption->current_balance ?>">
-                                        <?= html_escape($cashboxOption->code) ?> —
-                                        <?= html_escape($cashboxOption->name) ?> —
-                                        <?= number_format((float) $cashboxOption->current_balance, 0, ',', ' ') ?>
-                                        <?= html_escape($cashboxOption->devise) ?>
-                                    </option>
-                                    <?php endforeach; ?>
+                                        <?php foreach ($allCashboxes as $cashboxOption): ?>
+                                            <option value="<?= (int) $cashboxOption->id ?>"
+                                                data-role="<?= html_escape($cashboxOption->role) ?>"
+                                                data-currency="<?= html_escape($cashboxOption->devise) ?>"
+                                                data-balance="<?= (float) $cashboxOption->current_balance ?>">
+                                                <?= html_escape($cashboxOption->code) ?> —
+                                                <?= html_escape($cashboxOption->name) ?> —
+                                                <?= number_format((float) $cashboxOption->current_balance, 0, ',', ' ') ?>
+                                                <?= html_escape($cashboxOption->devise) ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
                                 <div id="selectedCashboxBalance" class="cashbox-selected-balance"
@@ -1981,18 +2072,18 @@ MODALE : NOUVELLE OPÉRATION (RÔLES VERROUILLÉS)
                                     disabled>
                                     <option value="">Sélectionner la destination</option>
                                     <?php if (!empty($allCashboxes)): ?>
-                                    <?php foreach ($allCashboxes as $cashboxOption): ?>
-                                    <?php if ($cashboxOption->role === 'secondaire'): ?>
-                                    <option value="<?= (int) $cashboxOption->id ?>" data-role="secondaire"
-                                        data-currency="<?= html_escape($cashboxOption->devise) ?>"
-                                        data-balance="<?= (float) $cashboxOption->current_balance ?>">
-                                        <?= html_escape($cashboxOption->code) ?> —
-                                        <?= html_escape($cashboxOption->name) ?> —
-                                        <?= number_format((float) $cashboxOption->current_balance, 0, ',', ' ') ?>
-                                        <?= html_escape($cashboxOption->devise) ?>
-                                    </option>
-                                    <?php endif; ?>
-                                    <?php endforeach; ?>
+                                        <?php foreach ($allCashboxes as $cashboxOption): ?>
+                                            <?php if ($cashboxOption->role === 'secondaire'): ?>
+                                                <option value="<?= (int) $cashboxOption->id ?>" data-role="secondaire"
+                                                    data-currency="<?= html_escape($cashboxOption->devise) ?>"
+                                                    data-balance="<?= (float) $cashboxOption->current_balance ?>">
+                                                    <?= html_escape($cashboxOption->code) ?> —
+                                                    <?= html_escape($cashboxOption->name) ?> —
+                                                    <?= number_format((float) $cashboxOption->current_balance, 0, ',', ' ') ?>
+                                                    <?= html_escape($cashboxOption->devise) ?>
+                                                </option>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
                             </div>
@@ -2003,8 +2094,8 @@ MODALE : NOUVELLE OPÉRATION (RÔLES VERROUILLÉS)
                                 <select name="purchase_request_id" id="purchaseRequestId" class="form-control" disabled>
                                     <option value="">Sélectionner la demande</option>
                                     <?php if (!empty($payablePurchaseRequests)): ?>
-                                    <?php foreach ($payablePurchaseRequests as $request): ?>
-                                    <?php
+                                        <?php foreach ($payablePurchaseRequests as $request): ?>
+                                            <?php
                                             /* Référence lisible : DA-AAAA-XXXX (id) */
                                             $requestYear = date(
                                                 'Y',
@@ -2020,22 +2111,22 @@ MODALE : NOUVELLE OPÉRATION (RÔLES VERROUILLÉS)
                                                 ? $request->summary
                                                 : 'Décaissement lié à la demande d’achat';
                                             ?>
-                                    <option value="<?= (int) $request->id ?>"
-                                        data-payment-voucher-id="<?= (int) $request->voucher_id ?>"
-                                        data-request-reference="<?= html_escape($requestReference) ?>"
-                                        data-voucher-reference="<?= html_escape($request->payment_number) ?>"
-                                        data-amount="<?= (float) $request->amount_paid ?>"
-                                        data-summary="<?= html_escape($expenseSummary) ?>"
-                                        data-chantier="<?= html_escape($chantierName) ?>"
-                                        data-payment-mode="<?= html_escape($request->payment_mode) ?>"
-                                        data-payment-date="<?= html_escape($request->payment_date) ?>"
-                                        data-observation="<?= html_escape($request->payment_observation) ?>">
-                                        <?= html_escape($requestReference) ?> —
-                                        <?= html_escape($request->payment_number) ?> —
-                                        <?= html_escape($chantierName) ?> —
-                                        <?= number_format((float) $request->amount_paid, 0, ',', ' ') ?> BIF
-                                    </option>
-                                    <?php endforeach; ?>
+                                            <option value="<?= (int) $request->id ?>"
+                                                data-payment-voucher-id="<?= (int) $request->voucher_id ?>"
+                                                data-request-reference="<?= html_escape($requestReference) ?>"
+                                                data-voucher-reference="<?= html_escape($request->payment_number) ?>"
+                                                data-amount="<?= (float) $request->amount_paid ?>"
+                                                data-summary="<?= html_escape($expenseSummary) ?>"
+                                                data-chantier="<?= html_escape($chantierName) ?>"
+                                                data-payment-mode="<?= html_escape($request->payment_mode) ?>"
+                                                data-payment-date="<?= html_escape($request->payment_date) ?>"
+                                                data-observation="<?= html_escape($request->payment_observation) ?>">
+                                                <?= html_escape($requestReference) ?> —
+                                                <?= html_escape($request->payment_number) ?> —
+                                                <?= html_escape($chantierName) ?> —
+                                                <?= number_format((float) $request->amount_paid, 0, ',', ' ') ?> BIF
+                                            </option>
+                                        <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
                                 <small class="text-muted">
@@ -2130,341 +2221,341 @@ MODALE : NOUVELLE OPÉRATION (RÔLES VERROUILLÉS)
 SCRIPTS : RÔLES + OPÉRATIONS + CRÉATION
 ========================================================== -->
 <script>
-/* =====================================================
- * FILTRAGE DES CAISSES PAR RÔLE
- * ===================================================== */
-function applyRoleFilter(select, allowedRoles) {
-    if (!select) {
-        return;
-    }
-    Array.prototype.forEach.call(select.options, function(opt) {
-        if (!opt.value) {
+    /* =====================================================
+     * FILTRAGE DES CAISSES PAR RÔLE
+     * ===================================================== */
+    function applyRoleFilter(select, allowedRoles) {
+        if (!select) {
             return;
         }
-        var role = opt.getAttribute('data-role') || 'secondaire';
-        var allowed = allowedRoles.indexOf(role) !== -1;
-        opt.disabled = !allowed;
-        opt.style.display = allowed ? '' : 'none';
-    });
-    var current = select.options[select.selectedIndex];
-    if (current && current.value && current.disabled) {
-        select.value = '';
-    }
-}
-
-function autoSelectSingleAllowed(select) {
-    if (!select) {
-        return;
-    }
-    var enabled = Array.prototype.filter.call(select.options, function(o) {
-        return o.value && !o.disabled;
-    });
-    if (enabled.length === 1) {
-        select.value = enabled[0].value;
-        select.dispatchEvent(new Event('change'));
-    }
-}
-
-/* =====================================================
- * PRÉPARER L'OPÉRATION SELON LE TYPE (RÔLES VERROUILLÉS)
- * ===================================================== */
-function prepareOperation(type) {
-    var operationType = document.getElementById('operationType');
-    var modalTitle = document.getElementById('operationModalTitle');
-    var cashboxLabel = document.getElementById('operationCashboxLabel');
-    var cashboxSelect = document.getElementById('operationCashboxId');
-    var destinationField = document.getElementById('destinationCashboxField');
-    var destinationSelect = document.getElementById('destinationCashboxId');
-    var purchaseRequestField = document.getElementById('purchaseRequestField');
-    var purchaseRequestSelect = document.getElementById('purchaseRequestId');
-    var justificationField = document.getElementById('expenseJustificationField');
-    var justificationInput = document.getElementById('expenseJustification');
-    var categorySelect = document.getElementById('operationCategory');
-    var amountInput = document.getElementById('operationAmount');
-
-    /* Réinitialisation */
-    operationType.value = type;
-    destinationField.style.display = 'none';
-    destinationSelect.disabled = true;
-    destinationSelect.required = false;
-    destinationSelect.value = '';
-    purchaseRequestField.style.display = 'none';
-    purchaseRequestSelect.disabled = true;
-    purchaseRequestSelect.required = false;
-    purchaseRequestSelect.value = '';
-    justificationField.style.display = 'none';
-    justificationInput.disabled = true;
-    justificationInput.required = false;
-    justificationInput.value = '';
-    amountInput.value = '';
-    amountInput.readOnly = false;
-
-    /* ENCAISSEMENT : caisse PRINCIPALE uniquement */
-    if (type === 'encaissement') {
-        modalTitle.textContent = 'Encaisser dans la caisse principale';
-        cashboxLabel.innerHTML = 'Caisse principale à créditer <span class="required-star">*</span>';
-        applyRoleFilter(cashboxSelect, ['principale']);
-        autoSelectSingleAllowed(cashboxSelect);
-    }
-
-    /* APPROVISIONNEMENT : principale → secondaire */
-    if (type === 'approvisionnement') {
-        modalTitle.textContent = 'Approvisionner la caisse secondaire';
-        cashboxLabel.innerHTML = 'Caisse principale (source) <span class="required-star">*</span>';
-        destinationField.style.display = 'block';
-        destinationSelect.disabled = false;
-        destinationSelect.required = true;
-        applyRoleFilter(cashboxSelect, ['principale']);
-        applyRoleFilter(destinationSelect, ['secondaire']);
-        autoSelectSingleAllowed(cashboxSelect);
-        autoSelectSingleAllowed(destinationSelect);
-        if (categorySelect) {
-            categorySelect.value = 'Approvisionnement';
+        Array.prototype.forEach.call(select.options, function(opt) {
+            if (!opt.value) {
+                return;
+            }
+            var role = opt.getAttribute('data-role') || 'secondaire';
+            var allowed = allowedRoles.indexOf(role) !== -1;
+            opt.disabled = !allowed;
+            opt.style.display = allowed ? '' : 'none';
+        });
+        var current = select.options[select.selectedIndex];
+        if (current && current.value && current.disabled) {
+            select.value = '';
         }
     }
 
-    /* DÉCAISSEMENT : caisse SECONDAIRE uniquement (DA) */
-    if (type === 'decaissement') {
-        modalTitle.textContent = 'Payer une demande d’achat (caisse secondaire)';
-        cashboxLabel.innerHTML = 'Caisse secondaire à débiter <span class="required-star">*</span>';
-        applyRoleFilter(cashboxSelect, ['secondaire']);
-        autoSelectSingleAllowed(cashboxSelect);
-        purchaseRequestField.style.display = 'block';
-        purchaseRequestSelect.disabled = false;
-        purchaseRequestSelect.required = true;
-        justificationField.style.display = 'block';
-        justificationInput.disabled = false;
-        justificationInput.required = true;
-        if (categorySelect) {
-            categorySelect.value = 'Paiement demande achat';
-        }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    var cashboxSelect = document.getElementById('operationCashboxId');
-    var destinationSelect = document.getElementById('destinationCashboxId');
-    var balanceBox = document.getElementById('selectedCashboxBalance');
-    var balanceValue = document.getElementById('selectedCashboxBalanceValue');
-    var currencyLabel = document.getElementById('operationCurrencyLabel');
-    var amountInput = document.getElementById('operationAmount');
-    var amountError = document.getElementById('amountError');
-    var submitButton = document.getElementById('submitCashboxOperation');
-    var purchaseRequestSelect = document.getElementById('purchaseRequestId');
-    var justificationInput = document.getElementById('expenseJustification');
-
-    function formatMoney(amount, currency) {
-        return new Intl.NumberFormat('fr-FR', {
-            maximumFractionDigits: 0
-        }).format(amount) + ' ' + currency;
-    }
-
-    function validateAmount() {
-        var option = cashboxSelect.options[cashboxSelect.selectedIndex];
-        var balance = option && option.value ? parseFloat(option.dataset.balance || 0) : 0;
-        var amount = parseFloat(amountInput.value || 0);
-        var type = document.getElementById('operationType').value;
-        var mustCheck = (type === 'decaissement' || type === 'approvisionnement');
-        var insufficient = mustCheck && amount > balance;
-        amountError.style.display = insufficient ? 'block' : 'none';
-        submitButton.disabled = insufficient;
-    }
-
-    cashboxSelect.addEventListener('change', function() {
-        var option = this.options[this.selectedIndex];
-        if (!this.value) {
-            balanceBox.style.display = 'none';
+    function autoSelectSingleAllowed(select) {
+        if (!select) {
             return;
         }
-        balanceBox.style.display = 'block';
-        balanceValue.textContent = formatMoney(parseFloat(option.dataset.balance || 0), option.dataset
-            .currency || 'BIF');
-        currencyLabel.textContent = option.dataset.currency || 'BIF';
-        validateAmount();
-    });
-
-    amountInput.addEventListener('input', validateAmount);
-
-    purchaseRequestSelect.addEventListener('change', function() {
-        var option = this.options[this.selectedIndex];
-        if (!this.value) {
-            amountInput.value = '';
-            justificationInput.value = '';
-            return;
+        var enabled = Array.prototype.filter.call(select.options, function(o) {
+            return o.value && !o.disabled;
+        });
+        if (enabled.length === 1) {
+            select.value = enabled[0].value;
+            select.dispatchEvent(new Event('change'));
         }
-        amountInput.value = option.dataset.amount || '';
-        amountInput.readOnly = true;
-        justificationInput.value = option.dataset.summary || '';
-        document.getElementById('paymentVoucherId').value = option.dataset.paymentVoucherId || '';
-        document.getElementById('purchaseRequestReference').value = option.dataset.requestReference ||
-            '';
-        document.getElementById('paymentVoucherReference').value = option.dataset.voucherReference ||
-            '';
-        document.getElementById('operationThirdParty').value = option.dataset.chantier || '';
-        validateAmount();
-    });
-
-    /* Réouverture des rôles à la fermeture */
-    $('#addOperationModal').on('hidden.bs.modal', function() {
-        applyRoleFilter(cashboxSelect, ['principale', 'secondaire']);
-        applyRoleFilter(destinationSelect, ['secondaire']);
-        balanceBox.style.display = 'none';
-        amountError.style.display = 'none';
-        submitButton.disabled = false;
-    });
+    }
 
     /* =====================================================
-     * MODALE CRÉATION : UNICITÉ PRINCIPALE + SECONDAIRE
+     * PRÉPARER L'OPÉRATION SELON LE TYPE (RÔLES VERROUILLÉS)
      * ===================================================== */
-    function refreshRoleOptions() {
-        var principaleExists = document.querySelectorAll('[data-role-caisse="principale"]').length > 0;
-        var secondaireExists = document.querySelectorAll('[data-role-caisse="secondaire"]').length > 0;
-        var optP = document.getElementById('optionPrincipale');
-        var optS = document.getElementById('optionSecondaire');
-        var note = document.getElementById('caisseRoleNote');
-        var roleSelect = document.getElementById('caisseRole');
+    function prepareOperation(type) {
+        var operationType = document.getElementById('operationType');
+        var modalTitle = document.getElementById('operationModalTitle');
+        var cashboxLabel = document.getElementById('operationCashboxLabel');
+        var cashboxSelect = document.getElementById('operationCashboxId');
+        var destinationField = document.getElementById('destinationCashboxField');
+        var destinationSelect = document.getElementById('destinationCashboxId');
+        var purchaseRequestField = document.getElementById('purchaseRequestField');
+        var purchaseRequestSelect = document.getElementById('purchaseRequestId');
+        var justificationField = document.getElementById('expenseJustificationField');
+        var justificationInput = document.getElementById('expenseJustification');
+        var categorySelect = document.getElementById('operationCategory');
+        var amountInput = document.getElementById('operationAmount');
 
-        if (optP) {
-            optP.enabled = principaleExists;
-        }
-        if (optS) {
-            optS.enabled = secondaireExists;
+        /* Réinitialisation */
+        operationType.value = type;
+        destinationField.style.display = 'none';
+        destinationSelect.disabled = true;
+        destinationSelect.required = false;
+        destinationSelect.value = '';
+        purchaseRequestField.style.display = 'none';
+        purchaseRequestSelect.disabled = true;
+        purchaseRequestSelect.required = false;
+        purchaseRequestSelect.value = '';
+        justificationField.style.display = 'none';
+        justificationInput.disabled = true;
+        justificationInput.required = false;
+        justificationInput.value = '';
+        amountInput.value = '';
+        amountInput.readOnly = false;
+
+        /* ENCAISSEMENT : caisse PRINCIPALE uniquement */
+        if (type === 'encaissement') {
+            modalTitle.textContent = 'Encaisser dans la caisse principale';
+            cashboxLabel.innerHTML = 'Caisse principale à créditer <span class="required-star">*</span>';
+            applyRoleFilter(cashboxSelect, ['principale']);
+            autoSelectSingleAllowed(cashboxSelect);
         }
 
-        if (note) {
-            if (principaleExists && secondaireExists) {
-                note.textContent =
-                    'Les deux caisses existent déjà : une principale + une secondaire (unicité).';
-            } else if (!principaleExists) {
-                note.textContent = 'Créez d’abord la caisse principale.';
-            } else {
-                note.textContent = 'La secondaire couvre TOUS les chantiers (unique).';
+        /* APPROVISIONNEMENT : principale → secondaire */
+        if (type === 'approvisionnement') {
+            modalTitle.textContent = 'Approvisionner la caisse secondaire';
+            cashboxLabel.innerHTML = 'Caisse principale (source) <span class="required-star">*</span>';
+            destinationField.style.display = 'block';
+            destinationSelect.disabled = false;
+            destinationSelect.required = true;
+            applyRoleFilter(cashboxSelect, ['principale']);
+            applyRoleFilter(destinationSelect, ['secondaire']);
+            autoSelectSingleAllowed(cashboxSelect);
+            autoSelectSingleAllowed(destinationSelect);
+            if (categorySelect) {
+                categorySelect.value = 'Approvisionnement';
             }
         }
-        if (roleSelect && roleSelect.value && roleSelect.options[roleSelect.selectedIndex].disabled) {
-            roleSelect.value = '';
+
+        /* DÉCAISSEMENT : caisse SECONDAIRE uniquement (DA) */
+        if (type === 'decaissement') {
+            modalTitle.textContent = 'Payer une demande d’achat (caisse secondaire)';
+            cashboxLabel.innerHTML = 'Caisse secondaire à débiter <span class="required-star">*</span>';
+            applyRoleFilter(cashboxSelect, ['secondaire']);
+            autoSelectSingleAllowed(cashboxSelect);
+            purchaseRequestField.style.display = 'block';
+            purchaseRequestSelect.disabled = false;
+            purchaseRequestSelect.required = true;
+            justificationField.style.display = 'block';
+            justificationInput.disabled = false;
+            justificationInput.required = true;
+            if (categorySelect) {
+                categorySelect.value = 'Paiement demande achat';
+            }
         }
     }
-    refreshRoleOptions();
-    $('#addCaisseModal').on('shown.bs.modal', refreshRoleOptions);
-});
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var cashboxSelect = document.getElementById('operationCashboxId');
+        var destinationSelect = document.getElementById('destinationCashboxId');
+        var balanceBox = document.getElementById('selectedCashboxBalance');
+        var balanceValue = document.getElementById('selectedCashboxBalanceValue');
+        var currencyLabel = document.getElementById('operationCurrencyLabel');
+        var amountInput = document.getElementById('operationAmount');
+        var amountError = document.getElementById('amountError');
+        var submitButton = document.getElementById('submitCashboxOperation');
+        var purchaseRequestSelect = document.getElementById('purchaseRequestId');
+        var justificationInput = document.getElementById('expenseJustification');
+
+        function formatMoney(amount, currency) {
+            return new Intl.NumberFormat('fr-FR', {
+                maximumFractionDigits: 0
+            }).format(amount) + ' ' + currency;
+        }
+
+        function validateAmount() {
+            var option = cashboxSelect.options[cashboxSelect.selectedIndex];
+            var balance = option && option.value ? parseFloat(option.dataset.balance || 0) : 0;
+            var amount = parseFloat(amountInput.value || 0);
+            var type = document.getElementById('operationType').value;
+            var mustCheck = (type === 'decaissement' || type === 'approvisionnement');
+            var insufficient = mustCheck && amount > balance;
+            amountError.style.display = insufficient ? 'block' : 'none';
+            submitButton.disabled = insufficient;
+        }
+
+        cashboxSelect.addEventListener('change', function() {
+            var option = this.options[this.selectedIndex];
+            if (!this.value) {
+                balanceBox.style.display = 'none';
+                return;
+            }
+            balanceBox.style.display = 'block';
+            balanceValue.textContent = formatMoney(parseFloat(option.dataset.balance || 0), option.dataset
+                .currency || 'BIF');
+            currencyLabel.textContent = option.dataset.currency || 'BIF';
+            validateAmount();
+        });
+
+        amountInput.addEventListener('input', validateAmount);
+
+        purchaseRequestSelect.addEventListener('change', function() {
+            var option = this.options[this.selectedIndex];
+            if (!this.value) {
+                amountInput.value = '';
+                justificationInput.value = '';
+                return;
+            }
+            amountInput.value = option.dataset.amount || '';
+            amountInput.readOnly = true;
+            justificationInput.value = option.dataset.summary || '';
+            document.getElementById('paymentVoucherId').value = option.dataset.paymentVoucherId || '';
+            document.getElementById('purchaseRequestReference').value = option.dataset.requestReference ||
+                '';
+            document.getElementById('paymentVoucherReference').value = option.dataset.voucherReference ||
+                '';
+            document.getElementById('operationThirdParty').value = option.dataset.chantier || '';
+            validateAmount();
+        });
+
+        /* Réouverture des rôles à la fermeture */
+        $('#addOperationModal').on('hidden.bs.modal', function() {
+            applyRoleFilter(cashboxSelect, ['principale', 'secondaire']);
+            applyRoleFilter(destinationSelect, ['secondaire']);
+            balanceBox.style.display = 'none';
+            amountError.style.display = 'none';
+            submitButton.disabled = false;
+        });
+
+        /* =====================================================
+         * MODALE CRÉATION : UNICITÉ PRINCIPALE + SECONDAIRE
+         * ===================================================== */
+        function refreshRoleOptions() {
+            var principaleExists = document.querySelectorAll('[data-role-caisse="principale"]').length > 0;
+            var secondaireExists = document.querySelectorAll('[data-role-caisse="secondaire"]').length > 0;
+            var optP = document.getElementById('optionPrincipale');
+            var optS = document.getElementById('optionSecondaire');
+            var note = document.getElementById('caisseRoleNote');
+            var roleSelect = document.getElementById('caisseRole');
+
+            if (optP) {
+                optP.enabled = principaleExists;
+            }
+            if (optS) {
+                optS.enabled = secondaireExists;
+            }
+
+            if (note) {
+                if (principaleExists && secondaireExists) {
+                    note.textContent =
+                        'Les deux caisses existent déjà : une principale + une secondaire (unicité).';
+                } else if (!principaleExists) {
+                    note.textContent = 'Créez d’abord la caisse principale.';
+                } else {
+                    note.textContent = 'La secondaire couvre TOUS les chantiers (unique).';
+                }
+            }
+            if (roleSelect && roleSelect.value && roleSelect.options[roleSelect.selectedIndex].disabled) {
+                roleSelect.value = '';
+            }
+        }
+        refreshRoleOptions();
+        $('#addCaisseModal').on('shown.bs.modal', refreshRoleOptions);
+    });
 </script>
 
 <!-- Graphique -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var el = document.getElementById('cashFlowChart');
-    if (!el || typeof Chart === 'undefined') {
-        return;
-    }
+    document.addEventListener('DOMContentLoaded', function() {
+        var el = document.getElementById('cashFlowChart');
+        if (!el || typeof Chart === 'undefined') {
+            return;
+        }
 
-    var labels = <?= json_encode($evolution['labels'], JSON_UNESCAPED_UNICODE) ?>;
-    var incomes = <?= json_encode(array_map('floatval', $evolution['incomes'])) ?>;
-    var expenses = <?= json_encode(array_map('floatval', $evolution['expenses'])) ?>;
+        var labels = <?= json_encode($evolution['labels'], JSON_UNESCAPED_UNICODE) ?>;
+        var incomes = <?= json_encode(array_map('floatval', $evolution['incomes'])) ?>;
+        var expenses = <?= json_encode(array_map('floatval', $evolution['expenses'])) ?>;
 
-    new Chart(el.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Encaissements (principale)',
-                data: incomes,
-                borderColor: '#0f766e',
-                backgroundColor: 'rgba(15,118,110,.15)',
-                borderWidth: 2.5,
-                pointRadius: 4,
-                fill: true,
-                tension: .35
-            }, {
-                label: 'Décaissements (secondaire)',
-                data: expenses,
-                borderColor: '#dc2626',
-                backgroundColor: 'rgba(220,38,38,.10)',
-                borderWidth: 2.5,
-                pointRadius: 4,
-                fill: true,
-                tension: .35
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        usePointStyle: true,
-                        boxWidth: 8,
-                        font: {
-                            size: 11
-                        }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(ctx) {
-                            return ctx.dataset.label + ' : ' +
-                                new Intl.NumberFormat('fr-FR').format(ctx.parsed.y) + ' BIF';
-                        }
-                    }
-                }
+        new Chart(el.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Encaissements (principale)',
+                    data: incomes,
+                    borderColor: '#0f766e',
+                    backgroundColor: 'rgba(15,118,110,.15)',
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: .35
+                }, {
+                    label: 'Décaissements (secondaire)',
+                    data: expenses,
+                    borderColor: '#dc2626',
+                    backgroundColor: 'rgba(220,38,38,.10)',
+                    borderWidth: 2.5,
+                    pointRadius: 4,
+                    fill: true,
+                    tension: .35
+                }]
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            boxWidth: 8,
+                            font: {
+                                size: 11
+                            }
+                        }
                     },
-                    ticks: {
-                        font: {
-                            size: 10
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ' : ' +
+                                    new Intl.NumberFormat('fr-FR').format(ctx.parsed.y) + ' BIF';
+                            }
                         }
                     }
                 },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(148,163,184,.15)'
-                    },
-                    ticks: {
-                        font: {
-                            size: 10
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
                         },
-                        callback: function(v) {
-                            return v >= 1000000 ? (v / 1000000) + ' M' : v;
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(148,163,184,.15)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            },
+                            callback: function(v) {
+                                return v >= 1000000 ? (v / 1000000) + ' M' : v;
+                            }
                         }
                     }
                 }
             }
-        }
+        });
     });
-});
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <?php if ($this->session->flashdata('success')): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    Swal.fire({
-        icon: 'success',
-        title: 'Succès',
-        html: <?= json_encode($this->session->flashdata('success')) ?>,
-        confirmButtonText: 'D’accord',
-        confirmButtonColor: '#0f766e'
-    });
-});
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'success',
+                title: 'Succès',
+                html: <?= json_encode($this->session->flashdata('success')) ?>,
+                confirmButtonText: 'D’accord',
+                confirmButtonColor: '#0f766e'
+            });
+        });
+    </script>
 <?php endif; ?>
 <?php if ($this->session->flashdata('error')): ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    Swal.fire({
-        icon: 'error',
-        title: 'Enregistrement impossible',
-        html: <?= json_encode($this->session->flashdata('error')) ?>,
-        confirmButtonText: 'Corriger',
-        confirmButtonColor: '#dc2626'
-    });
-});
-</script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Swal.fire({
+                icon: 'error',
+                title: 'Enregistrement impossible',
+                html: <?= json_encode($this->session->flashdata('error')) ?>,
+                confirmButtonText: 'Corriger',
+                confirmButtonColor: '#dc2626'
+            });
+        });
+    </script>
 <?php endif; ?>

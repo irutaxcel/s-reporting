@@ -484,7 +484,7 @@ class CrmModel extends CI_Model
      *  Achat effectué    : demande (purchase_request_forms) avec au moins un bon
      *                      purchase_payment_vouchers.payment_status = 'effectue'
      *                      montant = SUM(purchase_request_items.total_price)
-     *  Main-d'œuvre      : workforce_contracts.contract_amount
+     *  Main-d'œuvre      : workforce_contracts.unit_rate
      *  Dépenses chantier : achats effectués + main-d'œuvre   (table chantiers)
      *  Coût du projet    : SUM(tbl_devis.montant, statut 'signe') des tbl_chantiers du projet
      *  Bénéfice          : coût du projet − dépenses (lien par projects.id)
@@ -551,8 +551,8 @@ class CrmModel extends CI_Model
         return "
             SELECT w.chantier_id,
                    COUNT(*)                                        AS nb_contrats,
-                   SUM(w.contract_amount)                          AS main_oeuvre,
-                   SUM(CASE WHEN w.contract_amount = 0 THEN 1 ELSE 0 END) AS nb_sans_montant
+                   SUM(w.unit_rate)                          AS main_oeuvre,
+                   SUM(CASE WHEN w.unit_rate = 0 THEN 1 ELSE 0 END) AS nb_sans_montant
             FROM workforce_contracts w
             WHERE {$where}
             GROUP BY w.chantier_id";
@@ -756,7 +756,7 @@ class CrmModel extends CI_Model
         $sql = "
             SELECT w.chantier_id, w.worker_type,
                    COUNT(*)               AS nb_contrats,
-                   SUM(w.contract_amount) AS montant
+                   SUM(w.unit_rate) AS montant
             FROM workforce_contracts w
             WHERE {$where}
             GROUP BY w.chantier_id, w.worker_type

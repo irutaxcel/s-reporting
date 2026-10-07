@@ -1,155 +1,259 @@
 <style>
-    /* ===============================
-   SATRACO SIDEBAR FIX
-=================================*/
+    /* =========================================
+       SATRACO SIDEBAR — source unique
+       ========================================= */
 
     .main-sidebar {
-        background: linear-gradient(180deg, #102033, #173b35, #0f766e) !important;
+        background: linear-gradient(180deg, #102033 0%, #173b35 45%, #0f766e 100%) !important;
     }
 
+    .main-sidebar *,
+    .main-sidebar *::before,
+    .main-sidebar *::after {
+        box-sizing: border-box;
+    }
+
+    /* ---------- Logo (aligné sur la hauteur du header : 64px + 3px de bordure) ---------- */
     .brand-link {
-        height: 66px;
-        display: flex;
+        height: 67px;
+        display: flex !important;
         align-items: center;
-        padding: 10px 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, .12);
+        padding: 10px 14px !important;
+        background: rgba(255, 255, 255, .05);
+        border-bottom: 1px solid rgba(255, 255, 255, .12) !important;
+        overflow: hidden;
     }
 
     .brand-link .brand-image {
-        width: 42px;
-        height: 42px;
-        max-height: 42px;
+        width: 40px;
+        height: 40px;
+        max-height: 40px;
         object-fit: contain;
         background: #fff;
-        padding: 4px;
+        padding: 3px;
         border-radius: 50%;
-        margin-right: 10px;
+        margin: 0 10px 0 0 !important;
+        float: none !important;
+        flex-shrink: 0;
     }
 
     .brand-link .brand-text {
-        color: #fff;
-        font-size: 16px;
+        color: #fff !important;
+        font-size: 15px;
         font-weight: 800 !important;
         line-height: 1.15;
         white-space: normal;
     }
 
-    .sidebar {
-        padding: 12px 10px;
+    /* ---------- Conteneur ---------- */
+    .main-sidebar .sidebar {
+        padding: 12px 10px 20px;
+        overflow-x: hidden !important;
     }
 
-    .nav-sidebar>.nav-item {
-        margin-bottom: 9px;
+    .main-sidebar .sidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    .main-sidebar .sidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, .25);
+        border-radius: 10px;
+    }
+
+    /* ---------- Liens : on annule la largeur fixe d'AdminLTE ---------- */
+    .nav-sidebar .nav-item {
+        width: 100%;
+        margin: 0;
     }
 
     .nav-sidebar .nav-link {
-        display: flex;
+        width: 100% !important;
+        display: flex !important;
         align-items: center;
-        min-height: 48px;
-        width: 100%;
-        border-radius: 14px;
-        padding: 10px 12px;
-        color: #eaf7f2 !important;
-        font-weight: 700;
-        overflow: hidden;
+        margin: 0 !important;
+        white-space: normal;
+        transition: background .15s ease, color .15s ease;
     }
 
-    .nav-sidebar .nav-icon {
-        width: 22px;
-        min-width: 22px;
-        margin-right: 9px;
-        text-align: center;
-        font-size: 15px;
+    .nav-sidebar .nav-link:focus,
+    .nav-sidebar .nav-link:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
     }
 
     .nav-sidebar .nav-link p {
         flex: 1;
+        display: flex !important;
+        align-items: center;
         margin: 0;
-        font-size: 13px;
         line-height: 1.3;
         white-space: normal;
+        overflow-wrap: anywhere;
     }
 
-    .nav-link>.right {
+    .nav-sidebar .nav-icon {
+        width: 20px;
+        min-width: 20px;
+        margin-right: 10px !important;
+        text-align: center;
+        font-size: 15px;
+        color: inherit !important;
+    }
+
+    /* Flèche d'ouverture : dans le flux, poussée à droite */
+    .nav-sidebar .nav-link p>.right {
         position: static !important;
-        margin-left: 8px;
-    }
-
-    /* menu principal actif */
-    .nav-sidebar>.nav-item>.nav-link.active {
-        background: #74c476 !important;
-        color: #fff !important;
-    }
-
-    /* niveau 2 */
-    .nav-treeview {
+        margin-left: auto;
         padding-left: 8px;
-        margin-top: 6px;
+        transition: transform .2s ease;
     }
 
-    .nav-treeview .nav-link {
-        min-height: 44px;
-        background: #f4faf7 !important;
-        color: #064b43 !important;
-        border-radius: 13px;
-        padding: 9px 11px;
+    /* ---------- Niveau 1 ---------- */
+    .nav-sidebar>.nav-item {
         margin-bottom: 6px;
     }
 
-    /* niveau 3 */
-    .nav-treeview .nav-treeview {
-        padding-left: 10px;
-        margin-top: 5px;
+    .nav-sidebar>.nav-item>.nav-link {
+        min-height: 44px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        color: #eaf7f2 !important;
+        font-weight: 700;
+        font-size: 13.5px;
     }
 
-    .nav-treeview .nav-treeview .nav-link {
-        min-height: 40px;
+    .nav-sidebar>.nav-item>.nav-link:hover {
+        background: rgba(116, 196, 118, .18) !important;
+        color: #fff !important;
+    }
+
+    .nav-sidebar>.nav-item>.nav-link.active,
+    .nav-sidebar>.nav-item.menu-open>.nav-link.active {
+        background: #74c476 !important;
+        color: #fff !important;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .18);
+    }
+
+    /* Menu ouvert mais pas actif */
+    .nav-sidebar>.nav-item.menu-open>.nav-link:not(.active) {
+        background: rgba(255, 255, 255, .08) !important;
+    }
+
+    /* ---------- Niveau 2 : conteneur ---------- */
+    .nav-sidebar .nav-treeview {
+        background: rgba(255, 255, 255, .06);
+        border-radius: 14px;
+        padding: 6px !important;
+        margin: 6px 0 4px !important;
+    }
+
+    .nav-sidebar .nav-treeview>.nav-item {
+        margin-bottom: 4px;
+    }
+
+    .nav-sidebar .nav-treeview>.nav-item:last-child {
+        margin-bottom: 0;
+    }
+
+    /* ---------- Niveau 2 : liens ---------- */
+    .nav-sidebar .nav-treeview .nav-link {
+        min-height: 38px;
         padding: 8px 10px;
+        border-radius: 10px;
+        background: #f4faf7 !important;
+        color: #064b43 !important;
+        font-weight: 700;
+        font-size: 12.5px;
+        border: 2px solid transparent;
     }
 
-    .nav-treeview .nav-treeview .nav-link p {
+    /* Survol : teinte légère, différente de l'actif */
+    .nav-sidebar .nav-treeview .nav-link:hover {
+        background: #dff1e3 !important;
+        color: #064b43 !important;
+    }
+
+    /* Actif : vert plein */
+    .nav-sidebar .nav-treeview .nav-link.active {
+        background: #74c476 !important;
+        color: #fff !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
+    }
+
+    .nav-sidebar .nav-treeview .nav-icon {
+        font-size: 13px;
+        margin-right: 8px !important;
+    }
+
+    .nav-sidebar .nav-treeview .far.fa-circle {
+        font-size: 9px;
+    }
+
+    /* Sous-groupe ouvert (Comptabilité, Trésorerie...) mais pas actif */
+    .nav-sidebar .nav-treeview>.nav-item.menu-open>.nav-link:not(.active) {
+        background: #e7f4ea !important;
+        border-color: #74c476;
+    }
+
+    /* ---------- Niveau 3 ---------- */
+    .nav-sidebar .nav-treeview .nav-treeview {
+        background: rgba(255, 255, 255, .10);
+        padding: 5px !important;
+        margin: 4px 0 2px !important;
+    }
+
+    .nav-sidebar .nav-treeview .nav-treeview .nav-link {
+        min-height: 34px;
+        padding: 6px 9px;
         font-size: 12px;
     }
 
-    /* cercles */
-    .nav-treeview .far.fa-circle {
-        font-size: 8px;
-        margin-right: 8px;
+    /* Titres de section (SUIVI PROJETS, ANALYSE) */
+    .nav-sidebar .nav-treeview .nav-header {
+        color: rgba(255, 255, 255, .6);
+        font-size: 10.5px;
+        font-weight: 700;
+        letter-spacing: .8px;
+        padding: 8px 8px 4px !important;
+        background: transparent;
     }
 
-    /* sous-menu actif */
-    .nav-treeview .nav-link.active {
-        background: #fff !important;
-        color: #064b43 !important;
-        border: 2px solid #74c476 !important;
+    /* ---------- Sidebar réduite (bouton ☰) ---------- */
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar>.nav-item>.nav-link {
+        justify-content: center;
+        padding: 10px 0;
     }
 
-    /* éviter le débordement */
-    .nav-sidebar .nav-link,
-    .nav-sidebar .nav-link p {
-        max-width: 100%;
-        word-break: normal;
-        overflow-wrap: break-word;
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar .nav-icon {
+        margin-right: 0 !important;
     }
 
-    /* AdminLTE mobile */
-    @media(max-width:768px) {
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar p,
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .nav-sidebar .nav-treeview {
+        display: none !important;
+    }
 
-        .content-wrapper,
-        .main-header,
-        .main-footer {
-            margin-left: 0 !important;
-        }
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .brand-link {
+        justify-content: center;
+        padding: 10px 0 !important;
+    }
+
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .brand-link .brand-image {
+        margin: 0 !important;
+    }
+
+    .sidebar-mini.sidebar-collapse .main-sidebar:not(:hover) .sidebar {
+        padding: 12px 6px;
     }
 </style>
 
 <?php
 /* Titres par module : ouvrent (menu-open) et surlignent (active) les groupes */
-$dgTitles     = ['Synthèse des demandes', 'Tableau de bord', 'Indicateurs de performance', 'Reporting général', 'Analytique', 'Statistiques', 'Validations & Approbations', 'Suivi des projets', 'Notifications & Alertes', 'Messagerie interne', 'Gestion des utilisateurs', 'Paramètres', 'Archives', 'Relation Publique'];
+$dgTitles = ['Synthèse des demandes', 'Tableau de bord DG', 'Indicateurs de performance', 'Reporting général', 'Analytique', 'Statistiques', 'Validations & Approbations', 'Suivi des projets', 'Notifications & Alertes', 'Messagerie interne', 'Gestion des utilisateurs', 'Paramètres', 'Archives', 'Relation Publique'];
 $techTitles   = ['Projets', 'Chantiers & exécution', 'Achats & Approvisionnement', 'Sous-traitants', 'Stocks', 'Engin & Materiel', 'Maintenance & Carburant', 'Journal Production', 'Coût Réel & Rentabilité', 'Personnel Chantier', 'Suivie Paie Chantier'];
-$dafTitles    = ['Tableau de Bord DAF', 'Exercices Comptables', 'Classes de Comptes', 'Plan Comptable', 'Codes journaux', 'Écritures Comptables', 'Journal Comptable', 'Grand Livre Comptable', 'Balance Générale', 'Clôture Comptable', 'Caisse', 'Journal de caisse', 'Livre de Caisse', 'Comptes bancaires', 'Rapprochement bancaire', 'Prévisions de trésorerie', 'Factures clients', 'Factures fournisseurs', 'Paiements', 'Échéances', 'Rapport Financier', 'Contrôle de gestion', 'Patrimoine', 'Documents / GED', 'Rapports financiers'];
+$dafTitles    = ['Tableau de Bord DAF', 'Exercices Comptables', 'Classes de Comptes', 'Plan Comptable', 'Codes journaux', 'Écritures Comptables', 'Journal Comptable', 'Grand Livre Comptable', 'Balance Générale', 'Clôture Comptable', 'Caisse', 'Journal de caisse', 'Livre de Caisse', 'Comptes bancaires', 'Rapprochement bancaire', 'Prévisions de trésorerie', 'Factures clients', 'Factures fournisseurs', 'Paiements', 'Échéances', 'Rapport Financier', 'Contrôle de gestion', 'Patrimoine', 'Documents / GED', 'Rapports financiers', 'Livre de banque'];
 $comptaTitles = ['Exercices Comptables', 'Classes de Comptes', 'Plan Comptable', 'Codes journaux', 'Écritures Comptables', 'Journal Comptable', 'Grand Livre Comptable', 'Balance Générale', 'Clôture Comptable'];
-$tresoTitles  = ['Caisse', 'Journal de caisse', 'Livre de Caisse', 'Rapport Financier', 'Comptes bancaires', 'Rapprochement bancaire', 'Prévisions de trésorerie'];
+$tresoTitles  = ['Caisse', 'Journal de caisse', 'Livre de Caisse', 'Rapport Financier', 'Comptes bancaires', 'Livre de banque', 'Rapprochement bancaire', 'Prévisions de trésorerie'];
 $factuTitles  = ['Factures clients', 'Factures fournisseurs', 'Paiements', 'Échéances'];
 $rhTitles     = ['Tableau de bord RH', 'Employés', 'Contrats & mouvements', "Registre d'employeur", 'Temps & présences', 'Congés', 'Paie', 'Discipline', 'Évaluations', 'Rapports & éditions'];
 $crmTitles    = ['Tableau de Bord CRM', 'Clients CRM', 'Devis', 'Projets CRM', 'Chantiers & Avancement', 'Reporting & Statistiques'];
@@ -189,16 +293,18 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
 
                             <?php if (has_access('dg', 'direction-dashboard')): ?>
                                 <li class="nav-item">
-                                    <a href="<?= base_url('direction/dashboard') ?>" class="nav-link">
+                                    <a href="<?= base_url('direction-dashboard') ?>"
+                                        class="nav-link <?= $title == 'Tableau de bord DG' ? 'active' : '' ?>">
                                         <i class="nav-icon fas fa-tachometer-alt"></i>
-                                        <p>Tableau de bord</p>
+                                        <p>Tableau de bord General</p>
                                     </a>
                                 </li>
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-indicateurs')): ?>
                                 <li class="nav-item">
-                                    <a href="<?= base_url('direction/indicateurs') ?>" class="nav-link">
+                                    <a href="<?= base_url('direction-indicateurs') ?>"
+                                        class="nav-link <?= $title == 'Indicateurs de performance' ? 'active' : '' ?>">
                                         <i class="nav-icon fas fa-chart-line"></i>
                                         <p>Indicateurs de performance</p>
                                     </a>
@@ -215,7 +321,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                     <ul class="nav nav-treeview">
                                         <?php if (has_access('dg', 'direction-reporting-general')): ?>
                                             <li class="nav-item">
-                                                <a href="<?= base_url('direction/reporting/general') ?>"
+                                                <a href="<?= base_url('direction-reporting-general') ?>"
                                                     class="nav-link <?= $title == 'Reporting général' ? 'active' : '' ?>">
                                                     <i class="nav-icon far fa-file-alt"></i>
                                                     <p>Reporting général</p>
@@ -224,7 +330,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                         <?php endif; ?>
                                         <?php if (has_access('dg', 'direction-reporting-analytique')): ?>
                                             <li class="nav-item">
-                                                <a href="<?= base_url('direction/reporting/analytique') ?>"
+                                                <a href="<?= base_url('direction-reporting-analytique') ?>"
                                                     class="nav-link <?= $title == 'Analytique' ? 'active' : '' ?>">
                                                     <i class="nav-icon fas fa-chart-pie"></i>
                                                     <p>Analytique</p>
@@ -233,7 +339,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                         <?php endif; ?>
                                         <?php if (has_access('dg', 'direction-statistiques')): ?>
                                             <li class="nav-item">
-                                                <a href="<?= base_url('direction/statistiques') ?>"
+                                                <a href="<?= base_url('direction-statistiques') ?>"
                                                     class="nav-link <?= $title == 'Statistiques' ? 'active' : '' ?>">
                                                     <i class="nav-icon fas fa-chart-bar"></i>
                                                     <p>Statistiques</p>
@@ -245,18 +351,18 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-validations')): ?>
-                                <li class="nav-item">
-                                    <a href="<?= base_url('direction/validations') ?>"
-                                        class="nav-link <?= $title == 'Validations & Approbations' ? 'active' : '' ?>">
-                                        <i class="nav-icon fas fa-check-double"></i>
-                                        <p>Validations & Approbations</p>
-                                    </a>
-                                </li>
+                                <!-- <li class="nav-item">
+                            <a href="<?= base_url('direction/validations') ?>"
+                                class="nav-link <?= $title == 'Validations & Approbations' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-check-double"></i>
+                                <p>Validations & Approbations</p>
+                            </a>
+                        </li> -->
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-projets')): ?>
                                 <li class="nav-item">
-                                    <a href="<?= base_url('direction/projets') ?>"
+                                    <a href="<?= base_url('direction-projets') ?>"
                                         class="nav-link <?= $title == 'Suivi des projets' ? 'active' : '' ?>">
                                         <i class="nav-icon fas fa-tasks"></i>
                                         <p>Suivi des projets</p>
@@ -265,23 +371,23 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-notifications')): ?>
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a href="<?= base_url('direction/notifications') ?>"
                                         class="nav-link <?= $title == 'Notifications & Alertes' ? 'active' : '' ?>">
                                         <i class="nav-icon fas fa-bell"></i>
                                         <p>Notifications & Alertes</p>
                                     </a>
-                                </li>
+                                </li> -->
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-messagerie')): ?>
-                                <li class="nav-item">
+                                <!-- <li class="nav-item">
                                     <a href="<?= base_url('direction/messagerie') ?>"
                                         class="nav-link <?= $title == 'Messagerie interne' ? 'active' : '' ?>">
                                         <i class="nav-icon fas fa-envelope"></i>
                                         <p>Messagerie interne</p>
                                     </a>
-                                </li>
+                                </li> -->
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'synthese-demandes')): ?>
@@ -305,22 +411,22 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-utilisateurs')): ?>
-                                <li class="nav-item">
-                                    <a href="<?= base_url('direction/utilisateurs') ?>"
-                                        class="nav-link <?= $title == 'Gestion des utilisateurs' ? 'active' : '' ?>">
-                                        <i class="nav-icon fas fa-users"></i>
-                                        <p>Gestion des utilisateurs</p>
-                                    </a>
-                                </li>
+                                <!-- <li class="nav-item">
+                            <a href="<?= base_url('direction/utilisateurs') ?>"
+                                class="nav-link <?= $title == 'Gestion des utilisateurs' ? 'active' : '' ?>">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Gestion des utilisateurs</p>
+                            </a>
+                        </li> -->
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-parametres')): ?>
-                                <li class="nav-item">
-                                    <a href="<?= base_url('direction/parametres') ?>" class="nav-link">
-                                        <i class="nav-icon fas fa-cog"></i>
-                                        <p>Paramètres</p>
-                                    </a>
-                                </li>
+                                <!-- <li class="nav-item">
+                            <a href="<?= base_url('direction/parametres') ?>" class="nav-link">
+                                <i class="nav-icon fas fa-cog"></i>
+                                <p>Paramètres</p>
+                            </a>
+                        </li> -->
                             <?php endif; ?>
 
                             <?php if (has_access('dg', 'direction-archives')): ?>
@@ -639,7 +745,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                         <?php if (has_access('treso', 'compte-banques')): ?>
                                             <li class="nav-item">
                                                 <a href="<?= base_url('compte-banques') ?>"
-                                                    class="nav-link <?= $title == 'Comptes bancaires' ? 'active' : '' ?>">
+                                                    class="nav-link <?= in_array($title, ['Comptes bancaires', 'Livre de banque'], true) ? 'active' : '' ?>">
                                                     <i class="fas fa-university nav-icon text-primary"></i>
                                                     <p>Comptes bancaires</p>
                                                 </a>

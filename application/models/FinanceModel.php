@@ -2683,1794 +2683,7 @@ class FinanceModel extends CI_Model
         ];
     }
 
-    /**
-     * Insère un nouveau compte bancaire.
-     */
-    public function createBankAccount(array $data): bool
-    {
-        return $this->db->insert(
-            'tbl_finance_bank_account',
-            $data
-        );
-    }
 
-    /**
-     * Recherche un compte bancaire par identifiant.
-     */
-    public function getBankAccountById(int $id)
-    {
-        return $this->db
-            ->where('id', $id)
-            ->get('tbl_finance_bank_account')
-            ->row();
-    }
-
-    /**
-     * Retourne le prochain code bancaire prévisionnel.
-     *
-     * La véritable génération reste effectuée
-     * pendant l’enregistrement.
-     */
-    public function getNextBankAccountCode(): string
-    {
-        $year = date('Y');
-
-        $prefix = 'BAN-' . $year . '-';
-
-        $lastAccount = $this->db
-            ->select('code')
-            ->from('tbl_finance_bank_account')
-            ->like(
-                'code',
-                $prefix,
-                'after'
-            )
-            ->order_by('code', 'DESC')
-            ->limit(1)
-            ->get()
-            ->row();
-
-        $nextNumber = 1;
-
-        if (
-            $lastAccount
-            && !empty($lastAccount->code)
-        ) {
-            $parts = explode(
-                '-',
-                $lastAccount->code
-            );
-
-            $lastNumber = (int) end($parts);
-
-            $nextNumber = $lastNumber + 1;
-        }
-
-        return $prefix
-            . str_pad(
-                (string) $nextNumber,
-                3,
-                '0',
-                STR_PAD_LEFT
-            );
-    }
-
-    /**
-     * Retourne les comptes bancaires actifs.
-     */
-    public function getAllActiveBankAccounts(): array
-    {
-        return $this->db
-            ->select([
-                'id',
-                'code',
-                'name',
-                'bank_name',
-                'account_number',
-                'account_type',
-                'currency',
-                'current_balance',
-                'status',
-            ])
-            ->from('tbl_finance_bank_account')
-            ->where('status', 'active')
-            ->order_by('bank_name', 'ASC')
-            ->order_by('name', 'ASC')
-            ->get()
-            ->result();
-    }
-
-
-    /**
-     * Génère une référence bancaire :
-     *
-     * BMV-2026-00001
-     * BMV-2026-00002
-     */
-    private function generateBankOperationReference(): string
-    {
-        $year = date('Y');
-
-        $prefix = 'BMV-' . $year . '-';
-
-        $lastOperation = $this->db
-            ->select('reference')
-            ->from('tbl_finance_bank_operation')
-            ->like(
-                'reference',
-                $prefix,
-                'after'
-            )
-            ->order_by('reference', 'DESC')
-            ->limit(1)
-            ->get()
-            ->row();
-
-        $nextNumber = 1;
-
-        if (
-            $lastOperation
-            && !empty($lastOperation->reference)
-        ) {
-            $parts = explode(
-                '-',
-                $lastOperation->reference
-            );
-
-            $lastNumber = (int) end($parts);
-
-            $nextNumber =
-                $lastNumber + 1;
-        }
-
-        $reference = $prefix
-            . str_pad(
-                (string) $nextNumber,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
-
-        while (
-            $this->db
-            ->where(
-                'reference',
-                $reference
-            )
-            ->count_all_results(
-                'tbl_finance_bank_operation'
-            ) > 0
-        ) {
-            $nextNumber++;
-
-            $reference = $prefix
-                . str_pad(
-                    (string) $nextNumber,
-                    5,
-                    '0',
-                    STR_PAD_LEFT
-                );
-        }
-
-        return $reference;
-    }
-
-    /**
-     * Enregistre une opération bancaire et met à jour
-     * les soldes des comptes concernés.
-     */
-    public function createBankOperation(
-        array $operationData
-    ): array {
-        $this->db->trans_begin();
-
-        try {
-            $operationType =
-                $operationData['operation_type'];
-
-            $amount =
-                (float) $operationData['amount'];
-
-            $sourceAccountId =
-                !empty($operationData['source_bank_account_id'])
-                ? (int) $operationData['source_bank_account_id']
-                : NULL;
-
-            $destinationAccountId =
-                !empty($operationData['destination_bank_account_id'])
-                ? (int) $operationData['destination_bank_account_id']
-                : NULL;
-
-            /*
-         * =====================================================
-         * 1. VERROUILLER ET VÉRIFIER LA SOURCE
-         * =====================================================
-         */
-
-            $sourceAccount = NULL;
-
-            if ($sourceAccountId) {
-                $sourceAccount = $this->db
-                    ->query(
-                        "
-                    SELECT *
-                    FROM tbl_finance_bank_account
-                    WHERE id = ?
-                    FOR UPDATE
-                    ",
-                        [$sourceAccountId]
-                    )
-                    ->row();
-
-                if (!$sourceAccount) {
-                    throw new Exception(
-                        'Le compte bancaire source est introuvable.'
-                    );
-                }
-
-                if ($sourceAccount->status !== 'active') {
-                    throw new Exception(
-                        'Le compte bancaire source n’est pas actif.'
-                    );
-                }
-
-                if (
-                    (float) $sourceAccount
-                        ->current_balance
-                    < $amount
-                ) {
-                    throw new Exception(
-                        'Le solde du compte bancaire source est insuffisant.'
-                    );
-                }
-            }
-
-            /*
-         * =====================================================
-         * 2. VERROUILLER ET VÉRIFIER LA DESTINATION
-         * =====================================================
-         */
-
-            $destinationAccount = NULL;
-
-            if ($destinationAccountId) {
-                $destinationAccount = $this->db
-                    ->query(
-                        "
-                    SELECT *
-                    FROM tbl_finance_bank_account
-                    WHERE id = ?
-                    FOR UPDATE
-                    ",
-                        [$destinationAccountId]
-                    )
-                    ->row();
-
-                if (!$destinationAccount) {
-                    throw new Exception(
-                        'Le compte bancaire destination est introuvable.'
-                    );
-                }
-
-                if (
-                    $destinationAccount->status
-                    !== 'active'
-                ) {
-                    throw new Exception(
-                        'Le compte bancaire destination n’est pas actif.'
-                    );
-                }
-            }
-
-            /*
-         * =====================================================
-         * 3. CONTRÔLES DU TRANSFERT
-         * =====================================================
-         */
-
-            if ($operationType === 'transfert') {
-                if (
-                    !$sourceAccount
-                    || !$destinationAccount
-                ) {
-                    throw new Exception(
-                        'Le compte source et le compte destination sont obligatoires pour un transfert.'
-                    );
-                }
-
-                if (
-                    $sourceAccountId
-                    === $destinationAccountId
-                ) {
-                    throw new Exception(
-                        'Le compte source et le compte destination doivent être différents.'
-                    );
-                }
-
-                if (
-                    $sourceAccount->currency
-                    !== $destinationAccount->currency
-                ) {
-                    throw new Exception(
-                        'Les comptes source et destination doivent utiliser la même devise.'
-                    );
-                }
-            }
-
-            /*
-         * =====================================================
-         * 4. GÉNÉRER LA RÉFÉRENCE
-         * =====================================================
-         */
-
-            $reference =
-                $this->generateBankOperationReference();
-
-            $operationData['reference'] =
-                $reference;
-
-            /*
-         * =====================================================
-         * 5. INSÉRER L’OPÉRATION
-         * =====================================================
-         */
-
-            $inserted = $this->db->insert(
-                'tbl_finance_bank_operation',
-                $operationData
-            );
-
-            if (!$inserted) {
-                throw new Exception(
-                    'Impossible d’enregistrer l’opération bancaire.'
-                );
-            }
-
-            $operationId =
-                (int) $this->db->insert_id();
-
-            /*
-         * =====================================================
-         * 6. METTRE À JOUR LE COMPTE SOURCE
-         * =====================================================
-         */
-
-            if (
-                in_array(
-                    $operationType,
-                    ['decaissement', 'transfert'],
-                    TRUE
-                )
-            ) {
-                $newSourceBalance =
-                    (float) $sourceAccount
-                        ->current_balance
-                    - $amount;
-
-                $updatedSource = $this->db
-                    ->where(
-                        'id',
-                        $sourceAccountId
-                    )
-                    ->update(
-                        'tbl_finance_bank_account',
-                        [
-                            'current_balance' =>
-                            $newSourceBalance,
-
-                            'updated_at' =>
-                            date(
-                                'Y-m-d H:i:s'
-                            ),
-                        ]
-                    );
-
-                if (!$updatedSource) {
-                    throw new Exception(
-                        'Impossible de mettre à jour le solde du compte source.'
-                    );
-                }
-            }
-
-            /*
-         * =====================================================
-         * 7. METTRE À JOUR LA DESTINATION
-         * =====================================================
-         */
-
-            if (
-                in_array(
-                    $operationType,
-                    ['encaissement', 'transfert'],
-                    TRUE
-                )
-            ) {
-                $newDestinationBalance =
-                    (float) $destinationAccount
-                        ->current_balance
-                    + $amount;
-
-                $updatedDestination = $this->db
-                    ->where(
-                        'id',
-                        $destinationAccountId
-                    )
-                    ->update(
-                        'tbl_finance_bank_account',
-                        [
-                            'current_balance' =>
-                            $newDestinationBalance,
-
-                            'updated_at' =>
-                            date(
-                                'Y-m-d H:i:s'
-                            ),
-                        ]
-                    );
-
-                if (!$updatedDestination) {
-                    throw new Exception(
-                        'Impossible de mettre à jour le solde du compte destination.'
-                    );
-                }
-            }
-
-            /*
-         * =====================================================
-         * 8. VALIDER LA TRANSACTION
-         * =====================================================
-         */
-
-            if (
-                $this->db->trans_status()
-                === FALSE
-            ) {
-                throw new Exception(
-                    'Une erreur est survenue pendant la transaction bancaire.'
-                );
-            }
-
-            $this->db->trans_commit();
-
-            return [
-                'status' =>
-                TRUE,
-
-                'operation_id' =>
-                $operationId,
-
-                'reference' =>
-                $reference,
-
-                'message' =>
-                'Opération bancaire enregistrée avec succès.',
-            ];
-        } catch (Throwable $exception) {
-            $this->db->trans_rollback();
-
-            log_message(
-                'error',
-                'Erreur opération bancaire : '
-                    . $exception->getMessage()
-            );
-
-            return [
-                'status' =>
-                FALSE,
-
-                'message' =>
-                $exception->getMessage(),
-            ];
-        }
-    }
-
-    public function getNextBankOperationReference(): string
-    {
-        $year = date('Y');
-
-        $prefix = 'BMV-' . $year . '-';
-
-        $lastOperation = $this->db
-            ->select('reference')
-            ->from('tbl_finance_bank_operation')
-            ->like(
-                'reference',
-                $prefix,
-                'after'
-            )
-            ->order_by('reference', 'DESC')
-            ->limit(1)
-            ->get()
-            ->row();
-
-        $nextNumber = 1;
-
-        if (
-            $lastOperation
-            && !empty($lastOperation->reference)
-        ) {
-            $parts = explode(
-                '-',
-                $lastOperation->reference
-            );
-
-            $nextNumber =
-                ((int) end($parts)) + 1;
-        }
-
-        return $prefix
-            . str_pad(
-                (string) $nextNumber,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
-    }
-
-    /**
-     * Retourne les statistiques principales des comptes bancaires.
-     *
-     * Montants affichés :
-     * - solde bancaire global en BIF ;
-     * - comptes actifs ;
-     * - établissements bancaires ;
-     * - encaissements bancaires du jour ;
-     * - décaissements bancaires du jour ;
-     * - variation du solde depuis le début du mois.
-     */
-    public function getBankMainStatistics(): array
-    {
-        $currency = 'BIF';
-        $today = date('Y-m-d');
-        $monthStart = date('Y-m-01');
-
-        /*
-     * =========================================================
-     * 1. SOLDE BANCAIRE GLOBAL
-     * =========================================================
-     */
-
-        $globalRow = $this->db
-            ->select("
-            COALESCE(
-                SUM(current_balance),
-                0
-            ) AS global_balance,
-
-            COUNT(id) AS active_accounts,
-
-            COUNT(
-                DISTINCT bank_name
-            ) AS bank_count
-        ", false)
-            ->from('tbl_finance_bank_account')
-            ->where('status', 'active')
-            ->where('currency', $currency)
-            ->get()
-            ->row();
-
-        $globalBalance = $globalRow
-            ? (float) $globalRow->global_balance
-            : 0;
-
-        /*
-     * Ici, active_accounts compte uniquement
-     * les comptes actifs en BIF.
-     *
-     * Le nombre total des comptes actifs,
-     * toutes devises confondues, sera calculé
-     * séparément plus bas.
-     */
-
-        $activeBifAccounts = $globalRow
-            ? (int) $globalRow->active_accounts
-            : 0;
-
-        $bifBankCount = $globalRow
-            ? (int) $globalRow->bank_count
-            : 0;
-
-        /*
-     * =========================================================
-     * 2. NOMBRE TOTAL DE COMPTES ACTIFS
-     * =========================================================
-     */
-
-        $activeAccountsRow = $this->db
-            ->select("
-            COUNT(id) AS active_accounts,
-
-            COUNT(
-                DISTINCT bank_name
-            ) AS bank_count
-        ", false)
-            ->from('tbl_finance_bank_account')
-            ->where('status', 'active')
-            ->get()
-            ->row();
-
-        $activeAccounts = $activeAccountsRow
-            ? (int) $activeAccountsRow->active_accounts
-            : 0;
-
-        $bankCount = $activeAccountsRow
-            ? (int) $activeAccountsRow->bank_count
-            : 0;
-
-        /*
-     * =========================================================
-     * 3. ENCAISSEMENTS BANCAIRES DU JOUR
-     * =========================================================
-     *
-     * Un encaissement bancaire augmente la trésorerie globale.
-     *
-     * Le compte concerné est stocké dans :
-     * destination_bank_account_id.
-     */
-
-        $todayIncomeRow = $this->db
-            ->select("
-            COALESCE(
-                SUM(amount),
-                0
-            ) AS total_amount,
-
-            COUNT(id) AS total_operations
-        ", false)
-            ->from('tbl_finance_bank_operation')
-            ->where(
-                'operation_type',
-                'encaissement'
-            )
-            ->where(
-                'operation_date',
-                $today
-            )
-            ->where(
-                'status',
-                'validated'
-            )
-            ->where(
-                'currency',
-                $currency
-            )
-            ->get()
-            ->row();
-
-        $todayIncomeAmount = $todayIncomeRow
-            ? (float) $todayIncomeRow->total_amount
-            : 0;
-
-        $todayIncomeCount = $todayIncomeRow
-            ? (int) $todayIncomeRow->total_operations
-            : 0;
-
-        /*
-     * =========================================================
-     * 4. DÉCAISSEMENTS BANCAIRES DU JOUR
-     * =========================================================
-     *
-     * Un décaissement bancaire diminue la trésorerie globale.
-     *
-     * Les transferts internes sont exclus.
-     */
-
-        $todayExpenseRow = $this->db
-            ->select("
-            COALESCE(
-                SUM(amount),
-                0
-            ) AS total_amount,
-
-            COUNT(id) AS total_operations
-        ", false)
-            ->from('tbl_finance_bank_operation')
-            ->where(
-                'operation_type',
-                'decaissement'
-            )
-            ->where(
-                'operation_date',
-                $today
-            )
-            ->where(
-                'status',
-                'validated'
-            )
-            ->where(
-                'currency',
-                $currency
-            )
-            ->get()
-            ->row();
-
-        $todayExpenseAmount = $todayExpenseRow
-            ? (float) $todayExpenseRow->total_amount
-            : 0;
-
-        $todayExpenseCount = $todayExpenseRow
-            ? (int) $todayExpenseRow->total_operations
-            : 0;
-
-        /*
-     * =========================================================
-     * 5. FLUX DU MOIS
-     * =========================================================
-     *
-     * Cette partie sert à calculer la variation affichée
-     * sur la première carte.
-     */
-
-        $monthlyFlowRow = $this->db
-            ->select("
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN operation_type = 'encaissement'
-                        THEN amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS monthly_income,
-
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN operation_type = 'decaissement'
-                        THEN amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS monthly_expense
-        ", false)
-            ->from('tbl_finance_bank_operation')
-            ->where('status', 'validated')
-            ->where('currency', $currency)
-            ->where('operation_date >=', $monthStart)
-            ->where('operation_date <=', $today)
-            ->where_in(
-                'operation_type',
-                [
-                    'encaissement',
-                    'decaissement',
-                ]
-            )
-            ->get()
-            ->row();
-
-        $monthlyIncome = $monthlyFlowRow
-            ? (float) $monthlyFlowRow->monthly_income
-            : 0;
-
-        $monthlyExpense = $monthlyFlowRow
-            ? (float) $monthlyFlowRow->monthly_expense
-            : 0;
-
-        $monthlyNetFlow =
-            $monthlyIncome
-            - $monthlyExpense;
-
-        /*
-     * Solde actuel =
-     * solde au début du mois + mouvement net du mois.
-     *
-     * Donc :
-     * solde début mois =
-     * solde actuel - mouvement net du mois.
-     */
-
-        $monthOpeningBalance =
-            $globalBalance
-            - $monthlyNetFlow;
-
-        $globalVariationPercentage = 0;
-
-        if ($monthOpeningBalance != 0) {
-            $globalVariationPercentage = (
-                (
-                    $globalBalance
-                    - $monthOpeningBalance
-                )
-                / abs($monthOpeningBalance)
-            ) * 100;
-        }
-
-        return [
-            'currency' => $currency,
-
-            'global_balance' =>
-            $globalBalance,
-
-            'active_accounts' =>
-            $activeAccounts,
-
-            'active_bif_accounts' =>
-            $activeBifAccounts,
-
-            'bank_count' =>
-            $bankCount,
-
-            'bif_bank_count' =>
-            $bifBankCount,
-
-            'today_income_amount' =>
-            $todayIncomeAmount,
-
-            'today_income_count' =>
-            $todayIncomeCount,
-
-            'today_expense_amount' =>
-            $todayExpenseAmount,
-
-            'today_expense_count' =>
-            $todayExpenseCount,
-
-            'monthly_income' =>
-            $monthlyIncome,
-
-            'monthly_expense' =>
-            $monthlyExpense,
-
-            'monthly_net_flow' =>
-            $monthlyNetFlow,
-
-            'month_opening_balance' =>
-            $monthOpeningBalance,
-
-            'global_variation_percentage' =>
-            $globalVariationPercentage,
-        ];
-    }
-
-    /**
-     * Retourne l'évolution des flux bancaires.
-     *
-     * Périodes acceptées :
-     * - 7days
-     * - 30days
-     * - month
-     * - year
-     *
-     * Les transferts internes sont exclus.
-     */
-    public function getBankFlowEvolution(string $period = '7days'): array
-    {
-        $today = date('Y-m-d');
-
-        switch ($period) {
-            case '30days':
-                $startDate = date(
-                    'Y-m-d',
-                    strtotime('-29 days')
-                );
-
-                $endDate = $today;
-                $groupFormat = '%Y-%m-%d';
-                break;
-
-            case 'month':
-                $startDate = date('Y-m-01');
-                $endDate = date('Y-m-t');
-                $groupFormat = '%Y-%m-%d';
-                break;
-
-            case 'year':
-                $startDate = date('Y-01-01');
-                $endDate = date('Y-12-31');
-                $groupFormat = '%Y-%m';
-                break;
-
-            case '7days':
-            default:
-                $period = '7days';
-
-                $startDate = date(
-                    'Y-m-d',
-                    strtotime('-6 days')
-                );
-
-                $endDate = $today;
-                $groupFormat = '%Y-%m-%d';
-                break;
-        }
-
-        /*
-     * =========================================================
-     * RÉCUPÉRER LES OPÉRATIONS AGRÉGÉES
-     * =========================================================
-     */
-
-        $sql = "
-        SELECT
-            DATE_FORMAT(
-                operation_date,
-                ?
-            ) AS period_key,
-
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN operation_type = 'encaissement'
-                        THEN amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS total_income,
-
-            COALESCE(
-                SUM(
-                    CASE
-                        WHEN operation_type = 'decaissement'
-                        THEN amount
-                        ELSE 0
-                    END
-                ),
-                0
-            ) AS total_expense
-
-        FROM tbl_finance_bank_operation
-
-        WHERE status = 'validated'
-
-        AND operation_type IN (
-            'encaissement',
-            'decaissement'
-        )
-
-        AND currency = 'BIF'
-
-        AND operation_date BETWEEN ? AND ?
-
-        GROUP BY
-            DATE_FORMAT(
-                operation_date,
-                ?
-            )
-
-        ORDER BY period_key ASC
-    ";
-
-        $rows = $this->db
-            ->query(
-                $sql,
-                [
-                    $groupFormat,
-                    $startDate,
-                    $endDate,
-                    $groupFormat,
-                ]
-            )
-            ->result();
-
-        /*
-     * Indexer les résultats.
-     */
-        $indexedResults = [];
-
-        foreach ($rows as $row) {
-            $indexedResults[$row->period_key] = [
-                'income' =>
-                (float) $row->total_income,
-
-                'expense' =>
-                (float) $row->total_expense,
-            ];
-        }
-
-        $labels = [];
-        $incomes = [];
-        $expenses = [];
-
-        $monthNames = [
-            1  => 'Janv.',
-            2  => 'Févr.',
-            3  => 'Mars',
-            4  => 'Avr.',
-            5  => 'Mai',
-            6  => 'Juin',
-            7  => 'Juil.',
-            8  => 'Août',
-            9  => 'Sept.',
-            10 => 'Oct.',
-            11 => 'Nov.',
-            12 => 'Déc.',
-        ];
-
-        /*
-     * =========================================================
-     * ANNÉE : UN POINT PAR MOIS
-     * =========================================================
-     */
-
-        if ($period === 'year') {
-            for ($month = 1; $month <= 12; $month++) {
-                $key = date('Y')
-                    . '-'
-                    . str_pad(
-                        (string) $month,
-                        2,
-                        '0',
-                        STR_PAD_LEFT
-                    );
-
-                $labels[] = $monthNames[$month];
-
-                $incomes[] = isset(
-                    $indexedResults[$key]
-                )
-                    ? $indexedResults[$key]['income']
-                    : 0;
-
-                $expenses[] = isset(
-                    $indexedResults[$key]
-                )
-                    ? $indexedResults[$key]['expense']
-                    : 0;
-            }
-        }
-
-        /*
-     * =========================================================
-     * AUTRES PÉRIODES : UN POINT PAR JOUR
-     * =========================================================
-     */ else {
-            $startTimestamp = strtotime($startDate);
-            $endTimestamp = strtotime($endDate);
-
-            for (
-                $timestamp = $startTimestamp;
-                $timestamp <= $endTimestamp;
-                $timestamp = strtotime(
-                    '+1 day',
-                    $timestamp
-                )
-            ) {
-                $key = date(
-                    'Y-m-d',
-                    $timestamp
-                );
-
-                $day = date(
-                    'd',
-                    $timestamp
-                );
-
-                $monthNumber = (int) date(
-                    'n',
-                    $timestamp
-                );
-
-                $labels[] = $day
-                    . ' '
-                    . $monthNames[$monthNumber];
-
-                $incomes[] = isset(
-                    $indexedResults[$key]
-                )
-                    ? $indexedResults[$key]['income']
-                    : 0;
-
-                $expenses[] = isset(
-                    $indexedResults[$key]
-                )
-                    ? $indexedResults[$key]['expense']
-                    : 0;
-            }
-        }
-
-        return [
-            'period' =>
-            $period,
-
-            'start_date' =>
-            $startDate,
-
-            'end_date' =>
-            $endDate,
-
-            'labels' =>
-            $labels,
-
-            'incomes' =>
-            $incomes,
-
-            'expenses' =>
-            $expenses,
-        ];
-    }
-
-    /**
-     * Retourne le solde disponible par banque.
-     *
-     * Seuls les comptes actifs en BIF sont additionnés.
-     */
-    public function getBankBalanceDistribution(): array
-    {
-        $rows = $this->db
-            ->select("
-            bank_name,
-
-            COUNT(id) AS account_count,
-
-            COALESCE(
-                SUM(current_balance),
-                0
-            ) AS total_balance
-        ", false)
-            ->from('tbl_finance_bank_account')
-            ->where('status', 'active')
-            ->where('currency', 'BIF')
-            ->group_by('bank_name')
-            ->order_by('total_balance', 'DESC')
-            ->get()
-            ->result();
-
-        $maxBalance = 0;
-
-        foreach ($rows as $row) {
-            $balance = (float) $row->total_balance;
-
-            if ($balance > $maxBalance) {
-                $maxBalance = $balance;
-            }
-        }
-
-        $bankLabels = [
-            'CRDB' =>
-            'CRDB Bank',
-
-            'BANCOBU' =>
-            'BANCOBU',
-
-            'ECOBANK' =>
-            'ECOBANK',
-
-            'KCB' =>
-            'KCB Bank',
-
-            'BCB' =>
-            'BCB',
-
-            'BHB' =>
-            'BHB',
-
-            'INTERBANK' =>
-            'Interbank Burundi',
-        ];
-
-        $distribution = [];
-
-        foreach ($rows as $row) {
-            $balance = (float) $row->total_balance;
-
-            $percentage = $maxBalance > 0
-                ? ($balance / $maxBalance) * 100
-                : 0;
-
-            $distribution[] = [
-                'bank_code' =>
-                $row->bank_name,
-
-                'bank_name' =>
-                $bankLabels[$row->bank_name]
-                    ?? $row->bank_name,
-
-                'account_count' =>
-                (int) $row->account_count,
-
-                'total_balance' =>
-                $balance,
-
-                'percentage' =>
-                min(
-                    100,
-                    max(
-                        0,
-                        $percentage
-                    )
-                ),
-            ];
-        }
-
-        return $distribution;
-    }
-
-    /**
-     * Retourne la situation détaillée des comptes bancaires.
-     *
-     * Pour chaque compte :
-     * - solde actuel ;
-     * - entrées du mois ;
-     * - sorties du mois ;
-     * - nombre d'opérations ;
-     * - informations générales du compte.
-     */
-    public function getBankAccountSituations(): array
-    {
-        $monthStart = date('Y-m-01');
-        $monthEnd   = date('Y-m-t');
-
-        $sql = "
-        SELECT
-            ba.id,
-            ba.code,
-            ba.name,
-            ba.bank_name,
-            ba.account_number,
-            ba.account_type,
-            ba.currency,
-            ba.opening_balance,
-            ba.current_balance,
-            ba.alert_threshold,
-            ba.branch_name,
-            ba.swift_code,
-            ba.observation,
-            ba.status,
-            ba.created_at,
-            ba.updated_at,
-
-            COALESCE(
-                movements.monthly_entries,
-                0
-            ) AS monthly_entries,
-
-            COALESCE(
-                movements.monthly_outputs,
-                0
-            ) AS monthly_outputs,
-
-            COALESCE(
-                movements.monthly_operations,
-                0
-            ) AS monthly_operations
-
-        FROM tbl_finance_bank_account ba
-
-        LEFT JOIN
-        (
-            SELECT
-                bank_movements.bank_account_id,
-
-                SUM(
-                    bank_movements.entry_amount
-                ) AS monthly_entries,
-
-                SUM(
-                    bank_movements.output_amount
-                ) AS monthly_outputs,
-
-                COUNT(
-                    DISTINCT bank_movements.operation_id
-                ) AS monthly_operations
-
-            FROM
-            (
-                /*
-                 * Entrées :
-                 * encaissements et destinations des transferts.
-                 */
-                SELECT
-                    op.id AS operation_id,
-                    op.destination_bank_account_id
-                        AS bank_account_id,
-                    op.amount AS entry_amount,
-                    0 AS output_amount
-
-                FROM tbl_finance_bank_operation op
-
-                WHERE op.destination_bank_account_id IS NOT NULL
-                AND op.status = 'validated'
-                AND op.operation_date BETWEEN ? AND ?
-
-                UNION ALL
-
-                /*
-                 * Sorties :
-                 * décaissements et sources des transferts.
-                 */
-                SELECT
-                    op.id AS operation_id,
-                    op.source_bank_account_id
-                        AS bank_account_id,
-                    0 AS entry_amount,
-                    op.amount AS output_amount
-
-                FROM tbl_finance_bank_operation op
-
-                WHERE op.source_bank_account_id IS NOT NULL
-                AND op.status = 'validated'
-                AND op.operation_date BETWEEN ? AND ?
-
-            ) bank_movements
-
-            GROUP BY bank_movements.bank_account_id
-
-        ) movements
-            ON movements.bank_account_id = ba.id
-
-        ORDER BY
-            CASE
-                WHEN ba.status = 'active'
-                    THEN 0
-                WHEN ba.status = 'blocked'
-                    THEN 1
-                ELSE 2
-            END ASC,
-
-            ba.bank_name ASC,
-            ba.currency ASC,
-            ba.name ASC
-    ";
-
-        return $this->db
-            ->query(
-                $sql,
-                [
-                    $monthStart,
-                    $monthEnd,
-                    $monthStart,
-                    $monthEnd,
-                ]
-            )
-            ->result();
-    }
-
-    /**
-     * Compte tous les comptes bancaires actifs.
-     */
-    public function countActiveBankAccounts(): int
-    {
-        return (int) $this->db
-            ->where('status', 'active')
-            ->count_all_results(
-                'tbl_finance_bank_account'
-            );
-    }
-
-    /**
-     * Retourne les mouvements bancaires les plus récents.
-     *
-     * @param int $limit Nombre maximum d'opérations à retourner.
-     *
-     * @return array
-     */
-    public function getRecentBankOperations(int $limit = 10): array
-    {
-        $limit = max(
-            1,
-            min(
-                100,
-                $limit
-            )
-        );
-
-        return $this->db
-            ->select([
-                /*
-             * Informations de l'opération.
-             */
-                'operation.id',
-                'operation.reference',
-                'operation.operation_type',
-                'operation.operation_date',
-                'operation.source_bank_account_id',
-                'operation.destination_bank_account_id',
-                'operation.amount',
-                'operation.currency',
-                'operation.category',
-                'operation.third_party',
-                'operation.payment_method',
-                'operation.document_number',
-                'operation.attachment',
-                'operation.label',
-                'operation.status',
-                'operation.created_by',
-                'operation.validated_by',
-                'operation.created_at',
-                'operation.updated_at',
-
-                /*
-             * Compte source.
-             */
-                'source_account.code AS source_account_code',
-                'source_account.name AS source_account_name',
-                'source_account.bank_name AS source_bank_name',
-                'source_account.account_number AS source_account_number',
-                'source_account.currency AS source_currency',
-
-                /*
-             * Compte destination.
-             */
-                'destination_account.code AS destination_account_code',
-                'destination_account.name AS destination_account_name',
-                'destination_account.bank_name AS destination_bank_name',
-                'destination_account.account_number AS destination_account_number',
-                'destination_account.currency AS destination_currency',
-            ])
-            ->from(
-                'tbl_finance_bank_operation AS operation'
-            )
-            ->join(
-                'tbl_finance_bank_account AS source_account',
-                'source_account.id = operation.source_bank_account_id',
-                'left'
-            )
-            ->join(
-                'tbl_finance_bank_account AS destination_account',
-                'destination_account.id = operation.destination_bank_account_id',
-                'left'
-            )
-            ->order_by(
-                'operation.operation_date',
-                'DESC'
-            )
-            ->order_by(
-                'operation.created_at',
-                'DESC'
-            )
-            ->order_by(
-                'operation.id',
-                'DESC'
-            )
-            ->limit($limit)
-            ->get()
-            ->result();
-    }
-
-    /**
-     * Compte toutes les opérations bancaires enregistrées.
-     */
-    public function countBankOperations(): int
-    {
-        return (int) $this->db
-            ->count_all_results(
-                'tbl_finance_bank_operation'
-            );
-    }
-
-    /**
-     * Retourne les alertes bancaires à afficher.
-     *
-     * Alertes générées :
-     * - opérations en attente ;
-     * - opérations validées sans justificatif ;
-     * - comptes actifs sous leur seuil d'alerte.
-     *
-     * @param int $limit Nombre maximum d'alertes.
-     *
-     * @return array
-     */
-    public function getBankAlerts(int $limit = 10): array
-    {
-        $limit = max(
-            1,
-            min(
-                50,
-                $limit
-            )
-        );
-
-        $alerts = [];
-
-        /*
-     * =========================================================
-     * 1. OPÉRATIONS EN ATTENTE
-     * =========================================================
-     */
-
-        $pendingOperations = $this->db
-            ->select([
-                'operation.id',
-                'operation.reference',
-                'operation.operation_type',
-                'operation.amount',
-                'operation.currency',
-                'operation.label',
-                'operation.operation_date',
-                'operation.created_at',
-
-                'source_account.name AS source_account_name',
-                'destination_account.name AS destination_account_name',
-            ])
-            ->from(
-                'tbl_finance_bank_operation AS operation'
-            )
-            ->join(
-                'tbl_finance_bank_account AS source_account',
-                'source_account.id = operation.source_bank_account_id',
-                'left'
-            )
-            ->join(
-                'tbl_finance_bank_account AS destination_account',
-                'destination_account.id = operation.destination_bank_account_id',
-                'left'
-            )
-            ->where(
-                'operation.status',
-                'pending'
-            )
-            ->order_by(
-                'operation.operation_date',
-                'ASC'
-            )
-            ->order_by(
-                'operation.created_at',
-                'ASC'
-            )
-            ->limit($limit)
-            ->get()
-            ->result();
-
-        foreach ($pendingOperations as $operation) {
-            $title = 'Opération bancaire en attente';
-
-            $description =
-                'L’opération '
-                . $operation->reference
-                . ' d’un montant de '
-                . number_format(
-                    (float) $operation->amount,
-                    0,
-                    ',',
-                    ' '
-                )
-                . ' '
-                . $operation->currency
-                . ' attend une validation.';
-
-            if (
-                $operation->operation_type
-                === 'transfert'
-            ) {
-                $title =
-                    'Transfert bancaire en attente';
-
-                $description =
-                    'Le transfert de '
-                    . number_format(
-                        (float) $operation->amount,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $operation->currency
-                    . ' de '
-                    . (
-                        $operation->source_account_name
-                        ?: 'un compte source'
-                    )
-                    . ' vers '
-                    . (
-                        $operation
-                        ->destination_account_name
-                        ?: 'un compte destination'
-                    )
-                    . ' attend une validation.';
-            }
-
-            $alerts[] = [
-                'type' =>
-                'warning',
-
-                'icon' =>
-                'fas fa-clock',
-
-                'title' =>
-                $title,
-
-                'description' =>
-                $description,
-
-                'operation_id' =>
-                (int) $operation->id,
-
-                'priority' =>
-                2,
-
-                'created_at' =>
-                $operation->created_at,
-            ];
-        }
-
-        /*
-     * =========================================================
-     * 2. JUSTIFICATIFS MANQUANTS
-     * =========================================================
-     */
-
-        $missingAttachments = $this->db
-            ->select([
-                'operation.id',
-                'operation.reference',
-                'operation.amount',
-                'operation.currency',
-                'operation.operation_type',
-                'operation.label',
-                'operation.created_at',
-            ])
-            ->from(
-                'tbl_finance_bank_operation AS operation'
-            )
-            ->where(
-                'operation.status',
-                'validated'
-            )
-            ->group_start()
-            ->where(
-                'operation.attachment IS NULL',
-                null,
-                false
-            )
-            ->or_where(
-                'operation.attachment',
-                ''
-            )
-            ->group_end()
-            ->order_by(
-                'operation.created_at',
-                'DESC'
-            )
-            ->limit($limit)
-            ->get()
-            ->result();
-
-        foreach ($missingAttachments as $operation) {
-            $alerts[] = [
-                'type' =>
-                'danger',
-
-                'icon' =>
-                'fas fa-file-invoice',
-
-                'title' =>
-                'Justificatif manquant',
-
-                'description' =>
-                'L’opération '
-                    . $operation->reference
-                    . ' d’un montant de '
-                    . number_format(
-                        (float) $operation->amount,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $operation->currency
-                    . ' ne possède pas encore de pièce justificative.',
-
-                'operation_id' =>
-                (int) $operation->id,
-
-                'priority' =>
-                1,
-
-                'created_at' =>
-                $operation->created_at,
-            ];
-        }
-
-        /*
-     * =========================================================
-     * 3. COMPTES SOUS LE SEUIL D'ALERTE
-     * =========================================================
-     */
-
-        $lowBalanceAccounts = $this->db
-            ->select([
-                'id',
-                'code',
-                'name',
-                'current_balance',
-                'alert_threshold',
-                'currency',
-                'created_at',
-            ])
-            ->from(
-                'tbl_finance_bank_account'
-            )
-            ->where(
-                'status',
-                'active'
-            )
-            ->where(
-                'alert_threshold >',
-                0
-            )
-            ->where(
-                'current_balance <= alert_threshold',
-                null,
-                false
-            )
-            ->order_by(
-                'current_balance',
-                'ASC'
-            )
-            ->limit($limit)
-            ->get()
-            ->result();
-
-        foreach ($lowBalanceAccounts as $account) {
-            $alerts[] = [
-                'type' =>
-                'danger',
-
-                'icon' =>
-                'fas fa-university',
-
-                'title' =>
-                'Solde bancaire critique',
-
-                'description' =>
-                'Le compte '
-                    . $account->name
-                    . ' dispose de '
-                    . number_format(
-                        (float) $account
-                            ->current_balance,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $account->currency
-                    . ', pour un seuil fixé à '
-                    . number_format(
-                        (float) $account
-                            ->alert_threshold,
-                        0,
-                        ',',
-                        ' '
-                    )
-                    . ' '
-                    . $account->currency
-                    . '.',
-
-                'account_id' =>
-                (int) $account->id,
-
-                'priority' =>
-                0,
-
-                'created_at' =>
-                $account->created_at,
-            ];
-        }
-
-        /*
-     * Les alertes les plus importantes passent d'abord.
-     */
-        usort(
-            $alerts,
-            static function (
-                array $first,
-                array $second
-            ): int {
-                if (
-                    $first['priority']
-                    === $second['priority']
-                ) {
-                    return strcmp(
-                        (string) $second['created_at'],
-                        (string) $first['created_at']
-                    );
-                }
-
-                return $first['priority']
-                    <=> $second['priority'];
-            }
-        );
-
-        return array_slice(
-            $alerts,
-            0,
-            $limit
-        );
-    }
 
     /**
      * Retourne les statistiques principales de la page Encaissements.
@@ -5777,369 +3990,11 @@ class FinanceModel extends CI_Model
             ->count_all_results();
     }
 
-    /**
-     * Retourne la liste distincte des établissements bancaires.
-     *
-     * @return array
-     */
-    public function getAvailableBankNames(): array
-    {
-        return $this->db
-            ->select('bank_name')
-            ->from('tbl_finance_bank_account')
-            ->where('bank_name IS NOT NULL', null, false)
-            ->where("TRIM(bank_name) <> ''", null, false)
-            ->group_by('bank_name')
-            ->order_by('bank_name', 'ASC')
-            ->get()
-            ->result();
-    }
 
-    /**
-     * Retourne la situation des comptes bancaires
-     * avec possibilité de filtrage.
-     *
-     * Filtres disponibles :
-     * - search
-     * - bank_name
-     * - currency
-     * - status
-     *
-     * @param array $filters
-     *
-     * @return array
-     */
-    public function getFilteredBankAccounts(
-        array $filters = []
-    ): array {
-        /*
-     * =========================================================
-     * 1. VALEURS DES FILTRES
-     * =========================================================
-     */
 
-        $search = trim(
-            (string) (
-                $filters['search']
-                ?? ''
-            )
-        );
 
-        $bankName = trim(
-            (string) (
-                $filters['bank_name']
-                ?? ''
-            )
-        );
 
-        $currency = trim(
-            (string) (
-                $filters['currency']
-                ?? ''
-            )
-        );
 
-        $status = trim(
-            (string) (
-                $filters['status']
-                ?? ''
-            )
-        );
-
-        /*
-     * =========================================================
-     * 2. REQUÊTE DE BASE
-     * =========================================================
-     */
-
-        $this->db
-            ->select([
-                'account.id',
-                'account.code',
-                'account.name',
-                'account.bank_name',
-                'account.account_number',
-                'account.account_type',
-                'account.currency',
-                'account.opening_balance',
-                'account.current_balance',
-                'account.alert_threshold',
-                'account.branch_name',
-                'account.swift_code',
-                'account.observation',
-                'account.status',
-                'account.created_by',
-                'account.updated_by',
-                'account.created_at',
-                'account.updated_at',
-            ])
-            ->from(
-                'tbl_finance_bank_account AS account'
-            );
-
-        /*
-     * =========================================================
-     * 3. FILTRE DE RECHERCHE
-     * =========================================================
-     *
-     * Recherche dans :
-     * - code
-     * - intitulé
-     * - banque
-     * - numéro de compte
-     * - agence
-     * - code SWIFT
-     */
-
-        if ($search !== '') {
-            $this->db
-                ->group_start()
-                ->like(
-                    'account.code',
-                    $search
-                )
-                ->or_like(
-                    'account.name',
-                    $search
-                )
-                ->or_like(
-                    'account.bank_name',
-                    $search
-                )
-                ->or_like(
-                    'account.account_number',
-                    $search
-                )
-                ->or_like(
-                    'account.branch_name',
-                    $search
-                )
-                ->or_like(
-                    'account.swift_code',
-                    $search
-                )
-                ->group_end();
-        }
-
-        /*
-     * =========================================================
-     * 4. FILTRE PAR BANQUE
-     * =========================================================
-     */
-
-        if ($bankName !== '') {
-            $this->db->where(
-                'account.bank_name',
-                $bankName
-            );
-        }
-
-        /*
-     * =========================================================
-     * 5. FILTRE PAR DEVISE
-     * =========================================================
-     */
-
-        if (
-            in_array(
-                $currency,
-                [
-                    'BIF',
-                    'USD',
-                    'EUR',
-                ],
-                true
-            )
-        ) {
-            $this->db->where(
-                'account.currency',
-                $currency
-            );
-        }
-
-        /*
-     * =========================================================
-     * 6. FILTRE PAR STATUT
-     * =========================================================
-     */
-
-        if (
-            in_array(
-                $status,
-                [
-                    'active',
-                    'inactive',
-                    'blocked',
-                ],
-                true
-            )
-        ) {
-            $this->db->where(
-                'account.status',
-                $status
-            );
-        }
-
-        /*
-     * =========================================================
-     * 7. TRI
-     * =========================================================
-     *
-     * On affiche :
-     * - les comptes actifs en premier ;
-     * - ensuite les comptes inactifs ;
-     * - enfin les comptes bloqués.
-     */
-
-        $this->db->order_by(
-            "
-        CASE
-            WHEN account.status = 'active' THEN 1
-            WHEN account.status = 'inactive' THEN 2
-            WHEN account.status = 'blocked' THEN 3
-            ELSE 4
-        END
-        ",
-            '',
-            false
-        );
-
-        $this->db
-            ->order_by(
-                'account.bank_name',
-                'ASC'
-            )
-            ->order_by(
-                'account.name',
-                'ASC'
-            )
-            ->order_by(
-                'account.id',
-                'DESC'
-            );
-
-        return $this->db
-            ->get()
-            ->result();
-    }
-
-    /**
-     * Compte les comptes bancaires correspondant aux filtres.
-     *
-     * @param array $filters
-     *
-     * @return int
-     */
-    public function countFilteredBankAccounts(
-        array $filters = []
-    ): int {
-        $search = trim(
-            (string) (
-                $filters['search']
-                ?? ''
-            )
-        );
-
-        $bankName = trim(
-            (string) (
-                $filters['bank_name']
-                ?? ''
-            )
-        );
-
-        $currency = trim(
-            (string) (
-                $filters['currency']
-                ?? ''
-            )
-        );
-
-        $status = trim(
-            (string) (
-                $filters['status']
-                ?? ''
-            )
-        );
-
-        $this->db
-            ->from(
-                'tbl_finance_bank_account AS account'
-            );
-
-        if ($search !== '') {
-            $this->db
-                ->group_start()
-                ->like(
-                    'account.code',
-                    $search
-                )
-                ->or_like(
-                    'account.name',
-                    $search
-                )
-                ->or_like(
-                    'account.bank_name',
-                    $search
-                )
-                ->or_like(
-                    'account.account_number',
-                    $search
-                )
-                ->or_like(
-                    'account.branch_name',
-                    $search
-                )
-                ->or_like(
-                    'account.swift_code',
-                    $search
-                )
-                ->group_end();
-        }
-
-        if ($bankName !== '') {
-            $this->db->where(
-                'account.bank_name',
-                $bankName
-            );
-        }
-
-        if (
-            in_array(
-                $currency,
-                [
-                    'BIF',
-                    'USD',
-                    'EUR',
-                ],
-                true
-            )
-        ) {
-            $this->db->where(
-                'account.currency',
-                $currency
-            );
-        }
-
-        if (
-            in_array(
-                $status,
-                [
-                    'active',
-                    'inactive',
-                    'blocked',
-                ],
-                true
-            )
-        ) {
-            $this->db->where(
-                'account.status',
-                $status
-            );
-        }
-
-        return (int) $this->db
-            ->count_all_results();
-    }
 
 
     /**
@@ -7472,1208 +5327,9 @@ class FinanceModel extends CI_Model
         return $summary;
     }
 
-    /**
-     * Récupère tous les comptes bancaires actifs
-     * avec leur solde disponible.
-     *
-     * @return array
-     */
-    public function getActiveBankAccountsForReconciliation()
-    {
-        $this->db->select(
-            'id,
-         code,
-         name,
-         bank_name,
-         account_number,
-         account_type,
-         currency,
-         current_balance,
-         branch_name'
-        );
 
-        $this->db->from('tbl_finance_bank_account');
 
-        $this->db->where('status', 'active');
 
-        $this->db->order_by('bank_name', 'ASC');
-
-        $this->db->order_by('name', 'ASC');
-
-        return $this->db->get()->result();
-    }
-
-    /**
-     * Récupère un compte bancaire actif par son identifiant.
-     *
-     * @param int $bankAccountId
-     * @return object|null
-     */
-    public function getActiveBankAccountById($bankAccountId)
-    {
-        $bankAccountId = (int) $bankAccountId;
-
-        if ($bankAccountId <= 0) {
-            return null;
-        }
-
-        return $this->db
-            ->select([
-                'id',
-                'code',
-                'name',
-                'bank_name',
-                'account_number',
-                'account_type',
-                'currency',
-                'opening_balance',
-                'current_balance',
-                'status',
-            ])
-            ->from('tbl_finance_bank_account')
-            ->where('id', $bankAccountId)
-            ->where('status', 'active')
-            ->limit(1)
-            ->get()
-            ->row();
-    }
-
-    /**
-     * Génère la prochaine référence de rapprochement bancaire.
-     *
-     * Exemple :
-     * RAP-2026-00001
-     *
-     * @return string
-     */
-    public function generateBankReconciliationReference()
-    {
-        $year = date('Y');
-
-        $prefix = 'RAP-' . $year . '-';
-
-        $lastReconciliation = $this->db
-            ->select('reference')
-            ->from('tbl_finance_bank_reconciliation')
-            ->like('reference', $prefix, 'after')
-            ->order_by('id', 'DESC')
-            ->limit(1)
-            ->get()
-            ->row();
-
-        $nextNumber = 1;
-
-        if (
-            $lastReconciliation
-            && !empty($lastReconciliation->reference)
-        ) {
-            $parts = explode(
-                '-',
-                $lastReconciliation->reference
-            );
-
-            $lastNumber = (int) end($parts);
-
-            $nextNumber = $lastNumber + 1;
-        }
-
-        return $prefix
-            . str_pad(
-                $nextNumber,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
-    }
-
-    /**
-     * Vérifie si une session active existe déjà
-     * pour le même compte et la même période.
-     *
-     * @param int $bankAccountId
-     * @param string $periodStart
-     * @param string $periodEnd
-     * @return bool
-     */
-    public function bankReconciliationAlreadyExists(
-        $bankAccountId,
-        $periodStart,
-        $periodEnd
-    ) {
-        return $this->db
-            ->from('tbl_finance_bank_reconciliation')
-            ->where('bank_account_id', (int) $bankAccountId)
-            ->where('period_start', $periodStart)
-            ->where('period_end', $periodEnd)
-            ->where_in(
-                'status',
-                [
-                    'draft',
-                    'in_progress',
-                    'completed',
-                ]
-            )
-            ->count_all_results() > 0;
-    }
-
-    /**
-     * Calcule le solde système d'un compte à une date donnée.
-     *
-     * Solde =
-     * solde d'ouverture
-     * + encaissements
-     * - décaissements
-     * - transferts sortants
-     * + transferts entrants
-     *
-     * @param int $bankAccountId
-     * @param string $date
-     * @return float
-     */
-    public function getBankAccountSystemBalanceAtDate(
-        $bankAccountId,
-        $date
-    ) {
-        $bankAccount = $this->db
-            ->select('opening_balance')
-            ->from('tbl_finance_bank_account')
-            ->where('id', (int) $bankAccountId)
-            ->limit(1)
-            ->get()
-            ->row();
-
-        if (!$bankAccount) {
-            return 0;
-        }
-
-        $balance = (float) $bankAccount->opening_balance;
-
-        /*
-     * Entrées sur le compte.
-     */
-        $incoming = $this->db
-            ->select_sum('amount', 'total')
-            ->from('tbl_finance_bank_operation')
-            ->where('destination_bank_account_id', (int) $bankAccountId)
-            ->where('operation_date <', $date)
-            ->where('status', 'validated')
-            ->get()
-            ->row();
-
-        /*
-     * Sorties depuis le compte.
-     */
-        $outgoing = $this->db
-            ->select_sum('amount', 'total')
-            ->from('tbl_finance_bank_operation')
-            ->where('source_bank_account_id', (int) $bankAccountId)
-            ->where('operation_date <', $date)
-            ->where('status', 'validated')
-            ->get()
-            ->row();
-
-        $incomingAmount = $incoming
-            ? (float) $incoming->total
-            : 0;
-
-        $outgoingAmount = $outgoing
-            ? (float) $outgoing->total
-            : 0;
-
-        return $balance
-            + $incomingAmount
-            - $outgoingAmount;
-    }
-
-    /**
-     * Calcule le solde système jusqu'à la fin d'une date.
-     *
-     * @param int $bankAccountId
-     * @param string $date
-     * @return float
-     */
-    public function getBankAccountSystemClosingBalance(
-        $bankAccountId,
-        $date
-    ) {
-        $bankAccount = $this->db
-            ->select('opening_balance')
-            ->from('tbl_finance_bank_account')
-            ->where('id', (int) $bankAccountId)
-            ->limit(1)
-            ->get()
-            ->row();
-
-        if (!$bankAccount) {
-            return 0;
-        }
-
-        $balance = (float) $bankAccount->opening_balance;
-
-        $incoming = $this->db
-            ->select_sum('amount', 'total')
-            ->from('tbl_finance_bank_operation')
-            ->where('destination_bank_account_id', (int) $bankAccountId)
-            ->where('operation_date <=', $date)
-            ->where('status', 'validated')
-            ->get()
-            ->row();
-
-        $outgoing = $this->db
-            ->select_sum('amount', 'total')
-            ->from('tbl_finance_bank_operation')
-            ->where('source_bank_account_id', (int) $bankAccountId)
-            ->where('operation_date <=', $date)
-            ->where('status', 'validated')
-            ->get()
-            ->row();
-
-        $incomingAmount = $incoming
-            ? (float) $incoming->total
-            : 0;
-
-        $outgoingAmount = $outgoing
-            ? (float) $outgoing->total
-            : 0;
-
-        return $balance
-            + $incomingAmount
-            - $outgoingAmount;
-    }
-
-    /**
-     * Enregistre une nouvelle session de rapprochement.
-     *
-     * @param array $data
-     * @return array
-     */
-    public function createBankReconciliation(array $data)
-    {
-        $this->db->trans_begin();
-
-        try {
-            /*
-         * Génération de la référence dans la transaction.
-         */
-            $data['reference'] =
-                $this->generateBankReconciliationReference();
-
-            $inserted = $this->db->insert(
-                'tbl_finance_bank_reconciliation',
-                $data
-            );
-
-            if (!$inserted) {
-                throw new Exception(
-                    'Impossible d’enregistrer le rapprochement bancaire.'
-                );
-            }
-
-            $reconciliationId =
-                (int) $this->db->insert_id();
-
-            if ($this->db->trans_status() === false) {
-                throw new Exception(
-                    'Une erreur est survenue pendant la transaction.'
-                );
-            }
-
-            $this->db->trans_commit();
-
-            return [
-                'status' => true,
-                'id' => $reconciliationId,
-                'reference' => $data['reference'],
-                'message' =>
-                'Le rapprochement bancaire a été démarré.',
-            ];
-        } catch (Throwable $exception) {
-            $this->db->trans_rollback();
-
-            log_message(
-                'error',
-                'Erreur création rapprochement bancaire : '
-                    . $exception->getMessage()
-            );
-
-            return [
-                'status' => false,
-                'id' => null,
-                'reference' => null,
-                'message' => $exception->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Génère la prochaine référence du relevé bancaire.
-     *
-     * @return string
-     */
-    public function generateBankStatementReference()
-    {
-        $year = date('Y');
-
-        $prefix = 'REL-' . $year . '-';
-
-        $lastStatement = $this->db
-            ->select('reference')
-            ->from('tbl_finance_bank_statement')
-            ->like('reference', $prefix, 'after')
-            ->order_by('id', 'DESC')
-            ->limit(1)
-            ->get()
-            ->row();
-
-        $nextNumber = 1;
-
-        if (
-            $lastStatement
-            && !empty($lastStatement->reference)
-        ) {
-            $referenceParts = explode(
-                '-',
-                $lastStatement->reference
-            );
-
-            $lastNumber = (int) end($referenceParts);
-
-            $nextNumber = $lastNumber + 1;
-        }
-
-        return $prefix
-            . str_pad(
-                $nextNumber,
-                5,
-                '0',
-                STR_PAD_LEFT
-            );
-    }
-
-    /**
-     * Vérifie si un relevé existe déjà pour le compte
-     * et la période sélectionnés.
-     *
-     * @param int $bankAccountId
-     * @param string $periodStart
-     * @param string $periodEnd
-     * @return bool
-     */
-    public function bankStatementAlreadyExists(
-        $bankAccountId,
-        $periodStart,
-        $periodEnd
-    ) {
-        return $this->db
-            ->from('tbl_finance_bank_statement')
-            ->where('bank_account_id', (int) $bankAccountId)
-            ->where('period_start', $periodStart)
-            ->where('period_end', $periodEnd)
-            ->where_not_in(
-                'status',
-                [
-                    'cancelled',
-                    'failed',
-                ]
-            )
-            ->count_all_results() > 0;
-    }
-
-    /**
-     * Enregistre les informations d'un relevé bancaire.
-     *
-     * @param array $data
-     * @return array
-     */
-    public function createBankStatement(array $data)
-    {
-        $this->db->trans_begin();
-
-        try {
-            $data['reference'] =
-                $this->generateBankStatementReference();
-
-            $inserted = $this->db->insert(
-                'tbl_finance_bank_statement',
-                $data
-            );
-
-            if (!$inserted) {
-                $databaseError = $this->db->error();
-
-                throw new Exception(
-                    !empty($databaseError['message'])
-                        ? $databaseError['message']
-                        : 'Le relevé bancaire n’a pas pu être enregistré.'
-                );
-            }
-
-            $statementId =
-                (int) $this->db->insert_id();
-
-            if ($this->db->trans_status() === false) {
-                throw new Exception(
-                    'La transaction d’importation a échoué.'
-                );
-            }
-
-            $this->db->trans_commit();
-
-            return [
-                'status' => true,
-                'id' => $statementId,
-                'reference' => $data['reference'],
-                'message' =>
-                'Le relevé bancaire a été importé avec succès.',
-            ];
-        } catch (Throwable $exception) {
-            $this->db->trans_rollback();
-
-            log_message(
-                'error',
-                'Erreur import relevé bancaire : '
-                    . $exception->getMessage()
-            );
-
-            return [
-                'status' => false,
-                'id' => null,
-                'reference' => null,
-                'message' => $exception->getMessage(),
-            ];
-        }
-    }
-
-    /**
-     * Statistiques principales du rapprochement bancaire.
-     *
-     * @return array
-     */
-    public function getBankReconciliationMainStatistics()
-    {
-        $startDate = date('Y-m-01');
-        $endDate   = date('Y-m-t');
-
-        /*
-     * Valeurs par défaut.
-     */
-        $statistics = [
-            'total_bank_operations'       => 0,
-            'matched_operations'          => 0,
-            'matched_percentage'          => 0,
-
-            'statement_accounts_count'    => 0,
-            'statement_closing_balance'   => 0,
-
-            'pending_operations_count'    => 0,
-            'pending_operations_amount'   => 0,
-
-            'anomalies_count'             => 0,
-            'unjustified_difference'      => 0,
-        ];
-
-        /*
-     * =====================================================
-     * 1. Nombre total d'opérations bancaires du mois
-     * =====================================================
-     */
-        $totalOperations = $this->db
-            ->select('COUNT(bo.id) AS total_operations', false)
-            ->from('tbl_finance_bank_operation bo')
-            ->where('bo.operation_date >=', $startDate)
-            ->where('bo.operation_date <=', $endDate)
-            ->get()
-            ->row();
-
-        $statistics['total_bank_operations'] =
-            $totalOperations
-            ? (int) $totalOperations->total_operations
-            : 0;
-
-        /*
-     * =====================================================
-     * 2. Soldes des relevés bancaires importés
-     * =====================================================
-     *
-     * On prend le dernier relevé de chaque compte bancaire.
-     */
-        $latestStatementsSubquery = "
-        SELECT
-            MAX(bs2.id)
-        FROM tbl_finance_bank_statement bs2
-        WHERE bs2.bank_account_id = bs.bank_account_id
-    ";
-
-        $statementSummary = $this->db
-            ->select([
-                'COUNT(DISTINCT bs.bank_account_id) AS accounts_count',
-                'COALESCE(SUM(bs.closing_balance), 0) AS total_closing_balance',
-            ], false)
-            ->from('tbl_finance_bank_statement bs')
-            ->where(
-                "bs.id IN ($latestStatementsSubquery)",
-                null,
-                false
-            )
-            ->get()
-            ->row();
-
-        if ($statementSummary) {
-            $statistics['statement_accounts_count'] =
-                (int) $statementSummary->accounts_count;
-
-            $statistics['statement_closing_balance'] =
-                (float) $statementSummary->total_closing_balance;
-        }
-
-        /*
-     * =====================================================
-     * 3. Statistiques détaillées de rapprochement
-     * =====================================================
-     */
-        if (
-            !$this->db->table_exists(
-                'tbl_finance_bank_reconciliation_item'
-            )
-        ) {
-            return $statistics;
-        }
-
-        /*
-     * Opérations rapprochées.
-     */
-        $matchedResult = $this->db
-            ->select('COUNT(ri.id) AS matched_count', false)
-            ->from('tbl_finance_bank_reconciliation_item ri')
-            ->join(
-                'tbl_finance_bank_reconciliation br',
-                'br.id = ri.reconciliation_id',
-                'inner'
-            )
-            ->where('br.period_start <=', $endDate)
-            ->where('br.period_end >=', $startDate)
-            ->where('ri.matching_status', 'matched')
-            ->get()
-            ->row();
-
-        $statistics['matched_operations'] =
-            $matchedResult
-            ? (int) $matchedResult->matched_count
-            : 0;
-
-        /*
-     * Pourcentage rapproché.
-     */
-        if ($statistics['total_bank_operations'] > 0) {
-            $statistics['matched_percentage'] = round(
-                (
-                    $statistics['matched_operations']
-                    / $statistics['total_bank_operations']
-                ) * 100,
-                1
-            );
-        }
-
-        /*
-     * Opérations en attente de rapprochement.
-     */
-        $pendingResult = $this->db
-            ->select([
-                'COUNT(ri.id) AS pending_count',
-                '
-                COALESCE(
-                    SUM(
-                        CASE
-                            WHEN ri.statement_amount IS NOT NULL
-                            THEN ri.statement_amount
-                            ELSE ri.system_amount
-                        END
-                    ),
-                    0
-                ) AS pending_amount
-            ',
-            ], false)
-            ->from('tbl_finance_bank_reconciliation_item ri')
-            ->join(
-                'tbl_finance_bank_reconciliation br',
-                'br.id = ri.reconciliation_id',
-                'inner'
-            )
-            ->where('br.period_start <=', $endDate)
-            ->where('br.period_end >=', $startDate)
-            ->where_in(
-                'ri.matching_status',
-                [
-                    'unmatched',
-                    'pending',
-                ]
-            )
-            ->get()
-            ->row();
-
-        if ($pendingResult) {
-            $statistics['pending_operations_count'] =
-                (int) $pendingResult->pending_count;
-
-            $statistics['pending_operations_amount'] =
-                (float) $pendingResult->pending_amount;
-        }
-
-        /*
-     * Anomalies et écart global non justifié.
-     */
-        $anomalyResult = $this->db
-            ->select([
-                'COUNT(ri.id) AS anomalies_count',
-                '
-                COALESCE(
-                    SUM(ABS(ri.difference_amount)),
-                    0
-                ) AS total_difference
-            ',
-            ], false)
-            ->from('tbl_finance_bank_reconciliation_item ri')
-            ->join(
-                'tbl_finance_bank_reconciliation br',
-                'br.id = ri.reconciliation_id',
-                'inner'
-            )
-            ->where('br.period_start <=', $endDate)
-            ->where('br.period_end >=', $startDate)
-            ->where_in(
-                'ri.matching_status',
-                [
-                    'amount_difference',
-                    'date_difference',
-                    'missing_system_entry',
-                    'missing_statement_entry',
-                ]
-            )
-            ->get()
-            ->row();
-
-        if ($anomalyResult) {
-            $statistics['anomalies_count'] =
-                (int) $anomalyResult->anomalies_count;
-
-            $statistics['unjustified_difference'] =
-                (float) $anomalyResult->total_difference;
-        }
-
-        return $statistics;
-    }
-
-    /**
-     * Retourne les sessions de rapprochement pouvant être analysées.
-     *
-     * @return array
-     */
-    public function getReconciliationsAvailableForAnalysis()
-    {
-        return $this->db
-            ->select([
-                'br.id',
-                'br.reference',
-                'br.bank_account_id',
-                'br.period_start',
-                'br.period_end',
-                'br.currency',
-                'br.status',
-
-                'ba.name AS account_name',
-                'ba.bank_name',
-                'ba.account_number',
-            ])
-            ->from('tbl_finance_bank_reconciliation br')
-            ->join(
-                'tbl_finance_bank_account ba',
-                'ba.id = br.bank_account_id',
-                'inner'
-            )
-            ->where_in(
-                'br.status',
-                [
-                    'draft',
-                    'in_progress',
-                ]
-            )
-            ->order_by('br.created_at', 'DESC')
-            ->get()
-            ->result();
-    }
-
-    /**
-     * Récupère une session de rapprochement par ID.
-     *
-     * @param int $reconciliationId
-     * @return object|null
-     */
-    public function getBankReconciliationById($reconciliationId)
-    {
-        return $this->db
-            ->select([
-                'br.*',
-
-                'ba.name AS account_name',
-                'ba.bank_name',
-                'ba.account_number',
-                'ba.current_balance AS account_current_balance',
-                'ba.currency AS account_currency',
-            ])
-            ->from('tbl_finance_bank_reconciliation br')
-            ->join(
-                'tbl_finance_bank_account ba',
-                'ba.id = br.bank_account_id',
-                'inner'
-            )
-            ->where('br.id', (int) $reconciliationId)
-            ->limit(1)
-            ->get()
-            ->row();
-    }
-
-    /**
-     * Recherche un relevé bancaire compatible avec une session.
-     */
-    public function getStatementForReconciliation(
-        $bankAccountId,
-        $periodStart,
-        $periodEnd
-    ) {
-        $bankAccountId = (int) $bankAccountId;
-
-        if (
-            $bankAccountId <= 0
-            || empty($periodStart)
-            || empty($periodEnd)
-        ) {
-            return null;
-        }
-
-        return $this->db
-            ->select('bs.*')
-            ->from('tbl_finance_bank_statement bs')
-            ->where(
-                'bs.bank_account_id',
-                $bankAccountId
-            )
-
-            /*
-         * Les deux périodes doivent se chevaucher.
-         */
-            ->where(
-                'bs.period_start <=',
-                $periodEnd
-            )
-            ->where(
-                'bs.period_end >=',
-                $periodStart
-            )
-
-            /*
-         * Privilégier un relevé couvrant complètement
-         * la période de la session.
-         */
-            ->order_by(
-                '
-            CASE
-                WHEN bs.period_start <= '
-                    . $this->db->escape($periodStart)
-                    . '
-                AND bs.period_end >= '
-                    . $this->db->escape($periodEnd)
-                    . '
-                THEN 0
-                ELSE 1
-            END
-            ',
-                'ASC',
-                false
-            )
-            ->order_by(
-                'bs.statement_date',
-                'DESC'
-            )
-            ->order_by(
-                'bs.id',
-                'DESC'
-            )
-            ->limit(1)
-            ->get()
-            ->row();
-    }
-
-    /**
-     * Récupère toutes les lignes analysables d'un relevé.
-     */
-    public function getStatementLinesForAnalysis(
-        $statementId,
-        $periodStart,
-        $periodEnd
-    ) {
-        return $this->db
-            ->select('bsl.*')
-            ->from('tbl_finance_bank_statement_line bsl')
-            ->where(
-                'bsl.statement_id',
-                (int) $statementId
-            )
-            ->where(
-                'bsl.operation_date >=',
-                $periodStart
-            )
-            ->where(
-                'bsl.operation_date <=',
-                $periodEnd
-            )
-            ->where(
-                'bsl.matching_status !=',
-                'ignored'
-            )
-            ->order_by(
-                'bsl.operation_date',
-                'ASC'
-            )
-            ->order_by(
-                'bsl.id',
-                'ASC'
-            )
-            ->get()
-            ->result();
-    }
-
-    /**
-     * Cherche une opération système correspondant à une ligne bancaire.
-     *
-     * @param int $bankAccountId
-     * @param object $statementLine
-     * @param int $dateTolerance
-     * @param float $amountTolerance
-     * @return object|null
-     */
-    public function findMatchingBankOperation(
-        $bankAccountId,
-        $statementLine,
-        $dateTolerance,
-        $amountTolerance
-    ) {
-        $operationDate =
-            $statementLine->operation_date;
-
-        $minimumDate = date(
-            'Y-m-d',
-            strtotime(
-                $operationDate
-                    . ' -'
-                    . (int) $dateTolerance
-                    . ' days'
-            )
-        );
-
-        $maximumDate = date(
-            'Y-m-d',
-            strtotime(
-                $operationDate
-                    . ' +'
-                    . (int) $dateTolerance
-                    . ' days'
-            )
-        );
-
-        $minimumAmount =
-            max(
-                0,
-                (float) $statementLine->amount
-                    - (float) $amountTolerance
-            );
-
-        $maximumAmount =
-            (float) $statementLine->amount
-            + (float) $amountTolerance;
-
-        $this->db
-            ->select('bo.*')
-            ->from('tbl_finance_bank_operation bo')
-            ->where('bo.operation_date >=', $minimumDate)
-            ->where('bo.operation_date <=', $maximumDate)
-            ->where('bo.amount >=', $minimumAmount)
-            ->where('bo.amount <=', $maximumAmount)
-            ->where_not_in(
-                'bo.status',
-                [
-                    'cancelled',
-                    'rejected',
-                ]
-            );
-
-        /*
-        * Débit sur le relevé :
-        * argent sorti du compte.
-        */
-        if (
-            $statementLine->operation_direction
-            === 'debit'
-        ) {
-            $this->db
-                ->where(
-                    'bo.source_bank_account_id',
-                    (int) $bankAccountId
-                )
-                ->where_in(
-                    'bo.operation_type',
-                    [
-                        'decaissement',
-                        'transfert',
-                    ]
-                );
-        }
-
-        /*
-        * Crédit sur le relevé :
-        * argent entré dans le compte.
-        */
-        if (
-            $statementLine->operation_direction
-            === 'credit'
-        ) {
-            $this->db
-                ->where(
-                    'bo.destination_bank_account_id',
-                    (int) $bankAccountId
-                )
-                ->where_in(
-                    'bo.operation_type',
-                    [
-                        'encaissement',
-                        'transfert',
-                    ]
-                );
-        }
-
-        /*
-        * Exclure les opérations déjà rapprochées.
-        */
-        $this->db->where(
-            "
-        NOT EXISTS (
-            SELECT 1
-            FROM tbl_finance_bank_reconciliation_item bri
-            WHERE bri.bank_operation_id = bo.id
-            AND bri.matching_status = 'matched'
-        )
-        ",
-            null,
-            false
-        );
-
-        return $this->db
-            ->order_by(
-                'ABS(DATEDIFF(bo.operation_date, '
-                    . $this->db->escape($operationDate)
-                    . '))',
-                'ASC',
-                false
-            )
-            ->order_by(
-                'ABS(bo.amount - '
-                    . $this->db->escape(
-                        (float) $statementLine->amount
-                    )
-                    . ')',
-                'ASC',
-                false
-            )
-            ->limit(1)
-            ->get()
-            ->row();
-    }
-
-    /**
-     * Insère une ligne de résultat du rapprochement.
-     *
-     * @param array $data
-     * @return int
-     */
-    public function insertReconciliationItem(array $data)
-    {
-        $this->db->insert(
-            'tbl_finance_bank_reconciliation_item',
-            $data
-        );
-
-        return (int) $this->db->insert_id();
-    }
-
-    /**
-     * Supprime les résultats automatiques non validés d'une session.
-     *
-     * @param int $reconciliationId
-     * @return bool
-     */
-    public function deletePreviousAutomaticAnalysis(
-        $reconciliationId
-    ) {
-        return $this->db
-            ->where(
-                'reconciliation_id',
-                (int) $reconciliationId
-            )
-            ->where('matching_method', 'automatic')
-            ->where('validated_at IS NULL', null, false)
-            ->delete(
-                'tbl_finance_bank_reconciliation_item'
-            );
-    }
-
-    /**
-     * Change le statut de correspondance d'une ligne bancaire.
-     *
-     * @param int $statementLineId
-     * @param string $status
-     * @return bool
-     */
-    public function updateStatementLineMatchingStatus(
-        $statementLineId,
-        $status
-    ) {
-        return $this->db
-            ->where('id', (int) $statementLineId)
-            ->update(
-                'tbl_finance_bank_statement_line',
-                [
-                    'matching_status' => $status,
-                    'updated_at'      => date('Y-m-d H:i:s'),
-                ]
-            );
-    }
-
-    /**
-     * Met à jour une session de rapprochement.
-     *
-     * @param int $reconciliationId
-     * @param array $data
-     * @return bool
-     */
-    public function updateBankReconciliation(
-        $reconciliationId,
-        array $data
-    ) {
-        return $this->db
-            ->where('id', (int) $reconciliationId)
-            ->update(
-                'tbl_finance_bank_reconciliation',
-                $data
-            );
-    }
-
-    // public function getPayablePurchaseRequests(): array
-    // {
-    //     $this->db->select(
-    //         "
-    //     prf.id,
-
-    //     CONCAT(
-    //         'DA-',
-    //         YEAR(prf.created_at),
-    //         '-',
-    //         LPAD(prf.id, 3, '0')
-    //     ) AS request_reference,
-
-    //     prf.chantier_id,
-    //     prf.destination_chantier,
-    //     prf.created_at AS request_created_at,
-
-    //     p.name AS chantier_name,
-
-    //     ppv.id AS payment_voucher_id,
-    //     ppv.payment_number,
-    //     ppv.summary AS payment_summary,
-    //     ppv.payment_mode,
-    //     ppv.amount_paid,
-    //     ppv.payment_reference,
-    //     ppv.payment_date,
-    //     ppv.observation AS payment_observation,
-    //     ppv.payment_status,
-
-    //     GROUP_CONCAT(
-    //         DISTINCT pri.designation
-    //         ORDER BY pri.id ASC
-    //         SEPARATOR ', '
-    //     ) AS purchase_items_summary
-    //     ",
-    //         false
-    //     );
-
-    //     $this->db->from(
-    //         'purchase_request_forms prf'
-    //     );
-
-    //     $this->db->join(
-    //         'purchase_request_items pri',
-    //         'pri.request_id = prf.id',
-    //         'left'
-    //     );
-
-    //     $this->db->join(
-    //         'projects p',
-    //         'p.id = prf.chantier_id',
-    //         'left'
-    //     );
-
-    //     $this->db->join(
-    //         'purchase_payment_vouchers ppv',
-    //         'ppv.request_id = prf.id',
-    //         'inner'
-    //     );
-
-    //     /*
-    //     * Pour commencer, vérifier uniquement
-    //     * que le bon de paiement est effectué.
-    //     */
-    //     $this->db->where(
-    //         'ppv.payment_status',
-    //         'effectue'
-    //     );
-
-    //     $this->db->where("
-    //     NOT EXISTS (
-    //         SELECT 1
-    //         FROM tbl_finance_cashbox_operation cfo
-    //         WHERE cfo.payment_voucher_id = ppv.id
-    //         AND cfo.operation_type = 'decaissement'
-    //     )", NULL, FALSE);
-
-    //     $this->db->group_by([
-    //         'prf.id',
-    //         'prf.created_at',
-    //         'prf.chantier_id',
-    //         'prf.destination_chantier',
-    //         'p.name',
-    //         'ppv.id',
-    //         'ppv.payment_number',
-    //         'ppv.summary',
-    //         'ppv.payment_mode',
-    //         'ppv.amount_paid',
-    //         'ppv.payment_reference',
-    //         'ppv.payment_date',
-    //         'ppv.observation',
-    //         'ppv.payment_status',
-    //     ]);
-
-    //     $this->db->order_by(
-    //         'ppv.payment_date',
-    //         'DESC'
-    //     );
-
-    //     $this->db->order_by(
-    //         'ppv.id',
-    //         'DESC'
-    //     );
-
-    //     return $this->db
-    //         ->get()
-    //         ->result();
-    // }
 
     /**
      * =====================================================
@@ -10101,25 +6757,26 @@ class FinanceModel extends CI_Model
     }
 
     /**
-     * =====================================================
-     * DÉPENSES DE LA SECONDAIRE PAR CATÉGORIE (mois en cours)
-     * =====================================================
+     * ============================================================
+     * DÉPENSES DE LA SECONDAIRE PAR CATÉGORIE (période filtrable)
+     * ============================================================
+     * @param string|null $startDate 'Y-m-d H:i:s' (défaut : 1er du mois en cours 00:00:00)
+     * @param string|null $endDate   'Y-m-d H:i:s' (défaut : aujourd'hui 23:59:59)
      */
-    public function getSecondaryExpensesByCategory()
+    public function getSecondaryExpensesByCategory($startDate = null, $endDate = null)
     {
-        $monthStart = date('Y-m-01');
-        $monthEnd   = date('Y-m-t');
+        list($startDate, $endDate) = $this->_normalizePeriodRange($startDate, $endDate);
 
         $rows = $this->db->select("
-        category,
-        SUM(amount) AS total_amount,
-        COUNT(*)    AS total_operations
-    ")
+                category,
+                SUM(amount) AS total_amount,
+                COUNT(*)    AS total_operations
+            ")
             ->where('nature', 'paiement_da')
             ->where('sens', 'sortie')
             ->where('status', 'validated')
-            ->where('movement_date >=', $monthStart)
-            ->where('movement_date <=', $monthEnd)
+            ->where('movement_date >=', $startDate)
+            ->where('movement_date <=', $endDate)
             ->group_by('category')
             ->order_by('total_amount', 'DESC')
             ->get('tbl_finance_mouvement_secondaire')
@@ -10142,30 +6799,31 @@ class FinanceModel extends CI_Model
     }
 
     /**
-     * =====================================================
-     * CONSOMMATION PAR CHANTIER (DA payées par la secondaire)
-     * =====================================================
+     * ============================================================
+     * CONSOMMATION PAR CHANTIER (DA payées par la secondaire, période filtrable)
+     * ============================================================
+     * @param string|null $startDate 'Y-m-d H:i:s' (défaut : 1er du mois en cours 00:00:00)
+     * @param string|null $endDate   'Y-m-d H:i:s' (défaut : aujourd'hui 23:59:59)
      */
-    public function getSecondaryConsumptionByChantier()
+    public function getSecondaryConsumptionByChantier($startDate = null, $endDate = null)
     {
-        $monthStart = date('Y-m-01');
-        $monthEnd   = date('Y-m-t');
+        list($startDate, $endDate) = $this->_normalizePeriodRange($startDate, $endDate);
 
         $rows = $this->db->select("
-        ch.id   AS chantier_id,
-        ch.name AS chantier_name,
-        prf.destination_chantier,
-        SUM(m.amount)                        AS total_consumed,
-        COUNT(DISTINCT m.purchase_request_id) AS da_count
-    ")
+                ch.id   AS chantier_id,
+                ch.name AS chantier_name,
+                prf.destination_chantier,
+                SUM(m.amount)                       AS total_consumed,
+                COUNT(DISTINCT m.purchase_request_id) AS da_count
+            ")
             ->from('tbl_finance_mouvement_secondaire m')
             ->join('purchase_request_forms prf', 'prf.id = m.purchase_request_id', 'inner')
             ->join('chantiers ch', 'ch.id = prf.chantier_id', 'left')
             ->where('m.nature', 'paiement_da')
             ->where('m.sens', 'sortie')
             ->where('m.status', 'validated')
-            ->where('m.movement_date >=', $monthStart)
-            ->where('m.movement_date <=', $monthEnd)
+            ->where('m.movement_date >=', $startDate)
+            ->where('m.movement_date <=', $endDate)
             ->group_by('ch.id')
             ->order_by('total_consumed', 'DESC')
             ->get()
@@ -10187,6 +6845,35 @@ class FinanceModel extends CI_Model
         }
 
         return $rows;
+    }
+
+    /**
+     * Valide et normalise une plage de dates.
+     * - Valeurs absentes ou invalides => mois en cours (1er 00:00:00 → aujourd'hui 23:59:59)
+     * - Une date seule 'Y-m-d' est étendue à 00:00:00 / 23:59:59
+     * - Si start > end, les bornes sont inversées
+     */
+    private function _normalizePeriodRange($startDate, $endDate)
+    {
+        $parse = function ($value, $endOfDay) {
+            if (empty($value)) {
+                return null;
+            }
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+                $value .= $endOfDay ? ' 23:59:59' : ' 00:00:00';
+            }
+            $dt = DateTime::createFromFormat('Y-m-d H:i:s', $value);
+            return $dt ? $dt->format('Y-m-d H:i:s') : null;
+        };
+
+        $start = $parse($startDate, false) ?: date('Y-m-01 00:00:00');
+        $end   = $parse($endDate, true)    ?: date('Y-m-d 23:59:59');
+
+        if ($start > $end) {
+            list($start, $end) = [$end, $start];
+        }
+
+        return [$start, $end];
     }
 
     /** Filtres communs du livre (rôle + période + recherche) */
@@ -10857,5 +7544,2701 @@ class FinanceModel extends CI_Model
     public function getChantiersForFilter()
     {
         return $this->db->query('SELECT id, name AS nom FROM chantiers ORDER BY name')->result();
+    }
+
+        /* =====================================================================
+     * =====================================================================
+     *  MODULE BANQUE V2
+     *  Tables : tbl_finance_bank, tbl_finance_bank_account,
+     *           tbl_finance_bank_operation, tbl_finance_bank_movement
+     *  Lien caisse : tbl_finance_cashbox + tbl_finance_mouvement_principale
+     * =====================================================================
+     * ===================================================================== */
+
+    /**
+     * Règles par type d'opération :
+     * - source      : un compte bancaire est débité ;
+     * - destination : un compte bancaire est crédité ;
+     * - cashbox     : la caisse principale est impliquée.
+     */
+    private $bankOperationRules = [
+        'encaissement'        => ['source' => false, 'destination' => true,  'cashbox' => false],
+        'decaissement'        => ['source' => true,  'destination' => false, 'cashbox' => false],
+        'transfert'           => ['source' => true,  'destination' => true,  'cashbox' => false],
+        'retrait_banque'      => ['source' => true,  'destination' => false, 'cashbox' => true],
+        'versement_banque'    => ['source' => false, 'destination' => true,  'cashbox' => true],
+        'frais_bancaires'     => ['source' => true,  'destination' => false, 'cashbox' => false],
+        'interets_crediteurs' => ['source' => false, 'destination' => true,  'cashbox' => false],
+    ];
+
+    /* ---------------------------------------------------------------------
+     * OUTILS INTERNES
+     * ------------------------------------------------------------------- */
+
+    /** Chaîne vide → NULL, sinon valeur nettoyée. */
+    private function bankNullable($value)
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        return ($value === '' || $value === null) ? null : $value;
+    }
+
+    /**
+     * Prochaine référence séquentielle annuelle : PREFIXE-AAAA-00001.
+     * $lock = true : à appeler DANS une transaction (verrou FOR UPDATE).
+     */
+    private function bankNextReference(
+        string $table,
+        string $prefix,
+        int $padding = 5,
+        string $column = 'reference',
+        bool $lock = false
+    ): string {
+        $base = $prefix . '-' . date('Y') . '-';
+
+        $sql = "SELECT {$column} AS ref
+                FROM {$table}
+                WHERE {$column} LIKE ?
+                ORDER BY id DESC
+                LIMIT 1" . ($lock ? ' FOR UPDATE' : '');
+
+        $row = $this->db->query($sql, [$base . '%'])->row();
+
+        $next = $row ? ((int) substr($row->ref, strlen($base))) + 1 : 1;
+
+        return $base . str_pad((string) $next, $padding, '0', STR_PAD_LEFT);
+    }
+
+    /** Verrouille un compte bancaire (à appeler dans une transaction). */
+    private function getBankAccountForUpdate(int $accountId)
+    {
+        return $this->db
+            ->query(
+                'SELECT * FROM tbl_finance_bank_account WHERE id = ? LIMIT 1 FOR UPDATE',
+                [$accountId]
+            )
+            ->row();
+    }
+
+    /** Contrôles communs : existence, statut, période verrouillée, ouverture. */
+    private function assertBankAccountUsable($account, string $role, string $operationDate): void
+    {
+        if (!$account) {
+            throw new RuntimeException("Le compte {$role} est introuvable.");
+        }
+
+        if ($account->status !== 'active') {
+            throw new RuntimeException("Le compte {$account->name} n’est pas actif.");
+        }
+
+        if ($operationDate < $account->opening_date) {
+            throw new RuntimeException(
+                "La date de l’opération est antérieure à l’ouverture du compte {$account->name} ("
+                    . date('d/m/Y', strtotime($account->opening_date)) . ').'
+            );
+        }
+
+        if (
+            !empty($account->last_reconciled_date)
+            && $operationDate <= $account->last_reconciled_date
+        ) {
+            throw new RuntimeException(
+                "La période jusqu’au " . date('d/m/Y', strtotime($account->last_reconciled_date))
+                    . " est rapprochée et verrouillée pour le compte {$account->name}."
+            );
+        }
+    }
+
+    /** Vérifie que le compte peut supporter une sortie (solde + découvert autorisé). */
+    private function assertBankFundsAvailable($account, float $amount): void
+    {
+        $available = (float) $account->current_balance + (float) $account->overdraft_limit;
+
+        if ($amount > $available + 0.001) {
+            throw new RuntimeException(
+                'Solde insuffisant sur ' . $account->name . ' : disponible '
+                    . number_format($available, 2, ',', ' ') . ' ' . $account->currency . '.'
+            );
+        }
+    }
+
+    /**
+     * Écrit une ligne dans le livre de banque et met à jour le solde du compte.
+     * L'objet $account est mis à jour en mémoire (current_balance).
+     */
+    private function insertBankMovement($account, string $sens, string $nature, float $amount, array $extra): float
+    {
+        $before = round((float) $account->current_balance, 2);
+        $after  = round($sens === 'entree' ? $before + $amount : $before - $amount, 2);
+
+        $inserted = $this->db->insert('tbl_finance_bank_movement', [
+            'reference'          => $this->bankNextReference('tbl_finance_bank_movement', 'MVB', 5, 'reference', true),
+            'bank_account_id'    => (int) $account->id,
+            'bank_operation_id'  => $extra['bank_operation_id'] ?? null,
+            'sens'               => $sens,
+            'nature'             => $nature,
+            'movement_date'      => $extra['movement_date'],
+            'value_date'         => $extra['value_date'] ?? null,
+            'amount'             => $amount,
+            'balance_before'     => $before,
+            'balance_after'      => $after,
+            'currency'           => $account->currency,
+            'label'              => $extra['label'],
+            'third_party'        => $extra['third_party'] ?? null,
+            'document_number'    => $extra['document_number'] ?? null,
+            'transfer_reference' => $extra['transfer_reference'] ?? null,
+            'status'             => 'validated',
+            'created_by'         => $extra['created_by'] ?? null,
+        ]);
+
+        if (!$inserted) {
+            throw new RuntimeException('Impossible d’écrire la ligne du livre de banque.');
+        }
+
+        $this->db
+            ->where('id', (int) $account->id)
+            ->update('tbl_finance_bank_account', ['current_balance' => $after]);
+
+        $account->current_balance = $after;
+
+        return $after;
+    }
+
+    /**
+     * Écrit le mouvement correspondant dans le livre de la caisse principale.
+     * retrait_banque   : la caisse reçoit (entrée) ;
+     * versement_banque : la caisse donne  (sortie).
+     * $isReversal = true : écriture inverse (annulation).
+     */
+    private function insertCashMovementFromBank($cashbox, $operation, ?int $userId, bool $isReversal = false): string
+    {
+        $sens = $operation->operation_type === 'retrait_banque' ? 'entree' : 'sortie';
+
+        if ($isReversal) {
+            $sens = $sens === 'entree' ? 'sortie' : 'entree';
+        }
+
+        $amount = (float) $operation->amount;
+        $before = round((float) $cashbox->current_balance, 2);
+        $after  = round($sens === 'entree' ? $before + $amount : $before - $amount, 2);
+
+        if ($after < 0) {
+            throw new RuntimeException('Le solde de la caisse principale deviendrait négatif.');
+        }
+
+        $baseLabel = $operation->operation_type === 'retrait_banque'
+            ? 'Retrait bancaire ' . $operation->reference
+            : 'Versement en banque ' . $operation->reference;
+
+        $reference = $this->nextMovementReference('tbl_finance_mouvement_principale', 'MVP');
+
+        $inserted = $this->db->insert('tbl_finance_mouvement_principale', [
+            'reference'          => $reference,
+            'sens'               => $sens,
+            'nature'             => $isReversal ? 'contre_passation' : $operation->operation_type,
+            'movement_date'      => $isReversal ? date('Y-m-d') : $operation->operation_date,
+            'amount'             => $amount,
+            'balance_before'     => $before,
+            'balance_after'      => $after,
+            'devise'             => $cashbox->devise,
+            'transfer_reference' => $operation->reference,
+            'third_party'        => $operation->third_party,
+            'category'           => 'Banque',
+            'payment_method'     => 'cash',
+            'document_number'    => $operation->document_number,
+            'label'              => ($isReversal ? 'Annulation — ' : '') . $baseLabel,
+            'observation'        => $operation->observation,
+            'status'             => 'validated',
+            'created_by'         => $userId,
+        ]);
+
+        if (!$inserted) {
+            throw new RuntimeException('Impossible d’écrire le mouvement dans le livre de la caisse principale.');
+        }
+
+        $this->db
+            ->where('id', (int) $cashbox->id)
+            ->update('tbl_finance_cashbox', ['current_balance' => $after]);
+
+        $cashbox->current_balance = $after;
+
+        return $reference;
+    }
+
+    /* ---------------------------------------------------------------------
+     * RÉFÉRENTIEL DES BANQUES
+     * ------------------------------------------------------------------- */
+
+    public function getActiveBanks(): array
+    {
+        return $this->db
+            ->select('id, code, name, swift_code')
+            ->where('status', 'active')
+            ->order_by('name', 'ASC')
+            ->get('tbl_finance_bank')
+            ->result();
+    }
+
+    /* ---------------------------------------------------------------------
+     * COMPTES BANCAIRES
+     * ------------------------------------------------------------------- */
+
+    /** Aperçu du prochain code (affichage dans la modale, sans verrou). */
+    public function getNextBankAccountCode(): string
+    {
+        return $this->bankNextReference('tbl_finance_bank_account', 'BAN', 3, 'code', false);
+    }
+
+    public function bankAccountNumberExists(int $bankId, string $accountNumber, int $excludeId = 0): bool
+    {
+        $this->db
+            ->where('bank_id', $bankId)
+            ->where('account_number', $accountNumber);
+
+        if ($excludeId > 0) {
+            $this->db->where('id !=', $excludeId);
+        }
+
+        return $this->db->count_all_results('tbl_finance_bank_account') > 0;
+    }
+
+    /**
+     * Crée un compte bancaire.
+     * Si le solde initial > 0, la première ligne du livre est « solde_initial ».
+     */
+    public function createBankAccount(array $data): array
+    {
+        $openingBalance = round((float) ($data['opening_balance'] ?? 0), 2);
+        $userId         = !empty($data['created_by']) ? (int) $data['created_by'] : null;
+
+        $this->db->trans_begin();
+
+        try {
+            $bank = $this->db
+                ->where('id', (int) $data['bank_id'])
+                ->where('status', 'active')
+                ->get('tbl_finance_bank')
+                ->row();
+
+            if (!$bank) {
+                throw new RuntimeException('La banque sélectionnée est introuvable ou inactive.');
+            }
+
+            if ($this->bankAccountNumberExists((int) $data['bank_id'], $data['account_number'])) {
+                throw new RuntimeException('Ce numéro de compte existe déjà pour ' . $bank->name . '.');
+            }
+
+            $code = $this->bankNextReference('tbl_finance_bank_account', 'BAN', 3, 'code', true);
+
+            $this->db->insert('tbl_finance_bank_account', [
+                'code'                  => $code,
+                'bank_id'               => (int) $data['bank_id'],
+                'name'                  => $data['name'],
+                'account_number'        => $data['account_number'],
+                'account_type'          => $data['account_type'],
+                'currency'              => $data['currency'],
+                'branch_name'           => $this->bankNullable($data['branch_name'] ?? null),
+                'accounting_account_id' => !empty($data['accounting_account_id']) ? (int) $data['accounting_account_id'] : null,
+                'opening_date'          => $data['opening_date'],
+                'opening_balance'       => $openingBalance,
+                'current_balance'       => 0,
+                'overdraft_limit'       => round((float) ($data['overdraft_limit'] ?? 0), 2),
+                'alert_threshold'       => round((float) ($data['alert_threshold'] ?? 0), 2),
+                'observation'           => $this->bankNullable($data['observation'] ?? null),
+                'status'                => 'active',
+                'created_by'            => $userId,
+            ]);
+
+            $accountId = (int) $this->db->insert_id();
+
+            if ($accountId <= 0) {
+                throw new RuntimeException('Le compte bancaire n’a pas pu être enregistré.');
+            }
+
+            if ($openingBalance > 0) {
+                $account = $this->getBankAccountForUpdate($accountId);
+
+                $this->insertBankMovement($account, 'entree', 'solde_initial', $openingBalance, [
+                    'movement_date' => $data['opening_date'],
+                    'label'         => 'Solde initial à l’ouverture du compte',
+                    'created_by'    => $userId,
+                ]);
+            }
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant la création du compte.');
+            }
+
+            /* Point de départ convenu avec la banque : considéré comme rapproché */
+            $this->db
+                ->where('bank_account_id', $accountId)
+                ->where('nature', 'solde_initial')
+                ->update('tbl_finance_bank_movement', [
+                    'is_reconciled' => 1,
+                    'reconciled_at' => date('Y-m-d H:i:s'),
+                ]);
+
+            $this->db->trans_commit();
+
+            return [
+                'status'  => true,
+                'id'      => $accountId,
+                'code'    => $code,
+                'message' => 'Le compte ' . $code . ' — ' . $data['name'] . ' (' . $bank->name . ') a été créé.',
+            ];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Banque — création compte : ' . $e->getMessage());
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Met à jour les informations descriptives d'un compte.
+     * Les soldes ne se modifient jamais ici : uniquement via le livre.
+     */
+    public function updateBankAccount(int $accountId, array $data, ?int $userId = null): array
+    {
+        $account = $this->getBankAccountById($accountId);
+
+        if (!$account) {
+            return ['status' => false, 'message' => 'Compte bancaire introuvable.'];
+        }
+
+        $allowedStatus = ['active', 'inactive', 'blocked', 'closed'];
+
+        $update = [
+            'name'                  => $data['name'],
+            'branch_name'           => $this->bankNullable($data['branch_name'] ?? null),
+            'accounting_account_id' => !empty($data['accounting_account_id']) ? (int) $data['accounting_account_id'] : null,
+            'overdraft_limit'       => round((float) ($data['overdraft_limit'] ?? 0), 2),
+            'alert_threshold'       => round((float) ($data['alert_threshold'] ?? 0), 2),
+            'observation'           => $this->bankNullable($data['observation'] ?? null),
+            'status'                => in_array($data['status'] ?? '', $allowedStatus, true) ? $data['status'] : $account->status,
+            'updated_by'            => $userId,
+        ];
+
+        if ($update['status'] === 'closed' && abs((float) $account->current_balance) > 0.001) {
+            return ['status' => false, 'message' => 'Un compte ne peut être clôturé que si son solde est nul.'];
+        }
+
+        $this->db->where('id', $accountId)->update('tbl_finance_bank_account', $update);
+
+        return ['status' => true, 'message' => 'Le compte ' . $account->code . ' a été mis à jour.'];
+    }
+
+    public function getBankAccountById(int $accountId)
+    {
+        if ($accountId <= 0) {
+            return null;
+        }
+
+        return $this->db
+            ->select('a.*, b.code AS bank_code, b.name AS bank_name')
+            ->from('tbl_finance_bank_account a')
+            ->join('tbl_finance_bank b', 'b.id = a.bank_id', 'left')
+            ->where('a.id', $accountId)
+            ->get()
+            ->row();
+    }
+
+    /** Comptes actifs (listes déroulantes des modales). */
+    public function getActiveBankAccounts(?string $currency = null): array
+    {
+        $this->db
+            ->select('a.id, a.code, a.name, a.account_number, a.account_type, a.currency,
+                      a.current_balance, a.overdraft_limit, a.last_reconciled_date,
+                      b.code AS bank_code, b.name AS bank_name')
+            ->from('tbl_finance_bank_account a')
+            ->join('tbl_finance_bank b', 'b.id = a.bank_id', 'inner')
+            ->where('a.status', 'active');
+
+        if (in_array($currency, ['BIF', 'USD', 'EUR'], true)) {
+            $this->db->where('a.currency', $currency);
+        }
+
+        return $this->db
+            ->order_by('b.name', 'ASC')
+            ->order_by('a.name', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Situation des comptes (cartes de la page) avec filtres :
+     * search, bank_id, currency, status.
+     * Entrées / sorties du mois calculées depuis le livre (hors solde initial).
+     */
+    public function getBankAccounts(array $filters = []): array
+    {
+        $sql = "
+            SELECT
+                a.*,
+                b.code AS bank_code,
+                b.name AS bank_name,
+                COALESCE(m.monthly_entries, 0)    AS monthly_entries,
+                COALESCE(m.monthly_outputs, 0)    AS monthly_outputs,
+                COALESCE(m.monthly_operations, 0) AS monthly_operations
+            FROM tbl_finance_bank_account a
+            INNER JOIN tbl_finance_bank b ON b.id = a.bank_id
+            LEFT JOIN (
+                SELECT
+                    bank_account_id,
+                    SUM(CASE WHEN sens = 'entree' THEN amount ELSE 0 END) AS monthly_entries,
+                    SUM(CASE WHEN sens = 'sortie' THEN amount ELSE 0 END) AS monthly_outputs,
+                    COUNT(*) AS monthly_operations
+                FROM tbl_finance_bank_movement
+                WHERE status = 'validated'
+                  AND nature <> 'solde_initial'
+                  AND movement_date BETWEEN ? AND ?
+                GROUP BY bank_account_id
+            ) m ON m.bank_account_id = a.id
+            WHERE 1 = 1
+        ";
+
+        $binds = [date('Y-m-01'), date('Y-m-t')];
+
+        $search = trim((string) ($filters['search'] ?? ''));
+
+        if ($search !== '') {
+            $sql .= " AND (a.code LIKE ? OR a.name LIKE ? OR a.account_number LIKE ?
+                           OR a.branch_name LIKE ? OR b.name LIKE ? OR b.code LIKE ?)";
+            $like = '%' . $search . '%';
+            array_push($binds, $like, $like, $like, $like, $like, $like);
+        }
+
+        if (!empty($filters['bank_id'])) {
+            $sql .= ' AND a.bank_id = ?';
+            $binds[] = (int) $filters['bank_id'];
+        }
+
+        if (in_array($filters['currency'] ?? '', ['BIF', 'USD', 'EUR'], true)) {
+            $sql .= ' AND a.currency = ?';
+            $binds[] = $filters['currency'];
+        }
+
+        if (in_array($filters['status'] ?? '', ['active', 'inactive', 'blocked', 'closed'], true)) {
+            $sql .= ' AND a.status = ?';
+            $binds[] = $filters['status'];
+        }
+
+        $sql .= " ORDER BY FIELD(a.status, 'active', 'blocked', 'inactive', 'closed'),
+                           b.name ASC, a.currency ASC, a.name ASC";
+
+        return $this->db->query($sql, $binds)->result();
+    }
+
+    /**
+     * Recalcule le solde d'un compte depuis le livre (outil de contrôle).
+     */
+    public function recalculateBankAccountBalance(int $accountId): float
+    {
+        $row = $this->db
+            ->select("COALESCE(SUM(CASE WHEN sens = 'entree' THEN amount ELSE -amount END), 0) AS balance", false)
+            ->where('bank_account_id', $accountId)
+            ->where('status', 'validated')
+            ->get('tbl_finance_bank_movement')
+            ->row();
+
+        $balance = round((float) $row->balance, 2);
+
+        $this->db
+            ->where('id', $accountId)
+            ->update('tbl_finance_bank_account', ['current_balance' => $balance]);
+
+        return $balance;
+    }
+
+    /* ---------------------------------------------------------------------
+     * OPÉRATIONS BANCAIRES
+     * ------------------------------------------------------------------- */
+
+    /** Aperçu de la prochaine référence (affichage, sans verrou). */
+    public function getNextBankOperationReference(): string
+    {
+        return $this->bankNextReference('tbl_finance_bank_operation', 'BOP', 5, 'reference', false);
+    }
+
+    /**
+     * Crée une opération bancaire.
+     * status = 'validated' (défaut) : écrit immédiatement le livre.
+     * status = 'pending'            : enregistrée, en attente de validation.
+     */
+    public function createBankOperation(array $data): array
+    {
+        $type = (string) ($data['operation_type'] ?? '');
+
+        if (!isset($this->bankOperationRules[$type])) {
+            return ['status' => false, 'message' => 'Type d’opération bancaire invalide.'];
+        }
+
+        $amount = round((float) ($data['amount'] ?? 0), 2);
+
+        if ($amount <= 0) {
+            return ['status' => false, 'message' => 'Le montant doit être supérieur à zéro.'];
+        }
+
+        $rules  = $this->bankOperationRules[$type];
+        $userId = !empty($data['created_by']) ? (int) $data['created_by'] : null;
+        $status = ($data['status'] ?? 'validated') === 'pending' ? 'pending' : 'validated';
+
+        $this->db->trans_begin();
+
+        try {
+            $sourceId = $rules['source'] ? (int) ($data['source_bank_account_id'] ?? 0) : 0;
+            $destId   = $rules['destination'] ? (int) ($data['destination_bank_account_id'] ?? 0) : 0;
+
+            if ($rules['source'] && $sourceId <= 0) {
+                throw new RuntimeException('Le compte bancaire à débiter est obligatoire.');
+            }
+
+            if ($rules['destination'] && $destId <= 0) {
+                throw new RuntimeException('Le compte bancaire à créditer est obligatoire.');
+            }
+
+            if ($type === 'transfert' && $sourceId === $destId) {
+                throw new RuntimeException('Le compte source et le compte destination doivent être différents.');
+            }
+
+            $cashboxId = null;
+
+            if ($rules['cashbox']) {
+                $principal = $this->getPrincipalCashbox();
+
+                if (!$principal) {
+                    throw new RuntimeException('Aucune caisse principale active n’est configurée.');
+                }
+
+                $cashboxId = (int) $principal->id;
+            }
+
+            /* La devise vient toujours du compte, jamais du formulaire */
+            $referenceAccount = $this->getBankAccountById($sourceId ?: $destId);
+
+            if (!$referenceAccount) {
+                throw new RuntimeException('Le compte bancaire sélectionné est introuvable.');
+            }
+
+            $reference = $this->bankNextReference('tbl_finance_bank_operation', 'BOP', 5, 'reference', true);
+
+            $inserted = $this->db->insert('tbl_finance_bank_operation', [
+                'reference'                   => $reference,
+                'operation_type'              => $type,
+                'operation_date'              => $data['operation_date'],
+                'value_date'                  => $this->bankNullable($data['value_date'] ?? null),
+                'source_bank_account_id'      => $sourceId ?: null,
+                'destination_bank_account_id' => $destId ?: null,
+                'cashbox_id'                  => $cashboxId,
+                'amount'                      => $amount,
+                'currency'                    => $referenceAccount->currency,
+                'category'                    => $this->bankNullable($data['category'] ?? null),
+                'third_party'                 => $this->bankNullable($data['third_party'] ?? null),
+                'payment_method'              => $data['payment_method'] ?? 'virement',
+                'document_number'             => $this->bankNullable($data['document_number'] ?? null),
+                'attachment'                  => $this->bankNullable($data['attachment'] ?? null),
+                'source_type'                 => $this->bankNullable($data['source_type'] ?? null),
+                'source_id'                   => !empty($data['source_id']) ? (int) $data['source_id'] : null,
+                'chantier_id'                 => !empty($data['chantier_id']) ? (int) $data['chantier_id'] : null,
+                'label'                       => $data['label'],
+                'observation'                 => $this->bankNullable($data['observation'] ?? null),
+                'status'                      => 'pending',
+                'created_by'                  => $userId,
+            ]);
+
+            if (!$inserted) {
+                throw new RuntimeException('Impossible d’enregistrer l’opération bancaire.');
+            }
+
+            $operationId = (int) $this->db->insert_id();
+
+            if ($status === 'validated') {
+                $this->applyBankOperation($operationId, $userId);
+            }
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant l’opération bancaire.');
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status'       => true,
+                'operation_id' => $operationId,
+                'reference'    => $reference,
+                'message'      => $status === 'validated'
+                    ? 'Opération ' . $reference . ' enregistrée et inscrite au livre de banque.'
+                    : 'Opération ' . $reference . ' enregistrée, en attente de validation.',
+            ];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Banque — création opération : ' . $e->getMessage());
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /** Valide une opération en attente (écrit le livre). */
+    public function validateBankOperation(int $operationId, ?int $userId): array
+    {
+        $this->db->trans_begin();
+
+        try {
+            $this->applyBankOperation($operationId, $userId);
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant la validation.');
+            }
+
+            $this->db->trans_commit();
+
+            return ['status' => true, 'message' => 'Opération validée et inscrite au livre de banque.'];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Banque — validation opération : ' . $e->getMessage());
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Applique une opération « pending » : contrôles, lignes du livre,
+     * mouvement de caisse éventuel, passage au statut « validated ».
+     * Doit être appelée DANS une transaction.
+     */
+    private function applyBankOperation(int $operationId, ?int $userId): void
+    {
+        $operation = $this->db
+            ->query('SELECT * FROM tbl_finance_bank_operation WHERE id = ? LIMIT 1 FOR UPDATE', [$operationId])
+            ->row();
+
+        if (!$operation) {
+            throw new RuntimeException('Opération bancaire introuvable.');
+        }
+
+        if ($operation->status !== 'pending') {
+            throw new RuntimeException('L’opération ' . $operation->reference . ' a déjà été traitée.');
+        }
+
+        $amount = (float) $operation->amount;
+        $date   = $operation->operation_date;
+        $type   = $operation->operation_type;
+
+        /* Verrouillage dans l'ordre croissant des id (évite les interblocages) */
+        $accountIds = array_values(array_filter([
+            (int) $operation->source_bank_account_id,
+            (int) $operation->destination_bank_account_id,
+        ]));
+        sort($accountIds);
+
+        $locked = [];
+
+        foreach ($accountIds as $accountId) {
+            $locked[$accountId] = $this->getBankAccountForUpdate($accountId);
+        }
+
+        $source = $operation->source_bank_account_id
+            ? ($locked[(int) $operation->source_bank_account_id] ?? null)
+            : null;
+
+        $destination = $operation->destination_bank_account_id
+            ? ($locked[(int) $operation->destination_bank_account_id] ?? null)
+            : null;
+
+        if ($operation->source_bank_account_id) {
+            $this->assertBankAccountUsable($source, 'à débiter', $date);
+
+            if ($source->currency !== $operation->currency) {
+                throw new RuntimeException('La devise de l’opération ne correspond pas au compte à débiter.');
+            }
+
+            $this->assertBankFundsAvailable($source, $amount);
+        }
+
+        if ($operation->destination_bank_account_id) {
+            $this->assertBankAccountUsable($destination, 'à créditer', $date);
+
+            if ($destination->currency !== $operation->currency) {
+                throw new RuntimeException(
+                    'Les deux comptes doivent avoir la même devise (pas encore de gestion de taux de change).'
+                );
+            }
+        }
+
+        /* Caisse principale (retrait / versement) */
+        $cashbox = null;
+
+        if (!empty($operation->cashbox_id)) {
+            $cashbox = $this->db
+                ->query('SELECT * FROM tbl_finance_cashbox WHERE id = ? LIMIT 1 FOR UPDATE', [(int) $operation->cashbox_id])
+                ->row();
+
+            if (!$cashbox || $cashbox->status !== 'active' || $cashbox->role !== 'principale') {
+                throw new RuntimeException('La caisse principale est introuvable ou inactive.');
+            }
+
+            if ($cashbox->devise !== $operation->currency) {
+                throw new RuntimeException('La caisse principale et le compte bancaire n’ont pas la même devise.');
+            }
+
+            if ($type === 'versement_banque' && $amount > (float) $cashbox->current_balance + 0.001) {
+                throw new RuntimeException(
+                    'Solde de la caisse principale insuffisant : '
+                        . number_format((float) $cashbox->current_balance, 0, ',', ' ') . ' ' . $cashbox->devise . '.'
+                );
+            }
+        }
+
+        $transferReference = in_array($type, ['transfert', 'retrait_banque', 'versement_banque'], true)
+            ? $operation->reference
+            : null;
+
+        $common = [
+            'bank_operation_id'  => (int) $operation->id,
+            'movement_date'      => $date,
+            'value_date'         => $operation->value_date,
+            'label'              => $operation->label,
+            'third_party'        => $operation->third_party,
+            'document_number'    => $operation->document_number,
+            'transfer_reference' => $transferReference,
+            'created_by'         => $userId,
+        ];
+
+        if ($source) {
+            $this->insertBankMovement(
+                $source,
+                'sortie',
+                $type === 'transfert' ? 'transfert_sortant' : $type,
+                $amount,
+                $common
+            );
+        }
+
+        if ($destination) {
+            $this->insertBankMovement(
+                $destination,
+                'entree',
+                $type === 'transfert' ? 'transfert_entrant' : $type,
+                $amount,
+                $common
+            );
+        }
+
+        $cashReference = null;
+
+        if ($cashbox) {
+            $cashReference = $this->insertCashMovementFromBank($cashbox, $operation, $userId, false);
+        }
+
+        $this->db
+            ->where('id', (int) $operation->id)
+            ->update('tbl_finance_bank_operation', [
+                'status'                  => 'validated',
+                'validated_by'            => $userId,
+                'validated_at'            => date('Y-m-d H:i:s'),
+                'cash_movement_reference' => $cashReference,
+            ]);
+    }
+
+    /**
+     * Annule une opération.
+     * - pending   : simple changement de statut ;
+     * - validated : contre-passation dans le livre (et dans la caisse si besoin).
+     * Interdit si une de ses lignes est déjà rapprochée.
+     */
+    public function cancelBankOperation(int $operationId, string $reason, ?int $userId): array
+    {
+        $reason = trim($reason);
+
+        if ($reason === '') {
+            return ['status' => false, 'message' => 'Le motif d’annulation est obligatoire.'];
+        }
+
+        $this->db->trans_begin();
+
+        try {
+            $operation = $this->db
+                ->query('SELECT * FROM tbl_finance_bank_operation WHERE id = ? LIMIT 1 FOR UPDATE', [$operationId])
+                ->row();
+
+            if (!$operation) {
+                throw new RuntimeException('Opération bancaire introuvable.');
+            }
+
+            if ($operation->status === 'cancelled') {
+                throw new RuntimeException('Cette opération est déjà annulée.');
+            }
+
+            if ($operation->status === 'validated') {
+                $movements = $this->db
+                    ->where('bank_operation_id', (int) $operation->id)
+                    ->where('nature !=', 'contre_passation')
+                    ->get('tbl_finance_bank_movement')
+                    ->result();
+
+                foreach ($movements as $movement) {
+                    if ((int) $movement->is_reconciled === 1) {
+                        throw new RuntimeException(
+                            'L’opération est déjà rapprochée avec un relevé : annulation impossible.'
+                        );
+                    }
+                }
+
+                $accountIds = array_unique(array_map(function ($m) {
+                    return (int) $m->bank_account_id;
+                }, $movements));
+                sort($accountIds);
+
+                $locked = [];
+
+                foreach ($accountIds as $accountId) {
+                    $locked[$accountId] = $this->getBankAccountForUpdate($accountId);
+                }
+
+                $today = date('Y-m-d');
+
+                foreach ($movements as $movement) {
+                    $account     = $locked[(int) $movement->bank_account_id];
+                    $reverseSens = $movement->sens === 'entree' ? 'sortie' : 'entree';
+
+                    if ($account->status === 'closed') {
+                        throw new RuntimeException('Le compte ' . $account->name . ' est clôturé.');
+                    }
+
+                    if ($reverseSens === 'sortie') {
+                        $this->assertBankFundsAvailable($account, (float) $movement->amount);
+                    }
+
+                    $this->insertBankMovement($account, $reverseSens, 'contre_passation', (float) $movement->amount, [
+                        'bank_operation_id'  => (int) $operation->id,
+                        'movement_date'      => $today,
+                        'label'              => 'Contre-passation ' . $operation->reference . ' — ' . $reason,
+                        'transfer_reference' => $movement->transfer_reference,
+                        'created_by'         => $userId,
+                    ]);
+                }
+
+                if (!empty($operation->cash_movement_reference) && !empty($operation->cashbox_id)) {
+                    $cashbox = $this->db
+                        ->query('SELECT * FROM tbl_finance_cashbox WHERE id = ? LIMIT 1 FOR UPDATE', [(int) $operation->cashbox_id])
+                        ->row();
+
+                    if (!$cashbox) {
+                        throw new RuntimeException('La caisse principale liée est introuvable.');
+                    }
+
+                    $this->insertCashMovementFromBank($cashbox, $operation, $userId, true);
+                }
+            }
+
+            $this->db
+                ->where('id', (int) $operation->id)
+                ->update('tbl_finance_bank_operation', [
+                    'status'        => 'cancelled',
+                    'cancelled_by'  => $userId,
+                    'cancelled_at'  => date('Y-m-d H:i:s'),
+                    'cancel_reason' => $reason,
+                ]);
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant l’annulation.');
+            }
+
+            $this->db->trans_commit();
+
+            return ['status' => true, 'message' => 'L’opération ' . $operation->reference . ' a été annulée.'];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Banque — annulation opération : ' . $e->getMessage());
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /** Requête commune : opérations + comptes + banques + créateur. */
+    private function bankOperationBaseQuery(): void
+    {
+        $this->db
+            ->select("
+                o.*,
+                sa.code AS source_account_code, sa.name AS source_account_name,
+                sa.account_number AS source_account_number, sb.name AS source_bank_name,
+                da.code AS destination_account_code, da.name AS destination_account_name,
+                da.account_number AS destination_account_number, dbk.name AS destination_bank_name,
+                CONCAT_WS(' ', uc.first_name, uc.last_name) AS created_by_name,
+                CONCAT_WS(' ', uv.first_name, uv.last_name) AS validated_by_name
+            ", false)
+            ->from('tbl_finance_bank_operation o')
+            ->join('tbl_finance_bank_account sa', 'sa.id = o.source_bank_account_id', 'left')
+            ->join('tbl_finance_bank sb', 'sb.id = sa.bank_id', 'left')
+            ->join('tbl_finance_bank_account da', 'da.id = o.destination_bank_account_id', 'left')
+            ->join('tbl_finance_bank dbk', 'dbk.id = da.bank_id', 'left')
+            ->join('users uc', 'uc.id = o.created_by', 'left')
+            ->join('users uv', 'uv.id = o.validated_by', 'left');
+    }
+
+    public function getRecentBankOperations(int $limit = 10): array
+    {
+        $this->bankOperationBaseQuery();
+
+        return $this->db
+            ->order_by('o.operation_date', 'DESC')
+            ->order_by('o.id', 'DESC')
+            ->limit(max(1, min(100, $limit)))
+            ->get()
+            ->result();
+    }
+
+    public function countBankOperations(): int
+    {
+        return (int) $this->db->count_all('tbl_finance_bank_operation');
+    }
+
+    /** Détail d'une opération avec ses lignes du livre (modale « Voir »). */
+    public function getBankOperationById(int $operationId)
+    {
+        $this->bankOperationBaseQuery();
+
+        $operation = $this->db->where('o.id', $operationId)->get()->row();
+
+        if ($operation) {
+            $operation->movements = $this->db
+                ->select('m.*, a.code AS account_code, a.name AS account_name')
+                ->from('tbl_finance_bank_movement m')
+                ->join('tbl_finance_bank_account a', 'a.id = m.bank_account_id', 'left')
+                ->where('m.bank_operation_id', $operationId)
+                ->order_by('m.id', 'ASC')
+                ->get()
+                ->result();
+        }
+
+        return $operation;
+    }
+
+    /* ---------------------------------------------------------------------
+     * TABLEAU DE BORD BANCAIRE
+     * ------------------------------------------------------------------- */
+
+    /**
+     * Statistiques principales (comptes actifs d'une devise).
+     * Les flux du jour excluent le solde initial et les transferts internes.
+     */
+    public function getBankMainStatistics(string $currency = 'BIF'): array
+    {
+        $today      = date('Y-m-d');
+        $monthStart = date('Y-m-01');
+
+        $accounts = $this->db
+            ->query("
+                SELECT COALESCE(SUM(current_balance), 0) AS global_balance,
+                       COUNT(*) AS currency_accounts
+                FROM tbl_finance_bank_account
+                WHERE status = 'active' AND currency = ?
+            ", [$currency])
+            ->row();
+
+        $allActive = $this->db
+            ->query("
+                SELECT COUNT(*) AS active_accounts, COUNT(DISTINCT bank_id) AS bank_count
+                FROM tbl_finance_bank_account
+                WHERE status = 'active'
+            ")
+            ->row();
+
+        $opening = $this->db
+            ->query("
+                SELECT COALESCE(SUM(CASE WHEN m.sens = 'entree' THEN m.amount ELSE -m.amount END), 0) AS balance
+                FROM tbl_finance_bank_movement m
+                INNER JOIN tbl_finance_bank_account a ON a.id = m.bank_account_id
+                WHERE a.status = 'active' AND a.currency = ?
+                  AND m.status = 'validated' AND m.movement_date < ?
+            ", [$currency, $monthStart])
+            ->row();
+
+        $todayFlows = $this->db
+            ->query("
+                SELECT
+                    COALESCE(SUM(CASE WHEN sens = 'entree' THEN amount ELSE 0 END), 0) AS income_amount,
+                    COALESCE(SUM(CASE WHEN sens = 'entree' THEN 1 ELSE 0 END), 0)      AS income_count,
+                    COALESCE(SUM(CASE WHEN sens = 'sortie' THEN amount ELSE 0 END), 0) AS expense_amount,
+                    COALESCE(SUM(CASE WHEN sens = 'sortie' THEN 1 ELSE 0 END), 0)      AS expense_count
+                FROM tbl_finance_bank_movement
+                WHERE status = 'validated' AND currency = ? AND movement_date = ?
+                  AND nature NOT IN ('solde_initial', 'transfert_entrant', 'transfert_sortant')
+            ", [$currency, $today])
+            ->row();
+
+        $globalBalance = (float) $accounts->global_balance;
+        $monthOpening  = (float) $opening->balance;
+
+        if (abs($monthOpening) > 0.001) {
+            $variation = (($globalBalance - $monthOpening) / abs($monthOpening)) * 100;
+        } else {
+            $variation = $globalBalance > 0 ? 100 : 0;
+        }
+
+        return [
+            'currency'                    => $currency,
+            'global_balance'              => $globalBalance,
+            'currency_accounts'           => (int) $accounts->currency_accounts,
+            'active_accounts'             => (int) $allActive->active_accounts,
+            'bank_count'                  => (int) $allActive->bank_count,
+            'today_income_amount'         => (float) $todayFlows->income_amount,
+            'today_income_count'          => (int) $todayFlows->income_count,
+            'today_expense_amount'        => (float) $todayFlows->expense_amount,
+            'today_expense_count'         => (int) $todayFlows->expense_count,
+            'month_opening_balance'       => $monthOpening,
+            'global_variation_percentage' => round($variation, 1),
+        ];
+    }
+
+    /**
+     * Évolution des flux (graphique).
+     * Périodes : 7days, 30days, month, year.
+     */
+    public function getBankFlowEvolution(string $period = '7days', string $currency = 'BIF'): array
+    {
+        $monthNames = [
+            1 => 'Janv.',
+            2 => 'Févr.',
+            3 => 'Mars',
+            4 => 'Avr.',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juil.',
+            8 => 'Août',
+            9 => 'Sept.',
+            10 => 'Oct.',
+            11 => 'Nov.',
+            12 => 'Déc.',
+        ];
+
+        $byMonth = false;
+
+        switch ($period) {
+            case '30days':
+                $start = date('Y-m-d', strtotime('-29 days'));
+                $end   = date('Y-m-d');
+                break;
+            case 'month':
+                $start = date('Y-m-01');
+                $end   = date('Y-m-t');
+                break;
+            case 'year':
+                $start   = date('Y-01-01');
+                $end     = date('Y-12-31');
+                $byMonth = true;
+                break;
+            default:
+                $period = '7days';
+                $start  = date('Y-m-d', strtotime('-6 days'));
+                $end    = date('Y-m-d');
+                break;
+        }
+
+        $rows = $this->db
+            ->query("
+                SELECT
+                    DATE_FORMAT(movement_date, ?) AS period_key,
+                    SUM(CASE WHEN sens = 'entree' THEN amount ELSE 0 END) AS total_in,
+                    SUM(CASE WHEN sens = 'sortie' THEN amount ELSE 0 END) AS total_out
+                FROM tbl_finance_bank_movement
+                WHERE status = 'validated' AND currency = ?
+                  AND nature NOT IN ('solde_initial', 'transfert_entrant', 'transfert_sortant')
+                  AND movement_date BETWEEN ? AND ?
+                GROUP BY period_key
+            ", [$byMonth ? '%Y-%m' : '%Y-%m-%d', $currency, $start, $end])
+            ->result();
+
+        $indexed = [];
+
+        foreach ($rows as $row) {
+            $indexed[$row->period_key] = [(float) $row->total_in, (float) $row->total_out];
+        }
+
+        $labels = $incomes = $expenses = [];
+
+        if ($byMonth) {
+            for ($month = 1; $month <= 12; $month++) {
+                $key        = date('Y') . '-' . str_pad((string) $month, 2, '0', STR_PAD_LEFT);
+                $labels[]   = $monthNames[$month];
+                $incomes[]  = $indexed[$key][0] ?? 0;
+                $expenses[] = $indexed[$key][1] ?? 0;
+            }
+        } else {
+            for ($ts = strtotime($start); $ts <= strtotime($end); $ts = strtotime('+1 day', $ts)) {
+                $key        = date('Y-m-d', $ts);
+                $labels[]   = date('d', $ts) . ' ' . $monthNames[(int) date('n', $ts)];
+                $incomes[]  = $indexed[$key][0] ?? 0;
+                $expenses[] = $indexed[$key][1] ?? 0;
+            }
+        }
+
+        $totalIncome  = array_sum($incomes);
+        $totalExpense = array_sum($expenses);
+
+        return [
+            'period'        => $period,
+            'start_date'    => $start,
+            'end_date'      => $end,
+            'labels'        => $labels,
+            'incomes'       => $incomes,
+            'expenses'      => $expenses,
+            'total_income'  => $totalIncome,
+            'total_expense' => $totalExpense,
+            'net'           => $totalIncome - $totalExpense,
+        ];
+    }
+
+    /** Solde par banque (part du total, comptes actifs d'une devise). */
+    public function getBankBalanceDistribution(string $currency = 'BIF'): array
+    {
+        $rows = $this->db
+            ->query("
+                SELECT b.name AS bank_name,
+                       COUNT(a.id) AS account_count,
+                       COALESCE(SUM(a.current_balance), 0) AS total_balance
+                FROM tbl_finance_bank_account a
+                INNER JOIN tbl_finance_bank b ON b.id = a.bank_id
+                WHERE a.status = 'active' AND a.currency = ?
+                GROUP BY b.id, b.name
+                ORDER BY total_balance DESC
+            ", [$currency])
+            ->result();
+
+        $total = 0;
+
+        foreach ($rows as $row) {
+            $total += max(0, (float) $row->total_balance);
+        }
+
+        $distribution = [];
+
+        foreach ($rows as $row) {
+            $balance = (float) $row->total_balance;
+
+            $distribution[] = [
+                'bank_name'     => $row->bank_name,
+                'account_count' => (int) $row->account_count,
+                'total_balance' => $balance,
+                'percentage'    => $total > 0 ? round(max(0, $balance) / $total * 100, 2) : 0,
+            ];
+        }
+
+        return $distribution;
+    }
+
+    /**
+     * Alertes bancaires :
+     * découvert / seuil, opérations en attente, justificatifs manquants,
+     * rapprochement en retard (> 35 jours).
+     */
+    public function getBankAlerts(int $limit = 6): array
+    {
+        $alerts = [];
+
+        /* 1. Soldes sous le seuil ou à découvert */
+        $lowAccounts = $this->db
+            ->query("
+                SELECT id, name, currency, current_balance, alert_threshold
+                FROM tbl_finance_bank_account
+                WHERE status = 'active'
+                  AND (current_balance < 0 OR (alert_threshold > 0 AND current_balance <= alert_threshold))
+                ORDER BY current_balance ASC
+            ")
+            ->result();
+
+        foreach ($lowAccounts as $account) {
+            $isOverdraft = (float) $account->current_balance < 0;
+
+            $alerts[] = [
+                'type'        => 'danger',
+                'icon'        => 'fas fa-university',
+                'title'       => $isOverdraft ? 'Compte à découvert' : 'Solde sous le seuil d’alerte',
+                'description' => $account->name . ' : '
+                    . number_format((float) $account->current_balance, 0, ',', ' ') . ' ' . $account->currency
+                    . ($isOverdraft ? '.' : ' (seuil ' . number_format((float) $account->alert_threshold, 0, ',', ' ') . ').'),
+                'account_id'  => (int) $account->id,
+                'priority'    => 0,
+            ];
+        }
+
+        /* 2. Opérations en attente de validation */
+        $pending = $this->db
+            ->select('id, reference, amount, currency, operation_date')
+            ->where('status', 'pending')
+            ->order_by('operation_date', 'ASC')
+            ->limit(5)
+            ->get('tbl_finance_bank_operation')
+            ->result();
+
+        foreach ($pending as $operation) {
+            $alerts[] = [
+                'type'         => 'warning',
+                'icon'         => 'fas fa-clock',
+                'title'        => 'Opération en attente de validation',
+                'description'  => $operation->reference . ' — '
+                    . number_format((float) $operation->amount, 0, ',', ' ') . ' ' . $operation->currency
+                    . ' du ' . date('d/m/Y', strtotime($operation->operation_date)) . '.',
+                'operation_id' => (int) $operation->id,
+                'priority'     => 1,
+            ];
+        }
+
+        /* 3. Rapprochement en retard (> 35 jours) */
+        $limitDate = date('Y-m-d', strtotime('-35 days'));
+
+        $lateAccounts = $this->db
+            ->query("
+                SELECT id, name, last_reconciled_date
+                FROM tbl_finance_bank_account
+                WHERE status = 'active'
+                  AND (
+                        (last_reconciled_date IS NULL AND opening_date < ?)
+                     OR last_reconciled_date < ?
+                  )
+            ", [$limitDate, $limitDate])
+            ->result();
+
+        foreach ($lateAccounts as $account) {
+            $alerts[] = [
+                'type'        => 'warning',
+                'icon'        => 'fas fa-balance-scale',
+                'title'       => 'Rapprochement en retard',
+                'description' => $account->name . ' : '
+                    . (empty($account->last_reconciled_date)
+                        ? 'aucun rapprochement effectué.'
+                        : 'dernier rapprochement au ' . date('d/m/Y', strtotime($account->last_reconciled_date)) . '.'),
+                'account_id'  => (int) $account->id,
+                'priority'    => 2,
+            ];
+        }
+
+        /* 4. Justificatifs manquants (90 derniers jours) */
+        $missing = $this->db
+            ->query("
+                SELECT id, reference, amount, currency
+                FROM tbl_finance_bank_operation
+                WHERE status = 'validated'
+                  AND operation_type IN ('encaissement', 'decaissement')
+                  AND (attachment IS NULL OR attachment = '')
+                  AND operation_date >= ?
+                ORDER BY amount DESC
+                LIMIT 5
+            ", [date('Y-m-d', strtotime('-90 days'))])
+            ->result();
+
+        foreach ($missing as $operation) {
+            $alerts[] = [
+                'type'         => 'info',
+                'icon'         => 'fas fa-file-invoice',
+                'title'        => 'Justificatif manquant',
+                'description'  => $operation->reference . ' — '
+                    . number_format((float) $operation->amount, 0, ',', ' ') . ' ' . $operation->currency
+                    . ' sans pièce justificative.',
+                'operation_id' => (int) $operation->id,
+                'priority'     => 3,
+            ];
+        }
+
+        usort($alerts, function ($a, $b) {
+            return $a['priority'] <=> $b['priority'];
+        });
+
+        return array_slice($alerts, 0, max(1, $limit));
+    }
+
+        /* ---------------------------------------------------------------------
+     * LIVRE DE BANQUE
+     * ------------------------------------------------------------------- */
+
+    /** Libellés des natures de lignes du livre de banque. */
+    public function getBankMovementNatureLabels(): array
+    {
+        return [
+            'solde_initial'       => 'Solde initial',
+            'encaissement'        => 'Encaissement',
+            'decaissement'        => 'Décaissement',
+            'transfert_entrant'   => 'Transfert entrant',
+            'transfert_sortant'   => 'Transfert sortant',
+            'retrait_banque'      => 'Retrait vers caisse',
+            'versement_banque'    => 'Versement depuis caisse',
+            'frais_bancaires'     => 'Frais bancaires',
+            'interets_crediteurs' => 'Intérêts créditeurs',
+            'contre_passation'    => 'Contre-passation',
+        ];
+    }
+
+    /**
+     * Livre de banque d'un compte sur une période.
+     *
+     * Le solde progressif est calculé sur TOUTES les lignes de la période
+     * (ordre date puis id), puis les filtres d'affichage sont appliqués :
+     * le solde affiché sur chaque ligne reste donc toujours juste.
+     *
+     * Filtres : date_from, date_to, sens, nature, search, reconciled (yes|no)
+     */
+    public function getBankLedger(int $accountId, array $filters): array
+    {
+        $dateFrom = $filters['date_from'];
+        $dateTo   = $filters['date_to'];
+
+        /* Solde d'ouverture = toutes les lignes validées avant la période */
+        $openingBalance = round((float) $this->db
+            ->query("
+                SELECT COALESCE(SUM(CASE WHEN sens = 'entree' THEN amount ELSE -amount END), 0) AS balance
+                FROM tbl_finance_bank_movement
+                WHERE bank_account_id = ?
+                  AND status = 'validated'
+                  AND movement_date < ?
+            ", [$accountId, $dateFrom])
+            ->row()
+            ->balance, 2);
+
+        /* Lignes de la période */
+        $rows = $this->db
+            ->query("
+                SELECT
+                    m.id, m.reference, m.bank_operation_id, m.sens, m.nature,
+                    m.movement_date, m.value_date, m.amount, m.currency,
+                    m.label, m.third_party, m.document_number, m.transfer_reference,
+                    m.is_reconciled, m.reconciled_at, m.created_at,
+                    o.reference      AS operation_reference,
+                    o.operation_type AS operation_type,
+                    o.payment_method AS payment_method,
+                    o.attachment     AS attachment,
+                    o.status         AS operation_status,
+                    CONCAT_WS(' ', u.first_name, u.last_name) AS created_by_name
+                FROM tbl_finance_bank_movement m
+                LEFT JOIN tbl_finance_bank_operation o ON o.id = m.bank_operation_id
+                LEFT JOIN users u ON u.id = m.created_by
+                WHERE m.bank_account_id = ?
+                  AND m.status = 'validated'
+                  AND m.movement_date BETWEEN ? AND ?
+                ORDER BY m.movement_date ASC, m.id ASC
+            ", [$accountId, $dateFrom, $dateTo])
+            ->result();
+
+        /* Solde progressif + totaux de la période (sans filtre) */
+        $running      = $openingBalance;
+        $totalIn      = 0;
+        $totalOut     = 0;
+        $countIn      = 0;
+        $countOut     = 0;
+        $unreconciled = 0;
+        $lineNumber   = 0;
+
+        foreach ($rows as $row) {
+            $amount = (float) $row->amount;
+
+            if ($row->sens === 'entree') {
+                $running         += $amount;
+                $totalIn         += $amount;
+                $countIn++;
+                $row->entry_amount = $amount;
+                $row->exit_amount  = 0;
+            } else {
+                $running         -= $amount;
+                $totalOut        += $amount;
+                $countOut++;
+                $row->entry_amount = 0;
+                $row->exit_amount  = $amount;
+            }
+
+            $row->line_number     = ++$lineNumber;
+            $row->running_balance = round($running, 2);
+
+            if ((int) $row->is_reconciled !== 1) {
+                $unreconciled++;
+            }
+        }
+
+        /* Filtres d'affichage */
+        $search     = function_exists('mb_strtolower') ? mb_strtolower((string) ($filters['search'] ?? ''), 'UTF-8') : strtolower((string) ($filters['search'] ?? ''));
+        $sens       = $filters['sens'] ?? '';
+        $nature     = $filters['nature'] ?? '';
+        $reconciled = $filters['reconciled'] ?? '';
+
+        $displayed = array_values(array_filter($rows, function ($row) use ($search, $sens, $nature, $reconciled) {
+            if ($sens !== '' && $row->sens !== $sens) {
+                return false;
+            }
+
+            if ($nature !== '' && $row->nature !== $nature) {
+                return false;
+            }
+
+            if ($reconciled === 'yes' && (int) $row->is_reconciled !== 1) {
+                return false;
+            }
+
+            if ($reconciled === 'no' && (int) $row->is_reconciled === 1) {
+                return false;
+            }
+
+            if ($search !== '') {
+                $haystack = implode(' ', [
+                    $row->reference,
+                    $row->operation_reference,
+                    $row->label,
+                    $row->third_party,
+                    $row->document_number,
+                    $row->transfer_reference,
+                ]);
+
+                $haystack = function_exists('mb_strtolower') ? mb_strtolower($haystack, 'UTF-8') : strtolower($haystack);
+
+                if (strpos($haystack, $search) === false) {
+                    return false;
+                }
+            }
+
+            return true;
+        }));
+
+        $filteredIn  = 0;
+        $filteredOut = 0;
+
+        foreach ($displayed as $row) {
+            $filteredIn  += $row->entry_amount;
+            $filteredOut += $row->exit_amount;
+        }
+
+        return [
+            'opening_balance' => $openingBalance,
+            'closing_balance' => round($running, 2),
+            'total_in'        => round($totalIn, 2),
+            'total_out'       => round($totalOut, 2),
+            'count_in'        => $countIn,
+            'count_out'       => $countOut,
+            'count_all'       => count($rows),
+            'unreconciled'    => $unreconciled,
+            'filtered_in'     => round($filteredIn, 2),
+            'filtered_out'    => round($filteredOut, 2),
+            'is_filtered'     => ($search !== '' || $sens !== '' || $nature !== '' || $reconciled !== ''),
+            'rows'            => $displayed,
+        ];
+    }
+
+        /* ---------------------------------------------------------------------
+     * RAPPROCHEMENT BANCAIRE — SESSIONS ET RELEVÉS (6a)
+     * ------------------------------------------------------------------- */
+
+    /** Statuts encore modifiables. */
+    private $reconciliationOpenStatuses = ['draft', 'in_progress', 'completed'];
+
+    /** Statuts : [libellé, classe du badge]. */
+    public function getReconciliationStatusLabels(): array
+    {
+        return [
+            'draft'       => ['Relevé en saisie', 'badge-secondary'],
+            'in_progress' => ['Pointage en cours', 'badge-warning'],
+            'completed'   => ['Prêt à valider', 'badge-info'],
+            'validated'   => ['Validé', 'badge-success'],
+            'cancelled'   => ['Annulé', 'badge-dark'],
+        ];
+    }
+
+    /** Début de la prochaine période : lendemain du dernier rapprochement, sinon date d'ouverture. */
+    public function getReconciliationPeriodStart($account): string
+    {
+        return !empty($account->last_reconciled_date)
+            ? date('Y-m-d', strtotime($account->last_reconciled_date . ' +1 day'))
+            : $account->opening_date;
+    }
+
+    /** Solde initial attendu du relevé (continuité avec le rapprochement précédent). */
+    public function getReconciliationExpectedOpening($account): float
+    {
+        return $account->last_reconciled_balance !== null
+            ? (float) $account->last_reconciled_balance
+            : (float) $account->opening_balance;
+    }
+
+    /** Solde du livre de banque à une date (incluse). */
+    public function getBankBookBalanceAt(int $accountId, string $date): float
+    {
+        $row = $this->db
+            ->query("
+                SELECT COALESCE(SUM(CASE WHEN sens = 'entree' THEN amount ELSE -amount END), 0) AS balance
+                FROM tbl_finance_bank_movement
+                WHERE bank_account_id = ?
+                  AND status = 'validated'
+                  AND movement_date <= ?
+            ", [$accountId, $date])
+            ->row();
+
+        return round((float) $row->balance, 2);
+    }
+
+    /** Rapprochement encore ouvert pour un compte (au plus un). */
+    public function getOpenReconciliation(int $accountId)
+    {
+        return $this->db
+            ->select('id, reference, period_start, period_end, status')
+            ->where('bank_account_id', $accountId)
+            ->where_in('status', $this->reconciliationOpenStatuses)
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get('tbl_finance_bank_reconciliation')
+            ->row();
+    }
+
+    /** Historique (filtres : bank_account_id, status). */
+    public function getReconciliations(array $filters = []): array
+    {
+        $this->db
+            ->select("
+                r.*,
+                a.code AS account_code, a.name AS account_name, a.account_number,
+                b.name AS bank_name,
+                s.reference AS statement_reference, s.statement_number,
+                CONCAT_WS(' ', u.first_name, u.last_name) AS responsible_name
+            ", false)
+            ->from('tbl_finance_bank_reconciliation r')
+            ->join('tbl_finance_bank_account a', 'a.id = r.bank_account_id', 'inner')
+            ->join('tbl_finance_bank b', 'b.id = a.bank_id', 'left')
+            ->join('tbl_finance_bank_statement s', 's.id = r.statement_id', 'left')
+            ->join('users u', 'u.id = r.responsible_user_id', 'left');
+
+        if (!empty($filters['bank_account_id'])) {
+            $this->db->where('r.bank_account_id', (int) $filters['bank_account_id']);
+        }
+
+        if (!empty($filters['status'])) {
+            $this->db->where('r.status', $filters['status']);
+        }
+
+        return $this->db
+            ->order_by('r.period_end', 'DESC')
+            ->order_by('r.id', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    /** Détail d'un rapprochement avec son compte et son relevé. */
+    public function getReconciliationById(int $reconciliationId)
+    {
+        if ($reconciliationId <= 0) {
+            return null;
+        }
+
+        return $this->db
+            ->select("
+                r.*,
+                a.code AS account_code, a.name AS account_name, a.account_number,
+                a.opening_balance AS account_opening_balance, a.opening_date AS account_opening_date,
+                a.last_reconciled_date, a.last_reconciled_balance, a.status AS account_status,
+                b.name AS bank_name,
+                s.reference AS statement_reference, s.statement_number, s.statement_date,
+                s.original_file_name, s.imported_at,
+                CONCAT_WS(' ', u.first_name, u.last_name) AS responsible_name
+            ", false)
+            ->from('tbl_finance_bank_reconciliation r')
+            ->join('tbl_finance_bank_account a', 'a.id = r.bank_account_id', 'inner')
+            ->join('tbl_finance_bank b', 'b.id = a.bank_id', 'left')
+            ->join('tbl_finance_bank_statement s', 's.id = r.statement_id', 'left')
+            ->join('users u', 'u.id = r.responsible_user_id', 'left')
+            ->where('r.id', $reconciliationId)
+            ->get()
+            ->row();
+    }
+
+    /** Rapprochement modifiable, sinon exception. */
+    private function getEditableReconciliation(int $reconciliationId)
+    {
+        $reconciliation = $this->getReconciliationById($reconciliationId);
+
+        if (!$reconciliation) {
+            throw new RuntimeException('Rapprochement introuvable.');
+        }
+
+        if (!in_array($reconciliation->status, $this->reconciliationOpenStatuses, true)) {
+            throw new RuntimeException(
+                'Ce rapprochement est ' . ($reconciliation->status === 'validated' ? 'validé' : 'annulé') . ' : il ne peut plus être modifié.'
+            );
+        }
+
+        return $reconciliation;
+    }
+
+    /**
+     * Crée un rapprochement et son relevé.
+     * Période : du lendemain du dernier rapprochement validé jusqu'à period_end.
+     */
+    public function createReconciliation(array $data): array
+    {
+        $accountId = (int) ($data['bank_account_id'] ?? 0);
+        $userId    = !empty($data['created_by']) ? (int) $data['created_by'] : null;
+
+        $this->db->trans_begin();
+
+        try {
+            $account = $this->getBankAccountForUpdate($accountId);
+
+            if (!$account || !in_array($account->status, ['active', 'blocked'], true)) {
+                throw new RuntimeException('Le compte bancaire est introuvable ou n’est plus actif.');
+            }
+
+            $open = $this->getOpenReconciliation($accountId);
+
+            if ($open) {
+                throw new RuntimeException(
+                    'Le rapprochement ' . $open->reference . ' est déjà en cours pour ce compte : terminez-le ou annulez-le avant d’en commencer un autre.'
+                );
+            }
+
+            $periodStart = $this->getReconciliationPeriodStart($account);
+            $periodEnd   = $data['period_end'];
+
+            if ($periodEnd < $periodStart) {
+                throw new RuntimeException(
+                    'La date de fin doit être postérieure ou égale au ' . date('d/m/Y', strtotime($periodStart)) . ' (début de la période à rapprocher).'
+                );
+            }
+
+            if ($periodEnd > date('Y-m-d')) {
+                throw new RuntimeException('La date de fin ne peut pas être dans le futur.');
+            }
+
+            $opening = round((float) $data['statement_opening_balance'], 2);
+            $closing = round((float) $data['statement_closing_balance'], 2);
+
+            /* Relevé */
+            $this->db->insert('tbl_finance_bank_statement', [
+                'reference'        => $this->bankNextReference('tbl_finance_bank_statement', 'REL', 5, 'reference', true),
+                'bank_account_id'  => $accountId,
+                'statement_number' => $this->bankNullable($data['statement_number'] ?? null),
+                'statement_date'   => !empty($data['statement_date']) ? $data['statement_date'] : $periodEnd,
+                'period_start'     => $periodStart,
+                'period_end'       => $periodEnd,
+                'currency'         => $account->currency,
+                'opening_balance'  => $opening,
+                'closing_balance'  => $closing,
+                'import_mode'      => 'manual',
+                'status'           => 'draft',
+                'observation'      => $this->bankNullable($data['observation'] ?? null),
+                'imported_by'      => $userId,
+            ]);
+
+            $statementId = (int) $this->db->insert_id();
+
+            if ($statementId <= 0) {
+                throw new RuntimeException('Le relevé n’a pas pu être créé.');
+            }
+
+            /* Rapprochement */
+            $reference = $this->bankNextReference('tbl_finance_bank_reconciliation', 'RAP', 5, 'reference', true);
+
+            $this->db->insert('tbl_finance_bank_reconciliation', [
+                'reference'                 => $reference,
+                'bank_account_id'           => $accountId,
+                'statement_id'              => $statementId,
+                'period_start'              => $periodStart,
+                'period_end'                => $periodEnd,
+                'currency'                  => $account->currency,
+                'statement_opening_balance' => $opening,
+                'statement_closing_balance' => $closing,
+                'book_closing_balance'      => $this->getBankBookBalanceAt($accountId, $periodEnd),
+                'date_tolerance'            => 5,
+                'amount_tolerance'          => 0,
+                'status'                    => 'draft',
+                'observation'               => $this->bankNullable($data['observation'] ?? null),
+                'responsible_user_id'       => $userId,
+            ]);
+
+            $reconciliationId = (int) $this->db->insert_id();
+
+            if ($this->db->trans_status() === false || $reconciliationId <= 0) {
+                throw new RuntimeException('Erreur de base de données pendant la création du rapprochement.');
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status'    => true,
+                'id'        => $reconciliationId,
+                'reference' => $reference,
+                'message'   => 'Rapprochement ' . $reference . ' créé. Saisissez ou importez maintenant les lignes du relevé.',
+            ];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Banque — création rapprochement : ' . $e->getMessage());
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /** Lignes du relevé, dans l'ordre du relevé. */
+    public function getStatementLines(int $statementId): array
+    {
+        return $this->db
+            ->where('statement_id', $statementId)
+            ->order_by('operation_date', 'ASC')
+            ->order_by('line_number', 'ASC')
+            ->order_by('id', 'ASC')
+            ->get('tbl_finance_bank_statement_line')
+            ->result();
+    }
+
+    private function nextStatementLineNumber(int $statementId): int
+    {
+        $row = $this->db
+            ->select('COALESCE(MAX(line_number), 0) AS last_number', false)
+            ->where('statement_id', $statementId)
+            ->get('tbl_finance_bank_statement_line')
+            ->row();
+
+        return (int) $row->last_number + 1;
+    }
+
+    /** Recalcule les totaux du relevé. */
+    private function refreshStatementTotals(int $statementId): void
+    {
+        $row = $this->db
+            ->select('COALESCE(SUM(debit), 0) AS total_debit, COALESCE(SUM(credit), 0) AS total_credit, COUNT(*) AS total_lines', false)
+            ->where('statement_id', $statementId)
+            ->get('tbl_finance_bank_statement_line')
+            ->row();
+
+        $this->db
+            ->where('id', $statementId)
+            ->update('tbl_finance_bank_statement', [
+                'total_debit'  => round((float) $row->total_debit, 2),
+                'total_credit' => round((float) $row->total_credit, 2),
+                'total_lines'  => (int) $row->total_lines,
+            ]);
+    }
+
+    /** Ajoute une ligne au relevé (saisie manuelle). */
+    public function addStatementLine(int $reconciliationId, array $data): array
+    {
+        try {
+            $reconciliation = $this->getEditableReconciliation($reconciliationId);
+            $date           = $data['operation_date'];
+
+            if ($date < $reconciliation->period_start || $date > $reconciliation->period_end) {
+                throw new RuntimeException(
+                    'La date doit être comprise entre le ' . date('d/m/Y', strtotime($reconciliation->period_start))
+                        . ' et le ' . date('d/m/Y', strtotime($reconciliation->period_end)) . '.'
+                );
+            }
+
+            $amount = round((float) $data['amount'], 2);
+
+            if ($amount <= 0) {
+                throw new RuntimeException('Le montant doit être supérieur à zéro.');
+            }
+
+            $this->db->insert('tbl_finance_bank_statement_line', [
+                'statement_id'    => (int) $reconciliation->statement_id,
+                'line_number'     => $this->nextStatementLineNumber((int) $reconciliation->statement_id),
+                'operation_date'  => $date,
+                'value_date'      => $this->bankNullable($data['value_date'] ?? null),
+                'label'           => $data['label'],
+                'bank_reference'  => $this->bankNullable($data['bank_reference'] ?? null),
+                'debit'           => $data['direction'] === 'debit' ? $amount : 0,
+                'credit'          => $data['direction'] === 'credit' ? $amount : 0,
+                'matching_status' => 'unmatched',
+            ]);
+
+            $this->refreshStatementTotals((int) $reconciliation->statement_id);
+
+            return ['status' => true, 'message' => 'Ligne ajoutée au relevé.'];
+        } catch (Throwable $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Importe des lignes déjà analysées par le contrôleur.
+     * $rows : [line, operation_date, value_date, label, bank_reference, debit, credit]
+     */
+    public function importStatementLines(int $reconciliationId, array $rows, ?string $fileName, ?int $userId): array
+    {
+        $this->db->trans_begin();
+
+        try {
+            $reconciliation = $this->getEditableReconciliation($reconciliationId);
+            $statementId    = (int) $reconciliation->statement_id;
+            $lineNumber     = $this->nextStatementLineNumber($statementId);
+            $imported       = 0;
+            $errors         = [];
+
+            foreach ($rows as $row) {
+                if ($row['operation_date'] < $reconciliation->period_start || $row['operation_date'] > $reconciliation->period_end) {
+                    $errors[] = 'Ligne ' . $row['line'] . ' : date ' . date('d/m/Y', strtotime($row['operation_date'])) . ' hors de la période du rapprochement.';
+                    continue;
+                }
+
+                $this->db->insert('tbl_finance_bank_statement_line', [
+                    'statement_id'    => $statementId,
+                    'line_number'     => $lineNumber++,
+                    'operation_date'  => $row['operation_date'],
+                    'value_date'      => $row['value_date'],
+                    'label'           => $row['label'],
+                    'bank_reference'  => $this->bankNullable($row['bank_reference']),
+                    'debit'           => $row['debit'],
+                    'credit'          => $row['credit'],
+                    'matching_status' => 'unmatched',
+                ]);
+
+                $imported++;
+            }
+
+            $this->refreshStatementTotals($statementId);
+
+            $this->db
+                ->set('imported_lines', 'imported_lines + ' . (int) $imported, false)
+                ->set('rejected_lines', 'rejected_lines + ' . count($errors), false)
+                ->set('import_mode', 'csv')
+                ->set('original_file_name', $fileName)
+                ->set('imported_at', date('Y-m-d H:i:s'))
+                ->set('imported_by', $userId)
+                ->where('id', $statementId)
+                ->update('tbl_finance_bank_statement');
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant l’import.');
+            }
+
+            $this->db->trans_commit();
+
+            return ['status' => true, 'imported' => $imported, 'errors' => $errors];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Banque — import relevé : ' . $e->getMessage());
+
+            return ['status' => false, 'imported' => 0, 'errors' => [], 'message' => $e->getMessage()];
+        }
+    }
+
+    /** Supprime une ligne du relevé (uniquement si elle n'est pas pointée). */
+    public function deleteStatementLine(int $reconciliationId, int $lineId): array
+    {
+        try {
+            $reconciliation = $this->getEditableReconciliation($reconciliationId);
+
+            $line = $this->db
+                ->where('id', $lineId)
+                ->where('statement_id', (int) $reconciliation->statement_id)
+                ->get('tbl_finance_bank_statement_line')
+                ->row();
+
+            if (!$line) {
+                throw new RuntimeException('Ligne du relevé introuvable.');
+            }
+
+            if (in_array($line->matching_status, ['matched', 'partially_matched'], true)) {
+                throw new RuntimeException('Cette ligne est pointée : dépointez-la avant de la supprimer.');
+            }
+
+            $this->db->where('id', $lineId)->delete('tbl_finance_bank_statement_line');
+            $this->refreshStatementTotals((int) $reconciliation->statement_id);
+
+            return ['status' => true, 'message' => 'Ligne supprimée du relevé.'];
+        } catch (Throwable $e) {
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /** Synthèse : équilibre du relevé, continuité, solde du livre. */
+    public function getReconciliationSummary($reconciliation): array
+    {
+        $totals = $this->db
+            ->query("
+                SELECT
+                    COALESCE(SUM(debit), 0)  AS total_debit,
+                    COALESCE(SUM(credit), 0) AS total_credit,
+                    COUNT(*) AS line_count,
+                    COALESCE(SUM(CASE WHEN matching_status IN ('matched', 'ignored') THEN 0 ELSE 1 END), 0) AS unmatched_count
+                FROM tbl_finance_bank_statement_line
+                WHERE statement_id = ?
+            ", [(int) $reconciliation->statement_id])
+            ->row();
+
+        $opening  = (float) $reconciliation->statement_opening_balance;
+        $closing  = (float) $reconciliation->statement_closing_balance;
+        $debit    = (float) $totals->total_debit;
+        $credit   = (float) $totals->total_credit;
+        $computed = round($opening + $credit - $debit, 2);
+        $gap      = round($closing - $computed, 2);
+        $isOpen   = in_array($reconciliation->status, $this->reconciliationOpenStatuses, true);
+
+        /* Continuité : seulement tant que le rapprochement est ouvert */
+        $expectedOpening = null;
+        $continuityGap   = 0;
+
+        if ($isOpen) {
+            $account         = $this->getBankAccountById((int) $reconciliation->bank_account_id);
+            $expectedOpening = $this->getReconciliationExpectedOpening($account);
+            $continuityGap   = round($opening - $expectedOpening, 2);
+        }
+
+        return [
+            'opening'          => $opening,
+            'closing'          => $closing,
+            'total_debit'      => round($debit, 2),
+            'total_credit'     => round($credit, 2),
+            'computed_closing' => $computed,
+            'statement_gap'    => $gap,
+            'is_balanced'      => abs($gap) < 0.005,
+            'line_count'       => (int) $totals->line_count,
+            'unmatched_count'  => (int) $totals->unmatched_count,
+            'expected_opening' => $expectedOpening,
+            'continuity_gap'   => $continuityGap,
+            'book_closing'     => $isOpen
+                ? $this->getBankBookBalanceAt((int) $reconciliation->bank_account_id, $reconciliation->period_end)
+                : (float) $reconciliation->book_closing_balance,
+        ];
+    }
+
+    /** Annule un rapprochement non validé (le relevé est annulé avec lui). */
+    public function cancelReconciliation(int $reconciliationId, string $reason, ?int $userId): array
+    {
+        $reason = trim($reason);
+
+        if ($reason === '') {
+            return ['status' => false, 'message' => 'Le motif d’annulation est obligatoire.'];
+        }
+
+        $this->db->trans_begin();
+
+        try {
+            $reconciliation = $this->getEditableReconciliation($reconciliationId);
+
+            $this->db->where('reconciliation_id', $reconciliationId)->delete('tbl_finance_bank_reconciliation_match');
+
+            $this->db
+                ->where('statement_id', (int) $reconciliation->statement_id)
+                ->update('tbl_finance_bank_statement_line', ['matching_status' => 'unmatched']);
+
+            $this->db
+                ->where('id', (int) $reconciliation->statement_id)
+                ->update('tbl_finance_bank_statement', ['status' => 'cancelled']);
+
+            $this->db
+                ->where('id', $reconciliationId)
+                ->update('tbl_finance_bank_reconciliation', [
+                    'status'                 => 'cancelled',
+                    'validated_by'           => $userId,
+                    'validated_at'           => date('Y-m-d H:i:s'),
+                    'validation_observation' => 'Annulé : ' . $reason,
+                ]);
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant l’annulation.');
+            }
+
+            $this->db->trans_commit();
+
+            return ['status' => true, 'message' => 'Le rapprochement ' . $reconciliation->reference . ' a été annulé.'];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+        /* ---------------------------------------------------------------------
+     * PRÉVISIONS DE TRÉSORERIE
+     * ------------------------------------------------------------------- */
+
+    /** Catégories de prévision par sens de flux. */
+    public function getForecastCategories(): array
+    {
+        return [
+            'entree' => [
+                'paiement_client'  => 'Paiements clients / décomptes',
+                'avance_marche'    => 'Avances de démarrage',
+                'retenue_garantie' => 'Libération des retenues de garantie',
+                'apport'           => 'Apports des associés',
+                'emprunt'          => 'Emprunts / crédits reçus',
+                'autre_entree'     => 'Autres entrées',
+            ],
+            'sortie' => [
+                'salaires'              => 'Salaires et charges sociales',
+                'fournisseurs'          => 'Fournisseurs (matériaux)',
+                'sous_traitance'        => 'Sous-traitance',
+                'carburant'             => 'Carburant et entretien des engins',
+                'loyer'                 => 'Loyers et charges fixes',
+                'impots'                => 'Impôts et taxes',
+                'remboursement_emprunt' => 'Remboursements d’emprunts',
+                'frais_bancaires'       => 'Frais bancaires',
+                'investissement'        => 'Investissements',
+                'autre_sortie'          => 'Autres sorties',
+            ],
+        ];
+    }
+
+    /** Date de la n-ième échéance d'une récurrence (le 31 devient le dernier jour du mois). */
+    private function forecastShiftDate(string $date, string $recurrence, int $step): string
+    {
+        $base = new DateTime($date);
+
+        if ($recurrence === 'weekly') {
+            return $base->modify('+' . (7 * $step) . ' days')->format('Y-m-d');
+        }
+
+        $months = ['monthly' => 1, 'quarterly' => 3, 'yearly' => 12][$recurrence] ?? 0;
+
+        if ($months === 0) {
+            return $date;
+        }
+
+        $day   = (int) $base->format('j');
+        $first = (new DateTime($base->format('Y-m-01')))->modify('+' . ($months * $step) . ' months');
+
+        return $first->format('Y-m-') . str_pad((string) min($day, (int) $first->format('t')), 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Crée une prévision (et ses échéances si elle est récurrente).
+     * La première échéance est le « parent », les suivantes pointent vers elle.
+     */
+    public function createTreasuryForecast(array $data): array
+    {
+        $categories = $this->getForecastCategories();
+        $flowType   = (string) ($data['flow_type'] ?? '');
+        $category   = (string) ($data['category'] ?? '');
+
+        if (!isset($categories[$flowType][$category])) {
+            return ['status' => false, 'message' => 'La catégorie ne correspond pas au type de flux choisi.'];
+        }
+
+        $amount = round((float) ($data['amount'] ?? 0), 2);
+
+        if ($amount <= 0) {
+            return ['status' => false, 'message' => 'Le montant doit être supérieur à zéro.'];
+        }
+
+        $recurrence = in_array($data['recurrence'] ?? 'none', ['none', 'weekly', 'monthly', 'quarterly', 'yearly'], true)
+            ? $data['recurrence']
+            : 'none';
+
+        $startDate = (string) $data['expected_date'];
+        $endDate   = $recurrence !== 'none' ? (string) ($data['recurrence_end_date'] ?? '') : '';
+
+        if ($recurrence !== 'none' && ($endDate === '' || $endDate < $startDate)) {
+            return ['status' => false, 'message' => 'La date de fin de récurrence doit être postérieure à la première échéance.'];
+        }
+
+        $userId    = !empty($data['created_by']) ? (int) $data['created_by'] : null;
+        $accountId = !empty($data['bank_account_id']) ? (int) $data['bank_account_id'] : null;
+        $currency  = in_array($data['currency'] ?? '', ['BIF', 'USD', 'EUR'], true) ? $data['currency'] : 'BIF';
+
+        $this->db->trans_begin();
+
+        try {
+            if ($accountId) {
+                $account = $this->getBankAccountById($accountId);
+
+                if (!$account) {
+                    throw new RuntimeException('Le compte bancaire choisi est introuvable.');
+                }
+
+                /* La devise vient du compte quand un compte est choisi */
+                $currency = $account->currency;
+            }
+
+            $base = [
+                'flow_type'           => $flowType,
+                'category'            => $category,
+                'label'               => $data['label'],
+                'third_party'         => $this->bankNullable($data['third_party'] ?? null),
+                'bank_account_id'     => $accountId,
+                'chantier_id'         => !empty($data['chantier_id']) ? (int) $data['chantier_id'] : null,
+                'currency'            => $currency,
+                'amount'              => $amount,
+                'probability'         => max(0, min(100, (int) ($data['probability'] ?? 100))),
+                'recurrence'          => $recurrence,
+                'recurrence_end_date' => $endDate !== '' ? $endDate : null,
+                'observation'         => $this->bankNullable($data['observation'] ?? null),
+                'status'              => 'planned',
+                'created_by'          => $userId,
+            ];
+
+            $dates = [$startDate];
+
+            if ($recurrence !== 'none') {
+                for ($step = 1; $step < 60; $step++) {
+                    $next = $this->forecastShiftDate($startDate, $recurrence, $step);
+
+                    if ($next > $endDate) {
+                        break;
+                    }
+
+                    $dates[] = $next;
+                }
+            }
+
+            $parentId       = null;
+            $firstReference = null;
+
+            foreach ($dates as $date) {
+                $reference      = $this->bankNextReference('tbl_finance_treasury_forecast', 'PRV', 5, 'reference', true);
+                $firstReference = $firstReference ?? $reference;
+
+                $this->db->insert('tbl_finance_treasury_forecast', $base + [
+                    'reference'          => $reference,
+                    'expected_date'      => $date,
+                    'parent_forecast_id' => $parentId,
+                ]);
+
+                $insertedId = (int) $this->db->insert_id();
+
+                if ($insertedId <= 0) {
+                    throw new RuntimeException('La prévision n’a pas pu être enregistrée.');
+                }
+
+                if ($parentId === null) {
+                    $parentId = $insertedId;
+                }
+            }
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant l’enregistrement.');
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status'  => true,
+                'message' => count($dates) > 1
+                    ? count($dates) . ' échéances créées (série ' . $firstReference . ', jusqu’au ' . date('d/m/Y', strtotime(end($dates))) . ').'
+                    : 'Prévision ' . $firstReference . ' enregistrée.',
+            ];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+            log_message('error', 'Prévision — création : ' . $e->getMessage());
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /** Enregistre la réalisation (totale ou partielle) d'une prévision. */
+    public function realizeTreasuryForecast(int $forecastId, float $amount, string $date, ?int $operationId, ?int $userId): array
+    {
+        $amount = round($amount, 2);
+
+        if ($amount <= 0) {
+            return ['status' => false, 'message' => 'Le montant réalisé doit être supérieur à zéro.'];
+        }
+
+        $this->db->trans_begin();
+
+        try {
+            $forecast = $this->db
+                ->query('SELECT * FROM tbl_finance_treasury_forecast WHERE id = ? LIMIT 1 FOR UPDATE', [$forecastId])
+                ->row();
+
+            if (!$forecast) {
+                throw new RuntimeException('Prévision introuvable.');
+            }
+
+            if (!in_array($forecast->status, ['planned', 'partially_realized'], true)) {
+                throw new RuntimeException('Cette prévision est déjà réalisée ou annulée.');
+            }
+
+            if ($operationId) {
+                $operation = $this->db
+                    ->where('id', $operationId)
+                    ->where('status', 'validated')
+                    ->get('tbl_finance_bank_operation')
+                    ->row();
+
+                if (!$operation) {
+                    throw new RuntimeException('L’opération bancaire choisie est introuvable ou non validée.');
+                }
+
+                if ($operation->currency !== $forecast->currency) {
+                    throw new RuntimeException('L’opération bancaire n’est pas dans la devise de la prévision.');
+                }
+            }
+
+            $realized = round((float) $forecast->realized_amount + $amount, 2);
+            $status   = $realized + 0.005 >= (float) $forecast->amount ? 'realized' : 'partially_realized';
+
+            $this->db
+                ->where('id', $forecastId)
+                ->update('tbl_finance_treasury_forecast', [
+                    'realized_amount'       => $realized,
+                    'realized_date'         => $date,
+                    'realized_operation_id' => $operationId ?: $forecast->realized_operation_id,
+                    'status'                => $status,
+                    'updated_by'            => $userId,
+                ]);
+
+            if ($this->db->trans_status() === false) {
+                throw new RuntimeException('Erreur de base de données pendant la réalisation.');
+            }
+
+            $this->db->trans_commit();
+
+            return [
+                'status'  => true,
+                'message' => $status === 'realized'
+                    ? 'La prévision ' . $forecast->reference . ' est entièrement réalisée.'
+                    : 'Réalisation partielle enregistrée : reste '
+                    . number_format((float) $forecast->amount - $realized, 0, ',', ' ') . ' ' . $forecast->currency . '.',
+            ];
+        } catch (Throwable $e) {
+            $this->db->trans_rollback();
+
+            return ['status' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Annule une prévision.
+     * $withFollowing = true : annule aussi les échéances suivantes non réalisées de la même série.
+     */
+    public function cancelTreasuryForecast(int $forecastId, string $reason, bool $withFollowing, ?int $userId): array
+    {
+        $reason = trim($reason);
+
+        if ($reason === '') {
+            return ['status' => false, 'message' => 'Le motif d’annulation est obligatoire.'];
+        }
+
+        $forecast = $this->db->where('id', $forecastId)->get('tbl_finance_treasury_forecast')->row();
+
+        if (!$forecast) {
+            return ['status' => false, 'message' => 'Prévision introuvable.'];
+        }
+
+        if ($forecast->status !== 'planned') {
+            return ['status' => false, 'message' => 'Seule une prévision non réalisée peut être annulée.'];
+        }
+
+        $update = [
+            'status'        => 'cancelled',
+            'cancelled_by'  => $userId,
+            'cancelled_at'  => date('Y-m-d H:i:s'),
+            'cancel_reason' => $reason,
+        ];
+
+        if ($withFollowing && $forecast->recurrence !== 'none') {
+            $rootId = $forecast->parent_forecast_id ? (int) $forecast->parent_forecast_id : (int) $forecast->id;
+
+            $this->db
+                ->group_start()
+                ->where('id', $rootId)
+                ->or_where('parent_forecast_id', $rootId)
+                ->group_end()
+                ->where('expected_date >=', $forecast->expected_date)
+                ->where('status', 'planned')
+                ->update('tbl_finance_treasury_forecast', $update);
+
+            $count = $this->db->affected_rows();
+
+            return ['status' => true, 'message' => $count . ' échéance(s) de la série annulée(s).'];
+        }
+
+        $this->db->where('id', $forecastId)->update('tbl_finance_treasury_forecast', $update);
+
+        return ['status' => true, 'message' => 'La prévision ' . $forecast->reference . ' a été annulée.'];
+    }
+
+    /** Liste des prévisions (filtres : currency, flow_type, status, date_from, date_to). */
+    public function getTreasuryForecasts(array $filters = []): array
+    {
+        $this->db
+            ->select("
+                f.*,
+                a.code AS account_code, a.name AS account_name,
+                ch.name AS chantier_name,
+                o.reference AS operation_reference
+            ", false)
+            ->from('tbl_finance_treasury_forecast f')
+            ->join('tbl_finance_bank_account a', 'a.id = f.bank_account_id', 'left')
+            ->join('chantiers ch', 'ch.id = f.chantier_id', 'left')
+            ->join('tbl_finance_bank_operation o', 'o.id = f.realized_operation_id', 'left');
+
+        if (!empty($filters['currency'])) {
+            $this->db->where('f.currency', $filters['currency']);
+        }
+
+        if (in_array($filters['flow_type'] ?? '', ['entree', 'sortie'], true)) {
+            $this->db->where('f.flow_type', $filters['flow_type']);
+        }
+
+        if (($filters['status'] ?? '') === 'open') {
+            $this->db->where_in('f.status', ['planned', 'partially_realized']);
+        } elseif (in_array($filters['status'] ?? '', ['planned', 'partially_realized', 'realized', 'cancelled'], true)) {
+            $this->db->where('f.status', $filters['status']);
+        }
+
+        if (!empty($filters['date_from'])) {
+            $this->db->where('f.expected_date >=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $this->db->where('f.expected_date <=', $filters['date_to']);
+        }
+
+        return $this->db
+            ->order_by('f.expected_date', 'ASC')
+            ->order_by('f.id', 'ASC')
+            ->limit(500)
+            ->get()
+            ->result();
+    }
+
+    /** Trésorerie disponible aujourd'hui : comptes bancaires + caisses actifs d'une devise. */
+    public function getTreasuryStartingPosition(string $currency): array
+    {
+        $bank = $this->db
+            ->query("
+                SELECT COALESCE(SUM(current_balance), 0) AS balance,
+                       COALESCE(SUM(alert_threshold), 0) AS threshold,
+                       COUNT(*) AS items
+                FROM tbl_finance_bank_account
+                WHERE status = 'active' AND currency = ?
+            ", [$currency])
+            ->row();
+
+        $cash = $this->db
+            ->query("
+                SELECT COALESCE(SUM(current_balance), 0) AS balance,
+                       COALESCE(SUM(alert_threshold), 0) AS threshold,
+                       COUNT(*) AS items
+                FROM tbl_finance_cashbox
+                WHERE status = 'active' AND devise = ?
+            ", [$currency])
+            ->row();
+
+        return [
+            'bank'            => round((float) $bank->balance, 2),
+            'bank_count'      => (int) $bank->items,
+            'cash'            => round((float) $cash->balance, 2),
+            'cash_count'      => (int) $cash->items,
+            'total'           => round((float) $bank->balance + (float) $cash->balance, 2),
+            'alert_threshold' => round((float) $bank->threshold + (float) $cash->threshold, 2),
+        ];
+    }
+
+    /** Périodes du plan : 13 semaines, 6 mois ou 12 mois. */
+    private function getTreasuryPeriods(string $horizon): array
+    {
+        $monthNames = [
+            1 => 'Janv.',
+            2 => 'Févr.',
+            3 => 'Mars',
+            4 => 'Avr.',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juil.',
+            8 => 'Août',
+            9 => 'Sept.',
+            10 => 'Oct.',
+            11 => 'Nov.',
+            12 => 'Déc.'
+        ];
+
+        $periods = [];
+        $today   = new DateTime('today');
+
+        if ($horizon === '13w') {
+            $monday = (clone $today)->modify('monday this week');
+
+            for ($i = 0; $i < 13; $i++) {
+                $start = (clone $monday)->modify('+' . (7 * $i) . ' days');
+                $end   = (clone $start)->modify('+6 days');
+
+                $periods[] = [
+                    'start'    => $start->format('Y-m-d'),
+                    'end'      => $end->format('Y-m-d'),
+                    'label'    => 'S' . $start->format('W'),
+                    'sublabel' => $start->format('d/m') . '–' . $end->format('d/m'),
+                ];
+            }
+
+            return $periods;
+        }
+
+        $count = $horizon === '12m' ? 12 : 6;
+        $first = new DateTime($today->format('Y-m-01'));
+
+        for ($i = 0; $i < $count; $i++) {
+            $start = (clone $first)->modify('+' . $i . ' months');
+
+            $periods[] = [
+                'start'    => $start->format('Y-m-d'),
+                'end'      => $start->format('Y-m-t'),
+                'label'    => $monthNames[(int) $start->format('n')],
+                'sublabel' => $start->format('Y'),
+            ];
+        }
+
+        return $periods;
+    }
+
+    /**
+     * Plan de trésorerie.
+     * $scenario : 'pondere' (montant × probabilité) ou 'brut' (100 %).
+     * Les montants en retard (date passée, non réalisés) sont placés dans la 1re période.
+     */
+    public function getTreasuryPlan(string $horizon, string $currency, string $scenario, float $opening, float $threshold): array
+    {
+        $periods    = $this->getTreasuryPeriods($horizon);
+        $count      = count($periods);
+        $firstStart = $periods[0]['start'];
+        $lastEnd    = $periods[$count - 1]['end'];
+        $categories = $this->getForecastCategories();
+
+        $rows    = [];
+        $overdue = ['count' => 0, 'in' => 0.0, 'out' => 0.0];
+
+        $bucket = function (string $date) use ($periods, $firstStart) {
+            if ($date < $firstStart) {
+                return 0;
+            }
+
+            foreach ($periods as $index => $period) {
+                if ($date <= $period['end']) {
+                    return $index;
+                }
+            }
+
+            return null;
+        };
+
+        $add = function (string $flow, string $key, string $label, bool $isAuto, string $date, float $amount) use (&$rows, &$overdue, $bucket, $count, $firstStart) {
+            $index = $bucket($date);
+
+            if ($index === null || $amount <= 0) {
+                return;
+            }
+
+            $rowKey = $flow . '|' . $key;
+
+            if (!isset($rows[$rowKey])) {
+                $rows[$rowKey] = [
+                    'flow'   => $flow,
+                    'key'    => $key,
+                    'label'  => $label,
+                    'auto'   => $isAuto,
+                    'values' => array_fill(0, $count, 0.0),
+                    'total'  => 0.0,
+                ];
+            }
+
+            $rows[$rowKey]['values'][$index] += $amount;
+            $rows[$rowKey]['total']          += $amount;
+
+            if ($date < $firstStart) {
+                $overdue['count']++;
+                $overdue[$flow === 'entree' ? 'in' : 'out'] += $amount;
+            }
+        };
+
+        /* 1. Prévisions saisies (reste à réaliser) */
+        $forecasts = $this->db
+            ->query("
+                SELECT flow_type, category, expected_date, amount, realized_amount, probability
+                FROM tbl_finance_treasury_forecast
+                WHERE status IN ('planned', 'partially_realized')
+                  AND currency = ?
+                  AND expected_date <= ?
+            ", [$currency, $lastEnd])
+            ->result();
+
+        foreach ($forecasts as $forecast) {
+            $remaining = max(0, (float) $forecast->amount - (float) $forecast->realized_amount);
+
+            if ($scenario === 'pondere') {
+                $remaining *= ((int) $forecast->probability) / 100;
+            }
+
+            $label = $categories[$forecast->flow_type][$forecast->category] ?? $forecast->category;
+            $add($forecast->flow_type, $forecast->category, $label, false, $forecast->expected_date, round($remaining, 2));
+        }
+
+        /* 2. Échéances clients attendues (module Encaissements) */
+        if ($this->db->table_exists('tbl_finance_expected_receipt')) {
+            $receipts = $this->db
+                ->query("
+                    SELECT expected_date, expected_amount
+                    FROM tbl_finance_expected_receipt
+                    WHERE status IN ('pending', 'partial', 'overdue')
+                      AND expected_amount > 0
+                      AND currency = ?
+                      AND expected_date <= ?
+                ", [$currency, $lastEnd])
+                ->result();
+
+            foreach ($receipts as $receipt) {
+                $add('entree', 'auto_receipts', 'Échéances clients attendues', true, $receipt->expected_date, (float) $receipt->expected_amount);
+            }
+        }
+
+        /* 3. Bons de paiement en attente (achats) — en BIF */
+        if ($currency === 'BIF' && $this->db->table_exists('purchase_payment_vouchers')) {
+            $vouchers = $this->db
+                ->query("
+                    SELECT payment_date, amount_paid
+                    FROM purchase_payment_vouchers
+                    WHERE payment_status = 'en_attente'
+                      AND amount_paid > 0
+                ")
+                ->result();
+
+            foreach ($vouchers as $voucher) {
+                $date = !empty($voucher->payment_date) ? substr($voucher->payment_date, 0, 10) : date('Y-m-d');
+                $add('sortie', 'auto_vouchers', 'Bons de paiement en attente', true, $date, (float) $voucher->amount_paid);
+            }
+        }
+
+        /* Ordre d'affichage : catégories saisies puis sources automatiques */
+        $ordered = ['entree' => [], 'sortie' => []];
+
+        foreach (['entree', 'sortie'] as $flow) {
+            $keys = array_merge(array_keys($categories[$flow]), [$flow === 'entree' ? 'auto_receipts' : 'auto_vouchers']);
+
+            foreach ($keys as $key) {
+                if (isset($rows[$flow . '|' . $key])) {
+                    $ordered[$flow][] = $rows[$flow . '|' . $key];
+                }
+            }
+        }
+
+        /* Totaux et soldes */
+        $totalsIn  = array_fill(0, $count, 0.0);
+        $totalsOut = array_fill(0, $count, 0.0);
+
+        foreach ($ordered['entree'] as $row) {
+            foreach ($row['values'] as $i => $value) {
+                $totalsIn[$i] += $value;
+            }
+        }
+
+        foreach ($ordered['sortie'] as $row) {
+            foreach ($row['values'] as $i => $value) {
+                $totalsOut[$i] += $value;
+            }
+        }
+
+        $openings = [];
+        $closings = [];
+        $net      = [];
+        $balance  = $opening;
+        $lowest   = ['amount' => null, 'index' => 0];
+        $alerts   = 0;
+
+        for ($i = 0; $i < $count; $i++) {
+            $openings[$i] = round($balance, 2);
+            $net[$i]      = round($totalsIn[$i] - $totalsOut[$i], 2);
+            $balance     += $net[$i];
+            $closings[$i] = round($balance, 2);
+
+            if ($lowest['amount'] === null || $closings[$i] < $lowest['amount']) {
+                $lowest = ['amount' => $closings[$i], 'index' => $i];
+            }
+
+            if ($closings[$i] < $threshold) {
+                $alerts++;
+            }
+        }
+
+        return [
+            'periods'      => $periods,
+            'rows'         => $ordered,
+            'totals_in'    => array_map(function ($v) {
+                return round($v, 2);
+            }, $totalsIn),
+            'totals_out'   => array_map(function ($v) {
+                return round($v, 2);
+            }, $totalsOut),
+            'net'          => $net,
+            'openings'     => $openings,
+            'closings'     => $closings,
+            'total_in'     => round(array_sum($totalsIn), 2),
+            'total_out'    => round(array_sum($totalsOut), 2),
+            'opening'      => round($opening, 2),
+            'closing'      => $count ? $closings[$count - 1] : round($opening, 2),
+            'lowest'       => $lowest,
+            'threshold'    => round($threshold, 2),
+            'alert_count'  => $alerts,
+            'overdue'      => $overdue,
+        ];
+    }
+
+    /** Prévu / réalisé par mois sur les N derniers mois (prévisions saisies). */
+    public function getForecastVsActual(string $currency, int $months = 6): array
+    {
+        $monthNames = [
+            1 => 'Janv.',
+            2 => 'Févr.',
+            3 => 'Mars',
+            4 => 'Avr.',
+            5 => 'Mai',
+            6 => 'Juin',
+            7 => 'Juil.',
+            8 => 'Août',
+            9 => 'Sept.',
+            10 => 'Oct.',
+            11 => 'Nov.',
+            12 => 'Déc.'
+        ];
+
+        $start = date('Y-m-01', strtotime('-' . ($months - 1) . ' months', strtotime(date('Y-m-01'))));
+
+        $rows = $this->db
+            ->query("
+                SELECT DATE_FORMAT(expected_date, '%Y-%m') AS ym, flow_type,
+                       SUM(amount) AS planned, SUM(realized_amount) AS realized
+                FROM tbl_finance_treasury_forecast
+                WHERE status <> 'cancelled'
+                  AND currency = ?
+                  AND expected_date BETWEEN ? AND LAST_DAY(CURDATE())
+                GROUP BY ym, flow_type
+            ", [$currency, $start])
+            ->result();
+
+        $indexed = [];
+
+        foreach ($rows as $row) {
+            $indexed[$row->ym][$row->flow_type] = [(float) $row->planned, (float) $row->realized];
+        }
+
+        $result = [];
+
+        for ($i = 0; $i < $months; $i++) {
+            $ts = strtotime('+' . $i . ' months', strtotime($start));
+            $ym = date('Y-m', $ts);
+
+            $in  = $indexed[$ym]['entree'] ?? [0, 0];
+            $out = $indexed[$ym]['sortie'] ?? [0, 0];
+
+            $result[] = [
+                'label'        => $monthNames[(int) date('n', $ts)] . ' ' . date('Y', $ts),
+                'in_planned'   => $in[0],
+                'in_realized'  => $in[1],
+                'in_rate'      => $in[0] > 0 ? round($in[1] / $in[0] * 100, 1) : null,
+                'out_planned'  => $out[0],
+                'out_realized' => $out[1],
+                'out_rate'     => $out[0] > 0 ? round($out[1] / $out[0] * 100, 1) : null,
+            ];
+        }
+
+        return $result;
+    }
+
+    /** Opérations bancaires validées récentes (pour lier une réalisation). */
+    public function getRealizableBankOperations(string $currency, int $limit = 80): array
+    {
+        return $this->db
+            ->select('id, reference, operation_type, operation_date, amount, label')
+            ->where('status', 'validated')
+            ->where('currency', $currency)
+            ->where_not_in('operation_type', ['transfert'])
+            ->order_by('operation_date', 'DESC')
+            ->order_by('id', 'DESC')
+            ->limit($limit)
+            ->get('tbl_finance_bank_operation')
+            ->result();
     }
 }

@@ -1,3264 +1,1455 @@
+<?php
+/* =====================================================================
+ * PAGE : PRÉVISIONS DE TRÉSORERIE
+ * ===================================================================== */
+
+$flashSuccess = $this->session->flashdata('success');
+$flashError   = $this->session->flashdata('error');
+$reopenModal  = (bool) $this->session->flashdata('open_forecast_modal');
+$old          = $this->session->flashdata('forecast_old_input');
+$old          = is_array($old) ? $old : [];
+
+if (!function_exists('prvAmount')) {
+    function prvAmount($amount, string $currency = 'BIF'): string
+    {
+        return number_format((float) $amount, $currency === 'BIF' ? 0 : 2, ',', ' ');
+    }
+}
+
+$cur       = $filters['currency'];
+$today     = date('Y-m-d');
+$jsonFlags = JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP;
+$periods   = $plan['periods'];
+$nbPeriods = count($periods);
+
+$planQuery = http_build_query([
+    'horizon'   => $filters['horizon'],
+    'currency'  => $cur,
+    'scenario'  => $filters['scenario'],
+    'threshold' => $filters['threshold'],
+]);
+
+$statusLabels = [
+    'planned'            => ['Prévue', 'badge-info'],
+    'partially_realized' => ['Partielle', 'badge-warning'],
+    'realized'           => ['Réalisée', 'badge-success'],
+    'cancelled'          => ['Annulée', 'badge-secondary'],
+];
+
+$recurrenceLabels = [
+    'none'      => 'Ponctuelle',
+    'weekly'    => 'Hebdomadaire',
+    'monthly'   => 'Mensuelle',
+    'quarterly' => 'Trimestrielle',
+    'yearly'    => 'Annuelle',
+];
+
+$entryTypes = ['encaissement', 'versement_banque', 'interets_crediteurs'];
+
+$lowestAmount = (float) ($plan['lowest']['amount'] ?? $plan['opening']);
+$lowestPeriod = $periods[$plan['lowest']['index']] ?? $periods[0];
+$isLowAlert   = $lowestAmount < $plan['threshold'];
+
+$oldValue = function (string $key, $default = '') use ($old) {
+    return html_escape($old[$key] ?? $default);
+};
+?>
+
+<style>
+    :root {
+        --prv-primary: #0f766e;
+        --prv-primary-dark: #115e59;
+        --prv-secondary: #102033;
+        --prv-muted: #64748b;
+        --prv-border: #e2e8f0
+    }
+
+    .prv-page {
+        padding-bottom: 30px
+    }
+
+    .prv-hero {
+        margin-bottom: 18px;
+        padding: 20px 24px;
+        border-radius: 15px;
+        color: #fff;
+        background: linear-gradient(120deg, #0f766e 0%, #155e75 55%, #102033 100%);
+        box-shadow: 0 12px 30px rgba(15, 118, 110, .16)
+    }
+
+    .prv-hero h2 {
+        margin: 0 0 6px;
+        font-size: 21px;
+        font-weight: 800
+    }
+
+    .prv-hero p {
+        max-width: 820px;
+        margin: 0 0 14px;
+        color: rgba(255, 255, 255, .85);
+        font-size: 12px;
+        line-height: 1.6
+    }
+
+    .prv-hero label {
+        display: block;
+        margin-bottom: 4px;
+        color: rgba(255, 255, 255, .8);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase
+    }
+
+    .prv-hero .form-control {
+        min-height: 38px;
+        border: 0;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700
+    }
+
+    .prv-stat {
+        margin-bottom: 16px;
+        padding: 16px 18px;
+        border: 1px solid var(--prv-border);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 7px 24px rgba(15, 23, 42, .045)
+    }
+
+    .prv-stat span {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--prv-muted);
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase
+    }
+
+    .prv-stat strong {
+        display: block;
+        color: #0f172a;
+        font-size: 19px;
+        font-weight: 900
+    }
+
+    .prv-stat small {
+        color: var(--prv-muted);
+        font-size: 10px
+    }
+
+    .prv-stat.is-in strong {
+        color: #15803d
+    }
+
+    .prv-stat.is-out strong {
+        color: #b91c1c
+    }
+
+    .prv-stat.is-alert {
+        border-color: #fecaca;
+        background: #fef2f2
+    }
+
+    .prv-stat.is-alert strong {
+        color: #b91c1c
+    }
+
+    .prv-stat.is-ok {
+        border-color: #86efac;
+        background: #f0fdf4
+    }
+
+    .prv-card {
+        margin-bottom: 18px;
+        overflow: hidden;
+        border: 1px solid var(--prv-border);
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 6px 22px rgba(15, 23, 42, .04)
+    }
+
+    .prv-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 15px 18px;
+        border-bottom: 1px solid #edf2f7
+    }
+
+    .prv-card-title {
+        margin: 0 0 2px;
+        color: var(--prv-secondary);
+        font-size: 15px;
+        font-weight: 800
+    }
+
+    .prv-card-title i {
+        margin-right: 7px;
+        color: var(--prv-primary)
+    }
+
+    .prv-card-subtitle {
+        color: var(--prv-muted);
+        font-size: 11px
+    }
+
+    .prv-card-body {
+        padding: 18px
+    }
+
+    .btn-prv-primary {
+        color: #fff;
+        border: 1px solid var(--prv-primary);
+        border-radius: 8px;
+        background: var(--prv-primary);
+        font-size: 12px;
+        font-weight: 700
+    }
+
+    .btn-prv-primary:hover {
+        color: #fff;
+        background: var(--prv-primary-dark)
+    }
+
+    .btn-prv-outline {
+        color: var(--prv-primary);
+        border: 1px solid #9bd0ca;
+        border-radius: 8px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700
+    }
+
+    .btn-prv-outline:hover {
+        color: #fff;
+        background: var(--prv-primary)
+    }
+
+    .prv-warning {
+        margin-bottom: 16px;
+        padding: 10px 14px;
+        border: 1px solid #fde68a;
+        border-radius: 10px;
+        background: #fffbeb;
+        color: #92400e;
+        font-size: 12px;
+        font-weight: 600
+    }
+
+    .prv-chart {
+        position: relative;
+        height: 300px
+    }
+
+    /* Plan de trésorerie */
+    .prv-plan {
+        margin-bottom: 0;
+        font-size: 11px
+    }
+
+    .prv-plan th,
+    .prv-plan td {
+        padding: 7px 9px;
+        white-space: nowrap;
+        vertical-align: middle;
+        border-color: #edf2f7
+    }
+
+    .prv-plan thead th {
+        color: #475569;
+        background: #f8fafc;
+        font-size: 10px;
+        font-weight: 900;
+        text-align: right
+    }
+
+    .prv-plan thead th small {
+        display: block;
+        color: #94a3b8;
+        font-weight: 600
+    }
+
+    .prv-plan th:first-child,
+    .prv-plan td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        min-width: 230px;
+        text-align: left;
+        background: #fff
+    }
+
+    .prv-plan thead th:first-child {
+        background: #f8fafc
+    }
+
+    .prv-plan td {
+        text-align: right
+    }
+
+    .prv-plan .prv-section td {
+        color: var(--prv-secondary);
+        background: #f1f5f9;
+        font-weight: 900;
+        text-transform: uppercase;
+        font-size: 10px
+    }
+
+    .prv-plan .prv-section td:first-child {
+        background: #f1f5f9
+    }
+
+    .prv-plan .prv-total td {
+        background: #f8fafc;
+        font-weight: 900
+    }
+
+    .prv-plan .prv-total td:first-child {
+        background: #f8fafc
+    }
+
+    .prv-plan .prv-balance td {
+        background: #f0fdfa;
+        font-weight: 900;
+        color: #0f172a
+    }
+
+    .prv-plan .prv-balance td:first-child {
+        background: #f0fdfa
+    }
+
+    .prv-plan td.is-low {
+        color: #b91c1c !important;
+        background: #fee2e2 !important
+    }
+
+    .prv-plan .prv-in {
+        color: #15803d
+    }
+
+    .prv-plan .prv-out {
+        color: #b91c1c
+    }
+
+    .prv-plan .prv-zero {
+        color: #cbd5e1
+    }
+
+    .prv-auto {
+        display: inline-block;
+        margin-left: 5px;
+        padding: 1px 6px;
+        border-radius: 10px;
+        color: #6d28d9;
+        background: #ede9fe;
+        font-size: 9px;
+        font-weight: 800
+    }
+
+    /* Liste des prévisions */
+    .prv-table {
+        margin-bottom: 0
+    }
+
+    .prv-table thead th {
+        padding: 10px;
+        color: #475569;
+        border-top: 0;
+        background: #f8fafc;
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        white-space: nowrap
+    }
+
+    .prv-table tbody td {
+        padding: 9px 10px;
+        color: #334155;
+        font-size: 12px;
+        vertical-align: middle
+    }
+
+    .prv-table .num {
+        text-align: right;
+        white-space: nowrap;
+        font-weight: 800
+    }
+
+    .prv-flow {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 800
+    }
+
+    .prv-flow.entree {
+        color: #15803d;
+        background: #dcfce7
+    }
+
+    .prv-flow.sortie {
+        color: #b91c1c;
+        background: #fee2e2
+    }
+
+    .prv-late {
+        color: #b45309;
+        font-weight: 700
+    }
+
+    .prv-filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap
+    }
+
+    .prv-filters .form-control {
+        min-height: 36px;
+        border-color: #dbe4ea;
+        border-radius: 8px;
+        font-size: 12px
+    }
+
+    .prv-empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--prv-muted)
+    }
+
+    .prv-empty i {
+        display: block;
+        margin-bottom: 10px;
+        font-size: 32px;
+        color: #cbd5e1
+    }
+
+    .prv-rate {
+        display: inline-block;
+        min-width: 52px;
+        padding: 2px 7px;
+        border-radius: 10px;
+        font-size: 10px;
+        font-weight: 800;
+        text-align: center
+    }
+
+    .prv-rate.good {
+        color: #15803d;
+        background: #dcfce7
+    }
+
+    .prv-rate.mid {
+        color: #92400e;
+        background: #fef3c7
+    }
+
+    .prv-rate.bad {
+        color: #b91c1c;
+        background: #fee2e2
+    }
+
+    /* Modales */
+    .modal-prv .modal-content {
+        overflow: hidden;
+        border: 0;
+        border-radius: 14px
+    }
+
+    .modal-prv .modal-header {
+        color: #fff;
+        border-bottom: 0;
+        background: linear-gradient(120deg, #0f766e, #155e75, #102033)
+    }
+
+    .modal-prv .modal-title {
+        font-size: 15px;
+        font-weight: 800
+    }
+
+    .modal-prv .close {
+        color: #fff;
+        opacity: 1
+    }
+
+    .modal-prv label {
+        margin-bottom: 5px;
+        color: #475569;
+        font-size: 11px;
+        font-weight: 800
+    }
+
+    .modal-prv .form-control {
+        min-height: 38px;
+        border-color: #dbe4ea;
+        border-radius: 8px;
+        font-size: 12px
+    }
+
+    .prv-info-box {
+        padding: 9px 12px;
+        border: 1px solid #99d5ce;
+        border-radius: 9px;
+        background: #f0fdfa;
+        font-size: 12px
+    }
+
+    .required-star {
+        color: #dc2626
+    }
+</style>
+
 <div class="content-wrapper">
 
-    <!-- En-tête de page -->
     <div class="content-header">
-
         <div class="container-fluid">
-
             <div class="row mb-2">
-
                 <div class="col-sm-6">
-                    <h1 class="m-0">
-                        <?= $title ?? 'Prévisions de trésorerie'; ?>
-                    </h1>
+                    <h1 class="m-0"><?= html_escape($title) ?></h1>
                 </div>
-
                 <div class="col-sm-6">
-
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item">
-                            <a href="<?= base_url('dashboard'); ?>">
-                                Home
-                            </a>
-                        </li>
-
-                        <li class="breadcrumb-item active">
-                            Prévisions de trésorerie
-                        </li>
+                        <li class="breadcrumb-item"><a href="<?= base_url('dashboard') ?>">Home</a></li>
+                        <li class="breadcrumb-item active"><?= html_escape($title) ?></li>
                     </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 
+    <section class="content">
+        <div class="container-fluid prv-page">
+
+            <!-- =========================================================
+                 BANDEAU + PARAMÈTRES DU PLAN
+            ========================================================== -->
+            <div class="prv-hero">
+                <div class="d-flex justify-content-between flex-wrap" style="gap:12px">
+                    <div>
+                        <h2><i class="fas fa-chart-line mr-2"></i>Prévisions de trésorerie</h2>
+                        <p>
+                            Projection des soldes à partir de la trésorerie disponible aujourd’hui (banques et caisses),
+                            des prévisions saisies, des échéances clients attendues et des bons de paiement en attente.
+                        </p>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-light font-weight-bold mb-2" data-toggle="modal"
+                            data-target="#forecastModal">
+                            <i class="fas fa-plus mr-1"></i> Nouvelle prévision
+                        </button>
+                        <a href="<?= base_url('prevision-export') . '?' . $planQuery ?>"
+                            class="btn btn-outline-light font-weight-bold mb-2">
+                            <i class="fas fa-file-csv mr-1"></i> Exporter
+                        </a>
+                    </div>
                 </div>
 
+                <form method="get" action="<?= base_url('prevision') ?>" class="row align-items-end">
+                    <div class="col-xl-2 col-md-3 form-group mb-xl-0">
+                        <label>Horizon</label>
+                        <select name="horizon" class="form-control" onchange="this.form.submit()">
+                            <option value="13w" <?= $filters['horizon'] === '13w' ? 'selected' : '' ?>>13 semaines
+                            </option>
+                            <option value="6m" <?= $filters['horizon'] === '6m' ? 'selected' : '' ?>>6 mois</option>
+                            <option value="12m" <?= $filters['horizon'] === '12m' ? 'selected' : '' ?>>12 mois</option>
+                        </select>
+                    </div>
+                    <div class="col-xl-2 col-md-3 form-group mb-xl-0">
+                        <label>Devise</label>
+                        <select name="currency" class="form-control" onchange="this.form.submit()">
+                            <?php foreach (['BIF', 'USD', 'EUR'] as $c): ?>
+                                <option value="<?= $c ?>" <?= $cur === $c ? 'selected' : '' ?>><?= $c ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="col-xl-2 col-md-3 form-group mb-xl-0">
+                        <label>Scénario</label>
+                        <select name="scenario" class="form-control" onchange="this.form.submit()">
+                            <option value="pondere" <?= $filters['scenario'] === 'pondere' ? 'selected' : '' ?>>Pondéré
+                                (× probabilité)</option>
+                            <option value="brut" <?= $filters['scenario'] === 'brut' ? 'selected' : '' ?>>Brut (100 %)
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-xl-3 col-md-3 form-group mb-xl-0">
+                        <label>Seuil de sécurité (<?= html_escape($cur) ?>)</label>
+                        <input type="number" name="threshold" class="form-control" min="0" step="1"
+                            value="<?= html_escape($filters['threshold'] !== '' ? $filters['threshold'] : (string) round($threshold)) ?>">
+                    </div>
+                    <div class="col-xl-3 col-md-12 form-group mb-0">
+                        <button type="submit" class="btn btn-light font-weight-bold mr-1"><i
+                                class="fas fa-sync-alt mr-1"></i>Recalculer</button>
+                        <a href="<?= base_url('prevision') ?>" class="btn btn-outline-light font-weight-bold"><i
+                                class="fas fa-redo"></i></a>
+                    </div>
+                </form>
+            </div>
+
+            <?php if ($plan['overdue']['count'] > 0): ?>
+                <div class="prv-warning">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    <?= (int) $plan['overdue']['count'] ?> flux en retard (date dépassée, non réalisés) ont été reportés
+                    dans la première période :
+                    entrées <?= prvAmount($plan['overdue']['in'], $cur) ?>, sorties
+                    <?= prvAmount($plan['overdue']['out'], $cur) ?> <?= html_escape($cur) ?>.
+                    Mettez-les à jour (réalisés, reportés ou annulés) pour fiabiliser le plan.
+                </div>
+            <?php endif; ?>
+
+            <!-- =========================================================
+                 INDICATEURS
+            ========================================================== -->
+            <div class="row">
+                <div class="col-xl col-md-4">
+                    <div class="prv-stat">
+                        <span>Trésorerie disponible</span>
+                        <strong><?= prvAmount($position['total'], $cur) ?> <?= html_escape($cur) ?></strong>
+                        <small>Banques <?= prvAmount($position['bank'], $cur) ?> · Caisses
+                            <?= prvAmount($position['cash'], $cur) ?></small>
+                    </div>
+                </div>
+                <div class="col-xl col-md-4">
+                    <div class="prv-stat is-in">
+                        <span>Encaissements prévus</span>
+                        <strong>+ <?= prvAmount($plan['total_in'], $cur) ?></strong>
+                        <small>Sur l’horizon (<?= $filters['scenario'] === 'pondere' ? 'pondéré' : 'brut' ?>)</small>
+                    </div>
+                </div>
+                <div class="col-xl col-md-4">
+                    <div class="prv-stat is-out">
+                        <span>Décaissements prévus</span>
+                        <strong>- <?= prvAmount($plan['total_out'], $cur) ?></strong>
+                        <small>Dont bons de paiement en attente</small>
+                    </div>
+                </div>
+                <div class="col-xl col-md-6">
+                    <div class="prv-stat <?= $plan['closing'] < $plan['threshold'] ? 'is-alert' : '' ?>">
+                        <span>Solde prévisionnel fin d’horizon</span>
+                        <strong><?= prvAmount($plan['closing'], $cur) ?> <?= html_escape($cur) ?></strong>
+                        <small>Au <?= date('d/m/Y', strtotime($periods[$nbPeriods - 1]['end'])) ?></small>
+                    </div>
+                </div>
+                <div class="col-xl col-md-6">
+                    <div class="prv-stat <?= $isLowAlert ? 'is-alert' : 'is-ok' ?>">
+                        <span>Point bas</span>
+                        <strong><?= prvAmount($lowestAmount, $cur) ?> <?= html_escape($cur) ?></strong>
+                        <small>
+                            <?= html_escape($lowestPeriod['label'] . ' (' . $lowestPeriod['sublabel'] . ')') ?> —
+                            <?= $isLowAlert
+                                ? '<i class="fas fa-exclamation-circle"></i> sous le seuil (' . (int) $plan['alert_count'] . ' période(s))'
+                                : '<i class="fas fa-check-circle"></i> au-dessus du seuil' ?>
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================
+                 GRAPHIQUE + PRÉVU / RÉALISÉ
+            ========================================================== -->
+            <div class="row">
+                <div class="col-xl-8">
+                    <div class="prv-card">
+                        <div class="prv-card-header">
+                            <div>
+                                <h5 class="prv-card-title"><i class="fas fa-chart-area"></i> Évolution du solde
+                                    prévisionnel</h5>
+                                <span class="prv-card-subtitle">Encaissements, décaissements et solde de fin de période,
+                                    comparés au seuil de sécurité.</span>
+                            </div>
+                        </div>
+                        <div class="prv-card-body">
+                            <div class="prv-chart"><canvas id="prvChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="prv-card">
+                        <div class="prv-card-header">
+                            <div>
+                                <h5 class="prv-card-title"><i class="fas fa-bullseye"></i> Prévu / réalisé</h5>
+                                <span class="prv-card-subtitle">Prévisions saisies des 6 derniers mois.</span>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table prv-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mois</th>
+                                        <th class="text-right">Entrées</th>
+                                        <th class="text-right">Sorties</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($forecastVsActual as $month): ?>
+                                        <?php
+                                        $rateBadge = function ($rate) {
+                                            if ($rate === null) return '<span class="text-muted">—</span>';
+                                            $class = $rate >= 90 ? 'good' : ($rate >= 60 ? 'mid' : 'bad');
+                                            return '<span class="prv-rate ' . $class . '">' . number_format($rate, 0, ',', ' ') . ' %</span>';
+                                        };
+                                        ?>
+                                        <tr>
+                                            <td><?= html_escape($month['label']) ?></td>
+                                            <td class="text-right">
+                                                <?= $rateBadge($month['in_rate']) ?>
+                                                <?php if ($month['in_planned'] > 0): ?>
+                                                    <small
+                                                        class="d-block text-muted"><?= prvAmount($month['in_realized'], $cur) ?>
+                                                        / <?= prvAmount($month['in_planned'], $cur) ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-right">
+                                                <?= $rateBadge($month['out_rate']) ?>
+                                                <?php if ($month['out_planned'] > 0): ?>
+                                                    <small
+                                                        class="d-block text-muted"><?= prvAmount($month['out_realized'], $cur) ?>
+                                                        / <?= prvAmount($month['out_planned'], $cur) ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- =========================================================
+                 PLAN DE TRÉSORERIE
+            ========================================================== -->
+            <div class="prv-card">
+                <div class="prv-card-header">
+                    <div>
+                        <h5 class="prv-card-title"><i class="fas fa-table"></i> Plan de trésorerie
+                            (<?= html_escape($cur) ?>)</h5>
+                        <span class="prv-card-subtitle">
+                            Les cellules rouges indiquent un solde de fin sous le seuil de sécurité
+                            (<?= prvAmount($plan['threshold'], $cur) ?>).
+                            <span class="prv-auto">auto</span> = montant lu directement dans un autre module.
+                        </span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered prv-plan">
+                        <thead>
+                            <tr>
+                                <th>Rubrique</th>
+                                <?php foreach ($periods as $period): ?>
+                                    <th><?= html_escape($period['label']) ?><small><?= html_escape($period['sublabel']) ?></small>
+                                    </th>
+                                <?php endforeach; ?>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="prv-balance">
+                                <td>Solde de début</td>
+                                <?php foreach ($plan['openings'] as $value): ?>
+                                    <td><?= prvAmount($value, $cur) ?></td>
+                                <?php endforeach; ?>
+                                <td></td>
+                            </tr>
+
+                            <?php foreach (['entree' => ['Encaissements', 'prv-in', 'totals_in', 'total_in'], 'sortie' => ['Décaissements', 'prv-out', 'totals_out', 'total_out']] as $flow => $meta): ?>
+                                <tr class="prv-section">
+                                    <td colspan="<?= $nbPeriods + 2 ?>"><?= $meta[0] ?></td>
+                                </tr>
+
+                                <?php if (empty($plan['rows'][$flow])): ?>
+                                    <tr>
+                                        <td class="text-muted">Aucun flux prévu</td>
+                                        <td colspan="<?= $nbPeriods + 1 ?>"></td>
+                                    </tr>
+                                <?php endif; ?>
+
+                                <?php foreach ($plan['rows'][$flow] as $row): ?>
+                                    <tr>
+                                        <td>
+                                            <?= html_escape($row['label']) ?>
+                                            <?php if ($row['auto']): ?><span class="prv-auto">auto</span><?php endif; ?>
+                                        </td>
+                                        <?php foreach ($row['values'] as $value): ?>
+                                            <td class="<?= $value > 0 ? $meta[1] : 'prv-zero' ?>">
+                                                <?= $value > 0 ? prvAmount($value, $cur) : '—' ?></td>
+                                        <?php endforeach; ?>
+                                        <td class="<?= $meta[1] ?> font-weight-bold"><?= prvAmount($row['total'], $cur) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+
+                                <tr class="prv-total">
+                                    <td>Total <?= mb_strtolower($meta[0]) ?></td>
+                                    <?php foreach ($plan[$meta[2]] as $value): ?>
+                                        <td class="<?= $meta[1] ?>"><?= prvAmount($value, $cur) ?></td>
+                                    <?php endforeach; ?>
+                                    <td class="<?= $meta[1] ?>"><?= prvAmount($plan[$meta[3]], $cur) ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+
+                            <tr class="prv-total">
+                                <td>Flux net</td>
+                                <?php foreach ($plan['net'] as $value): ?>
+                                    <td class="<?= $value >= 0 ? 'prv-in' : 'prv-out' ?>">
+                                        <?= ($value >= 0 ? '+' : '') . prvAmount($value, $cur) ?></td>
+                                <?php endforeach; ?>
+                                <td><?= prvAmount($plan['total_in'] - $plan['total_out'], $cur) ?></td>
+                            </tr>
+                            <tr class="prv-balance">
+                                <td>Solde de fin</td>
+                                <?php foreach ($plan['closings'] as $value): ?>
+                                    <td class="<?= $value < $plan['threshold'] ? 'is-low' : '' ?>">
+                                        <?= prvAmount($value, $cur) ?></td>
+                                <?php endforeach; ?>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- =========================================================
+                 PRÉVISIONS SAISIES
+            ========================================================== -->
+            <div class="prv-card">
+                <div class="prv-card-header">
+                    <div>
+                        <h5 class="prv-card-title"><i class="fas fa-list"></i> Prévisions saisies</h5>
+                        <span class="prv-card-subtitle"><?= count($forecasts) ?> ligne(s) — devise
+                            <?= html_escape($cur) ?></span>
+                    </div>
+                    <form method="get" action="<?= base_url('prevision') ?>" class="prv-filters">
+                        <input type="hidden" name="horizon" value="<?= html_escape($filters['horizon']) ?>">
+                        <input type="hidden" name="currency" value="<?= html_escape($cur) ?>">
+                        <input type="hidden" name="scenario" value="<?= html_escape($filters['scenario']) ?>">
+                        <input type="hidden" name="threshold" value="<?= html_escape($filters['threshold']) ?>">
+                        <select name="flow_type" class="form-control" onchange="this.form.submit()">
+                            <option value="">Entrées et sorties</option>
+                            <option value="entree" <?= $filters['flow_type'] === 'entree' ? 'selected' : '' ?>>Entrées
+                            </option>
+                            <option value="sortie" <?= $filters['flow_type'] === 'sortie' ? 'selected' : '' ?>>Sorties
+                            </option>
+                        </select>
+                        <select name="status" class="form-control" onchange="this.form.submit()">
+                            <option value="open" <?= $filters['status'] === 'open' ? 'selected' : '' ?>>À réaliser
+                            </option>
+                            <?php foreach ($statusLabels as $key => $label): ?>
+                                <option value="<?= $key ?>" <?= $filters['status'] === $key ? 'selected' : '' ?>>
+                                    <?= $label[0] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table prv-table">
+                        <thead>
+                            <tr>
+                                <th>Date prévue</th>
+                                <th>Référence</th>
+                                <th>Sens</th>
+                                <th>Libellé</th>
+                                <th>Récurrence</th>
+                                <th class="text-right">Montant</th>
+                                <th class="text-right">Réalisé</th>
+                                <th class="text-center">Proba.</th>
+                                <th>Statut</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($forecasts)): ?>
+                                <?php foreach ($forecasts as $f): ?>
+                                    <?php
+                                    $isOpen  = in_array($f->status, ['planned', 'partially_realized'], true);
+                                    $isLate  = $isOpen && $f->expected_date < $today;
+                                    $st      = $statusLabels[$f->status] ?? [$f->status, 'badge-light'];
+                                    $payload = [
+                                        'id'        => (int) $f->id,
+                                        'reference' => $f->reference,
+                                        'label'     => $f->label,
+                                        'flow'      => $f->flow_type,
+                                        'currency'  => $f->currency,
+                                        'remaining' => round((float) $f->amount - (float) $f->realized_amount, 2),
+                                    ];
+                                    ?>
+                                    <tr>
+                                        <td class="<?= $isLate ? 'prv-late' : '' ?>">
+                                            <?= date('d/m/Y', strtotime($f->expected_date)) ?>
+                                            <?php if ($isLate): ?><small class="d-block"><i class="fas fa-clock"></i> en
+                                                    retard</small><?php endif; ?>
+                                        </td>
+                                        <td><strong><?= html_escape($f->reference) ?></strong></td>
+                                        <td><span
+                                                class="prv-flow <?= $f->flow_type ?>"><?= $f->flow_type === 'entree' ? 'Entrée' : 'Sortie' ?></span>
+                                        </td>
+                                        <td>
+                                            <strong><?= html_escape($f->label) ?></strong>
+                                            <small class="d-block text-muted">
+                                                <?= html_escape($categories[$f->flow_type][$f->category] ?? $f->category) ?>
+                                                <?= !empty($f->third_party) ? ' · ' . html_escape($f->third_party) : '' ?>
+                                                <?= !empty($f->chantier_name) ? ' · ' . html_escape($f->chantier_name) : '' ?>
+                                                <?= !empty($f->account_name) ? ' · ' . html_escape($f->account_name) : '' ?>
+                                            </small>
+                                            <?php if ($f->status === 'cancelled' && !empty($f->cancel_reason)): ?>
+                                                <small class="d-block text-danger">Annulée :
+                                                    <?= html_escape($f->cancel_reason) ?></small>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= html_escape($recurrenceLabels[$f->recurrence] ?? $f->recurrence) ?></td>
+                                        <td class="num"><?= prvAmount($f->amount, $f->currency) ?></td>
+                                        <td class="num">
+                                            <?= (float) $f->realized_amount > 0 ? prvAmount($f->realized_amount, $f->currency) : '—' ?>
+                                            <?php if (!empty($f->operation_reference)): ?>
+                                                <small
+                                                    class="d-block text-muted"><?= html_escape($f->operation_reference) ?></small>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td class="text-center"><?= (int) $f->probability ?> %</td>
+                                        <td><span class="badge <?= $st[1] ?>"><?= $st[0] ?></span></td>
+                                        <td class="text-center text-nowrap">
+                                            <?php if ($isOpen): ?>
+                                                <button type="button" class="btn btn-sm btn-prv-outline" title="Réaliser"
+                                                    data-toggle="modal" data-target="#realizeModal"
+                                                    data-forecast="<?= html_escape(json_encode($payload, $jsonFlags)) ?>">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                            <?php if ($f->status === 'planned'): ?>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" title="Annuler"
+                                                    onclick="prvCancel(<?= (int) $f->id ?>, <?= html_escape(json_encode($f->reference)) ?>, <?= $f->recurrence !== 'none' ? 'true' : 'false' ?>)">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="10">
+                                        <div class="prv-empty">
+                                            <i class="fas fa-calendar-plus"></i>
+                                            Aucune prévision pour ces critères.
+                                            <div class="mt-3">
+                                                <button type="button" class="btn btn-prv-primary" data-toggle="modal"
+                                                    data-target="#forecastModal">
+                                                    <i class="fas fa-plus mr-1"></i> Saisir une prévision
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
+    </section>
+</div>
 
+<!-- =========================================================
+     MODALE : NOUVELLE PRÉVISION
+========================================================== -->
+<div class="modal fade modal-prv" id="forecastModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <form action="<?= base_url('prevision-store') ?>" method="post" class="w-100" autocomplete="off">
+            <input type="hidden" name="return_query" value="<?= html_escape($planQuery) ?>">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-calendar-plus mr-2"></i>Nouvelle prévision</h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label>Sens <span class="required-star">*</span></label>
+                            <select name="flow_type" id="prvFlow" class="form-control" required>
+                                <option value="sortie"
+                                    <?= ($old['flow_type'] ?? 'sortie') === 'sortie' ? 'selected' : '' ?>>Sortie
+                                    (décaissement)</option>
+                                <option value="entree" <?= ($old['flow_type'] ?? '') === 'entree' ? 'selected' : '' ?>>
+                                    Entrée (encaissement)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8 form-group">
+                            <label>Catégorie <span class="required-star">*</span></label>
+                            <select name="category" id="prvCategory" class="form-control" required>
+                                <?php foreach ($categories as $flow => $items): ?>
+                                    <?php foreach ($items as $key => $label): ?>
+                                        <option value="<?= $key ?>" data-flow="<?= $flow ?>"
+                                            <?= ($old['category'] ?? '') === $key ? 'selected' : '' ?>>
+                                            <?= html_escape($label) ?></option>
+                                    <?php endforeach; ?>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>Libellé <span class="required-star">*</span></label>
+                            <input type="text" name="label" class="form-control" maxlength="255" required
+                                value="<?= $oldValue('label') ?>"
+                                placeholder="Ex. Salaires du personnel de chantier, décompte n°3 chantier X…">
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Date prévue <span class="required-star">*</span></label>
+                            <input type="date" name="expected_date" class="form-control" required
+                                value="<?= $oldValue('expected_date', $today) ?>">
+                        </div>
+                        <div class="col-md-5 form-group">
+                            <label>Montant <span class="required-star">*</span></label>
+                            <input type="number" name="amount" class="form-control" min="0.01" step="0.01" required
+                                value="<?= $oldValue('amount') ?>">
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label>Devise <span class="required-star">*</span></label>
+                            <select name="currency" id="prvCurrency" class="form-control" required>
+                                <?php foreach (['BIF', 'USD', 'EUR'] as $c): ?>
+                                    <option value="<?= $c ?>" <?= ($old['currency'] ?? $cur) === $c ? 'selected' : '' ?>>
+                                        <?= $c ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Probabilité <span class="required-star">*</span></label>
+                            <select name="probability" class="form-control" required>
+                                <?php foreach ([100 => 'Certaine (100 %)', 90 => 'Très probable (90 %)', 70 => 'Probable (70 %)', 50 => 'Incertaine (50 %)', 25 => 'Peu probable (25 %)'] as $p => $label): ?>
+                                    <option value="<?= $p ?>"
+                                        <?= (int) ($old['probability'] ?? 100) === $p ? 'selected' : '' ?>><?= $label ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label>Récurrence <span class="required-star">*</span></label>
+                            <select name="recurrence" id="prvRecurrence" class="form-control" required>
+                                <?php foreach ($recurrenceLabels as $key => $label): ?>
+                                    <option value="<?= $key ?>"
+                                        <?= ($old['recurrence'] ?? 'none') === $key ? 'selected' : '' ?>><?= $label ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-4 form-group" id="prvRecurrenceEndField">
+                            <label>Jusqu’au <span class="required-star">*</span></label>
+                            <input type="date" name="recurrence_end_date" id="prvRecurrenceEnd" class="form-control"
+                                value="<?= $oldValue('recurrence_end_date', date('Y-12-31')) ?>">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Compte bancaire concerné</label>
+                            <select name="bank_account_id" id="prvAccount" class="form-control">
+                                <option value="">Trésorerie globale</option>
+                                <?php foreach ($bankAccounts as $account): ?>
+                                    <option value="<?= (int) $account->id ?>"
+                                        data-currency="<?= html_escape($account->currency) ?>"
+                                        <?= (string) ($old['bank_account_id'] ?? '') === (string) $account->id ? 'selected' : '' ?>>
+                                        <?= html_escape($account->code . ' — ' . $account->name . ' (' . $account->currency . ')') ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Chantier</label>
+                            <select name="chantier_id" class="form-control">
+                                <option value="">Aucun / frais généraux</option>
+                                <?php foreach ($chantiers as $chantier): ?>
+                                    <option value="<?= (int) $chantier->id ?>"
+                                        <?= (string) ($old['chantier_id'] ?? '') === (string) $chantier->id ? 'selected' : '' ?>>
+                                        <?= html_escape(($chantier->ref_chantier ? $chantier->ref_chantier . ' — ' : '') . $chantier->name) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>Tiers</label>
+                            <input type="text" name="third_party" class="form-control" maxlength="255"
+                                value="<?= $oldValue('third_party') ?>"
+                                placeholder="Client, fournisseur, administration…">
+                        </div>
+                        <div class="col-md-12 form-group mb-0">
+                            <label>Observation</label>
+                            <textarea name="observation" class="form-control"
+                                rows="2"><?= $oldValue('observation') ?></textarea>
+                        </div>
+                    </div>
+                    <div class="prv-info-box mt-3" id="prvRecurrenceInfo" style="display:none"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-prv-outline" data-dismiss="modal"><i
+                            class="fas fa-times mr-1"></i>Annuler</button>
+                    <button type="submit" class="btn btn-prv-primary"><i
+                            class="fas fa-save mr-1"></i>Enregistrer</button>
+                </div>
+            </div>
+        </form>
     </div>
+</div>
 
-    <!-- Contenu -->
-    <section class="content forecast-content-section">
-
-        <div class="container-fluid forecast-container">
-
-            <!-- Tout le contenu de ta page ici -->
-
-            <!-- =========================================================
-     PAGE : PRÉVISIONS DE TRÉSORERIE
+<!-- =========================================================
+     MODALE : RÉALISATION
 ========================================================== -->
-
-            <style>
-            :root {
-                --prev-primary: #0f766e;
-                --prev-primary-dark: #0b4f4a;
-                --prev-dark: #102033;
-                --prev-blue: #0284c7;
-                --prev-green: #16a34a;
-                --prev-orange: #d97706;
-                --prev-red: #dc2626;
-                --prev-purple: #7c3aed;
-                --prev-border: #dbe5ec;
-                --prev-muted: #64748b;
-                --prev-bg: #f5f8fa;
-                --prev-white: #ffffff;
-            }
-
-            .forecast-page {
-                padding-bottom: 30px;
-            }
-
-            /* =====================================================
-       BANNIÈRE
-    ====================================================== */
-
-            .forecast-hero {
-                position: relative;
-                overflow: hidden;
-                min-height: 150px;
-                margin-bottom: 20px;
-                padding: 28px 30px;
-                border-radius: 16px;
-                color: #fff;
-                background: linear-gradient(135deg,
-                        #0f766e 0%,
-                        #0b5d58 45%,
-                        #102033 100%);
-                box-shadow: 0 12px 30px rgba(15, 118, 110, 0.14);
-            }
-
-            .forecast-hero::before,
-            .forecast-hero::after {
-                position: absolute;
-                content: "";
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.06);
-            }
-
-            .forecast-hero::before {
-                width: 230px;
-                height: 230px;
-                top: -95px;
-                right: 85px;
-            }
-
-            .forecast-hero::after {
-                width: 170px;
-                height: 170px;
-                right: -35px;
-                bottom: -75px;
-            }
-
-            .forecast-hero-content {
-                position: relative;
-                z-index: 2;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 20px;
-            }
-
-            .forecast-hero-left {
-                display: flex;
-                align-items: flex-start;
-                gap: 16px;
-            }
-
-            .forecast-hero-icon {
-                width: 58px;
-                height: 58px;
-                flex: 0 0 58px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 14px;
-                font-size: 24px;
-                background: rgba(255, 255, 255, 0.14);
-                border: 1px solid rgba(255, 255, 255, 0.15);
-            }
-
-            .forecast-hero h2 {
-                margin: 2px 0 8px;
-                font-size: 28px;
-                font-weight: 800;
-            }
-
-            .forecast-hero p {
-                max-width: 820px;
-                margin: 0;
-                line-height: 1.65;
-                color: rgba(255, 255, 255, 0.88);
-            }
-
-            .forecast-situation {
-                min-width: 170px;
-                padding: 14px 18px;
-                text-align: center;
-                border-radius: 12px;
-                background: rgba(255, 255, 255, 0.11);
-                border: 1px solid rgba(255, 255, 255, 0.20);
-                backdrop-filter: blur(4px);
-            }
-
-            .forecast-situation span {
-                display: block;
-                margin-bottom: 4px;
-                font-size: 11px;
-                color: rgba(255, 255, 255, 0.74);
-            }
-
-            .forecast-situation strong {
-                display: block;
-                font-size: 15px;
-            }
-
-            /* =====================================================
-       BOUTONS
-    ====================================================== */
-
-            .btn-forecast-primary {
-                color: #fff;
-                background: var(--prev-primary);
-                border: 1px solid var(--prev-primary);
-                border-radius: 9px;
-                font-weight: 700;
-                padding: 9px 15px;
-            }
-
-            .btn-forecast-primary:hover,
-            .btn-forecast-primary:focus {
-                color: #fff;
-                background: var(--prev-primary-dark);
-                border-color: var(--prev-primary-dark);
-            }
-
-            .btn-forecast-outline {
-                color: var(--prev-primary);
-                background: #fff;
-                border: 1px solid #a7d4d0;
-                border-radius: 9px;
-                font-weight: 700;
-                padding: 9px 15px;
-            }
-
-            .btn-forecast-outline:hover {
-                color: #fff;
-                background: var(--prev-primary);
-                border-color: var(--prev-primary);
-            }
-
-            .btn-forecast-danger {
-                color: #fff;
-                background: #b91c1c;
-                border: 1px solid #b91c1c;
-                border-radius: 9px;
-                font-weight: 700;
-                padding: 9px 15px;
-            }
-
-            /* =====================================================
-       CARTES STATISTIQUES
-    ====================================================== */
-
-            .forecast-stat-card {
-                position: relative;
-                overflow: hidden;
-                min-height: 165px;
-                margin-bottom: 20px;
-                padding: 20px;
-                border: 1px solid var(--prev-border);
-                border-radius: 15px;
-                background: #fff;
-                box-shadow: 0 8px 22px rgba(15, 23, 42, 0.045);
-            }
-
-            .forecast-stat-card::after {
-                position: absolute;
-                width: 105px;
-                height: 105px;
-                right: -32px;
-                bottom: -42px;
-                content: "";
-                border-radius: 50%;
-                background: #f0f7f7;
-            }
-
-            .forecast-stat-top {
-                position: relative;
-                z-index: 2;
-                display: flex;
-                align-items: flex-start;
-                justify-content: space-between;
-                margin-bottom: 18px;
-            }
-
-            .forecast-stat-icon {
-                width: 48px;
-                height: 48px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 13px;
-                font-size: 19px;
-            }
-
-            .forecast-icon-green {
-                color: #15803d;
-                background: #dcfce7;
-            }
-
-            .forecast-icon-blue {
-                color: #0369a1;
-                background: #e0f2fe;
-            }
-
-            .forecast-icon-orange {
-                color: #b45309;
-                background: #fef3c7;
-            }
-
-            .forecast-icon-red {
-                color: #b91c1c;
-                background: #fee2e2;
-            }
-
-            .forecast-stat-badge {
-                display: inline-flex;
-                align-items: center;
-                padding: 5px 9px;
-                border-radius: 20px;
-                font-size: 10px;
-                font-weight: 800;
-            }
-
-            .forecast-badge-success {
-                color: #15803d;
-                background: #dcfce7;
-            }
-
-            .forecast-badge-info {
-                color: #0369a1;
-                background: #e0f2fe;
-            }
-
-            .forecast-badge-warning {
-                color: #b45309;
-                background: #fef3c7;
-            }
-
-            .forecast-badge-danger {
-                color: #b91c1c;
-                background: #fee2e2;
-            }
-
-            .forecast-stat-label {
-                position: relative;
-                z-index: 2;
-                margin-bottom: 5px;
-                color: #64748b;
-                font-size: 11px;
-                font-weight: 800;
-                text-transform: uppercase;
-                letter-spacing: 0.35px;
-            }
-
-            .forecast-stat-value {
-                position: relative;
-                z-index: 2;
-                margin-bottom: 4px;
-                color: #0f172a;
-                font-size: 23px;
-                font-weight: 800;
-            }
-
-            .forecast-stat-footer {
-                position: relative;
-                z-index: 2;
-                color: var(--prev-muted);
-                font-size: 11px;
-            }
-
-            /* =====================================================
-       CARTES PRINCIPALES
-    ====================================================== */
-
-            .forecast-card {
-                margin-bottom: 20px;
-                border: 1px solid var(--prev-border);
-                border-radius: 15px;
-                background: #fff;
-                box-shadow: 0 7px 20px rgba(15, 23, 42, 0.04);
-                overflow: hidden;
-            }
-
-            .forecast-card-header {
-                min-height: 70px;
-                padding: 16px 18px;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                gap: 15px;
-                border-bottom: 1px solid #e8eef3;
-                background: #fff;
-            }
-
-            .forecast-card-title {
-                margin: 0 0 4px;
-                color: #102033;
-                font-size: 16px;
-                font-weight: 800;
-            }
-
-            .forecast-card-title i {
-                margin-right: 7px;
-                color: var(--prev-primary);
-            }
-
-            .forecast-card-subtitle {
-                color: var(--prev-muted);
-                font-size: 11px;
-            }
-
-            .forecast-card-body {
-                padding: 18px;
-            }
-
-            /* =====================================================
-       ACTIONS RAPIDES
-    ====================================================== */
-
-            .forecast-quick-actions {
-                display: grid;
-                grid-template-columns: repeat(6, minmax(145px, 1fr));
-                gap: 12px;
-            }
-
-            .forecast-action {
-                display: flex;
-                align-items: center;
-                gap: 11px;
-                min-height: 82px;
-                padding: 12px;
-                color: #1e293b;
-                background: #fff;
-                border: 1px solid var(--prev-border);
-                border-radius: 12px;
-                transition: all 0.2s ease;
-                cursor: pointer;
-            }
-
-            .forecast-action:hover {
-                color: #0f766e;
-                border-color: #82c8c1;
-                box-shadow: 0 7px 16px rgba(15, 118, 110, 0.09);
-                transform: translateY(-2px);
-            }
-
-            .forecast-action-icon {
-                width: 42px;
-                height: 42px;
-                flex: 0 0 42px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 11px;
-                font-size: 17px;
-            }
-
-            .forecast-action strong {
-                display: block;
-                margin-bottom: 2px;
-                font-size: 12px;
-            }
-
-            .forecast-action small {
-                display: block;
-                color: var(--prev-muted);
-                font-size: 9px;
-                line-height: 1.4;
-            }
-
-            /* =====================================================
-       FILTRES
-    ====================================================== */
-
-            .forecast-filter-box {
-                margin-bottom: 20px;
-                padding: 18px;
-                border: 1px solid var(--prev-border);
-                border-radius: 15px;
-                background: #fff;
-            }
-
-            .forecast-filter-box label {
-                margin-bottom: 6px;
-                color: #475569;
-                font-size: 10px;
-                font-weight: 800;
-                text-transform: uppercase;
-            }
-
-            .forecast-filter-box .form-control {
-                height: 40px;
-                border-color: #d5e0e8;
-                border-radius: 8px;
-                font-size: 12px;
-            }
-
-            /* =====================================================
-       GRAPHIQUE
-    ====================================================== */
-
-            .forecast-chart-wrapper {
-                position: relative;
-                height: 340px;
-            }
-
-            .forecast-summary-row {
-                display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 12px;
-                margin-bottom: 18px;
-            }
-
-            .forecast-summary-item {
-                padding: 12px 14px;
-                border-radius: 10px;
-                background: #f8fafc;
-                border: 1px solid #e6edf2;
-            }
-
-            .forecast-summary-item span {
-                display: block;
-                margin-bottom: 4px;
-                color: var(--prev-muted);
-                font-size: 9px;
-                font-weight: 800;
-                text-transform: uppercase;
-            }
-
-            .forecast-summary-item strong {
-                display: block;
-                font-size: 16px;
-            }
-
-            /* =====================================================
-       ALERTES
-    ====================================================== */
-
-            .forecast-alert {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 13px;
-                margin-bottom: 12px;
-                border-radius: 11px;
-                border: 1px solid;
-            }
-
-            .forecast-alert:last-child {
-                margin-bottom: 0;
-            }
-
-            .forecast-alert-icon {
-                width: 38px;
-                height: 38px;
-                flex: 0 0 38px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 10px;
-            }
-
-            .forecast-alert h6 {
-                margin: 0 0 4px;
-                font-size: 12px;
-                font-weight: 800;
-            }
-
-            .forecast-alert p {
-                margin: 0;
-                color: #475569;
-                font-size: 10px;
-                line-height: 1.5;
-            }
-
-            .forecast-alert-danger {
-                border-color: #fecaca;
-                background: #fef2f2;
-            }
-
-            .forecast-alert-danger .forecast-alert-icon {
-                color: #b91c1c;
-                background: #fee2e2;
-            }
-
-            .forecast-alert-warning {
-                border-color: #fde68a;
-                background: #fffbeb;
-            }
-
-            .forecast-alert-warning .forecast-alert-icon {
-                color: #b45309;
-                background: #fef3c7;
-            }
-
-            .forecast-alert-info {
-                border-color: #bae6fd;
-                background: #f0f9ff;
-            }
-
-            .forecast-alert-info .forecast-alert-icon {
-                color: #0369a1;
-                background: #e0f2fe;
-            }
-
-            .forecast-alert-success {
-                border-color: #bbf7d0;
-                background: #f0fdf4;
-            }
-
-            .forecast-alert-success .forecast-alert-icon {
-                color: #15803d;
-                background: #dcfce7;
-            }
-
-            /* =====================================================
-       TABLEAUX
-    ====================================================== */
-
-            .forecast-table {
-                margin-bottom: 0;
-                color: #334155;
-                font-size: 11px;
-            }
-
-            .forecast-table thead th {
-                padding: 13px 12px;
-                color: #475569;
-                background: #f8fafc;
-                border-top: 0;
-                border-bottom: 1px solid #dce6ed;
-                font-size: 9px;
-                font-weight: 800;
-                text-transform: uppercase;
-                white-space: nowrap;
-            }
-
-            .forecast-table tbody td {
-                padding: 13px 12px;
-                vertical-align: middle;
-                border-top: 1px solid #edf2f6;
-            }
-
-            .forecast-table tbody tr:hover {
-                background: #fbfefe;
-            }
-
-            .forecast-reference {
-                color: #0f172a;
-                font-size: 10px;
-                font-weight: 800;
-            }
-
-            .forecast-table small {
-                font-size: 9px;
-            }
-
-            .amount-income {
-                color: #15803d;
-                font-weight: 800;
-            }
-
-            .amount-expense {
-                color: #b91c1c;
-                font-weight: 800;
-            }
-
-            .forecast-badge {
-                display: inline-flex;
-                align-items: center;
-                padding: 5px 8px;
-                border-radius: 18px;
-                font-size: 9px;
-                font-weight: 800;
-            }
-
-            .forecast-badge-green {
-                color: #15803d;
-                background: #dcfce7;
-            }
-
-            .forecast-badge-orange {
-                color: #b45309;
-                background: #fef3c7;
-            }
-
-            .forecast-badge-red {
-                color: #b91c1c;
-                background: #fee2e2;
-            }
-
-            .forecast-badge-blue {
-                color: #0369a1;
-                background: #e0f2fe;
-            }
-
-            .btn-forecast-table {
-                width: 31px;
-                height: 31px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                margin: 1px;
-                padding: 0;
-                color: #0f766e;
-                background: #fff;
-                border: 1px solid #d5e1e8;
-                border-radius: 8px;
-            }
-
-            .btn-forecast-table:hover {
-                color: #fff;
-                background: #0f766e;
-                border-color: #0f766e;
-            }
-
-            /* =====================================================
-       PROJECTION PAR CHANTIER
-    ====================================================== */
-
-            .forecast-progress {
-                width: 100%;
-                height: 7px;
-                overflow: hidden;
-                border-radius: 10px;
-                background: #e8eef2;
-            }
-
-            .forecast-progress span {
-                display: block;
-                height: 100%;
-                border-radius: 10px;
-            }
-
-            .progress-green {
-                background: #16a34a;
-            }
-
-            .progress-orange {
-                background: #f59e0b;
-            }
-
-            .progress-red {
-                background: #dc2626;
-            }
-
-            .progress-blue {
-                background: #0891b2;
-            }
-
-            /* =====================================================
-       RÉPARTITION DES DÉPENSES
-    ====================================================== */
-
-            .forecast-category-item {
-                margin-bottom: 17px;
-            }
-
-            .forecast-category-item:last-child {
-                margin-bottom: 0;
-            }
-
-            .forecast-category-top {
-                display: flex;
-                justify-content: space-between;
-                gap: 12px;
-                margin-bottom: 7px;
-                font-size: 11px;
-            }
-
-            .forecast-category-name {
-                font-weight: 700;
-            }
-
-            .forecast-category-name i {
-                width: 18px;
-                color: var(--prev-primary);
-            }
-
-            .forecast-category-amount {
-                font-weight: 800;
-                color: #0f172a;
-            }
-
-            /* =====================================================
-       PLAN D'ACTION
-    ====================================================== */
-
-            .forecast-plan-item {
-                display: flex;
-                gap: 12px;
-                padding: 13px 0;
-                border-bottom: 1px dashed #dce5eb;
-            }
-
-            .forecast-plan-item:last-child {
-                padding-bottom: 0;
-                border-bottom: 0;
-            }
-
-            .forecast-plan-number {
-                width: 28px;
-                height: 28px;
-                flex: 0 0 28px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 8px;
-                color: #fff;
-                background: var(--prev-primary);
-                font-size: 10px;
-                font-weight: 800;
-            }
-
-            .forecast-plan-item h6 {
-                margin: 0 0 3px;
-                font-size: 11px;
-                font-weight: 800;
-            }
-
-            .forecast-plan-item p {
-                margin: 0;
-                color: var(--prev-muted);
-                font-size: 10px;
-                line-height: 1.5;
-            }
-
-            /* =====================================================
-       MODALES
-    ====================================================== */
-
-            .modal-forecast .modal-content {
-                overflow: hidden;
-                border: 0;
-                border-radius: 15px;
-                box-shadow: 0 20px 55px rgba(15, 23, 42, 0.26);
-            }
-
-            .modal-forecast .modal-header {
-                color: #fff;
-                background: linear-gradient(135deg, #0f766e, #102033);
-                border-bottom: 0;
-            }
-
-            .modal-forecast .modal-title {
-                font-size: 15px;
-                font-weight: 800;
-            }
-
-            .modal-forecast .modal-header .close {
-                color: #fff;
-                opacity: 1;
-            }
-
-            .modal-forecast label {
-                margin-bottom: 6px;
-                color: #475569;
-                font-size: 10px;
-                font-weight: 800;
-            }
-
-            .modal-forecast .form-control {
-                min-height: 40px;
-                border-radius: 8px;
-                border-color: #d7e2e9;
-                font-size: 12px;
-            }
-
-            .modal-forecast textarea.form-control {
-                min-height: 90px;
-            }
-
-            .required-star {
-                color: #dc2626;
-            }
-
-            /* =====================================================
-       RESPONSIVE
-    ====================================================== */
-
-            @media (max-width: 1400px) {
-                .forecast-quick-actions {
-                    grid-template-columns: repeat(3, 1fr);
-                }
-            }
-
-            @media (max-width: 991px) {
-                .forecast-hero-content {
-                    align-items: flex-start;
-                    flex-direction: column;
-                }
-
-                .forecast-situation {
-                    min-width: 100%;
-                    text-align: left;
-                }
-
-                .forecast-quick-actions {
-                    grid-template-columns: repeat(2, 1fr);
-                }
-
-                .forecast-summary-row {
-                    grid-template-columns: 1fr;
-                }
-            }
-
-            @media (max-width: 575px) {
-                .forecast-hero {
-                    padding: 22px 18px;
-                }
-
-                .forecast-hero-left {
-                    flex-direction: column;
-                }
-
-                .forecast-hero h2 {
-                    font-size: 22px;
-                }
-
-                .forecast-quick-actions {
-                    grid-template-columns: 1fr;
-                }
-
-                .forecast-card-header {
-                    align-items: flex-start;
-                    flex-direction: column;
-                }
-            }
-            </style>
-
-            <div class="forecast-page">
-
-                <!-- =====================================================
-         BANNIÈRE PRINCIPALE
-    ====================================================== -->
-                <div class="forecast-hero">
-
-                    <div class="forecast-hero-content">
-
-                        <div class="forecast-hero-left">
-
-                            <div class="forecast-hero-icon">
-                                <i class="fas fa-chart-line"></i>
-                            </div>
-
-                            <div>
-                                <h2>Prévisions de trésorerie</h2>
-
-                                <p>
-                                    Anticipez les entrées et sorties de fonds, identifiez les futurs
-                                    besoins de financement et assurez la continuité des opérations
-                                    du siège et des différents chantiers.
-                                </p>
-                            </div>
-
-                        </div>
-
-                        <div class="forecast-situation">
-                            <span>
-                                <i class="fas fa-calendar-alt mr-1"></i>
-                                Situation au
-                            </span>
-
-                            <strong>
-                                <?= date('d/m/Y'); ?>
-                            </strong>
-                        </div>
-
-                    </div>
-
+<div class="modal fade modal-prv" id="realizeModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <form id="realizeForm" class="w-100" autocomplete="off">
+            <input type="hidden" name="forecast_id" id="realizeId">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-check-circle mr-2"></i>Réaliser <span
+                            id="realizeRef"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
-
-                <!-- =====================================================
-         STATISTIQUES PRINCIPALES
-    ====================================================== -->
-                <div class="row">
-
-                    <div class="col-xl-3 col-lg-6 col-md-6">
-
-                        <div class="forecast-stat-card">
-
-                            <div class="forecast-stat-top">
-
-                                <div class="forecast-stat-icon forecast-icon-green">
-                                    <i class="fas fa-wallet"></i>
-                                </div>
-
-                                <span class="forecast-stat-badge forecast-badge-success">
-                                    Disponible
-                                </span>
-
-                            </div>
-
-                            <div class="forecast-stat-label">
-                                Trésorerie actuelle
-                            </div>
-
-                            <div class="forecast-stat-value">
-                                245 600 000 BIF
-                            </div>
-
-                            <div class="forecast-stat-footer">
-                                Caisses et comptes bancaires actifs
-                            </div>
-
-                        </div>
-
+                <div class="modal-body">
+                    <div class="prv-info-box mb-3" id="realizeInfo"></div>
+                    <div class="form-group">
+                        <label>Montant réalisé <span class="required-star">*</span></label>
+                        <input type="number" name="realized_amount" id="realizeAmount" class="form-control" min="0.01"
+                            step="0.01" required>
+                        <small class="text-muted">Un montant inférieur au reste à réaliser donne une réalisation
+                            partielle.</small>
                     </div>
-
-                    <div class="col-xl-3 col-lg-6 col-md-6">
-
-                        <div class="forecast-stat-card">
-
-                            <div class="forecast-stat-top">
-
-                                <div class="forecast-stat-icon forecast-icon-blue">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-
-                                <span class="forecast-stat-badge forecast-badge-danger">
-                                    <i class="fas fa-arrow-down mr-1"></i>
-                                    19,2 %
-                                </span>
-
-                            </div>
-
-                            <div class="forecast-stat-label">
-                                Solde prévu à 30 jours
-                            </div>
-
-                            <div class="forecast-stat-value">
-                                198 450 000 BIF
-                            </div>
-
-                            <div class="forecast-stat-footer">
-                                Projection après mouvements attendus
-                            </div>
-
-                        </div>
-
+                    <div class="form-group">
+                        <label>Date de réalisation <span class="required-star">*</span></label>
+                        <input type="date" name="realized_date" class="form-control" max="<?= $today ?>"
+                            value="<?= $today ?>" required>
                     </div>
-
-                    <div class="col-xl-3 col-lg-6 col-md-6">
-
-                        <div class="forecast-stat-card">
-
-                            <div class="forecast-stat-top">
-
-                                <div class="forecast-stat-icon forecast-icon-green">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-
-                                <span class="forecast-stat-badge forecast-badge-success">
-                                    14 opérations
-                                </span>
-
-                            </div>
-
-                            <div class="forecast-stat-label">
-                                Encaissements prévus
-                            </div>
-
-                            <div class="forecast-stat-value">
-                                132 500 000 BIF
-                            </div>
-
-                            <div class="forecast-stat-footer">
-                                Prévisions des 30 prochains jours
-                            </div>
-
-                        </div>
-
+                    <div class="form-group mb-0">
+                        <label>Opération bancaire correspondante (facultatif)</label>
+                        <select name="bank_operation_id" id="realizeOperation" class="form-control">
+                            <option value="">Aucune / paiement en caisse</option>
+                            <?php foreach ($realizableOperations as $op): ?>
+                                <option value="<?= (int) $op->id ?>"
+                                    data-direction="<?= in_array($op->operation_type, $entryTypes, true) ? 'entree' : 'sortie' ?>">
+                                    <?= html_escape($op->reference . ' — ' . date('d/m/Y', strtotime($op->operation_date)) . ' — ' . prvAmount($op->amount, $cur) . ' — ' . $op->label) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
-
-                    <div class="col-xl-3 col-lg-6 col-md-6">
-
-                        <div class="forecast-stat-card">
-
-                            <div class="forecast-stat-top">
-
-                                <div class="forecast-stat-icon forecast-icon-red">
-                                    <i class="fas fa-arrow-up"></i>
-                                </div>
-
-                                <span class="forecast-stat-badge forecast-badge-danger">
-                                    21 opérations
-                                </span>
-
-                            </div>
-
-                            <div class="forecast-stat-label">
-                                Décaissements prévus
-                            </div>
-
-                            <div class="forecast-stat-value">
-                                179 650 000 BIF
-                            </div>
-
-                            <div class="forecast-stat-footer">
-                                Engagements des 30 prochains jours
-                            </div>
-
-                        </div>
-
-                    </div>
-
                 </div>
-
-                <!-- =====================================================
-         ACTIONS RAPIDES
-    ====================================================== -->
-                <div class="forecast-card">
-
-                    <div class="forecast-card-header">
-
-                        <div>
-                            <h5 class="forecast-card-title">
-                                <i class="fas fa-bolt"></i>
-                                Actions rapides
-                            </h5>
-
-                            <span class="forecast-card-subtitle">
-                                Enregistrez une prévision ou simulez une situation future.
-                            </span>
-                        </div>
-
-                    </div>
-
-                    <div class="forecast-card-body">
-
-                        <div class="forecast-quick-actions">
-
-                            <div class="forecast-action" data-toggle="modal" data-target="#addForecastIncomeModal">
-
-                                <div class="forecast-action-icon forecast-icon-green">
-                                    <i class="fas fa-arrow-down"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Encaissement prévu</strong>
-                                    <small>Ajouter une entrée future</small>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-action" data-toggle="modal" data-target="#addForecastExpenseModal">
-
-                                <div class="forecast-action-icon forecast-icon-red">
-                                    <i class="fas fa-arrow-up"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Décaissement prévu</strong>
-                                    <small>Ajouter une sortie future</small>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-action" data-toggle="modal" data-target="#forecastScenarioModal">
-
-                                <div class="forecast-action-icon forecast-icon-blue">
-                                    <i class="fas fa-project-diagram"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Simuler un scénario</strong>
-                                    <small>Tester plusieurs hypothèses</small>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-action">
-
-                                <div class="forecast-action-icon forecast-icon-orange">
-                                    <i class="fas fa-sync-alt"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Actualiser les données</strong>
-                                    <small>Recalculer les projections</small>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-action">
-
-                                <div class="forecast-action-icon" style="background:#ede9fe;color:#6d28d9;">
-                                    <i class="fas fa-file-excel"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Exporter le rapport</strong>
-                                    <small>Télécharger au format Excel</small>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-action">
-
-                                <div class="forecast-action-icon forecast-icon-orange">
-                                    <i class="fas fa-print"></i>
-                                </div>
-
-                                <div>
-                                    <strong>Imprimer</strong>
-                                    <small>Rapport prévisionnel complet</small>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-prv-outline" data-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-prv-primary"><i class="fas fa-check mr-1"></i>Enregistrer la
+                        réalisation</button>
                 </div>
-
-                <!-- =====================================================
-         FILTRES
-    ====================================================== -->
-                <div class="forecast-filter-box">
-
-                    <form action="" method="get">
-
-                        <div class="row align-items-end">
-
-                            <div class="col-xl-2 col-lg-3 col-md-6">
-
-                                <div class="form-group mb-lg-0">
-                                    <label>Horizon de prévision</label>
-
-                                    <select name="forecast_period" class="form-control">
-                                        <option value="30">30 prochains jours</option>
-                                        <option value="60">60 prochains jours</option>
-                                        <option value="90">90 prochains jours</option>
-                                        <option value="365">12 prochains mois</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                            <div class="col-xl-2 col-lg-3 col-md-6">
-
-                                <div class="form-group mb-lg-0">
-                                    <label>Chantier</label>
-
-                                    <select name="chantier_id" class="form-control">
-                                        <option value="">Tous les chantiers</option>
-                                        <option value="1">Chantier Bujumbura</option>
-                                        <option value="2">Chantier Gitega</option>
-                                        <option value="3">Chantier Ngozi</option>
-                                        <option value="4">Chantier Muyinga</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                            <div class="col-xl-2 col-lg-3 col-md-6">
-
-                                <div class="form-group mb-lg-0">
-                                    <label>Type de flux</label>
-
-                                    <select name="flow_type" class="form-control">
-                                        <option value="">Tous les flux</option>
-                                        <option value="income">Encaissements</option>
-                                        <option value="expense">Décaissements</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                            <div class="col-xl-2 col-lg-3 col-md-6">
-
-                                <div class="form-group mb-lg-0">
-                                    <label>Scénario</label>
-
-                                    <select name="scenario" class="form-control">
-                                        <option value="realistic">Scénario réaliste</option>
-                                        <option value="optimistic">Scénario optimiste</option>
-                                        <option value="pessimistic">Scénario pessimiste</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                            <div class="col-xl-2 col-lg-3 col-md-6">
-
-                                <div class="form-group mb-lg-0">
-                                    <label>Devise</label>
-
-                                    <select name="currency" class="form-control">
-                                        <option value="BIF">BIF</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                    </select>
-                                </div>
-
-                            </div>
-
-                            <div class="col-xl-2 col-lg-5 col-md-12">
-
-                                <button type="submit" class="btn btn-forecast-primary mr-1">
-                                    <i class="fas fa-filter mr-1"></i>
-                                    Appliquer
-                                </button>
-
-                                <a href="<?= current_url(); ?>" class="btn btn-forecast-outline">
-                                    <i class="fas fa-redo mr-1"></i>
-                                    Réinitialiser
-                                </a>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-                <!-- =====================================================
-         COURBE + ALERTES
-    ====================================================== -->
-                <div class="row">
-
-                    <div class="col-xl-8 col-lg-8">
-
-                        <div class="forecast-card">
-
-                            <div class="forecast-card-header">
-
-                                <div>
-                                    <h5 class="forecast-card-title">
-                                        <i class="fas fa-chart-area"></i>
-                                        Évolution prévisionnelle de la trésorerie
-                                    </h5>
-
-                                    <span class="forecast-card-subtitle">
-                                        Comparaison des flux prévus et du solde projeté sur les 90 prochains jours.
-                                    </span>
-                                </div>
-
-                                <select class="form-control form-control-sm" style="width:165px;border-radius:8px;"
-                                    id="forecastChartPeriod">
-
-                                    <option value="90">90 prochains jours</option>
-                                    <option value="30">30 prochains jours</option>
-                                    <option value="60">60 prochains jours</option>
-                                    <option value="365">12 prochains mois</option>
-                                </select>
-
-                            </div>
-
-                            <div class="forecast-card-body">
-
-                                <div class="forecast-summary-row">
-
-                                    <div class="forecast-summary-item">
-                                        <span>Total encaissements prévus</span>
-                                        <strong class="text-success">
-                                            + 265 500 000 BIF
-                                        </strong>
-                                    </div>
-
-                                    <div class="forecast-summary-item">
-                                        <span>Total décaissements prévus</span>
-                                        <strong class="text-danger">
-                                            - 246 100 000 BIF
-                                        </strong>
-                                    </div>
-
-                                    <div class="forecast-summary-item">
-                                        <span>Solde net prévisionnel</span>
-                                        <strong style="color:#0f766e;">
-                                            + 19 400 000 BIF
-                                        </strong>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-chart-wrapper">
-                                    <canvas id="treasuryForecastChart"></canvas>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4">
-
-                        <div class="forecast-card">
-
-                            <div class="forecast-card-header">
-
-                                <div>
-                                    <h5 class="forecast-card-title">
-                                        <i class="fas fa-exclamation-triangle"></i>
-                                        Alertes prévisionnelles
-                                    </h5>
-
-                                    <span class="forecast-card-subtitle">
-                                        Risques détectés dans les projections.
-                                    </span>
-                                </div>
-
-                                <span class="badge badge-danger">
-                                    4 alertes
-                                </span>
-
-                            </div>
-
-                            <div class="forecast-card-body">
-
-                                <div class="forecast-alert forecast-alert-danger">
-
-                                    <div class="forecast-alert-icon">
-                                        <i class="fas fa-wallet"></i>
-                                    </div>
-
-                                    <div>
-                                        <h6>Risque de rupture — Chantier Ngozi</h6>
-
-                                        <p>
-                                            Le solde prévisionnel pourrait devenir insuffisant
-                                            dans les 14 prochains jours.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-alert forecast-alert-warning">
-
-                                    <div class="forecast-alert-icon">
-                                        <i class="fas fa-users"></i>
-                                    </div>
-
-                                    <div>
-                                        <h6>Paiement des salaires à anticiper</h6>
-
-                                        <p>
-                                            Un besoin de 20 000 000 BIF est prévu avant
-                                            la prochaine paie.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-alert forecast-alert-info">
-
-                                    <div class="forecast-alert-icon">
-                                        <i class="fas fa-file-invoice-dollar"></i>
-                                    </div>
-
-                                    <div>
-                                        <h6>Encaissement client non sécurisé</h6>
-
-                                        <p>
-                                            Le paiement de 45 000 000 BIF attendu du client
-                                            REGIDESO reste incertain.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-alert forecast-alert-success">
-
-                                    <div class="forecast-alert-icon">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-
-                                    <div>
-                                        <h6>Chantier Bujumbura suffisamment couvert</h6>
-
-                                        <p>
-                                            Les disponibilités prévues couvrent les besoins
-                                            des 60 prochains jours.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- =====================================================
-         PRÉVISIONS ENCAISSEMENTS
-    ====================================================== -->
-                <div class="forecast-card">
-
-                    <div class="forecast-card-header">
-
-                        <div>
-                            <h5 class="forecast-card-title">
-                                <i class="fas fa-arrow-circle-down"></i>
-                                Encaissements prévus
-                            </h5>
-
-                            <span class="forecast-card-subtitle">
-                                Entrées de fonds attendues provenant des clients, marchés et autres partenaires.
-                            </span>
-                        </div>
-
-                        <button type="button" class="btn btn-forecast-primary" data-toggle="modal"
-                            data-target="#addForecastIncomeModal">
-
-                            <i class="fas fa-plus mr-1"></i>
-                            Ajouter une prévision
-                        </button>
-
-                    </div>
-
-                    <div class="table-responsive">
-
-                        <table class="table forecast-table">
-
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Date prévue</th>
-                                    <th>Référence</th>
-                                    <th>Client / Provenance</th>
-                                    <th>Chantier</th>
-                                    <th>Libellé</th>
-                                    <th class="text-right">Montant</th>
-                                    <th>Probabilité</th>
-                                    <th>Statut</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <tr>
-                                    <td>1</td>
-
-                                    <td>
-                                        20/07/2026
-                                        <small class="d-block text-muted">
-                                            Dans 5 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-ENC-2026-001
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>REGIDESO</strong>
-                                        <small class="d-block text-muted">
-                                            Client institutionnel
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Chantier Bujumbura
-                                        <small class="d-block text-muted">
-                                            CH-2026-001
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Paiement décompte n° 05
-                                    </td>
-
-                                    <td class="text-right amount-income">
-                                        + 45 000 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-green">
-                                            95 %
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-green">
-                                            Très probable
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table" title="Voir">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table" title="Modifier">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>2</td>
-
-                                    <td>
-                                        28/07/2026
-                                        <small class="d-block text-muted">
-                                            Dans 13 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-ENC-2026-002
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>Commune de Gitega</strong>
-                                        <small class="d-block text-muted">
-                                            Maître d’ouvrage
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Chantier Gitega
-                                        <small class="d-block text-muted">
-                                            CH-2026-002
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Avance sur travaux
-                                    </td>
-
-                                    <td class="text-right amount-income">
-                                        + 18 000 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-orange">
-                                            80 %
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-orange">
-                                            Probable
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>3</td>
-
-                                    <td>
-                                        10/08/2026
-                                        <small class="d-block text-muted">
-                                            Dans 26 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-ENC-2026-003
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>Office Burundais des Routes</strong>
-                                        <small class="d-block text-muted">
-                                            Client public
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Chantier Ngozi
-                                        <small class="d-block text-muted">
-                                            CH-2026-003
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Paiement situation travaux
-                                    </td>
-
-                                    <td class="text-right amount-income">
-                                        + 32 000 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-red">
-                                            60 %
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-red">
-                                            À confirmer
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>4</td>
-
-                                    <td>
-                                        18/08/2026
-                                        <small class="d-block text-muted">
-                                            Dans 34 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-ENC-2026-004
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>Banque CRDB</strong>
-                                        <small class="d-block text-muted">
-                                            Institution financière
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        Siège
-                                    </td>
-
-                                    <td>
-                                        Mise à disposition crédit
-                                    </td>
-
-                                    <td class="text-right amount-income">
-                                        + 75 000 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-green">
-                                            100 %
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-blue">
-                                            Confirmé
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-                <!-- =====================================================
-         PRÉVISIONS DÉCAISSEMENTS
-    ====================================================== -->
-                <div class="forecast-card">
-
-                    <div class="forecast-card-header">
-
-                        <div>
-                            <h5 class="forecast-card-title">
-                                <i class="fas fa-arrow-circle-up"></i>
-                                Décaissements prévus
-                            </h5>
-
-                            <span class="forecast-card-subtitle">
-                                Engagements financiers futurs liés aux fournisseurs, salaires, taxes et chantiers.
-                            </span>
-                        </div>
-
-                        <button type="button" class="btn btn-forecast-danger" data-toggle="modal"
-                            data-target="#addForecastExpenseModal">
-
-                            <i class="fas fa-plus mr-1"></i>
-                            Ajouter une dépense prévue
-                        </button>
-
-                    </div>
-
-                    <div class="table-responsive">
-
-                        <table class="table forecast-table">
-
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Date prévue</th>
-                                    <th>Référence</th>
-                                    <th>Bénéficiaire</th>
-                                    <th>Catégorie</th>
-                                    <th>Chantier</th>
-                                    <th class="text-right">Montant</th>
-                                    <th>Priorité</th>
-                                    <th>Statut</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                <tr>
-                                    <td>1</td>
-
-                                    <td>
-                                        18/07/2026
-                                        <small class="d-block text-muted">
-                                            Dans 3 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-DEC-2026-001
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>Personnel chantier Ngozi</strong>
-                                        <small class="d-block text-muted">
-                                            Main-d’œuvre
-                                        </small>
-                                    </td>
-
-                                    <td>Salaires</td>
-
-                                    <td>
-                                        Chantier Ngozi
-                                        <small class="d-block text-muted">
-                                            CH-2026-003
-                                        </small>
-                                    </td>
-
-                                    <td class="text-right amount-expense">
-                                        - 12 500 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-red">
-                                            Critique
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-orange">
-                                            À payer
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>2</td>
-
-                                    <td>
-                                        21/07/2026
-                                        <small class="d-block text-muted">
-                                            Dans 6 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-DEC-2026-002
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>TotalEnergies Burundi</strong>
-                                        <small class="d-block text-muted">
-                                            Fournisseur carburant
-                                        </small>
-                                    </td>
-
-                                    <td>Carburant</td>
-
-                                    <td>
-                                        Chantier Bujumbura
-                                        <small class="d-block text-muted">
-                                            CH-2026-001
-                                        </small>
-                                    </td>
-
-                                    <td class="text-right amount-expense">
-                                        - 6 800 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-orange">
-                                            Haute
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-green">
-                                            Approuvé
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>3</td>
-
-                                    <td>
-                                        24/07/2026
-                                        <small class="d-block text-muted">
-                                            Dans 9 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-DEC-2026-003
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>ABC Construction</strong>
-                                        <small class="d-block text-muted">
-                                            Sous-traitant
-                                        </small>
-                                    </td>
-
-                                    <td>Sous-traitance</td>
-
-                                    <td>
-                                        Chantier Gitega
-                                        <small class="d-block text-muted">
-                                            CH-2026-002
-                                        </small>
-                                    </td>
-
-                                    <td class="text-right amount-expense">
-                                        - 18 500 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-blue">
-                                            Normale
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-orange">
-                                            Planifié
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td>4</td>
-
-                                    <td>
-                                        31/07/2026
-                                        <small class="d-block text-muted">
-                                            Dans 16 jours
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-reference">
-                                            PRE-DEC-2026-004
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <strong>Office Burundais des Recettes</strong>
-                                        <small class="d-block text-muted">
-                                            Administration fiscale
-                                        </small>
-                                    </td>
-
-                                    <td>Impôts et taxes</td>
-
-                                    <td>Siège</td>
-
-                                    <td class="text-right amount-expense">
-                                        - 21 300 000 BIF
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-red">
-                                            Critique
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        <span class="forecast-badge forecast-badge-green">
-                                            Confirmé
-                                        </span>
-                                    </td>
-
-                                    <td class="text-center">
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-
-                                        <button class="btn-forecast-table">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-
-                                    </td>
-                                </tr>
-
-                            </tbody>
-
-                        </table>
-
-                    </div>
-
-                </div>
-
-                <!-- =====================================================
-         PROJECTION PAR CHANTIER + RÉPARTITION DÉPENSES
-    ====================================================== -->
-                <div class="row">
-
-                    <div class="col-xl-8 col-lg-8">
-
-                        <div class="forecast-card">
-
-                            <div class="forecast-card-header">
-
-                                <div>
-                                    <h5 class="forecast-card-title">
-                                        <i class="fas fa-hard-hat"></i>
-                                        Projection de trésorerie par chantier
-                                    </h5>
-
-                                    <span class="forecast-card-subtitle">
-                                        Solde projeté après prise en compte des encaissements et décaissements.
-                                    </span>
-                                </div>
-
-                            </div>
-
-                            <div class="table-responsive">
-
-                                <table class="table forecast-table">
-
-                                    <thead>
-                                        <tr>
-                                            <th>Chantier</th>
-                                            <th class="text-right">Solde actuel</th>
-                                            <th class="text-right">Encaissements</th>
-                                            <th class="text-right">Décaissements</th>
-                                            <th class="text-right">Solde futur</th>
-                                            <th>Couverture</th>
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>Chantier Bujumbura</strong>
-                                                <small class="d-block text-muted">
-                                                    CH-2026-001
-                                                </small>
-                                            </td>
-
-                                            <td class="text-right">
-                                                58 000 000
-                                            </td>
-
-                                            <td class="text-right amount-income">
-                                                + 45 000 000
-                                            </td>
-
-                                            <td class="text-right amount-expense">
-                                                - 37 000 000
-                                            </td>
-
-                                            <td class="text-right font-weight-bold">
-                                                66 000 000
-                                            </td>
-
-                                            <td style="min-width:180px;">
-
-                                                <div class="forecast-progress mb-1">
-                                                    <span class="progress-green" style="width:82%;"></span>
-                                                </div>
-
-                                                <small>Couverture satisfaisante : 82 %</small>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>Chantier Gitega</strong>
-                                                <small class="d-block text-muted">
-                                                    CH-2026-002
-                                                </small>
-                                            </td>
-
-                                            <td class="text-right">
-                                                43 000 000
-                                            </td>
-
-                                            <td class="text-right amount-income">
-                                                + 18 000 000
-                                            </td>
-
-                                            <td class="text-right amount-expense">
-                                                - 29 000 000
-                                            </td>
-
-                                            <td class="text-right font-weight-bold">
-                                                32 000 000
-                                            </td>
-
-                                            <td>
-
-                                                <div class="forecast-progress mb-1">
-                                                    <span class="progress-orange" style="width:58%;"></span>
-                                                </div>
-
-                                                <small>Couverture moyenne : 58 %</small>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>Chantier Ngozi</strong>
-                                                <small class="d-block text-muted">
-                                                    CH-2026-003
-                                                </small>
-                                            </td>
-
-                                            <td class="text-right">
-                                                25 000 000
-                                            </td>
-
-                                            <td class="text-right amount-income">
-                                                + 10 000 000
-                                            </td>
-
-                                            <td class="text-right amount-expense">
-                                                - 31 000 000
-                                            </td>
-
-                                            <td class="text-right text-danger font-weight-bold">
-                                                4 000 000
-                                            </td>
-
-                                            <td>
-
-                                                <div class="forecast-progress mb-1">
-                                                    <span class="progress-red" style="width:18%;"></span>
-                                                </div>
-
-                                                <small class="text-danger">
-                                                    Risque élevé : 18 %
-                                                </small>
-                                            </td>
-
-                                        </tr>
-
-                                        <tr>
-
-                                            <td>
-                                                <strong>Chantier Muyinga</strong>
-                                                <small class="d-block text-muted">
-                                                    CH-2026-004
-                                                </small>
-                                            </td>
-
-                                            <td class="text-right">
-                                                38 000 000
-                                            </td>
-
-                                            <td class="text-right amount-income">
-                                                + 22 000 000
-                                            </td>
-
-                                            <td class="text-right amount-expense">
-                                                - 24 500 000
-                                            </td>
-
-                                            <td class="text-right font-weight-bold">
-                                                35 500 000
-                                            </td>
-
-                                            <td>
-
-                                                <div class="forecast-progress mb-1">
-                                                    <span class="progress-blue" style="width:66%;"></span>
-                                                </div>
-
-                                                <small>Couverture correcte : 66 %</small>
-                                            </td>
-
-                                        </tr>
-
-                                    </tbody>
-
-                                </table>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4">
-
-                        <div class="forecast-card">
-
-                            <div class="forecast-card-header">
-
-                                <div>
-                                    <h5 class="forecast-card-title">
-                                        <i class="fas fa-chart-pie"></i>
-                                        Dépenses futures par catégorie
-                                    </h5>
-
-                                    <span class="forecast-card-subtitle">
-                                        Répartition des engagements prévus.
-                                    </span>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-card-body">
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            <i class="fas fa-users"></i>
-                                            Salaires
-                                        </span>
-
-                                        <span class="forecast-category-amount">
-                                            57,5 M
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-red" style="width:82%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            <i class="fas fa-truck"></i>
-                                            Fournisseurs
-                                        </span>
-
-                                        <span class="forecast-category-amount">
-                                            43,1 M
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-orange" style="width:68%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            <i class="fas fa-user-tie"></i>
-                                            Sous-traitants
-                                        </span>
-
-                                        <span class="forecast-category-amount">
-                                            32,3 M
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-blue" style="width:51%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            <i class="fas fa-gas-pump"></i>
-                                            Carburant
-                                        </span>
-
-                                        <span class="forecast-category-amount">
-                                            26,9 M
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-orange" style="width:42%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            <i class="fas fa-university"></i>
-                                            Impôts et taxes
-                                        </span>
-
-                                        <span class="forecast-category-amount">
-                                            12,6 M
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-green" style="width:24%;"></span>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <!-- =====================================================
-         PLAN D'ACTION
-    ====================================================== -->
-                <div class="row">
-
-                    <div class="col-xl-8 col-lg-8">
-
-                        <div class="forecast-card">
-
-                            <div class="forecast-card-header">
-
-                                <div>
-                                    <h5 class="forecast-card-title">
-                                        <i class="fas fa-tasks"></i>
-                                        Plan d’action recommandé
-                                    </h5>
-
-                                    <span class="forecast-card-subtitle">
-                                        Actions proposées pour sécuriser la trésorerie future.
-                                    </span>
-                                </div>
-
-                                <span class="badge badge-info">
-                                    4 recommandations
-                                </span>
-
-                            </div>
-
-                            <div class="forecast-card-body">
-
-                                <div class="forecast-plan-item">
-
-                                    <div class="forecast-plan-number">1</div>
-
-                                    <div>
-                                        <h6>Approvisionner la caisse du chantier Ngozi</h6>
-
-                                        <p>
-                                            Prévoir un transfert de 15 000 000 BIF avant le
-                                            22/07/2026 afin d’éviter une rupture de trésorerie.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-plan-item">
-
-                                    <div class="forecast-plan-number">2</div>
-
-                                    <div>
-                                        <h6>Relancer le client REGIDESO</h6>
-
-                                        <p>
-                                            Confirmer la date de règlement du décompte de
-                                            45 000 000 BIF attendu le 20/07/2026.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-plan-item">
-
-                                    <div class="forecast-plan-number">3</div>
-
-                                    <div>
-                                        <h6>Reporter un paiement fournisseur non prioritaire</h6>
-
-                                        <p>
-                                            Négocier le report d’une échéance de 8 500 000 BIF
-                                            pour préserver la liquidité disponible.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-plan-item">
-
-                                    <div class="forecast-plan-number">4</div>
-
-                                    <div>
-                                        <h6>Renforcer la réserve du chantier Gitega</h6>
-
-                                        <p>
-                                            Programmer un transfert bancaire de 20 000 000 BIF
-                                            avant le démarrage de la prochaine phase des travaux.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-xl-4 col-lg-4">
-
-                        <div class="forecast-card">
-
-                            <div class="forecast-card-header">
-
-                                <div>
-                                    <h5 class="forecast-card-title">
-                                        <i class="fas fa-shield-alt"></i>
-                                        Indicateurs de couverture
-                                    </h5>
-
-                                    <span class="forecast-card-subtitle">
-                                        Capacité à couvrir les engagements futurs.
-                                    </span>
-                                </div>
-
-                            </div>
-
-                            <div class="forecast-card-body">
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            Couverture à 30 jours
-                                        </span>
-
-                                        <span class="forecast-category-amount text-success">
-                                            110,4 %
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-green" style="width:100%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            Couverture à 60 jours
-                                        </span>
-
-                                        <span class="forecast-category-amount text-warning">
-                                            86,8 %
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-orange" style="width:86.8%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-category-item">
-
-                                    <div class="forecast-category-top">
-                                        <span class="forecast-category-name">
-                                            Couverture à 90 jours
-                                        </span>
-
-                                        <span class="forecast-category-amount text-danger">
-                                            72,5 %
-                                        </span>
-                                    </div>
-
-                                    <div class="forecast-progress">
-                                        <span class="progress-red" style="width:72.5%;"></span>
-                                    </div>
-
-                                </div>
-
-                                <div class="forecast-alert forecast-alert-warning mt-4 mb-0">
-
-                                    <div class="forecast-alert-icon">
-                                        <i class="fas fa-lightbulb"></i>
-                                    </div>
-
-                                    <div>
-                                        <h6>Besoin de financement estimé</h6>
-
-                                        <p>
-                                            Un financement complémentaire de
-                                            <strong>47 150 000 BIF</strong> pourrait être nécessaire.
-                                        </p>
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
             </div>
+        </form>
+    </div>
+</div>
 
-            <!-- =========================================================
-     MODALE : ENCAISSEMENT PRÉVU
+<!-- =========================================================
+     SCRIPTS
 ========================================================== -->
-            <div class="modal fade modal-forecast" id="addForecastIncomeModal" tabindex="-1" role="dialog">
-
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-
-                    <form action="#" method="post" style="width:100%;">
-
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-
-                                <h5 class="modal-title">
-                                    <i class="fas fa-arrow-circle-down mr-2"></i>
-                                    Ajouter un encaissement prévu
-                                </h5>
-
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span>&times;</span>
-                                </button>
-
-                            </div>
-
-                            <div class="modal-body">
-
-                                <div class="row">
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Date prévue
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="date" name="forecast_date" class="form-control" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Client / Provenance
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="text" name="client" class="form-control"
-                                                placeholder="Nom du client ou de la provenance" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Chantier concerné</label>
-
-                                            <select name="chantier_id" class="form-control">
-                                                <option value="">Siège / Non affecté</option>
-                                                <option value="1">Chantier Bujumbura</option>
-                                                <option value="2">Chantier Gitega</option>
-                                                <option value="3">Chantier Ngozi</option>
-                                                <option value="4">Chantier Muyinga</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Montant prévu
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <div class="input-group">
-
-                                                <input type="number" name="amount" class="form-control" min="0"
-                                                    step="0.01" required>
-
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">BIF</span>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Probabilité d’encaissement</label>
-
-                                            <select name="probability" class="form-control">
-                                                <option value="100">100 % — Confirmé</option>
-                                                <option value="95">95 % — Très probable</option>
-                                                <option value="80">80 % — Probable</option>
-                                                <option value="60">60 % — Incertain</option>
-                                                <option value="30">30 % — Faible</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Catégorie</label>
-
-                                            <select name="category" class="form-control">
-                                                <option value="client">Paiement client</option>
-                                                <option value="advance">Avance sur marché</option>
-                                                <option value="loan">Emprunt</option>
-                                                <option value="refund">Remboursement</option>
-                                                <option value="other">Autre produit</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-12">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Libellé
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="text" name="label" class="form-control"
-                                                placeholder="Ex. Paiement du décompte n° 05" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-12">
-
-                                        <div class="form-group mb-0">
-                                            <label>Observation</label>
-
-                                            <textarea name="observation" class="form-control"
-                                                placeholder="Informations complémentaires..."></textarea>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="modal-footer">
-
-                                <button type="button" class="btn btn-forecast-outline" data-dismiss="modal">
-
-                                    <i class="fas fa-times mr-1"></i>
-                                    Annuler
-                                </button>
-
-                                <button type="submit" class="btn btn-forecast-primary">
-
-                                    <i class="fas fa-save mr-1"></i>
-                                    Enregistrer la prévision
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-            <!-- =========================================================
-     MODALE : DÉCAISSEMENT PRÉVU
-========================================================== -->
-            <div class="modal fade modal-forecast" id="addForecastExpenseModal" tabindex="-1" role="dialog">
-
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-
-                    <form action="#" method="post" style="width:100%;">
-
-                        <div class="modal-content">
-
-                            <div class="modal-header" style="background:linear-gradient(135deg,#991b1b,#102033);">
-
-                                <h5 class="modal-title">
-                                    <i class="fas fa-arrow-circle-up mr-2"></i>
-                                    Ajouter un décaissement prévu
-                                </h5>
-
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span>&times;</span>
-                                </button>
-
-                            </div>
-
-                            <div class="modal-body">
-
-                                <div class="row">
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Date prévue
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="date" name="forecast_date" class="form-control" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Bénéficiaire
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="text" name="supplier" class="form-control"
-                                                placeholder="Fournisseur ou bénéficiaire" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Chantier concerné</label>
-
-                                            <select name="chantier_id" class="form-control">
-                                                <option value="">Siège / Non affecté</option>
-                                                <option value="1">Chantier Bujumbura</option>
-                                                <option value="2">Chantier Gitega</option>
-                                                <option value="3">Chantier Ngozi</option>
-                                                <option value="4">Chantier Muyinga</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Montant prévu
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <div class="input-group">
-
-                                                <input type="number" name="amount" class="form-control" min="0"
-                                                    step="0.01" required>
-
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">BIF</span>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Catégorie</label>
-
-                                            <select name="category" class="form-control">
-                                                <option value="salary">Salaires</option>
-                                                <option value="supplier">Fournisseur</option>
-                                                <option value="subcontractor">Sous-traitance</option>
-                                                <option value="fuel">Carburant</option>
-                                                <option value="tax">Impôts et taxes</option>
-                                                <option value="maintenance">Maintenance</option>
-                                                <option value="other">Autre dépense</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Priorité</label>
-
-                                            <select name="priority" class="form-control">
-                                                <option value="normal">Normale</option>
-                                                <option value="high">Haute</option>
-                                                <option value="critical">Critique</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-12">
-
-                                        <div class="form-group">
-                                            <label>
-                                                Libellé
-                                                <span class="required-star">*</span>
-                                            </label>
-
-                                            <input type="text" name="label" class="form-control"
-                                                placeholder="Ex. Paiement facture carburant" required>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-12">
-
-                                        <div class="form-group mb-0">
-                                            <label>Observation</label>
-
-                                            <textarea name="observation" class="form-control"
-                                                placeholder="Informations complémentaires..."></textarea>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="modal-footer">
-
-                                <button type="button" class="btn btn-forecast-outline" data-dismiss="modal">
-
-                                    <i class="fas fa-times mr-1"></i>
-                                    Annuler
-                                </button>
-
-                                <button type="submit" class="btn btn-forecast-danger">
-
-                                    <i class="fas fa-save mr-1"></i>
-                                    Enregistrer la prévision
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-            <!-- =========================================================
-     MODALE : SIMULATION
-========================================================== -->
-            <div class="modal fade modal-forecast" id="forecastScenarioModal" tabindex="-1" role="dialog">
-
-                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
-
-                    <form action="#" method="post" style="width:100%;">
-
-                        <div class="modal-content">
-
-                            <div class="modal-header">
-
-                                <h5 class="modal-title">
-                                    <i class="fas fa-project-diagram mr-2"></i>
-                                    Simuler un scénario de trésorerie
-                                </h5>
-
-                                <button type="button" class="close" data-dismiss="modal">
-                                    <span>&times;</span>
-                                </button>
-
-                            </div>
-
-                            <div class="modal-body">
-
-                                <div class="row">
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Nom du scénario</label>
-
-                                            <input type="text" name="scenario_name" class="form-control"
-                                                placeholder="Ex. Retard paiement client REGIDESO">
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Horizon</label>
-
-                                            <select name="period" class="form-control">
-                                                <option value="30">30 jours</option>
-                                                <option value="60">60 jours</option>
-                                                <option value="90">90 jours</option>
-                                                <option value="365">12 mois</option>
-                                            </select>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Variation des encaissements</label>
-
-                                            <div class="input-group">
-
-                                                <input type="number" name="income_variation" class="form-control"
-                                                    value="0">
-
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">%</span>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-6">
-
-                                        <div class="form-group">
-                                            <label>Variation des décaissements</label>
-
-                                            <div class="input-group">
-
-                                                <input type="number" name="expense_variation" class="form-control"
-                                                    value="0">
-
-                                                <div class="input-group-append">
-                                                    <span class="input-group-text">%</span>
-                                                </div>
-
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="col-md-12">
-
-                                        <div class="form-group mb-0">
-                                            <label>Description du scénario</label>
-
-                                            <textarea name="description" class="form-control"
-                                                placeholder="Décrivez les hypothèses de la simulation..."></textarea>
-                                        </div>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                            <div class="modal-footer">
-
-                                <button type="button" class="btn btn-forecast-outline" data-dismiss="modal">
-
-                                    <i class="fas fa-times mr-1"></i>
-                                    Annuler
-                                </button>
-
-                                <button type="submit" class="btn btn-forecast-primary">
-
-                                    <i class="fas fa-calculator mr-1"></i>
-                                    Lancer la simulation
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-            <!-- =========================================================
-     GRAPHIQUE CHART.JS
-========================================================== -->
-            <script>
-            document.addEventListener('DOMContentLoaded', function() {
-
-                const canvas = document.getElementById('treasuryForecastChart');
-
-                if (!canvas || typeof Chart === 'undefined') {
-                    return;
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    var PRV = {
+        urls: {
+            realize: <?= json_encode(base_url('prevision-realize'), $jsonFlags) ?>,
+            cancel: <?= json_encode(base_url('prevision-cancel'), $jsonFlags) ?>
+        },
+        csrf: {
+            name: <?= json_encode($this->security->get_csrf_token_name()) ?>,
+            hash: <?= json_encode($this->security->get_csrf_hash()) ?>
+        },
+        currency: <?= json_encode($cur) ?>,
+        chart: {
+            labels: <?= json_encode(array_map(function ($p) {
+                        return $p['label'];
+                    }, $periods), $jsonFlags) ?>,
+            incomes: <?= json_encode($plan['totals_in']) ?>,
+            expenses: <?= json_encode($plan['totals_out']) ?>,
+            closings: <?= json_encode($plan['closings']) ?>,
+            threshold: <?= json_encode((float) $plan['threshold']) ?>
+        },
+        recurrenceLabels: <?= json_encode($recurrenceLabels, $jsonFlags) ?>
+    };
+
+    function prvMoney(amount, currency) {
+        currency = currency || PRV.currency;
+        var digits = currency === 'BIF' ? 0 : 2;
+        return new Intl.NumberFormat('fr-FR', {
+                minimumFractionDigits: digits,
+                maximumFractionDigits: digits
+            })
+            .format(parseFloat(amount || 0)) + ' ' + currency;
+    }
+
+    function prvPost(url, data) {
+        if (PRV.csrf.name) data[PRV.csrf.name] = PRV.csrf.hash;
+        return window.jQuery.ajax({
+            url: url,
+            method: 'POST',
+            data: data,
+            dataType: 'json'
+        });
+    }
+
+    function prvError(xhr) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Action impossible',
+            text: (xhr.responseJSON && xhr.responseJSON.message) || 'Erreur serveur.',
+            confirmButtonColor: '#dc2626'
+        });
+    }
+
+    function prvSuccessReload(title, message) {
+        Swal.fire({
+                icon: 'success',
+                title: title,
+                text: message,
+                confirmButtonColor: '#0f766e'
+            })
+            .then(function() {
+                window.location.reload();
+            });
+    }
+
+    /* Annulation d'une prévision (avec option « toute la suite de la série ») */
+    function prvCancel(id, reference, isRecurring) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Annuler ' + reference + ' ?',
+            html: '<textarea id="prvCancelReason" class="swal2-textarea" placeholder="Motif de l’annulation…"></textarea>' +
+                (isRecurring ?
+                    '<label style="font-size:13px;display:block;margin-top:8px"><input type="checkbox" id="prvCancelSeries"> Annuler aussi les échéances suivantes de cette série</label>' :
+                    ''),
+            showCancelButton: true,
+            confirmButtonText: 'Annuler la prévision',
+            cancelButtonText: 'Fermer',
+            confirmButtonColor: '#dc2626',
+            preConfirm: function() {
+                var reason = document.getElementById('prvCancelReason').value.trim();
+                if (!reason) {
+                    Swal.showValidationMessage('Le motif est obligatoire.');
+                    return false;
                 }
+                var series = document.getElementById('prvCancelSeries');
+                return {
+                    reason: reason,
+                    series: series && series.checked ? 1 : 0
+                };
+            }
+        }).then(function(result) {
+            if (!result.isConfirmed) return;
 
-                const ctx = canvas.getContext('2d');
+            prvPost(PRV.urls.cancel, {
+                    forecast_id: id,
+                    cancel_reason: result.value.reason,
+                    cancel_series: result.value.series
+                })
+                .done(function(response) {
+                    prvSuccessReload('Prévision annulée', response.message);
+                })
+                .fail(prvError);
+        });
+    }
 
-                const balanceGradient = ctx.createLinearGradient(0, 0, 0, 320);
+    document.addEventListener('DOMContentLoaded', function() {
+        var $ = window.jQuery;
 
-                balanceGradient.addColorStop(
-                    0,
-                    'rgba(15, 118, 110, 0.28)'
-                );
+        if (!$) {
+            console.error('Prévisions : jQuery n’est pas chargé.');
+            return;
+        }
 
-                balanceGradient.addColorStop(
-                    1,
-                    'rgba(15, 118, 110, 0.02)'
-                );
+        $(document).ajaxComplete(function(event, xhr) {
+            if (xhr.responseJSON && xhr.responseJSON.csrf_hash) {
+                PRV.csrf.hash = xhr.responseJSON.csrf_hash;
+            }
+        });
 
-                new Chart(ctx, {
+        /* ---------- Modale « Nouvelle prévision » ---------- */
+        function refreshCategories() {
+            var flow = $('#prvFlow').val();
+            var $select = $('#prvCategory');
 
-                    type: 'line',
+            $select.find('option').each(function() {
+                var visible = $(this).data('flow') === flow;
+                $(this).prop('hidden', !visible).prop('disabled', !visible);
+            });
 
-                    data: {
+            if ($select.find('option:selected').prop('disabled')) {
+                $select.val($select.find('option[data-flow="' + flow + '"]').first().val());
+            }
+        }
 
-                        labels: [
-                            'Aujourd’hui',
-                            '+ 7 jours',
-                            '+ 15 jours',
-                            '+ 30 jours',
-                            '+ 60 jours',
-                            '+ 90 jours'
-                        ],
+        function refreshRecurrence() {
+            var recurrence = $('#prvRecurrence').val();
+            var isRecurring = recurrence !== 'none';
 
-                        datasets: [{
-                                label: 'Solde prévisionnel',
+            $('#prvRecurrenceEndField').toggle(isRecurring);
+            $('#prvRecurrenceEnd').prop('required', isRecurring);
+            $('#prvRecurrenceInfo').toggle(isRecurring).text(
+                isRecurring ?
+                'Une échéance ' + PRV.recurrenceLabels[recurrence].toLowerCase() +
+                ' sera créée de la date prévue jusqu’à la date de fin (60 échéances maximum). Chacune pourra être réalisée ou annulée séparément.' :
+                ''
+            );
+        }
 
-                                data: [
-                                    245600000,
-                                    228500000,
-                                    214300000,
-                                    198450000,
-                                    173200000,
-                                    265000000
-                                ],
+        function refreshAccountCurrency() {
+            var currency = $('#prvAccount option:selected').data('currency');
+            if (currency) {
+                $('#prvCurrency').val(currency);
+            }
+            $('#prvCurrency').prop('disabled', !!currency);
+        }
 
-                                borderColor: '#0f766e',
-                                backgroundColor: balanceGradient,
-                                borderWidth: 3,
-                                pointRadius: 4,
-                                pointHoverRadius: 6,
-                                pointBackgroundColor: '#ffffff',
-                                pointBorderColor: '#0f766e',
-                                pointBorderWidth: 2,
-                                fill: true,
-                                tension: 0.35
-                            },
-                            {
-                                label: 'Encaissements prévus',
+        $('#prvFlow').on('change', refreshCategories);
+        $('#prvRecurrence').on('change', refreshRecurrence);
+        $('#prvAccount').on('change', refreshAccountCurrency);
 
-                                data: [
-                                    0,
-                                    38000000,
-                                    65000000,
-                                    132500000,
-                                    185000000,
-                                    265500000
-                                ],
+        /* Le champ devise désactivé n'est pas envoyé : on le réactive avant l'envoi */
+        $('#forecastModal form').on('submit', function() {
+            $('#prvCurrency').prop('disabled', false);
+        });
 
-                                borderColor: '#0284c7',
-                                backgroundColor: 'transparent',
-                                borderWidth: 2,
-                                borderDash: [6, 5],
-                                pointRadius: 3,
-                                pointBackgroundColor: '#ffffff',
-                                pointBorderColor: '#0284c7',
-                                fill: false,
-                                tension: 0.30
-                            },
-                            {
-                                label: 'Décaissements prévus',
+        refreshCategories();
+        refreshRecurrence();
+        refreshAccountCurrency();
 
-                                data: [
-                                    0,
-                                    55100000,
-                                    96300000,
-                                    179650000,
-                                    257400000,
-                                    246100000
-                                ],
+        <?php if ($reopenModal): ?>
+            $('#forecastModal').modal('show');
+        <?php endif; ?>
 
-                                borderColor: '#dc2626',
-                                backgroundColor: 'transparent',
-                                borderWidth: 2,
-                                borderDash: [4, 4],
-                                pointRadius: 3,
-                                pointBackgroundColor: '#ffffff',
-                                pointBorderColor: '#dc2626',
-                                fill: false,
-                                tension: 0.30
-                            }
-                        ]
+        /* ---------- Modale « Réaliser » ---------- */
+        $('#realizeModal').on('show.bs.modal', function(event) {
+            var data = $(event.relatedTarget).data('forecast');
+
+            if (!data) return;
+
+            $('#realizeId').val(data.id);
+            $('#realizeRef').text(data.reference);
+            $('#realizeAmount').val(data.remaining);
+            $('#realizeInfo').html(
+                '<strong>' + $('<div>').text(data.label).html() + '</strong><br>' +
+                (data.flow === 'entree' ? 'Entrée' : 'Sortie') + ' — reste à réaliser : <strong>' +
+                prvMoney(data.remaining, data.currency) + '</strong>'
+            );
+
+            /* Seules les opérations bancaires de même sens sont proposées */
+            $('#realizeOperation').val('').find('option').each(function() {
+                if (!this.value) return;
+                var visible = $(this).data('direction') === data.flow;
+                $(this).prop('hidden', !visible).prop('disabled', !visible);
+            });
+        });
+
+        $('#realizeForm').on('submit', function(event) {
+            event.preventDefault();
+
+            var data = {};
+            $(this).serializeArray().forEach(function(field) {
+                data[field.name] = field.value;
+            });
+
+            prvPost(PRV.urls.realize, data)
+                .done(function(response) {
+                    $('#realizeModal').modal('hide');
+                    prvSuccessReload('Réalisation enregistrée', response.message);
+                })
+                .fail(prvError);
+        });
+
+        /* ---------- Graphique ---------- */
+        var canvas = document.getElementById('prvChart');
+
+        if (canvas && typeof Chart !== 'undefined') {
+            new Chart(canvas.getContext('2d'), {
+                data: {
+                    labels: PRV.chart.labels,
+                    datasets: [{
+                        type: 'bar',
+                        label: 'Encaissements',
+                        data: PRV.chart.incomes,
+                        backgroundColor: 'rgba(22,163,74,.55)',
+                        borderRadius: 4,
+                        order: 3
+                    }, {
+                        type: 'bar',
+                        label: 'Décaissements',
+                        data: PRV.chart.expenses,
+                        backgroundColor: 'rgba(220,38,38,.5)',
+                        borderRadius: 4,
+                        order: 3
+                    }, {
+                        type: 'line',
+                        label: 'Solde de fin',
+                        data: PRV.chart.closings,
+                        borderColor: '#0f766e',
+                        backgroundColor: '#0f766e',
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        tension: .3,
+                        order: 1
+                    }, {
+                        type: 'line',
+                        label: 'Seuil de sécurité',
+                        data: PRV.chart.labels.map(function() {
+                            return PRV.chart.threshold;
+                        }),
+                        borderColor: '#f59e0b',
+                        borderDash: [6, 6],
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        order: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     },
-
-                    options: {
-
-                        responsive: true,
-                        maintainAspectRatio: false,
-
-                        interaction: {
-                            intersect: false,
-                            mode: 'index'
-                        },
-
-                        plugins: {
-
-                            legend: {
-                                position: 'bottom',
-
-                                labels: {
-                                    usePointStyle: true,
-                                    boxWidth: 8,
-                                    padding: 20,
-
-                                    font: {
-                                        size: 11
-                                    }
-                                }
-                            },
-
-                            tooltip: {
-
-                                callbacks: {
-
-                                    label: function(context) {
-
-                                        return context.dataset.label +
-                                            ' : ' +
-                                            new Intl.NumberFormat('fr-FR').format(
-                                                context.parsed.y
-                                            ) +
-                                            ' BIF';
-                                    }
-                                }
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8
                             }
                         },
-
-                        scales: {
-
-                            x: {
-
-                                grid: {
-                                    display: false
-                                },
-
-                                ticks: {
-                                    font: {
-                                        size: 10
-                                    }
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    return ctx.dataset.label + ' : ' + prvMoney(ctx.parsed.y);
                                 }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(148,163,184,.15)'
                             },
-
-                            y: {
-
-                                beginAtZero: true,
-
-                                grid: {
-                                    color: 'rgba(148, 163, 184, 0.16)'
-                                },
-
-                                ticks: {
-
-                                    font: {
-                                        size: 10
-                                    },
-
-                                    callback: function(value) {
-                                        return (
-                                            value / 1000000
-                                        ) + ' M';
-                                    }
+                            ticks: {
+                                callback: function(v) {
+                                    var a = Math.abs(v);
+                                    if (a >= 1e9) return (v / 1e9) + ' Md';
+                                    if (a >= 1e6) return (v / 1e6) + ' M';
+                                    if (a >= 1e3) return (v / 1e3) + ' K';
+                                    return v;
                                 }
                             }
                         }
                     }
-                });
+                }
             });
-            </script>
+        }
 
-        </div>
-
-    </section>
-
-</div>
+        <?php if ($flashSuccess || $flashError): ?>
+            Swal.fire({
+                icon: <?= json_encode($flashError ? 'error' : 'success') ?>,
+                title: <?= json_encode($flashError ? 'Action impossible' : 'Succès', JSON_UNESCAPED_UNICODE) ?>,
+                html: <?= json_encode($flashError ?: $flashSuccess, $jsonFlags) ?>,
+                confirmButtonColor: <?= json_encode($flashError ? '#dc2626' : '#0f766e') ?>
+            });
+        <?php endif; ?>
+    });
+</script>
