@@ -249,8 +249,8 @@
 
 <?php
 /* Titres par module : ouvrent (menu-open) et surlignent (active) les groupes */
-$dgTitles = ['Synthèse des demandes', 'Tableau de bord DG', 'Indicateurs de performance', 'Reporting général', 'Analytique', 'Statistiques', 'Validations & Approbations', 'Suivi des projets', 'Notifications & Alertes', 'Messagerie interne', 'Gestion des utilisateurs', 'Paramètres', 'Archives', 'Relation Publique'];
-$techTitles   = ['Projets', 'Chantiers & exécution', 'Achats & Approvisionnement', 'Sous-traitants', 'Stocks', 'Engin & Materiel', 'Maintenance & Carburant', 'Journal Production', 'Coût Réel & Rentabilité', 'Personnel Chantier', 'Suivie Paie Chantier'];
+$dgTitles = ['Synthèse des demandes', 'Tableau de board DG', 'Indicateurs de performance', 'Reporting général', 'Analytique', 'Statistiques', 'Validations & Approbations', 'Suivi des projets', 'Notifications & Alertes', 'Messagerie interne', 'Gestion des utilisateurs', 'Paramètres', 'Archives', 'Relation Publique'];
+$techTitles   = ['Projets', 'Chantiers & exécution', 'Achats & Approvisionnement', 'Sous-traitants', 'Stocks', 'Engin & Materiel', 'Maintenance & Carburant', 'Journal Production', 'Coût Réel & Rentabilité', 'Personnel Chantier', 'Suivie Paie Chantier', 'Evaluation Chantier', 'Pointage', 'Ordre service'];
 $dafTitles    = ['Tableau de Bord DAF', 'Exercices Comptables', 'Classes de Comptes', 'Plan Comptable', 'Codes journaux', 'Écritures Comptables', 'Journal Comptable', 'Grand Livre Comptable', 'Balance Générale', 'Clôture Comptable', 'Caisse', 'Journal de caisse', 'Livre de Caisse', 'Comptes bancaires', 'Rapprochement bancaire', 'Prévisions de trésorerie', 'Factures clients', 'Factures fournisseurs', 'Paiements', 'Échéances', 'Rapport Financier', 'Contrôle de gestion', 'Patrimoine', 'Documents / GED', 'Rapports financiers', 'Livre de banque'];
 $comptaTitles = ['Exercices Comptables', 'Classes de Comptes', 'Plan Comptable', 'Codes journaux', 'Écritures Comptables', 'Journal Comptable', 'Grand Livre Comptable', 'Balance Générale', 'Clôture Comptable'];
 $tresoTitles  = ['Caisse', 'Journal de caisse', 'Livre de Caisse', 'Rapport Financier', 'Comptes bancaires', 'Livre de banque', 'Rapprochement bancaire', 'Prévisions de trésorerie'];
@@ -456,7 +456,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('projects') ?>"
                                         class="nav-link <?= $title == 'Projets' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-project-diagram nav-icon"></i>
                                         <p>Projets</p>
                                     </a>
                                 </li>
@@ -466,7 +466,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('chantiers') ?>"
                                         class="nav-link <?= $title == 'Chantiers & exécution' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-building nav-icon"></i>
                                         <p>Chantiers</p>
                                     </a>
                                 </li>
@@ -476,7 +476,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('achat') ?>"
                                         class="nav-link <?= $title == 'Achats & Approvisionnement' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-shopping-cart nav-icon"></i>
                                         <p>Achats</p>
                                     </a>
                                 </li>
@@ -485,7 +485,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                             <?php if (has_access('tech', 'fournisseurs')): ?>
                                 <li class="nav-item">
                                     <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-truck nav-icon"></i>
                                         <p>Fournisseurs</p>
                                     </a>
                                 </li>
@@ -495,7 +495,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('sous-traitant') ?>"
                                         class="nav-link <?= $title == 'Sous-traitants' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-handshake nav-icon"></i>
                                         <p>Sous Traitant</p>
                                     </a>
                                 </li>
@@ -505,7 +505,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('stock-general') ?>"
                                         class="nav-link <?= $title == 'Stocks' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-boxes nav-icon"></i>
                                         <p>Stocks</p>
                                     </a>
                                 </li>
@@ -515,7 +515,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('engin-materiel') ?>"
                                         class="nav-link <?= $title == 'Engin & Materiel' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-tractor nav-icon"></i>
                                         <p>Engin & Materiel</p>
                                     </a>
                                 </li>
@@ -525,7 +525,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('maintenance-carburant') ?>"
                                         class="nav-link <?= $title == 'Maintenance & Carburant' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-gas-pump nav-icon"></i>
                                         <p>Maintenance & Carburant</p>
                                     </a>
                                 </li>
@@ -535,7 +535,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('journal-production') ?>"
                                         class="nav-link <?= $title == 'Journal Production' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-book-open nav-icon"></i>
                                         <p>Journal Production</p>
                                     </a>
                                 </li>
@@ -545,7 +545,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('cout-reelle-rentebilite') ?>"
                                         class="nav-link <?= $title == 'Coût Réel & Rentabilité' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-balance-scale nav-icon"></i>
                                         <p>Coût Réel & Rentabilité</p>
                                     </a>
                                 </li>
@@ -553,8 +553,9 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
 
                             <?php if (has_access('tech', 'evaluation-chantier')): ?>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
+                                    <a href="<?= base_url('evaluation-chantier') ?>"
+                                        class="nav-link <?= $title == 'Evaluation Chantier' ? 'active' : '' ?>">
+                                        <i class="fas fa-clipboard-check nav-icon"></i>
                                         <p>Evaluation Chantier</p>
                                     </a>
                                 </li>
@@ -564,7 +565,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('personnel-chantier') ?>"
                                         class="nav-link <?= $title == 'Personnel Chantier' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-users nav-icon"></i>
                                         <p>Personnel Chantier</p>
                                     </a>
                                 </li>
@@ -574,7 +575,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('suivie-paie-chantier') ?>"
                                         class="nav-link <?= $title == 'Suivie Paie Chantier' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-money-bill-wave nav-icon"></i>
                                         <p>Suivie Paie Chantier</p>
                                     </a>
                                 </li>
@@ -582,8 +583,9 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
 
                             <?php if (has_access('tech', 'pointage')): ?>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
+                                    <a href="<?= base_url('pointage') ?>"
+                                        class="nav-link <?= $title == 'Pointage' ? 'active' : '' ?>">
+                                        <i class="fas fa-user-check nav-icon"></i>
                                         <p>Pointage</p>
                                     </a>
                                 </li>
@@ -591,8 +593,9 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
 
                             <?php if (has_access('tech', 'ordre-service')): ?>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
+                                    <a href="<?= base_url('ordre-service') ?>"
+                                        class="nav-link <?= $title == 'Ordre service' ? 'active' : '' ?>">
+                                        <i class="fas fa-file-signature nav-icon"></i>
                                         <p>Ordre service</p>
                                     </a>
                                 </li>
@@ -1053,7 +1056,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('users') ?>"
                                         class="nav-link <?= $title == 'Utilisateurs' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-user-cog nav-icon"></i>
                                         <p>Utilisateurs</p>
                                     </a>
                                 </li>
@@ -1062,7 +1065,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('matrice-access') ?>"
                                         class="nav-link <?= $title == 'Matrice des access' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-th nav-icon"></i>
                                         <p>Matrice des access</p>
                                     </a>
                                 </li>
@@ -1071,7 +1074,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('roles-permissions') ?>"
                                         class="nav-link <?= $title == 'Rôles & Permissions' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-user-shield nav-icon"></i>
                                         <p>Rôles & Permissions</p>
                                     </a>
                                 </li>
@@ -1080,7 +1083,7 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                 <li class="nav-item">
                                     <a href="<?= base_url('settings') ?>"
                                         class="nav-link <?= $title == 'Paramètres' ? 'active' : '' ?>">
-                                        <i class="far fa-circle nav-icon"></i>
+                                        <i class="fas fa-sliders-h nav-icon"></i>
                                         <p>Paramètres</p>
                                     </a>
                                 </li>

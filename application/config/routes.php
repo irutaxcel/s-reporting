@@ -181,6 +181,25 @@ $route['engin-panne-store']                 = 'TechController/enginPanneStore';
 $route['engin-panne-status']                = 'TechController/enginPanneStatus';
 
 $route['cout-reelle-rentebilite'] = 'TechController/coutReelleRentebilite';
+$route['cout-reelle-rentebilite/detail/(:num)'] = 'TechController/coutReelDetail/$1';
+$route['cout-reelle-rentebilite/export']        = 'TechController/coutReelExport';
+
+$route['evaluation-chantier'] = 'TechController/evaluationChantier';
+$route['evaluation-chantier/detail/(:num)'] = 'TechController/evaluationChantierDetail/$1';
+$route['evaluation-chantier/export']        = 'TechController/evaluationChantierExport';
+
+$route['pointage'] = 'TechController/pointage';
+$route['pointage/store']  = 'TechController/pointageStore';
+$route['pointage/export'] = 'TechController/pointageExport';
+
+$route['ordre-service'] = 'TechController/ordreService';
+$route['ordre-service/store']        = 'TechController/ordreServiceStore';
+$route['ordre-service/update']       = 'TechController/ordreServiceUpdate';
+$route['ordre-service/get/(:num)']   = 'TechController/ordreServiceGet/$1';
+$route['ordre-service/statut']       = 'TechController/ordreServiceStatut';
+$route['ordre-service/delete']       = 'TechController/ordreServiceDelete';
+$route['ordre-service/print/(:num)'] = 'TechController/ordreServicePrint/$1';
+$route['ordre-service/export']       = 'TechController/ordreServiceExport';
 
 $route['journal-production'] = 'TechController/journalProduction';
 

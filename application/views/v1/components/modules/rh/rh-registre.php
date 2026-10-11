@@ -1,39 +1,134 @@
-<!-- Content Wrapper. Contains page content -->
+<?php
+/* =====================================================================
+   PRÉPARATION DES DONNÉES DU REGISTRE
+   ===================================================================== */
+
+/* Sortie enregistrée via « Contrats & mouvements » (secours si la fiche n'a pas de date_sortie) */
+$sorties_mvt = [];
+foreach ($mouvements as $m) {
+    if (
+        in_array($m->type_mouvement, ['Démission', 'Licenciement', 'Fin de contrat', 'Retraite'])
+        && !isset($sorties_mvt[$m->employe_id])
+    ) {
+        $sorties_mvt[$m->employe_id] = $m;   // mouvements triés DESC → le plus récent
+    }
+}
+
+/* Registre : ordre d'entrée en service (date d'entrée, puis ordre de saisie) */
+$registre = $employes;
+usort($registre, function ($a, $b) {
+    return [$a->date_embauche, (int) $a->employe_id] <=> [$b->date_embauche, (int) $b->employe_id];
+});
+
+$CODES_NAT = [
+    'Burundaise' => 'B',
+    'Rwandaise' => 'RW',
+    'Congolaise (RDC)' => 'RDC',
+    'Tanzanienne' => 'TZ',
+    'Ougandaise' => 'UG',
+    'Kényane' => 'KE',
+    'Autre' => 'Autre',
+];
+
+/* Lignes prêtes à afficher + indicateurs */
+$lignes   = [];
+$nb_service = $nb_conge = $nb_sortis = 0;
+$annees   = [];
+$sites    = [];
+$ordre    = 0;
+
+foreach ($registre as $e) {
+    $ordre++;
+    $mv          = $sorties_mvt[$e->employe_id] ?? null;
+    $date_sortie = !empty($e->date_sortie) ? $e->date_sortie : ($mv ? $mv->date_effet : null);
+    $cause       = !empty($e->cause_cessation) ? $e->cause_cessation : ($mv ? $mv->type_mouvement : null);
+    $sorti       = $date_sortie || $e->statut === 'Fin de contrat';
+
+    if ($sorti) {
+        $situation = 'Sorti';
+        $nb_sortis++;
+    } elseif ($e->statut === 'En congé') {
+        $situation = 'En congé';
+        $nb_conge++;
+    } elseif ($e->statut === 'Suspendu') {
+        $situation = 'Suspendu';
+        $nb_service++;
+    } else {
+        $situation = 'En service';
+        $nb_service++;
+    }
+
+    $age = !empty($e->date_naissance)
+        ? (new DateTime($e->date_naissance))->diff(new DateTime($e->date_embauche))->y
+        : null;
+
+    $annee   = date('Y', strtotime($e->date_embauche));
+    $annees[$annee] = true;
+    if (!empty($e->site_affectation)) $sites[$e->site_affectation] = true;
+
+    $nat = $e->nationalite ?? 'Burundaise';
+
+    $lignes[] = (object) [
+        'e'           => $e,
+        'ordre'       => $ordre,
+        'age'         => $age,
+        'nat_code'    => $CODES_NAT[$nat] ?? $nat,
+        'nat'         => $nat,
+        'date_sortie' => $date_sortie,
+        'cause'       => $cause,
+        'sorti'       => $sorti,
+        'situation'   => $situation,
+        'annee'       => $annee,
+        'search'      => mb_strtolower(implode(' ', array_filter([
+            $e->matricule,
+            $e->nom,
+            $e->prenoms,
+            $e->fonction,
+            $e->cnid,
+            $e->matricule_inss,
+            $e->telephone,
+            $e->email,
+            $e->assurance_maladie ?? '',
+        ]))),
+    ];
+}
+krsort($annees);
+ksort($sites);
+$total = count($lignes);
+
+$fd = function ($d) {
+    return $d ? date('d/m/Y', strtotime($d)) : '';
+};   // format date
+$v  = function ($x) {
+    return ($x === null || $x === '') ? '' : html_escape($x);
+};
+?>
+
+<!-- Content Wrapper -->
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
+    <div class="content-header no-print">
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1 class="m-0"><?= $title ?></h1>
+                    <h1 class="m-0"><?= html_escape($title) ?></h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="<?= base_url() ?>">Home</a></li>
-                        <li class="breadcrumb-item active"><?= $title ?></li>
+                        <li class="breadcrumb-item active"><?= html_escape($title) ?></li>
                     </ol>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
 
-            <!-- ============ STYLE LOCAL (page registre) ============ -->
+            <!-- =================================================================
+                 STYLES
+                 ================================================================= -->
             <style>
-            .registre-table th {
-                background: #f4f6f9;
-                font-size: .82rem;
-                text-transform: uppercase;
-                letter-spacing: .02em;
-            }
-
-            .registre-table td {
-                font-size: .9rem;
-            }
-
             .section-title {
                 color: #1f7a5c;
                 font-weight: 700;
@@ -50,59 +145,196 @@
                 display: none;
             }
 
+            /* --- Tableau façon registre papier --- */
+            .registre-papier {
+                border-collapse: collapse;
+                width: 100%;
+                font-size: .84rem;
+                background: #fff;
+            }
+
+            .registre-papier th,
+            .registre-papier td {
+                border: 1px solid #9aa5ad;
+                padding: .35rem .45rem;
+                vertical-align: middle;
+            }
+
+            .registre-papier thead th {
+                background: #f4f6f9;
+                font-weight: 700;
+                text-align: center;
+                font-size: .76rem;
+                line-height: 1.2;
+            }
+
+            .registre-papier thead tr.groupes th {
+                background: #1f7a5c;
+                color: #fff;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                font-size: .72rem;
+            }
+
+            .registre-papier thead tr.groupes th.grp-f2 {
+                background: #5c6f7b;
+            }
+
+            .registre-papier td.c {
+                text-align: center;
+            }
+
+            .registre-papier td.nw {
+                white-space: nowrap;
+            }
+
+            .registre-papier td.ordre {
+                font-weight: 700;
+                text-align: center;
+                color: #1f7a5c;
+            }
+
+            .registre-papier td.nom {
+                white-space: nowrap;
+            }
+
+            .registre-papier td.nom strong {
+                letter-spacing: .02em;
+            }
+
+            .registre-papier tbody tr:nth-child(even) {
+                background: #fafbfc;
+            }
+
+            .registre-papier tbody tr:hover {
+                background: #eef7f3;
+            }
+
+            .registre-papier tr.sorti td {
+                color: #6c757d;
+            }
+
+            .registre-papier tr.sorti td.sortie {
+                color: #8a3033;
+                font-weight: 600;
+            }
+
+            .registre-papier .sep-f2 {
+                border-left: 3px solid #5c6f7b !important;
+            }
+
+            .registre-masque-f2 .col-f2 {
+                display: none;
+            }
+
+            .legende {
+                font-size: .78rem;
+                color: #6c757d;
+            }
+
+            /* --- Impression : A4 paysage, comme le registre papier --- */
+            @page {
+                size: A4 landscape;
+                margin: 8mm;
+            }
+
             @media print {
                 .print-only {
                     display: block !important;
                 }
 
-                .no-print {
+                .no-print,
+                .main-sidebar,
+                .main-header,
+                .main-footer,
+                .info-box {
                     display: none !important;
                 }
 
+                .content-wrapper {
+                    margin-left: 0 !important;
+                    background: #fff !important;
+                }
+
                 .card {
-                    border: 1px solid #000 !important;
+                    border: none !important;
                     box-shadow: none !important;
                 }
 
-                .info-box {
-                    break-inside: avoid;
+                .card-body,
+                .container-fluid {
+                    padding: 0 !important;
                 }
 
-                .registre-table tbody tr {
-                    break-inside: avoid;
+                .table-responsive {
+                    overflow: visible !important;
                 }
+
+                .registre-papier {
+                    font-size: 7.5pt;
+                }
+
+                .registre-papier th,
+                .registre-papier td {
+                    border: 1px solid #000 !important;
+                    padding: 2px 3px;
+                    color: #000 !important;
+                }
+
+                .registre-papier thead {
+                    display: table-header-group;
+                }
+
+                .registre-papier thead th,
+                .registre-papier thead tr.groupes th {
+                    background: #fff !important;
+                    color: #000 !important;
+                }
+
+                .registre-papier tbody tr {
+                    break-inside: avoid;
+                    background: #fff !important;
+                }
+
+                .registre-entete-papier {
+                    display: flex !important;
+                }
+            }
+
+            .registre-entete-papier {
+                display: none;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 8px;
+            }
+
+            .registre-entete-papier .titre {
+                font-weight: 700;
+                font-size: 13pt;
+            }
+
+            .registre-entete-papier .sous-titre {
+                text-align: center;
+                font-size: 9pt;
+            }
+
+            .registre-entete-papier .visa {
+                border: 1px dashed #000;
+                border-radius: 50%;
+                width: 170px;
+                height: 70px;
+                font-size: 8pt;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
             }
             </style>
 
-            <?php
-            /* ----- Dernière sortie par employé (démission, licenciement, fin de contrat, retraite) ----- */
-            $sorties = [];
-            foreach ($mouvements as $m) {
-                if (
-                    in_array($m->type_mouvement, ['Démission', 'Licenciement', 'Fin de contrat', 'Retraite'])
-                    && !isset($sorties[$m->employe_id])
-                ) {
-                    $sorties[$m->employe_id] = $m;   // mouvements triés DESC → 1er rencontré = le plus récent
-                }
-            }
-
-            $badge_type = ['CDI' => 'success', 'CDD' => 'warning', 'Stage' => 'info'];
-
-            /* ----- Indicateurs ----- */
-            $total = count($employes);
-            $en_service = $nb_actifs = $nb_conge = $nb_sortis = 0;
-            foreach ($employes as $e) {
-                if ($e->statut === 'Fin de contrat') {
-                    $nb_sortis++;
-                    continue;
-                }
-                $en_service++;
-                ($e->statut === 'En congé') ? $nb_conge++ : $nb_actifs++;
-            }
-            ?>
-
-            <!-- ============ 1. INDICATEURS DU REGISTRE ============ -->
-            <div class="row">
+            <!-- =================================================================
+                 1. INDICATEURS
+                 ================================================================= -->
+            <div class="row no-print">
                 <div class="col-lg-4 col-6">
                     <div class="info-box">
                         <span class="info-box-icon bg-success"><i class="fas fa-book"></i></span>
@@ -118,8 +350,8 @@
                         <span class="info-box-icon bg-info"><i class="fas fa-user-check"></i></span>
                         <div class="info-box-content">
                             <span class="info-box-text">En service</span>
-                            <span class="info-box-number"><?= $en_service ?></span>
-                            <span class="progress-description"><?= $nb_actifs ?> actifs · <?= $nb_conge ?> en
+                            <span class="info-box-number"><?= $nb_service + $nb_conge ?></span>
+                            <span class="progress-description"><?= $nb_service ?> en poste · <?= $nb_conge ?> en
                                 congé</span>
                         </div>
                     </div>
@@ -130,14 +362,16 @@
                         <div class="info-box-content">
                             <span class="info-box-text">Sortis</span>
                             <span class="info-box-number"><?= $nb_sortis ?></span>
-                            <span class="progress-description">Démission · retraite · fin de contrat</span>
+                            <span class="progress-description">Démission · retraite · fin de contrat…</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ============ 2. IDENTITÉ DE L'EMPLOYEUR + RAPPEL LÉGAL ============ -->
-            <div class="row">
+            <!-- =================================================================
+                 2. IDENTITÉ DE L'EMPLOYEUR + RAPPEL LÉGAL
+                 ================================================================= -->
+            <div class="row no-print">
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-header">
@@ -175,9 +409,11 @@
                                 Obligation légale</h6>
                             <p class="mb-2 text-justify" style="font-size:.88rem">
                                 Conformément au <strong>Code du travail de la République du Burundi</strong> et à ses
-                                mesures d'application, tout employeur est tenu de tenir un <strong>registre du
-                                    personnel</strong> à jour, à présenter à toute réquisition de l'<strong>Inspection
-                                    Générale du Travail</strong> et de l'<strong>OBEM</strong>.
+                                mesures
+                                d'application, tout employeur est tenu de tenir un <strong>registre du
+                                    personnel</strong> à jour,
+                                à présenter à toute réquisition de l'<strong>Inspection Générale du Travail</strong> et
+                                de l'<strong>OBEM</strong>.
                             </p>
                             <ul class="mb-0 pl-3" style="font-size:.85rem">
                                 <li>Inscrire tout travailleur dès son embauche ;</li>
@@ -190,156 +426,188 @@
                 </div>
             </div>
 
-            <!-- ============ 3. REGISTRE DU PERSONNEL ============ -->
+            <!-- =================================================================
+                 3. REGISTRE GÉNÉRAL D'EMPLOI
+                 ================================================================= -->
             <div class="card">
-                <div class="card-header">
+                <div class="card-header no-print">
                     <div class="d-flex justify-content-between align-items-center flex-wrap">
-                        <h3 class="card-title mb-0"><i class="fas fa-book mr-1 text-success"></i> Registre du personnel
+                        <h3 class="card-title mb-0"><i class="fas fa-book mr-1 text-success"></i> Registre général
+                            d'emploi
+                            <small class="text-muted ml-1">— ordre d'entrée en service</small>
                         </h3>
-                        <div class="no-print">
-                            <div class="btn-group mr-2">
-                                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                                    <i class="fas fa-download mr-1"></i> Exporter
-                                </button>
-                                <div class="dropdown-menu dropdown-menu-right">
-                                    <a class="dropdown-item" href="#"><i
-                                            class="fas fa-file-excel mr-2 text-success"></i>Excel</a>
-                                    <a class="dropdown-item" href="#"><i
-                                            class="fas fa-file-pdf mr-2 text-danger"></i>PDF</a>
-                                </div>
+                        <div>
+                            <div class="custom-control custom-switch d-inline-block mr-3 align-middle">
+                                <input type="checkbox" class="custom-control-input" id="toggleF2" checked>
+                                <label class="custom-control-label" for="toggleF2">Afficher les compléments</label>
                             </div>
-                            <button type="button" class="btn btn-success" onclick="window.print()">
+                            <button type="button" class="btn btn-default mr-2" id="btnCsvRegistre">
+                                <i class="fas fa-file-excel mr-1 text-success"></i> Excel (CSV)
+                            </button>
+                            <button type="button" class="btn btn-success" id="btnPrintRegistre">
                                 <i class="fas fa-print mr-1"></i> Imprimer le registre
                             </button>
                         </div>
                     </div>
 
                     <!-- Filtres -->
-                    <div class="row mt-3 no-print">
-                        <div class="col-md-5 mb-2">
+                    <div class="row mt-3">
+                        <div class="col-lg-4 col-md-12 mb-2">
                             <div class="input-group">
                                 <input type="search" id="searchRegistre" class="form-control"
-                                    placeholder="Rechercher (nom, matricule, CNID…)">
+                                    placeholder="Rechercher (nom, matricule, INSS, CNI, téléphone…)">
                                 <div class="input-group-append"><span class="input-group-text"><i
                                             class="fas fa-search"></i></span></div>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-2">
-                            <select id="filterSite" class="form-control">
-                                <option value="">Site : tous</option>
-                                <option>Siège (Bujumbura)</option>
-                                <option>Chantier Ngagara II</option>
-                                <option>Chantier Gitega</option>
-                                <option>Chantier Ngozi</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 mb-2">
+                        <div class="col-lg-2 col-md-3 mb-2">
                             <select id="filterSituation" class="form-control">
-                                <option value="">Situation : tous</option>
+                                <option value="">Situation : toutes</option>
                                 <option>En service</option>
                                 <option>En congé</option>
+                                <option>Suspendu</option>
                                 <option>Sorti</option>
                             </select>
                         </div>
-                        <div class="col-md-2 mb-2">
+                        <div class="col-lg-2 col-md-3 mb-2">
                             <select id="filterCategorie" class="form-control">
-                                <option value="">Catégorie : tous</option>
+                                <option value="">Catégorie : toutes</option>
                                 <option>Bureau</option>
                                 <option>Chantier</option>
                             </select>
                         </div>
+                        <div class="col-lg-2 col-md-3 mb-2">
+                            <select id="filterSite" class="form-control">
+                                <option value="">Site : tous</option>
+                                <?php foreach (array_keys($sites) as $s): ?>
+                                <option value="<?= html_escape($s) ?>"><?= html_escape($s) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-3 mb-2">
+                            <select id="filterAnnee" class="form-control">
+                                <option value="">Entrée : toutes années</option>
+                                <?php foreach (array_keys($annees) as $a): ?>
+                                <option value="<?= $a ?>"><?= $a ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-body table-responsive p-0">
-                    <table class="table table-hover table-striped text-nowrap registre-table">
-                        <thead>
-                            <tr>
-                                <th>N°</th>
-                                <th>Matricule</th>
-                                <th>Nom &amp; prénoms</th>
-                                <th>Sexe</th>
-                                <th>Date de naissance</th>
-                                <th>N° CNID</th>
-                                <th>Fonction</th>
-                                <th>Cat.</th>
-                                <th>Affectation</th>
-                                <th>Embauche</th>
-                                <th>Contrat</th>
-                                <th>N° INSS</th>
-                                <th>Situation</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $n = 0;
-                            foreach ($employes as $e): $n++;
-                                $sexe   = ($e->sexe === 'Féminin') ? 'F' : 'M';
-                                $sorti  = isset($sorties[$e->employe_id]) ? $sorties[$e->employe_id] : NULL;
-                                $affect = ($e->categorie === 'Chantier') ? $e->site_affectation : $e->departement;
-                            ?>
-                            <tr data-site="<?= html_escape($affect) ?>"
-                                data-categorie="<?= html_escape($e->categorie) ?>"
-                                data-situation="<?= $sorti ? 'Sorti' : ($e->statut === 'Fin de contrat' ? 'Sorti' : ($e->statut === 'En congé' ? 'En congé' : 'En service')) ?>">
-                                <td><?= $n ?></td>
-                                <td><strong><?= html_escape($e->matricule) ?></strong></td>
-                                <td><?= html_escape(mb_strtoupper($e->nom) . ' ' . $e->prenoms) ?></td>
-                                <td><?= $sexe ?></td>
-                                <td><?= $e->date_naissance ? date('d/m/Y', strtotime($e->date_naissance)) : '—' ?></td>
-                                <td><?= html_escape($e->cnid ?: '—') ?></td>
-                                <td><?= html_escape($e->fonction) ?></td>
-                                <td><?= html_escape($e->categorie) ?></td>
-                                <td><?= html_escape($affect) ?></td>
-                                <td><?= date('d/m/Y', strtotime($e->date_embauche)) ?></td>
-                                <td><span
-                                        class="badge badge-<?= $badge_type[$e->type_contrat] ?? 'secondary' ?>"><?= $e->type_contrat ?></span>
-                                </td>
-                                <td><?= html_escape($e->matricule_inss ?: '—') ?></td>
-                                <td>
-                                    <?php if ($sorti): ?>
-                                    <span class="badge badge-secondary">Sorti —
-                                        <?= strtolower($sorti->type_mouvement) ?>
-                                        <?= date('d/m/Y', strtotime($sorti->date_effet)) ?></span>
-                                    <?php elseif ($e->statut === 'Fin de contrat'): ?>
-                                    <span class="badge badge-secondary">Sorti</span>
-                                    <?php elseif ($e->statut === 'En congé'): ?>
-                                    <span class="badge badge-info">En congé</span>
-                                    <?php elseif ($e->statut === 'Suspendu'): ?>
-                                    <span class="badge badge-warning">Suspendu</span>
-                                    <?php else: ?>
-                                    <span class="badge badge-success">En service</span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
+                <div class="card-body">
+                    <!-- En-tête reproduit du registre papier (impression) -->
+                    <div class="registre-entete-papier">
+                        <div>
+                            <div class="titre">REGISTRE GÉNÉRAL D'EMPLOI</div>
+                            <div style="font-size:9pt">SATRACO Construction · INSS employeur E-10245 · OBR 400 987 654
+                            </div>
+                        </div>
+                        <div class="sous-titre">Liste nominative des travailleurs, inscrits dans l'ordre<br>de leur
+                            entrée en service</div>
+                        <div class="text-center">
+                            <div style="font-size:10pt" class="mb-1">N° ..................</div>
+                            <!-- <div class="visa">Cachet &amp; visa<br>Inspection du Travail</div> -->
+                        </div>
+                    </div>
 
-                <div class="card-footer clearfix">
-                    <small class="text-muted float-left mt-2">
-                        Registre mis à jour le <?= date('d/m/Y') ?> · Affichage de <?= $total ?>
-                        inscrit<?= $total > 1 ? 's' : '' ?>
-                    </small>
-                    <ul class="pagination pagination-sm float-right mb-0 no-print">
-                        <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
-                    </ul>
+                    <div class="table-responsive">
+                        <table class="registre-papier" id="tableRegistre">
+                            <thead>
+                                <tr class="groupes">
+                                    <th colspan="12">Registre général d'emploi</th>
+                                    <th colspan="6" class="col-f2 grp-f2 sep-f2">Compléments</th>
+                                </tr>
+                                <tr>
+                                    <th>Matricule</th>
+                                    <th>N°<br>d'ordre</th>
+                                    <th>Nom et Prénom</th>
+                                    <th>Âge</th>
+                                    <th>Sexe</th>
+                                    <th>Nationalité</th>
+                                    <th>Qualification<br>professionnelle</th>
+                                    <th>Date<br>d'entrée</th>
+                                    <th>N° INSS</th>
+                                    <th>Assurance<br>Maladie-Maternité</th>
+                                    <th>Date de<br>sortie</th>
+                                    <th>Cause de<br>cessation</th>
+                                    <th class="col-f2 sep-f2">Date de<br>naissance</th>
+                                    <th class="col-f2">N° CNI</th>
+                                    <th class="col-f2">Cat.</th>
+                                    <th class="col-f2">Site<br>d'affectation</th>
+                                    <th class="col-f2">N° téléphone</th>
+                                    <th class="col-f2">E-mail prof.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($lignes)): ?>
+                                <tr>
+                                    <td colspan="18" class="text-center text-muted py-4">Aucun travailleur inscrit au
+                                        registre.</td>
+                                </tr>
+                                <?php endif; ?>
+                                <?php foreach ($lignes as $l): $e = $l->e; ?>
+                                <tr class="reg-row<?= $l->sorti ? ' sorti' : '' ?>"
+                                    data-situation="<?= $l->situation ?>"
+                                    data-categorie="<?= html_escape($e->categorie) ?>"
+                                    data-site="<?= html_escape($e->site_affectation) ?>" data-annee="<?= $l->annee ?>"
+                                    data-search="<?= html_escape($l->search) ?>">
+                                    <td class="nw"><strong><?= html_escape($e->matricule) ?></strong></td>
+                                    <td class="ordre"><?= $l->ordre ?></td>
+                                    <td class="nom"><strong><?= html_escape(mb_strtoupper($e->nom)) ?></strong>
+                                        <?= html_escape($e->prenoms) ?></td>
+                                    <td class="c"><?= $l->age !== null ? $l->age : '' ?></td>
+                                    <td class="c"><?= $e->sexe === 'Féminin' ? 'F' : 'M' ?></td>
+                                    <td class="c" title="<?= html_escape($l->nat) ?>"><?= html_escape($l->nat_code) ?>
+                                    </td>
+                                    <td><?= $v($e->fonction) ?></td>
+                                    <td class="nw c"><?= $fd($e->date_embauche) ?></td>
+                                    <td class="nw"><?= $v($e->matricule_inss) ?></td>
+                                    <td><?= $v($e->assurance_maladie ?? '') ?></td>
+                                    <td class="nw c sortie"><?= $fd($l->date_sortie) ?></td>
+                                    <td class="sortie"><?= $v($l->cause) ?></td>
+                                    <td class="nw c col-f2 sep-f2"><?= $fd($e->date_naissance) ?></td>
+                                    <td class="nw col-f2"><?= $v($e->cnid) ?></td>
+                                    <td class="c col-f2"><?= $e->categorie === 'Chantier' ? 'Chantier' : 'Bureau' ?>
+                                    </td>
+                                    <td class="col-f2"><?= $v($e->site_affectation) ?></td>
+                                    <td class="nw col-f2"><?= $v($e->telephone) ?></td>
+                                    <td class="col-f2"><?= $v($e->email) ?></td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <tr id="regVide" style="display:none">
+                                    <td colspan="18" class="text-center text-muted py-4"><i
+                                            class="fas fa-filter mr-1"></i>Aucun travailleur ne correspond aux filtres.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="d-flex justify-content-between flex-wrap mt-2">
+                        <span class="legende">
+                            Âge = âge à l'entrée en service · Nationalité : B = Burundaise, RW = Rwandaise, RDC =
+                            Congolaise,
+                            TZ = Tanzanienne, UG = Ougandaise, KE = Kényane
+                        </span>
+                        <span class="legende" id="regCompteur">Registre mis à jour le <?= date('d/m/Y') ?> ·
+                            <?= $total ?> inscrit<?= $total > 1 ? 's' : '' ?></span>
+                    </div>
                 </div>
             </div>
 
-            <!-- ============ 4. BLOC DE SIGNATURES (visible uniquement à l'impression) ============ -->
+            <!-- =================================================================
+                 4. SIGNATURES (impression uniquement)
+                 ================================================================= -->
             <div class="print-only mt-4">
-                <p class="mb-4">Fait à Bujumbura, le <?= date('d/m/Y') ?></p>
+                <p class="mb-4">Arrêté le présent registre à <?= $total ?> inscrit<?= $total > 1 ? 's' : '' ?>. Fait à
+                    Bujumbura, le <?= date('d/m/Y') ?></p>
                 <div class="row text-center">
-                    <div class="col-6">
-                        <strong>Le Responsable RH</strong><br><br><br>
-                        ______________________
+                    <div class="col-4"><strong>Le Responsable RH</strong><br><br><br>______________________</div>
+                    <div class="col-4"><strong>Pour la Direction Générale</strong><br><br><br>______________________
                     </div>
-                    <div class="col-6">
-                        <strong>Pour la Direction Générale</strong><br><br><br>
-                        ______________________
-                    </div>
+                    <div class="col-4"><strong>Visa de l'Inspection du
+                            Travail</strong><br><br><br>______________________</div>
                 </div>
             </div>
 
@@ -349,37 +617,86 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    var table = document.getElementById('tableRegistre');
+    var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr.reg-row'));
+    var total = rows.length;
+    var $ = function(id) {
+        return document.getElementById(id);
+    };
 
-    /* ===== Recherche textuelle ===== */
-    var s = document.getElementById('searchRegistre');
-    if (s) {
-        s.addEventListener('keyup', filtrer);
+    /* ---------- Filtres ---------- */
+    function filtrer() {
+        var q = $('searchRegistre').value.toLowerCase().trim();
+        var sit = $('filterSituation').value;
+        var cat = $('filterCategorie').value;
+        var site = $('filterSite').value;
+        var an = $('filterAnnee').value;
+        var n = 0;
+
+        rows.forEach(function(tr) {
+            var d = tr.dataset;
+            var ok = (!q || d.search.indexOf(q) !== -1) && (!sit || d.situation === sit) &&
+                (!cat || d.categorie === cat) && (!site || d.site === site) && (!an || d.annee === an);
+            tr.style.display = ok ? '' : 'none';
+            if (ok) n++;
+        });
+
+        $('regVide').style.display = (n === 0 && total > 0) ? '' : 'none';
+        $('regCompteur').textContent = 'Registre mis à jour le <?= date('d/m/Y') ?> · ' +
+            (n === total ? total + ' inscrit' + (total > 1 ? 's' : '') : n + ' affiché' + (n > 1 ? 's' : '') +
+                ' sur ' + total);
     }
 
-    /* ===== Filtres par select (site, situation, catégorie) ===== */
-    ['filterSite', 'filterSituation', 'filterCategorie'].forEach(function(id) {
-        var el = document.getElementById(id);
-        if (el) el.addEventListener('change', filtrer);
+    $('searchRegistre').addEventListener('input', filtrer);
+    ['filterSituation', 'filterCategorie', 'filterSite', 'filterAnnee'].forEach(function(id) {
+        $(id).addEventListener('change', filtrer);
     });
 
-    function filtrer() {
-        var q = (s ? s.value : '').toLowerCase();
-        var sit = document.getElementById('filterSite');
-        var sts = document.getElementById('filterSituation');
-        var cat = document.getElementById('filterCategorie');
+    /* ---------- Afficher / masquer la feuille 2 (compléments) ---------- */
+    $('toggleF2').addEventListener('change', function() {
+        table.classList.toggle('registre-masque-f2', !this.checked);
+    });
 
-        var fSite = sit ? sit.value : '';
-        var fStat = sts ? sts.value : '';
-        var fCat = cat ? cat.value : '';
+    /* ---------- Impression ---------- */
+    $('btnPrintRegistre').addEventListener('click', function() {
+        window.print();
+    });
 
-        document.querySelectorAll('.registre-table tbody tr').forEach(function(tr) {
-            var txt = tr.textContent.toLowerCase();
-            var txtOk = !q || txt.indexOf(q) !== -1;
-            var siteOk = !fSite || tr.dataset.site === fSite;
-            var catOk = !fCat || tr.dataset.categorie === fCat;
-            var statOk = !fStat || tr.dataset.situation === fStat;
-            tr.style.display = (txtOk && siteOk && catOk && statOk) ? '' : 'none';
+    /* ---------- Export CSV : colonnes et lignes affichées, dans l'ordre du registre ---------- */
+    $('btnCsvRegistre').addEventListener('click', function() {
+        var avecF2 = $('toggleF2').checked;
+        var garder = function(cell) {
+            return avecF2 || !cell.classList.contains('col-f2');
+        };
+        var cel = function(t) {
+            return '"' + String(t).replace(/\s+/g, ' ').trim().replace(/"/g, '""') + '"';
+        };
+
+        var entetes = Array.prototype.slice.call(table.querySelectorAll('thead tr:last-child th'))
+            .filter(garder).map(function(th) {
+                return cel(th.innerText);
+            });
+        var lignes = [entetes.join(';')];
+
+        rows.forEach(function(tr) {
+            if (tr.style.display === 'none') return;
+            lignes.push(Array.prototype.slice.call(tr.cells).filter(garder)
+                .map(function(td) {
+                    return cel(td.innerText);
+                }).join(';'));
         });
-    }
+
+        var blob = new Blob(['\ufeff' + lignes.join('\r\n')], {
+            type: 'text/csv;charset=utf-8;'
+        });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'registre_general_emploi_' + new Date().toISOString().slice(0, 10) + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+    });
+
+    filtrer();
 });
 </script>

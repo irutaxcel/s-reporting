@@ -3288,4 +3288,1255 @@ class TechModel extends CI_Model
 
         return $stats;
     }
+
+        // ============================================================
+    // COÛT RÉEL & RENTABILITÉ (Direction Technique)
+    // Sans modification de schéma : les postes sont déduits de la
+    // désignation des lignes de DA, montant payé réparti au prorata.
+    // ============================================================
+
+    /** Mots-clés (désignation de ligne de DA) => poste "Engins & carburant" */
+    private $crMotsEngins = [
+        'gasoil',
+        'gazoil',
+        'gas-oil',
+        'gas oil',
+        'carburant',
+        'essence',
+        'diesel',
+        'mazout',
+        'lubrifiant',
+        'huile',
+        'graisse',
+        'vidange',
+        'pneu',
+        'chambre a air',
+        'batterie',
+        'filtre a',
+        'filtre gasoil',
+        'filtre huile',
+        'engin',
+        'camion',
+        'tracteur',
+        'bulldozer',
+        'niveleuse',
+        'pelleteuse',
+        'pelle hydraulique',
+        'chargeuse',
+        'compacteur',
+        'rouleau compresseur',
+        'grue',
+        'benne',
+        'location machine',
+        'location de machine',
+    ];
+
+    /** Mots-clés => poste "Sous-traitance" (les noms des sous-traitants sont ajoutés automatiquement) */
+    private $crMotsSousTraitance = [
+        'sous-trait',
+        'sous trait',
+        'soustrait',
+        'prestation',
+        'tacheron',
+        'tâcheron',
+        "main d'oeuvre",
+        "main d'œuvre",
+        'main d oeuvre',
+        "main-d'oeuvre",
+        'main d’oeuvre',
+    ];
+
+    /** category_type des DA qui ne sont PAS des coûts de chantier */
+    private $crCategoriesExclues = ['fonctionnement'];
+
+    /** status_label des contrats main-d'œuvre exclus du coût (minuscules) */
+    private $crContratsExclus = ['annule', 'annulé', 'resilie', 'résilié', 'rejete', 'rejeté'];
+
+    /** % de budget consommé à partir duquel un chantier passe "À surveiller" */
+    private $crSeuilSurveillance = 90;
+
+    /** Points d'écart tolérés entre % budget consommé et % temps écoulé */
+    private $crToleranceAvancement = 15;
+
+    private $crMotsStCache = null;
+
+    private function crInList(array $values)
+    {
+        return implode(',', array_map([$this->db, 'escape'], $values));
+    }
+
+    /** ( col LIKE '%mot1%' OR col LIKE '%mot2%' ... ) — insensible casse/accents en *_general_ci
+     *  Les apostrophes sont doublées ('') et non échappées par \' : sinon CodeIgniter
+     *  se trompe en repérant les chaînes et casse le remplacement des « ? » de la requête. */
+    private function crLikeAny($col, array $mots)
+    {
+        $parts = [];
+        foreach ($mots as $m) {
+            $m = trim((string) $m);
+            if ($m === '') {
+                continue;
+            }
+            $motif   = '%' . $this->db->escape_like_str($m) . '%';
+            $motif   = str_replace(['\\', "'"], ['\\\\', "''"], $motif);
+            $parts[] = $col . " LIKE '" . $motif . "' ESCAPE '!'";
+        }
+        return $parts ? '(' . implode(' OR ', $parts) . ')' : '(0)';
+    }
+
+    /** Mots sous-traitance + noms des sous-traitants enregistrés */
+    private function crMotsSousTraitanceComplets($companyId = 0)
+    {
+        if ($this->crMotsStCache !== null) {
+            return $this->crMotsStCache;
+        }
+        $this->db->select('name')->from('subcontractors');
+        if ($companyId > 0) {
+            $this->db->where('company_id', $companyId);
+        }
+        $noms = [];
+        foreach ($this->db->get()->result_array() as $s) {
+            $nom = trim((string) $s['name']);
+            if (mb_strlen($nom, 'UTF-8') >= 4) {   // évite les noms trop courts qui matcheraient tout
+                $noms[] = $nom;
+            }
+        }
+        return $this->crMotsStCache = array_merge($this->crMotsSousTraitance, $noms);
+    }
+
+    /** Sous-requête : par DA, montant total des lignes et part engins / sous-traitance */
+    private function crSqlVentilation($companyId = 0)
+    {
+        $eng = $this->crLikeAny('i.designation', $this->crMotsEngins);
+        $st  = $this->crLikeAny('i.designation', $this->crMotsSousTraitanceComplets($companyId));
+
+        return "SELECT i.request_id,
+                    SUM(i.total_price) AS total_items,
+                    SUM(CASE WHEN $eng THEN i.total_price ELSE 0 END) AS items_engins,
+                    SUM(CASE WHEN NOT $eng AND $st THEN i.total_price ELSE 0 END) AS items_st
+                FROM purchase_request_items i
+                GROUP BY i.request_id";
+    }
+
+    /** Liste des chantiers pour le filtre */
+    public function getChantiersPourFiltreCoutReel($companyId = 0)
+    {
+        $this->db->select('id, ref_chantier, name')->from('chantiers');
+        if ($companyId > 0) {
+            $this->db->where('company_id', $companyId);
+        }
+        return $this->db->order_by('name', 'ASC')->get()->result_array();
+    }
+
+    /**
+     * Coût réel par chantier et par poste + indicateurs calculés.
+     * $filters : company_id, chantier_id, date_debut, date_fin (Y-m-d), statut
+     */
+    public function getCoutReelRentabilite(array $filters = [])
+    {
+        $companyId    = (int) ($filters['company_id'] ?? 0);
+        $horsChantier = $this->crInList($this->crCategoriesExclues);
+        $exclus       = $this->crInList($this->crContratsExclus);
+        $ventil       = $this->crSqlVentilation($companyId);
+        $binds        = [];
+
+        // 1) Achats payés, répartis par poste au prorata des lignes de la DA
+        $sqlAchats = "SELECT f.chantier_id,
+                SUM(v.amount_paid * COALESCE(r.items_engins / NULLIF(r.total_items, 0), 0)) AS cout_engins,
+                SUM(v.amount_paid * COALESCE(r.items_st     / NULLIF(r.total_items, 0), 0)) AS cout_sous_traitance,
+                SUM(v.amount_paid * (1 - COALESCE((r.items_engins + r.items_st) / NULLIF(r.total_items, 0), 0))) AS cout_materiaux
+            FROM purchase_payment_vouchers v
+            INNER JOIN purchase_request_forms f ON f.id = v.request_id
+            LEFT JOIN ($ventil) r ON r.request_id = f.id
+            WHERE COALESCE(v.payment_status, 'effectue') = 'effectue'
+              AND f.chantier_id > 0
+              AND LOWER(f.category_type) NOT IN ($horsChantier)";
+        if (!empty($filters['date_debut'])) {
+            $sqlAchats .= " AND v.payment_date >= ?";
+            $binds[] = $filters['date_debut'];
+        }
+        if (!empty($filters['date_fin'])) {
+            $sqlAchats .= " AND v.payment_date <= ?";
+            $binds[] = $filters['date_fin'];
+        }
+        $sqlAchats .= " GROUP BY f.chantier_id";
+
+        // 2) Main-d'œuvre : montant de paie = unit_rate (comme la page "Suivie Paie Chantier").
+        //    contract_amount est toujours enregistré à 0 par storePersonnelChantier().
+        $debutMo = "COALESCE(w.start_date, DATE(w.created_at))";
+        $finMo   = "COALESCE(w.end_date, w.start_date, DATE(w.created_at))";
+        $sqlMo = "SELECT w.chantier_id, SUM(w.unit_rate) AS cout_main_oeuvre
+            FROM workforce_contracts w
+            WHERE w.chantier_id > 0
+              AND LOWER(w.status_label) NOT IN ($exclus)";
+        if (!empty($filters['date_fin'])) {
+            $sqlMo .= " AND $debutMo <= ?";
+            $binds[] = $filters['date_fin'];
+        }
+        if (!empty($filters['date_debut'])) {
+            $sqlMo .= " AND $finMo >= ?";
+            $binds[] = $filters['date_debut'];
+        }
+        $sqlMo .= " GROUP BY w.chantier_id";
+
+        // 3) Requête principale
+        $sql = "SELECT c.id, c.ref_chantier, c.name, c.budget, c.date_debut, c.date_fin_prevue, c.status,
+                    p.name AS projet_name,
+                    COALESCE(a.cout_materiaux, 0)      AS cout_materiaux,
+                    COALESCE(m.cout_main_oeuvre, 0)    AS cout_main_oeuvre,
+                    COALESCE(a.cout_engins, 0)         AS cout_engins,
+                    COALESCE(a.cout_sous_traitance, 0) AS cout_sous_traitance
+                FROM chantiers c
+                LEFT JOIN projects p ON p.id = c.project_id
+                LEFT JOIN ($sqlAchats) a ON a.chantier_id = c.id
+                LEFT JOIN ($sqlMo) m     ON m.chantier_id = c.id
+                WHERE 1 = 1";
+        if ($companyId > 0) {
+            $sql .= " AND c.company_id = ?";
+            $binds[] = $companyId;
+        }
+        if (!empty($filters['chantier_id'])) {
+            $sql .= " AND c.id = ?";
+            $binds[] = (int) $filters['chantier_id'];
+        }
+        $sql .= " ORDER BY c.name ASC";
+
+        $rows   = $this->db->query($sql, $binds)->result_array();
+        $result = [];
+        foreach ($rows as $r) {
+            $r = $this->crCalculerIndicateurs($r);
+            if (!empty($filters['statut']) && $r['statut'] !== $filters['statut']) {
+                continue;
+            }
+            $result[] = $r;
+        }
+        return $result;
+    }
+
+    private function crCalculerIndicateurs(array $r)
+    {
+        foreach (['budget', 'cout_materiaux', 'cout_main_oeuvre', 'cout_engins', 'cout_sous_traitance'] as $k) {
+            $r[$k] = round((float) $r[$k], 2);
+        }
+        $budget = $r['budget'];
+        $cout   = $r['cout_materiaux'] + $r['cout_main_oeuvre'] + $r['cout_engins'] + $r['cout_sous_traitance'];
+
+        $r['cout_total'] = $cout;
+        $r['ecart']      = $budget - $cout;
+        $r['marge_pct']  = $budget > 0 ? round(($budget - $cout) / $budget * 100, 1) : null;
+        $r['conso_pct']  = $budget > 0 ? round($cout / $budget * 100, 1) : null;
+
+        $r['temps_pct'] = null;
+        if (!empty($r['date_debut']) && !empty($r['date_fin_prevue'])) {
+            $debut = strtotime($r['date_debut']);
+            $fin   = strtotime($r['date_fin_prevue']);
+            if ($fin > $debut) {
+                $pct = (time() - $debut) / ($fin - $debut) * 100;
+                $r['temps_pct'] = round(max(0, min(100, $pct)), 1);
+            }
+        }
+
+        if ($budget <= 0) {
+            $r['statut'] = 'sans_budget';
+        } elseif ($cout > $budget) {
+            $r['statut'] = 'depassement';
+        } elseif (
+            $r['conso_pct'] >= $this->crSeuilSurveillance
+            || ($r['temps_pct'] !== null && $r['temps_pct'] < 100
+                && $r['conso_pct'] > $r['temps_pct'] + $this->crToleranceAvancement)
+        ) {
+            $r['statut'] = 'surveiller';
+        } else {
+            $r['statut'] = 'rentable';
+        }
+
+        $map = [
+            'rentable'    => ['Rentable', 'success'],
+            'surveiller'  => ['À surveiller', 'warning'],
+            'depassement' => ['Dépassement', 'danger'],
+            'sans_budget' => ['Sans budget', 'secondary'],
+        ];
+        $r['statut_label'] = $map[$r['statut']][0];
+        $r['statut_class'] = $map[$r['statut']][1];
+
+        return $r;
+    }
+
+    /** Totaux pour les tuiles, le pied de tableau et la répartition */
+    public function getCoutReelSynthese(array $rows)
+    {
+        $s = [
+            'nb_chantiers' => count($rows),
+            'budget' => 0,
+            'cout_materiaux' => 0,
+            'cout_main_oeuvre' => 0,
+            'cout_engins' => 0,
+            'cout_sous_traitance' => 0,
+            'cout_total' => 0,
+            'nb_depassement' => 0,
+            'nb_surveiller' => 0,
+        ];
+        foreach ($rows as $r) {
+            foreach (['budget', 'cout_materiaux', 'cout_main_oeuvre', 'cout_engins', 'cout_sous_traitance', 'cout_total'] as $k) {
+                $s[$k] += $r[$k];
+            }
+            if ($r['statut'] === 'depassement') $s['nb_depassement']++;
+            if ($r['statut'] === 'surveiller')  $s['nb_surveiller']++;
+        }
+        $s['ecart']     = $s['budget'] - $s['cout_total'];
+        $s['marge_pct'] = $s['budget'] > 0 ? round($s['ecart'] / $s['budget'] * 100, 1) : null;
+        return $s;
+    }
+
+    /** Détail d'un chantier : indicateurs + paiements ventilés + contrats */
+    public function getCoutReelDetailChantier($chantierId, array $filters = [])
+    {
+        $filters['chantier_id'] = (int) $chantierId;
+        $filters['statut']      = '';
+        $rows = $this->getCoutReelRentabilite($filters);
+        if (empty($rows)) {
+            return null;
+        }
+        $companyId = (int) ($filters['company_id'] ?? 0);
+
+        // Paiements avec leur ventilation par poste
+        $ventil = $this->crSqlVentilation($companyId);
+        $binds  = [(int) $chantierId];
+        $sql = "SELECT v.payment_number, v.payment_date, v.payment_mode, v.amount_paid, v.summary,
+                       f.id AS da_id, f.requested_by,
+                       COALESCE(r.total_items, 0) AS total_items,
+                       COALESCE(r.items_engins, 0) AS items_engins,
+                       COALESCE(r.items_st, 0) AS items_st
+                FROM purchase_payment_vouchers v
+                INNER JOIN purchase_request_forms f ON f.id = v.request_id
+                LEFT JOIN ($ventil) r ON r.request_id = f.id
+                WHERE f.chantier_id = ?
+                  AND COALESCE(v.payment_status, 'effectue') = 'effectue'
+                  AND LOWER(f.category_type) NOT IN (" . $this->crInList($this->crCategoriesExclues) . ")";
+        if (!empty($filters['date_debut'])) {
+            $sql .= " AND v.payment_date >= ?";
+            $binds[] = $filters['date_debut'];
+        }
+        if (!empty($filters['date_fin'])) {
+            $sql .= " AND v.payment_date <= ?";
+            $binds[] = $filters['date_fin'];
+        }
+        $sql .= " ORDER BY v.payment_date DESC, v.id DESC";
+
+        $paiements = $this->db->query($sql, $binds)->result_array();
+        foreach ($paiements as &$p) {
+            $tot = (float) $p['total_items'];
+            $re  = $tot > 0 ? (float) $p['items_engins'] / $tot : 0;
+            $rs  = $tot > 0 ? (float) $p['items_st'] / $tot : 0;
+            $rm  = max(0, 1 - $re - $rs);
+
+            $p['amount_paid'] = (float) $p['amount_paid'];
+            $parts = array_filter([
+                'Mat.' => $rm,
+                'Engins' => $re,
+                'S-trait.' => $rs,
+            ], function ($x) {
+                return $x > 0.0005;
+            });
+
+            if (count($parts) <= 1) {
+                $cle = key($parts) ?: 'Mat.';
+                $p['poste'] = ['Mat.' => 'Matériaux & achats', 'Engins' => 'Engins & carburant', 'S-trait.' => 'Sous-traitance'][$cle];
+            } else {
+                $txt = [];
+                foreach ($parts as $lbl => $x) {
+                    $txt[] = $lbl . ' ' . round($x * 100) . ' %';
+                }
+                $p['poste'] = 'Mixte : ' . implode(' / ', $txt);
+            }
+            unset($p['total_items'], $p['items_engins'], $p['items_st']);
+        }
+        unset($p);
+
+        // Contrats main-d'œuvre
+        $exclus = $this->crInList($this->crContratsExclus);
+        $binds  = [(int) $chantierId];
+        $sql = "SELECT worker_name, worker_type, function_name, start_date, end_date,
+                       pay_mode, unit_rate, contract_amount, status_label
+                FROM workforce_contracts
+                WHERE chantier_id = ? AND LOWER(status_label) NOT IN ($exclus)";
+        if (!empty($filters['date_fin'])) {
+            $sql .= " AND COALESCE(start_date, DATE(created_at)) <= ?";
+            $binds[] = $filters['date_fin'];
+        }
+        if (!empty($filters['date_debut'])) {
+            $sql .= " AND COALESCE(end_date, start_date, DATE(created_at)) >= ?";
+            $binds[] = $filters['date_debut'];
+        }
+        $sql .= " ORDER BY start_date DESC, id DESC";
+        $contrats = $this->db->query($sql, $binds)->result_array();
+        foreach ($contrats as &$c) {
+            $c['unit_rate']       = (float) $c['unit_rate'];
+            $c['contract_amount'] = (float) $c['unit_rate']; // montant réel = unit_rate (contract_amount toujours à 0)
+        }
+        unset($c);
+
+        return [
+            'chantier'  => $rows[0],
+            'paiements' => $paiements,
+            'contrats'  => $contrats,
+        ];
+    }
+
+        // ============================================================
+    // ÉVALUATION CHANTIER (Direction Technique)
+    // Note de performance calculée à partir des données existantes :
+    // budget (coût réel), délais, suivi (journal de production),
+    // engins (pannes) et approvisionnement (DA payées livrées).
+    // ============================================================
+
+    /** Pondération des critères (total 100) */
+    private $evPoids = ['budget' => 30, 'delais' => 25, 'suivi' => 20, 'engins' => 15, 'appro' => 10];
+
+    /** Statuts de chantier considérés comme clôturés (comparaison en minuscules) */
+    private $evStatutsClos = [
+        'termine',
+        'terminé',
+        'cloture',
+        'clôture',
+        'clôturé',
+        'clos',
+        'acheve',
+        'achevé',
+        'receptionne',
+        'réceptionné',
+    ];
+
+    /** Jours sans journal attendu (date('w') : 0 = dimanche … 6 = samedi) */
+    private $evJoursNonOuvres = [6];
+
+    /** Retard (jours) à partir duquel la note "Délais" tombe à 0 */
+    private $evJoursRetardMax = 60;
+
+    /** Délai (jours) laissé au fournisseur entre paiement et livraison */
+    private $evDelaiLivraison = 7;
+
+    /** Période d'analyse par défaut (jours) quand aucune date n'est choisie */
+    private $evPeriodeDefaut = 30;
+
+    public function getEvaluationPoids()
+    {
+        return $this->evPoids;
+    }
+
+    /** [du, au] : période choisie, ou les N derniers jours */
+    public function getEvaluationPeriode(array $f = [])
+    {
+        $au = !empty($f['date_fin']) ? $f['date_fin'] : date('Y-m-d');
+        $du = !empty($f['date_debut'])
+            ? $f['date_debut']
+            : date('Y-m-d', strtotime($au . ' -' . ($this->evPeriodeDefaut - 1) . ' days'));
+        if ($du > $au) {
+            list($du, $au) = [$au, $du];
+        }
+        return [$du, $au];
+    }
+
+    private function evIndex(array $rows, $key = 'chantier_id')
+    {
+        $out = [];
+        foreach ($rows as $r) {
+            $out[(int) $r[$key]] = $r;
+        }
+        return $out;
+    }
+
+    private function evClamp($v)
+    {
+        return round(max(0, min(100, $v)), 1);
+    }
+
+    private function evNum($n)
+    {
+        return number_format((float) $n, 0, ',', ' ');
+    }
+
+    /** Nombre de jours ouvrés entre deux dates incluses */
+    private function evJoursOuvres($debut, $fin)
+    {
+        $d = strtotime($debut);
+        $f = strtotime($fin);
+        if (!$d || !$f || $d > $f) {
+            return 0;
+        }
+        $n = 0;
+        for ($t = $d; $t <= $f; $t = strtotime('+1 day', $t)) {
+            if (!in_array((int) date('w', $t), $this->evJoursNonOuvres, true)) {
+                $n++;
+            }
+        }
+        return $n;
+    }
+
+    private function evGrade($note)
+    {
+        if ($note === null) return ['NE', 'Non évaluable', 'secondary'];
+        if ($note >= 85)    return ['A', 'Excellent', 'success'];
+        if ($note >= 70)    return ['B', 'Bon', 'info'];
+        if ($note >= 50)    return ['C', 'À améliorer', 'warning'];
+        return ['D', 'Critique', 'danger'];
+    }
+
+    /**
+     * Évaluation de chaque chantier.
+     * $filters : company_id, chantier_id, date_debut, date_fin, grade (A|B|C|D|NE), q
+     */
+    public function getEvaluationChantiers(array $filters = [])
+    {
+        list($du, $au) = $this->getEvaluationPeriode($filters);
+        $companyId = (int) ($filters['company_id'] ?? 0);
+        $today     = date('Y-m-d');
+
+        // Base : coût réel cumulé depuis le début du chantier (sans filtre de dates)
+        $base = $this->getCoutReelRentabilite([
+            'company_id'  => $companyId,
+            'chantier_id' => (int) ($filters['chantier_id'] ?? 0),
+        ]);
+        if (empty($base)) {
+            return [];
+        }
+        $in = implode(',', array_map('intval', array_column($base, 'id')));
+
+        $infos = $this->evIndex($this->db->query(
+            "SELECT id, chef_chantier, location FROM chantiers WHERE id IN ($in)"
+        )->result_array(), 'id');
+
+        // Journal de production sur la période
+        $journaux = $this->evIndex($this->db->query(
+            "SELECT chantier_id,
+                    COUNT(*) AS nb_journaux,
+                    COUNT(DISTINCT journal_date) AS nb_jours,
+                    COALESCE(SUM(statut = 'valide'), 0) AS nb_valides,
+                    COALESCE(SUM(statut = 'en_attente'), 0) AS nb_attente,
+                    COALESCE(SUM(heures_travaillees), 0) AS heures,
+                    COALESCE(AVG(effectif_interne + effectif_sous_traitant), 0) AS effectif_moyen
+               FROM tbl_journal_production
+              WHERE chantier_id IN ($in) AND statut <> 'brouillon'
+                AND journal_date BETWEEN ? AND ?
+              GROUP BY chantier_id",
+            [$du, $au]
+        )->result_array());
+
+        // Dernier journal (fin réelle approximative d'un chantier clôturé)
+        $derniers = $this->evIndex($this->db->query(
+            "SELECT chantier_id, MAX(journal_date) AS dernier
+               FROM tbl_journal_production
+              WHERE chantier_id IN ($in) AND statut <> 'brouillon'
+              GROUP BY chantier_id"
+        )->result_array());
+
+        // Engins : pannes, carburant, maintenances sur la période
+        $open = $this->crInList(self::PANNE_OPEN);
+        $pannes = $this->evIndex($this->db->query(
+            "SELECT chantier_id, COUNT(*) AS nb_pannes,
+                    COALESCE(SUM(gravite = 'Critique'), 0) AS critiques,
+                    COALESCE(SUM(gravite = 'Majeure'), 0)  AS majeures,
+                    COALESCE(SUM(gravite = 'Mineure'), 0)  AS mineures,
+                    COALESCE(SUM(panne_status IN ($open)), 0) AS ouvertes
+               FROM tbl_engin_panne
+              WHERE status = 1 AND panne_status <> 'Annulée' AND chantier_id IN ($in)
+                AND DATE(date_signalement) BETWEEN ? AND ?
+              GROUP BY chantier_id",
+            [$du, $au]
+        )->result_array());
+
+        $fuels = $this->evIndex($this->db->query(
+            "SELECT chantier_id, COUNT(*) AS nb_fuel,
+                    COALESCE(SUM(total_amount), 0) AS cout_fuel,
+                    COALESCE(SUM(quantity_litre), 0) AS litres
+               FROM tbl_engin_fuel
+              WHERE status = 1 AND chantier_id IN ($in) AND operation_date BETWEEN ? AND ?
+              GROUP BY chantier_id",
+            [$du, $au]
+        )->result_array());
+
+        $maints = $this->evIndex($this->db->query(
+            "SELECT chantier_id, COUNT(*) AS nb_maint, COALESCE(SUM(total_cost), 0) AS cout_maint
+               FROM tbl_engin_maintenance
+              WHERE record_status = 1 AND maintenance_status IN ('En cours', 'Terminé')
+                AND chantier_id IN ($in)
+                AND COALESCE(end_date, start_date, planned_date) BETWEEN ? AND ?
+              GROUP BY chantier_id",
+            [$du, $au]
+        )->result_array());
+
+        // Approvisionnement : DA payées sur la période (hors délai de livraison toléré)
+        $auAppro = min($au, date('Y-m-d', strtotime($today . ' -' . $this->evDelaiLivraison . ' days')));
+        $appros  = [];
+        if ($du <= $auAppro) {
+            $horsChantier = $this->crInList($this->crCategoriesExclues);
+            $appros = $this->evIndex($this->db->query(
+                "SELECT f.chantier_id, COUNT(*) AS nb_payees,
+                        COALESCE(SUM(f.delivery_status = 'livre'), 0)   AS livrees,
+                        COALESCE(SUM(f.delivery_status = 'partiel'), 0) AS partielles
+                   FROM purchase_request_forms f
+                  WHERE f.chantier_id IN ($in)
+                    AND LOWER(f.category_type) NOT IN ($horsChantier)
+                    AND EXISTS (SELECT 1 FROM purchase_payment_vouchers v
+                                 WHERE v.request_id = f.id AND v.payment_status = 'effectue'
+                                   AND v.payment_date BETWEEN ? AND ?)
+                  GROUP BY f.chantier_id",
+                [$du, $auAppro]
+            )->result_array());
+        }
+
+        $out = [];
+        foreach ($base as $c) {
+            $id   = (int) $c['id'];
+            $jr   = $journaux[$id] ?? [];
+            $pn   = $pannes[$id] ?? [];
+            $fu   = $fuels[$id] ?? [];
+            $mt   = $maints[$id] ?? [];
+            $ap   = $appros[$id] ?? [];
+            $info = $infos[$id] ?? [];
+            $clos = in_array(mb_strtolower(trim((string) $c['status']), 'UTF-8'), $this->evStatutsClos, true);
+
+            $notes   = [];
+            $alertes = [];
+
+            // 1. Budget
+            if ($c['budget'] > 0) {
+                $ref    = $clos ? 100 : ($c['temps_pct'] !== null ? $c['temps_pct'] : 100);
+                $derive = $c['conso_pct'] - $ref;
+                $notes['budget'] = $this->evClamp(100 - max(0, $derive) * 2);
+                if ($c['cout_total'] > $c['budget']) {
+                    $alertes[] = ['danger', 'Budget dépassé de ' . $this->evNum($c['cout_total'] - $c['budget']) . ' BIF'];
+                } elseif ($derive > $this->crToleranceAvancement) {
+                    $alertes[] = ['warning', 'Budget consommé à ' . round($c['conso_pct']) . ' % pour '
+                        . round($ref) . ' % du délai écoulé'];
+                }
+            } else {
+                $notes['budget'] = null;
+                $alertes[] = ['secondary', 'Aucun budget saisi : critère budget non évalué'];
+            }
+
+            // 2. Délais
+            $retard = null;
+            $joursRestants = null;
+            if (!empty($c['date_fin_prevue'])) {
+                $finRef = $clos ? ($derniers[$id]['dernier'] ?? null) : $today;
+                if ($finRef) {
+                    $retard = max(0, (int) floor((strtotime($finRef) - strtotime($c['date_fin_prevue'])) / 86400));
+                }
+                if (!$clos) {
+                    $reste = (int) floor((strtotime($c['date_fin_prevue']) - strtotime($today)) / 86400);
+                    $joursRestants = $reste >= 0 ? $reste : null;
+                }
+            }
+            $notes['delais'] = $retard === null ? null : $this->evClamp(100 - $retard * 100 / $this->evJoursRetardMax);
+            if ($retard > 0) {
+                $alertes[] = [
+                    $retard > 30 ? 'danger' : 'warning',
+                    ($clos ? 'Terminé avec ' : 'En retard de ') . $retard . ' jour(s) sur la fin prévue'
+                ];
+            } elseif ($joursRestants !== null && $joursRestants <= 15) {
+                $alertes[] = ['info', 'Fin prévue dans ' . $joursRestants . ' jour(s)'];
+            }
+
+            // 3. Suivi (régularité du journal de production)
+            $attendus   = null;
+            $couverture = null;
+            if (!$clos) {
+                $debut    = max($du, $c['date_debut'] ?: $du);
+                $fin      = min($au, $today);
+                $attendus = $this->evJoursOuvres($debut, $fin);
+                if ($attendus > 0) {
+                    $couverture = min(100, round(((int) ($jr['nb_jours'] ?? 0)) / $attendus * 100, 1));
+                }
+            }
+            $notes['suivi'] = $couverture;
+            if ($couverture !== null && $couverture < 60) {
+                $alertes[] = ['warning', (int) ($jr['nb_jours'] ?? 0) . ' jour(s) de journal pour '
+                    . $attendus . ' jours ouvrés sur la période'];
+            }
+            if ((int) ($jr['nb_attente'] ?? 0) > 0) {
+                $alertes[] = ['info', (int) $jr['nb_attente'] . ' journal(aux) en attente de validation'];
+            }
+
+            // 4. Engins
+            $nbPannes = (int) ($pn['nb_pannes'] ?? 0);
+            $ouvertes = (int) ($pn['ouvertes'] ?? 0);
+            $activite = $nbPannes + (int) ($fu['nb_fuel'] ?? 0) + (int) ($mt['nb_maint'] ?? 0);
+            $notes['engins'] = $activite > 0
+                ? $this->evClamp(100 - (int) ($pn['mineures'] ?? 0) * 5 - (int) ($pn['majeures'] ?? 0) * 10
+                    - (int) ($pn['critiques'] ?? 0) * 20 - $ouvertes * 5)
+                : null;
+            if ($ouvertes > 0) {
+                $alertes[] = ['danger', $ouvertes . " panne(s) d'engin non résolue(s)"];
+            }
+
+            // 5. Approvisionnement
+            $nbPayees = (int) ($ap['nb_payees'] ?? 0);
+            $livrees  = (int) ($ap['livrees'] ?? 0);
+            $partiel  = (int) ($ap['partielles'] ?? 0);
+            $notes['appro'] = $nbPayees > 0 ? $this->evClamp(($livrees + 0.5 * $partiel) / $nbPayees * 100) : null;
+            if ($nbPayees - $livrees > 0) {
+                $alertes[] = ['warning', ($nbPayees - $livrees) . ' DA payée(s) pas entièrement livrée(s)'];
+            }
+
+            // Note globale (critères non évalués exclus, poids re-normalisés)
+            $somme = 0;
+            $poids = 0;
+            foreach ($this->evPoids as $k => $w) {
+                if ($notes[$k] !== null) {
+                    $somme += $notes[$k] * $w;
+                    $poids += $w;
+                }
+            }
+            $note  = $poids > 0 ? round($somme / $poids, 1) : null;
+            $grade = $this->evGrade($note);
+
+            $row = [
+                'id'              => $id,
+                'ref_chantier'    => $c['ref_chantier'],
+                'name'            => $c['name'],
+                'projet_name'     => $c['projet_name'],
+                'chef_chantier'   => $info['chef_chantier'] ?? null,
+                'location'        => $info['location'] ?? null,
+                'status'          => $c['status'],
+                'clos'            => $clos,
+                'date_debut'      => $c['date_debut'],
+                'date_fin_prevue' => $c['date_fin_prevue'],
+                'temps_pct'       => $c['temps_pct'],
+                'budget'          => $c['budget'],
+                'cout_total'      => $c['cout_total'],
+                'conso_pct'       => $c['conso_pct'],
+                'marge_pct'       => $c['marge_pct'],
+                'retard'          => $retard,
+                'jours_restants'  => $joursRestants,
+                'nb_journaux'     => (int) ($jr['nb_journaux'] ?? 0),
+                'nb_jours'        => (int) ($jr['nb_jours'] ?? 0),
+                'nb_valides'      => (int) ($jr['nb_valides'] ?? 0),
+                'nb_attente'      => (int) ($jr['nb_attente'] ?? 0),
+                'heures'          => (float) ($jr['heures'] ?? 0),
+                'effectif_moyen'  => round((float) ($jr['effectif_moyen'] ?? 0), 1),
+                'attendus'        => $attendus,
+                'couverture'      => $couverture,
+                'nb_pannes'       => $nbPannes,
+                'pannes_ouvertes' => $ouvertes,
+                'cout_fuel'       => (float) ($fu['cout_fuel'] ?? 0),
+                'litres'          => (float) ($fu['litres'] ?? 0),
+                'cout_maint'      => (float) ($mt['cout_maint'] ?? 0),
+                'nb_payees'       => $nbPayees,
+                'livrees'         => $livrees,
+                'partielles'      => $partiel,
+                'notes'           => $notes,
+                'note'            => $note,
+                'grade'           => $grade[0],
+                'grade_label'     => $grade[1],
+                'grade_class'     => $grade[2],
+                'alertes'         => $alertes,
+            ];
+
+            // Filtres en PHP (la note est calculée ici)
+            if (!empty($filters['grade']) && $row['grade'] !== $filters['grade']) {
+                continue;
+            }
+            if (!empty($filters['q'])) {
+                $hay = $row['name'] . ' ' . $row['ref_chantier'] . ' ' . $row['projet_name'] . ' ' . $row['chef_chantier'];
+                if (mb_stripos($hay, $filters['q'], 0, 'UTF-8') === false) {
+                    continue;
+                }
+            }
+            $out[] = $row;
+        }
+
+        // Du plus mauvais au meilleur, les non évaluables à la fin
+        usort($out, function ($a, $b) {
+            if ($a['note'] === null) return $b['note'] === null ? 0 : 1;
+            if ($b['note'] === null) return -1;
+            return $a['note'] <=> $b['note'];
+        });
+
+        return $out;
+    }
+
+    /** Totaux pour les tuiles et la répartition des classes */
+    public function getEvaluationSynthese(array $rows)
+    {
+        $s = [
+            'nb' => count($rows),
+            'notes' => 0,
+            'moyenne' => null,
+            'retard' => 0,
+            'grades' => ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0, 'NE' => 0]
+        ];
+        $somme = 0;
+        foreach ($rows as $r) {
+            $s['grades'][$r['grade']]++;
+            if ($r['note'] !== null) {
+                $s['notes']++;
+                $somme += $r['note'];
+            }
+            if (!$r['clos'] && $r['retard'] > 0) {
+                $s['retard']++;
+            }
+        }
+        $s['moyenne'] = $s['notes'] > 0 ? round($somme / $s['notes'], 1) : null;
+        return $s;
+    }
+
+    /** Détail d'un chantier : évaluation + journaux, pannes et DA non livrées */
+    public function getEvaluationDetail($chantierId, array $filters = [])
+    {
+        $filters['chantier_id'] = (int) $chantierId;
+        $filters['grade'] = '';
+        $filters['q']     = '';
+        $rows = $this->getEvaluationChantiers($filters);
+        if (empty($rows)) {
+            return null;
+        }
+        list($du, $au) = $this->getEvaluationPeriode($filters);
+        $id = (int) $chantierId;
+
+        $journaux = $this->db->query(
+            "SELECT reference, journal_date, chef_chantier, effectif_interne, effectif_sous_traitant,
+                    heures_travaillees, statut
+               FROM tbl_journal_production
+              WHERE chantier_id = ? AND statut <> 'brouillon' AND journal_date BETWEEN ? AND ?
+              ORDER BY journal_date DESC, id DESC LIMIT 15",
+            [$id, $du, $au]
+        )->result_array();
+
+        $pannes = $this->db->query(
+            "SELECT p.reference, DATE(p.date_signalement) AS date_signalement, p.gravite, p.panne_status,
+                    p.description, m.code_engin, m.designation
+               FROM tbl_engin_panne p
+               JOIN tbl_engin_materiel m ON m.id = p.engin_id
+              WHERE p.status = 1 AND p.panne_status <> 'Annulée' AND p.chantier_id = ?
+                AND DATE(p.date_signalement) BETWEEN ? AND ?
+              ORDER BY p.date_signalement DESC LIMIT 15",
+            [$id, $du, $au]
+        )->result_array();
+
+        $horsChantier = $this->crInList($this->crCategoriesExclues);
+        $da = $this->db->query(
+            "SELECT f.id, f.requested_by, f.total_amount, f.delivery_status,
+                    MAX(v.payment_date) AS payment_date, SUM(v.amount_paid) AS amount_paid
+               FROM purchase_request_forms f
+               JOIN purchase_payment_vouchers v ON v.request_id = f.id AND v.payment_status = 'effectue'
+              WHERE f.chantier_id = ? AND f.delivery_status <> 'livre'
+                AND LOWER(f.category_type) NOT IN ($horsChantier)
+              GROUP BY f.id, f.requested_by, f.total_amount, f.delivery_status
+              ORDER BY payment_date ASC LIMIT 15",
+            [$id]
+        )->result_array();
+
+        return [
+            'evaluation' => $rows[0],
+            'periode'    => ['du' => $du, 'au' => $au],
+            'poids'      => $this->evPoids,
+            'journaux'   => $journaux,
+            'pannes'     => $pannes,
+            'da'         => $da,
+        ];
+    }
+
+    // ============================================================
+    // POINTAGE (Direction Technique)
+    // Table tbl_pointage : une ligne par contrat (travailleur) et par jour.
+    // ============================================================
+
+    const POINTAGE_STATUTS = [
+        'present'  => 'Présent',
+        'demi'     => 'Demi-journée',
+        'absent'   => 'Absent',
+        'justifie' => 'Absence justifiée',
+    ];
+
+    /** Valeur en jours travaillés de chaque statut */
+    private $ptValeurs = ['present' => 1, 'demi' => 0.5, 'absent' => 0, 'justifie' => 0];
+
+    /** Semaine de travail : N jours à partir du dimanche (comme Personnel Chantier) */
+    private $ptJoursSemaine = 6;
+
+    /** Période d'activité d'un contrat (fin = début + 6 jours si non renseignée) */
+    private function ptDebutSql($a = 'w')
+    {
+        return "COALESCE($a.start_date, DATE($a.created_at))";
+    }
+
+    private function ptFinSql($a = 'w')
+    {
+        return "COALESCE($a.end_date, DATE_ADD(COALESCE($a.start_date, DATE($a.created_at)), INTERVAL 6 DAY))";
+    }
+
+    /** Bornes de la semaine (dimanche → vendredi) contenant $date */
+    public function getPointageSemaineBornes($date)
+    {
+        $t     = strtotime($date);
+        $debut = (int) date('w', $t) === 0 ? date('Y-m-d', $t) : date('Y-m-d', strtotime('last sunday', $t));
+        $jours = [];
+        for ($i = 0; $i < $this->ptJoursSemaine; $i++) {
+            $jours[] = date('Y-m-d', strtotime($debut . " +$i days"));
+        }
+        return ['debut' => $debut, 'fin' => end($jours), 'jours' => $jours];
+    }
+
+    /** Travailleurs actifs sur le chantier à la date + leur pointage éventuel */
+    public function getPointageFeuille($chantierId, $date)
+    {
+        $exclus = $this->crInList($this->crContratsExclus);
+        $sql = "SELECT w.id AS contract_id, w.worker_name, w.worker_type, w.function_name,
+                       w.pay_mode, w.unit_rate,
+                       p.statut, p.heures, p.observation
+                  FROM workforce_contracts w
+                  LEFT JOIN tbl_pointage p ON p.contract_id = w.id AND p.pointage_date = ?
+                 WHERE w.chantier_id = ?
+                   AND LOWER(w.status_label) NOT IN ($exclus)
+                   AND " . $this->ptDebutSql() . " <= ?
+                   AND " . $this->ptFinSql() . " >= ?
+                 ORDER BY w.worker_name ASC, w.id ASC";
+        return $this->db->query($sql, [$date, (int) $chantierId, $date, $date])->result_array();
+    }
+
+    /**
+     * Enregistre la feuille d'une journée (insertion ou mise à jour).
+     * $lignes : [contract_id => ['statut' => ''|clé, 'heures' => float|null, 'observation' => string|null]]
+     * statut vide = pointage supprimé. Retourne le nombre de lignes enregistrées, ou false.
+     */
+    public function savePointage($chantierId, $date, array $lignes, $userId, $companyId = null)
+    {
+        // Seuls les contrats réellement actifs sur ce chantier à cette date sont acceptés
+        $autorises = array_flip(array_map('intval', array_column($this->getPointageFeuille($chantierId, $date), 'contract_id')));
+
+        $n = 0;
+        $this->db->trans_start();
+        foreach ($lignes as $contractId => $l) {
+            $contractId = (int) $contractId;
+            if (!isset($autorises[$contractId])) {
+                continue;
+            }
+            if ($l['statut'] === '') {
+                $this->db->delete('tbl_pointage', ['contract_id' => $contractId, 'pointage_date' => $date]);
+                continue;
+            }
+            $this->db->query(
+                "INSERT INTO tbl_pointage
+                    (company_id, chantier_id, contract_id, pointage_date, statut, heures, observation, created_by)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE
+                    statut = VALUES(statut), heures = VALUES(heures), observation = VALUES(observation),
+                    updated_by = VALUES(created_by), updated_at = NOW()",
+                [
+                    $companyId ?: null,
+                    (int) $chantierId,
+                    $contractId,
+                    $date,
+                    $l['statut'],
+                    $l['heures'],
+                    $l['observation'],
+                    $userId ?: null
+                ]
+            );
+            $n++;
+        }
+        $this->db->trans_complete();
+
+        return $this->db->trans_status() ? $n : false;
+    }
+
+    /** Récapitulatif d'une semaine : grille travailleurs × jours */
+    public function getPointageSemaine($chantierId, array $b)
+    {
+        $exclus = $this->crInList($this->crContratsExclus);
+        $debutSql = $this->ptDebutSql();
+        $finSql   = $this->ptFinSql();
+
+        $contrats = $this->db->query(
+            "SELECT w.id, w.worker_name, w.worker_type, w.function_name,
+                    $debutSql AS actif_du, $finSql AS actif_au
+               FROM workforce_contracts w
+              WHERE w.chantier_id = ? AND LOWER(w.status_label) NOT IN ($exclus)
+                AND $debutSql <= ? AND $finSql >= ?
+              ORDER BY w.worker_name ASC, w.id ASC",
+            [(int) $chantierId, $b['fin'], $b['debut']]
+        )->result_array();
+
+        $map = [];
+        foreach (
+            $this->db->query(
+                "SELECT contract_id, pointage_date, statut, heures
+               FROM tbl_pointage
+              WHERE chantier_id = ? AND pointage_date BETWEEN ? AND ?",
+                [(int) $chantierId, $b['debut'], $b['fin']]
+            )->result_array() as $p
+        ) {
+            $map[(int) $p['contract_id']][$p['pointage_date']] = $p;
+        }
+
+        $totaux = [];
+        foreach ($b['jours'] as $d) {
+            $totaux[$d] = ['presents' => 0, 'pointes' => 0];
+        }
+
+        $lignes = [];
+        foreach ($contrats as $c) {
+            $jours = [];
+            $travailles = 0;
+            $absences = 0;
+            $actifs = 0;
+            $heures = 0;
+            foreach ($b['jours'] as $d) {
+                $actif = $d >= $c['actif_du'] && $d <= $c['actif_au'];
+                $p = $map[(int) $c['id']][$d] ?? null;
+                if ($actif) {
+                    $actifs++;
+                }
+                if ($p) {
+                    $v = $this->ptValeurs[$p['statut']] ?? 0;
+                    $travailles += $v;
+                    $heures     += (float) $p['heures'];
+                    if (in_array($p['statut'], ['absent', 'justifie'], true)) {
+                        $absences++;
+                    }
+                    $totaux[$d]['pointes']++;
+                    $totaux[$d]['presents'] += $v;
+                }
+                $jours[$d] = ['actif' => $actif, 'statut' => $p['statut'] ?? null];
+            }
+            $lignes[] = [
+                'contract_id'   => (int) $c['id'],
+                'worker_name'   => $c['worker_name'],
+                'worker_type'   => $c['worker_type'],
+                'function_name' => $c['function_name'],
+                'jours'         => $jours,
+                'travailles'    => $travailles,
+                'absences'      => $absences,
+                'actifs'        => $actifs,
+                'heures'        => $heures,
+                'taux'          => $actifs > 0 ? round($travailles / $actifs * 100, 1) : null,
+            ];
+        }
+
+        return ['lignes' => $lignes, 'totaux' => $totaux];
+    }
+
+    /** Tuiles : jour + semaine + chantiers non pointés aujourd'hui */
+    public function getPointageStats($companyId, $date, array $b)
+    {
+        $wp = $companyId > 0 ? ' AND company_id = ' . (int) $companyId : '';
+        $wc = $companyId > 0 ? ' AND w.company_id = ' . (int) $companyId : '';
+
+        $jour = $this->db->query(
+            "SELECT COALESCE(SUM(statut IN ('present', 'demi')), 0) AS presents,
+                    COALESCE(SUM(statut = 'absent'), 0) AS absents,
+                    COALESCE(SUM(statut = 'justifie'), 0) AS justifies
+               FROM tbl_pointage WHERE pointage_date = ? $wp",
+            [$date]
+        )->row_array();
+
+        $sem = $this->db->query(
+            "SELECT COUNT(*) AS nb,
+                    COALESCE(SUM(CASE statut WHEN 'present' THEN 1 WHEN 'demi' THEN 0.5 ELSE 0 END), 0) AS jours
+               FROM tbl_pointage WHERE pointage_date BETWEEN ? AND ? $wp",
+            [$b['debut'], $b['fin']]
+        )->row_array();
+
+        $exclus = $this->crInList($this->crContratsExclus);
+        $nonPointes = $this->db->query(
+            "SELECT DISTINCT c.id, c.name
+               FROM workforce_contracts w
+               JOIN chantiers c ON c.id = w.chantier_id
+              WHERE LOWER(w.status_label) NOT IN ($exclus) $wc
+                AND " . $this->ptDebutSql() . " <= ? AND " . $this->ptFinSql() . " >= ?
+                AND NOT EXISTS (SELECT 1 FROM tbl_pointage p
+                                 WHERE p.chantier_id = w.chantier_id AND p.pointage_date = ?)
+              ORDER BY c.name ASC",
+            [$date, $date, $date]
+        )->result_array();
+
+        return [
+            'presents'     => (int) $jour['presents'],
+            'absents'      => (int) $jour['absents'],
+            'justifies'    => (int) $jour['justifies'],
+            'taux_semaine' => (int) $sem['nb'] > 0 ? round($sem['jours'] / $sem['nb'] * 100, 1) : null,
+            'non_pointes'  => $nonPointes,
+        ];
+    }
+
+    // ============================================================
+    // ORDRES DE SERVICE (Direction Technique) — table tbl_ordre_service
+    // ============================================================
+
+    const OS_TYPES = [
+        'demarrage'    => 'Démarrage des travaux',
+        'arret'        => 'Arrêt / suspension',
+        'reprise'      => 'Reprise des travaux',
+        'travaux_supp' => 'Travaux supplémentaires',
+        'modification' => 'Modification des travaux',
+        'prolongation' => 'Prolongation de délai',
+        'autre'        => 'Autre',
+    ];
+
+    const OS_STATUTS = [
+        'brouillon' => 'Brouillon',
+        'emis'      => 'Émis / notifié',
+        'en_cours'  => 'En exécution',
+        'execute'   => 'Exécuté',
+        'annule'    => 'Annulé',
+    ];
+
+    const OS_SENS = [
+        'emis' => 'Émis par SATRACO',
+        'recu' => "Reçu du maître d'ouvrage",
+    ];
+
+    /** Changements de statut autorisés */
+    const OS_TRANSITIONS = [
+        'brouillon' => ['emis', 'annule'],
+        'emis'      => ['en_cours', 'execute', 'annule'],
+        'en_cours'  => ['execute', 'annule'],
+        'execute'   => [],
+        'annule'    => [],
+    ];
+
+    private function osRetardSql($a = 'o')
+    {
+        return "($a.statut IN ('emis', 'en_cours') AND $a.date_effet IS NOT NULL AND $a.delai_jours IS NOT NULL
+                 AND DATE_ADD($a.date_effet, INTERVAL $a.delai_jours DAY) < CURDATE())";
+    }
+
+    private function osSelect()
+    {
+        $this->db->select("o.*, c.name AS chantier_name, c.ref_chantier, c.location AS chantier_location,
+                p.name AS projet_name, s.name AS subcontractor_name,
+                DATE_ADD(o.date_effet, INTERVAL o.delai_jours DAY) AS echeance,
+                " . $this->osRetardSql() . " AS en_retard", false)
+            ->from('tbl_ordre_service o')
+            ->join('chantiers c', 'c.id = o.chantier_id', 'left')
+            ->join('projects p', 'p.id = c.project_id', 'left')
+            ->join('subcontractors s', 's.id = o.subcontractor_id', 'left')
+            ->where('o.status', 1);
+    }
+
+    private function osFilters(array $f)
+    {
+        if (!empty($f['company_id']))  $this->db->where('o.company_id', (int) $f['company_id']);
+        if (!empty($f['chantier_id'])) $this->db->where('o.chantier_id', (int) $f['chantier_id']);
+        if (!empty($f['type']))        $this->db->where('o.type_os', $f['type']);
+        if (!empty($f['sens']))        $this->db->where('o.sens', $f['sens']);
+        if (!empty($f['statut'])) {
+            if ($f['statut'] === 'retard') {
+                $this->db->where($this->osRetardSql(), null, false);
+            } else {
+                $this->db->where('o.statut', $f['statut']);
+            }
+        }
+        if (!empty($f['date_debut'])) $this->db->where('o.date_emission >=', $f['date_debut']);
+        if (!empty($f['date_fin']))   $this->db->where('o.date_emission <=', $f['date_fin']);
+        if (!empty($f['q'])) {
+            $this->db->group_start()
+                ->like('o.numero', $f['q'])
+                ->or_like('o.objet', $f['q'])
+                ->or_like('o.destinataire', $f['q'])
+                ->or_like('o.emetteur', $f['q'])
+                ->or_like('c.name', $f['q'])
+                ->group_end();
+        }
+    }
+
+    public function getOrdresService(array $f = [], $limit = null, $offset = 0)
+    {
+        $this->osSelect();
+        $this->osFilters($f);
+        $this->db->order_by('o.date_emission', 'DESC')->order_by('o.id', 'DESC');
+        if ($limit) {
+            $this->db->limit((int) $limit, (int) $offset);
+        }
+        return $this->db->get()->result_array();
+    }
+
+    public function countOrdresService(array $f = [])
+    {
+        $this->db->from('tbl_ordre_service o')
+            ->join('chantiers c', 'c.id = o.chantier_id', 'left')
+            ->where('o.status', 1);
+        $this->osFilters($f);
+        return $this->db->count_all_results();
+    }
+
+    public function getOrdreService($id)
+    {
+        $this->osSelect();
+        return $this->db->where('o.id', (int) $id)->get()->row_array();
+    }
+
+    public function getOsStats($companyId = 0)
+    {
+        $w = $companyId > 0 ? ' AND company_id = ' . (int) $companyId : '';
+        return $this->db->query(
+            "SELECT COALESCE(SUM(date_emission >= ?), 0) AS mois,
+                    COALESCE(SUM(statut = 'brouillon'), 0) AS brouillons,
+                    COALESCE(SUM(statut IN ('emis', 'en_cours')), 0) AS actifs,
+                    COALESCE(SUM(" . $this->osRetardSql('t') . "), 0) AS retard,
+                    COALESCE(SUM(CASE WHEN type_os IN ('travaux_supp', 'modification') AND statut <> 'annule'
+                                      THEN montant ELSE 0 END), 0) AS montant_supp
+               FROM tbl_ordre_service t
+              WHERE status = 1 $w",
+            [date('Y-m-01')]
+        )->row_array();
+    }
+
+    public function getSubcontractorsPourOs($companyId = 0)
+    {
+        $this->db->select('id, name, specialty')->from('subcontractors');
+        if ($companyId > 0) {
+            $this->db->where('company_id', (int) $companyId);
+        }
+        return $this->db->order_by('name', 'ASC')->get()->result_array();
+    }
+
+    /** Insère un OS avec un numéro réservé ; retourne [id, numero] ou false */
+    public function insertOrdreService(array $data)
+    {
+        $this->db->trans_start();
+        $data['numero'] = $this->reserveCode('OS');
+        $this->db->insert('tbl_ordre_service', $data);
+        $id = (int) $this->db->insert_id();
+        $this->db->trans_complete();
+
+        return $this->db->trans_status() ? ['id' => $id, 'numero' => $data['numero']] : false;
+    }
+
+    public function updateOrdreService($id, array $data)
+    {
+        return $this->db->where('id', (int) $id)->update('tbl_ordre_service', $data);
+    }
+
+    /** Change le statut ; retourne true ou un message d'erreur */
+    public function setOsStatut($id, $statut, $userId)
+    {
+        $os = $this->db->get_where('tbl_ordre_service', ['id' => (int) $id, 'status' => 1])->row_array();
+        if (!$os) {
+            return 'Ordre de service introuvable.';
+        }
+        $permis = self::OS_TRANSITIONS[$os['statut']] ?? [];
+        if (!in_array($statut, $permis, true)) {
+            return 'Changement de statut non autorisé.';
+        }
+
+        $upd = ['statut' => $statut, 'updated_by' => $userId, 'updated_at' => date('Y-m-d H:i:s')];
+        if ($statut === 'emis' && empty($os['date_notification'])) {
+            $upd['date_notification'] = date('Y-m-d');
+        }
+        if ($statut === 'execute' && empty($os['date_execution'])) {
+            $upd['date_execution'] = date('Y-m-d');
+        }
+        $this->db->where('id', $os['id'])->update('tbl_ordre_service', $upd);
+        return true;
+    }
+
+    public function softDeleteOrdreService($id, $userId)
+    {
+        return $this->updateOrdreService($id, [
+            'status' => 0,
+            'updated_by' => $userId,
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+    }
 }

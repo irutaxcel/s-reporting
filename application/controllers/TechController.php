@@ -320,6 +320,11 @@ class TechController extends CI_Controller
 
     public function stockGeneral()
     {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
         $this->load->model('TechModel', 'tech');
 
         $article_id = $this->input->get('article_id');
@@ -2809,16 +2814,381 @@ class TechController extends CI_Controller
             return;
         }
 
-        $data['title'] = 'Coût Réel & Rentabilité';
+        $filters  = $this->_crFiltres();
+        $rows     = $this->tech->getCoutReelRentabilite($filters);
+        $synthese = $this->tech->getCoutReelSynthese($rows);
 
-        $data['allChantiers'] = $this->tech->getAllChantier();
+        // Pagination (en PHP : le statut est calculé après la requête)
+        $perPage = 15;
+        $total   = count($rows);
+        $pages   = max(1, (int) ceil($total / $perPage));
+        $page    = min(max(1, (int) $this->input->get('page')), $pages);
+        $offset  = ($page - 1) * $perPage;
 
-        // $data['coutReelleRentabilite'] = $this->tech->getCoutReelleRentabilite();
+        $data['title']        = 'Coût Réel & Rentabilité';
+        $data['filters']      = $filters;
+        $data['rows']         = array_slice($rows, $offset, $perPage);
+        $data['offset']       = $offset;
+        $data['totalRows']    = $total;
+        $data['synthese']     = $synthese;
+        $data['pagination']   = $this->_crPagination($page, $pages, $filters);
+        $data['allChantiers'] = $this->tech->getChantiersPourFiltreCoutReel($filters['company_id']);
+        $data['queryString']  = http_build_query(array_filter([
+            'chantier'   => $filters['chantier_id'] ?: null,
+            'date_debut' => $filters['date_debut'] ?: null,
+            'date_fin'   => $filters['date_fin'] ?: null,
+            'statut'     => $filters['statut'] ?: null,
+        ]));
+        $data['datesQueryString'] = http_build_query(array_filter([
+            'date_debut' => $filters['date_debut'] ?: null,
+            'date_fin'   => $filters['date_fin'] ?: null,
+        ]));
 
         $this->load->view('v1/components/layout/header', $data);
         $this->load->view('v1/components/layout/sidebar', $data);
         $this->load->view('v1/components/modules/technique/coutReelleRentabilite', $data);
         $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /** AJAX : détail d'un chantier (JSON) */
+    public function coutReelDetail($id = 0)
+    {
+        $this->output->set_content_type('application/json');
+
+        if (!$this->session->userdata('user_id')) {
+            $this->output->set_status_header(401)
+                ->set_output(json_encode(['success' => false, 'message' => 'Session expirée, reconnectez-vous.']));
+            return;
+        }
+
+        $detail = $this->tech->getCoutReelDetailChantier((int) $id, $this->_crFiltres());
+        if (!$detail) {
+            $this->output->set_status_header(404)
+                ->set_output(json_encode(['success' => false, 'message' => 'Chantier introuvable.']));
+            return;
+        }
+
+        $this->output->set_output(json_encode(['success' => true, 'data' => $detail]));
+    }
+
+    /** Export CSV (ouvrable directement dans Excel) */
+    public function coutReelExport()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $rows = $this->tech->getCoutReelRentabilite($this->_crFiltres());
+        $s    = $this->tech->getCoutReelSynthese($rows);
+        $n    = function ($v) {
+            return number_format((float) $v, 0, ',', '');
+        };
+        $p    = function ($v) {
+            return $v === null ? '' : number_format($v, 1, ',', '');
+        };
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="cout_reel_rentabilite_' . date('Ymd_His') . '.csv"');
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF"); // BOM UTF-8 pour Excel
+
+        fputcsv($out, [
+            'Réf.',
+            'Chantier',
+            'Projet',
+            'Budget',
+            'Matériaux',
+            "Main-d'œuvre",
+            'Engins & carb.',
+            'Sous-traitance',
+            'Coût réel total',
+            'Écart',
+            'Marge sur budget (%)',
+            'Budget consommé (%)',
+            'Temps écoulé (%)',
+            'Statut'
+        ], ';');
+
+        foreach ($rows as $r) {
+            fputcsv($out, [
+                $r['ref_chantier'],
+                $r['name'],
+                $r['projet_name'],
+                $n($r['budget']),
+                $n($r['cout_materiaux']),
+                $n($r['cout_main_oeuvre']),
+                $n($r['cout_engins']),
+                $n($r['cout_sous_traitance']),
+                $n($r['cout_total']),
+                $n($r['ecart']),
+                $p($r['marge_pct']),
+                $p($r['conso_pct']),
+                $p($r['temps_pct']),
+                $r['statut_label']
+            ], ';');
+        }
+
+        fputcsv($out, [
+            '',
+            'TOTAUX',
+            '',
+            $n($s['budget']),
+            $n($s['cout_materiaux']),
+            $n($s['cout_main_oeuvre']),
+            $n($s['cout_engins']),
+            $n($s['cout_sous_traitance']),
+            $n($s['cout_total']),
+            $n($s['ecart']),
+            $p($s['marge_pct']),
+            '',
+            '',
+            ''
+        ], ';');
+
+        fclose($out);
+        exit;
+    }
+
+    /** Filtres GET validés */
+    private function _crFiltres()
+    {
+        $date = function ($v) {
+            $d = DateTime::createFromFormat('Y-m-d', (string) $v);
+            return ($d && $d->format('Y-m-d') === $v) ? $v : '';
+        };
+        $statut = (string) $this->input->get('statut');
+
+        return [
+            'company_id'  => (int) $this->session->userdata('company_id'),
+            'chantier_id' => (int) $this->input->get('chantier'),
+            'date_debut'  => $date($this->input->get('date_debut')),
+            'date_fin'    => $date($this->input->get('date_fin')),
+            'statut'      => in_array($statut, ['rentable', 'surveiller', 'depassement', 'sans_budget'], true) ? $statut : '',
+        ];
+    }
+
+    /** Pagination Bootstrap/AdminLTE (sans la librairie CI, incompatible PHP 8.1 en query string) */
+    private function _crPagination($page, $pages, array $filters)
+    {
+        if ($pages <= 1) {
+            return '';
+        }
+
+        $params = array_filter([
+            'chantier'   => $filters['chantier_id'] ?: null,
+            'date_debut' => $filters['date_debut'] ?: null,
+            'date_fin'   => $filters['date_fin'] ?: null,
+            'statut'     => $filters['statut'] ?: null,
+        ]);
+
+        $li = function ($p, $label, $active = false, $disabled = false) use ($params) {
+            $params['page'] = $p;
+            $href = $disabled ? '#' : site_url('cout-reelle-rentebilite') . '?' . http_build_query($params);
+            $cls  = 'page-item' . ($active ? ' active' : '') . ($disabled ? ' disabled' : '');
+            return '<li class="' . $cls . '"><a class="page-link" href="' . html_escape($href) . '">' . $label . '</a></li>';
+        };
+        $dots = '<li class="page-item disabled"><span class="page-link">…</span></li>';
+
+        $start = max(1, $page - 2);
+        $end   = min($pages, $page + 2);
+
+        $html = '<ul class="pagination pagination-sm m-0 float-right">';
+        $html .= $li($page - 1, '&laquo;', false, $page <= 1);
+        if ($start > 1) {
+            $html .= $li(1, '1') . ($start > 2 ? $dots : '');
+        }
+        for ($p = $start; $p <= $end; $p++) {
+            $html .= $li($p, (string) $p, $p === $page);
+        }
+        if ($end < $pages) {
+            $html .= ($end < $pages - 1 ? $dots : '') . $li($pages, (string) $pages);
+        }
+        $html .= $li($page + 1, '&raquo;', false, $page >= $pages);
+
+        return $html . '</ul>';
+    }
+
+    /* =========================================================
+     *  ÉVALUATION CHANTIER
+     * ========================================================= */
+
+    public function evaluationChantier()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $filters = $this->_evFiltres();
+        $rows    = $this->tech->getEvaluationChantiers($filters);
+        list($du, $au) = $this->tech->getEvaluationPeriode($filters);
+
+        $perPage = 15;
+        $total   = count($rows);
+        $pages   = max(1, (int) ceil($total / $perPage));
+        $page    = min(max(1, (int) $this->input->get('page')), $pages);
+        $offset  = ($page - 1) * $perPage;
+
+        $params = array_filter([
+            'chantier'   => $filters['chantier_id'] ?: null,
+            'date_debut' => $filters['date_debut'] ?: null,
+            'date_fin'   => $filters['date_fin'] ?: null,
+            'grade'      => $filters['grade'] ?: null,
+            'q'          => $filters['q'] !== '' ? $filters['q'] : null,
+        ]);
+
+        $data['title']            = 'Evaluation Chantier';
+        $data['filters']          = $filters;
+        $data['rows']             = array_slice($rows, $offset, $perPage);
+        $data['offset']           = $offset;
+        $data['synthese']         = $this->tech->getEvaluationSynthese($rows);
+        $data['periode']          = ['du' => $du, 'au' => $au];
+        $data['poids']            = $this->tech->getEvaluationPoids();
+        $data['allChantiers']     = $this->tech->getChantiersPourFiltreCoutReel($filters['company_id']);
+        $data['pagination']       = $this->_pagination('evaluation-chantier', $page, $pages, $params);
+        $data['queryString']      = http_build_query($params);
+        $data['datesQueryString'] = http_build_query(array_filter([
+            'date_debut' => $filters['date_debut'] ?: null,
+            'date_fin'   => $filters['date_fin'] ?: null,
+        ]));
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/evaluationChantier', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    /** AJAX : détail d'une évaluation (JSON) */
+    public function evaluationChantierDetail($id = 0)
+    {
+        $this->output->set_content_type('application/json');
+
+        if (!$this->session->userdata('user_id')) {
+            $this->output->set_status_header(401)
+                ->set_output(json_encode(['success' => false, 'message' => 'Session expirée, reconnectez-vous.']));
+            return;
+        }
+
+        $detail = $this->tech->getEvaluationDetail((int) $id, $this->_evFiltres());
+        if (!$detail) {
+            $this->output->set_status_header(404)
+                ->set_output(json_encode(['success' => false, 'message' => 'Chantier introuvable.']));
+            return;
+        }
+
+        $this->output->set_output(json_encode(['success' => true, 'data' => $detail]));
+    }
+
+    /** Export CSV */
+    public function evaluationChantierExport()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $rows = $this->tech->getEvaluationChantiers($this->_evFiltres());
+        $n = function ($v) {
+            return $v === null ? '' : number_format((float) $v, 1, ',', '');
+        };
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="evaluation_chantiers_' . date('Ymd_His') . '.csv"');
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF");
+
+        fputcsv($out, [
+            'Réf.',
+            'Chantier',
+            'Projet',
+            'Chef de chantier',
+            'Statut',
+            'Note budget',
+            'Note délais',
+            'Note suivi',
+            'Note engins',
+            'Note appro.',
+            'Note globale',
+            'Classe',
+            'Retard (jours)',
+            'Couverture journal (%)',
+            'Pannes',
+            "Points d'attention"
+        ], ';');
+
+        foreach ($rows as $r) {
+            fputcsv($out, [
+                $r['ref_chantier'],
+                $r['name'],
+                $r['projet_name'],
+                $r['chef_chantier'],
+                $r['status'],
+                $n($r['notes']['budget']),
+                $n($r['notes']['delais']),
+                $n($r['notes']['suivi']),
+                $n($r['notes']['engins']),
+                $n($r['notes']['appro']),
+                $n($r['note']),
+                $r['grade'] . ' - ' . $r['grade_label'],
+                $r['retard'] === null ? '' : $r['retard'],
+                $n($r['couverture']),
+                $r['nb_pannes'],
+                implode(' | ', array_map(function ($a) {
+                    return $a[1];
+                }, $r['alertes'])),
+            ], ';');
+        }
+
+        fclose($out);
+        exit;
+    }
+
+    private function _evFiltres()
+    {
+        $date = function ($v) {
+            $d = DateTime::createFromFormat('Y-m-d', (string) $v);
+            return ($d && $d->format('Y-m-d') === $v) ? $v : '';
+        };
+        $grade = (string) $this->input->get('grade');
+
+        return [
+            'company_id'  => (int) $this->session->userdata('company_id'),
+            'chantier_id' => (int) $this->input->get('chantier'),
+            'date_debut'  => $date($this->input->get('date_debut')),
+            'date_fin'    => $date($this->input->get('date_fin')),
+            'grade'       => in_array($grade, ['A', 'B', 'C', 'D', 'NE'], true) ? $grade : '',
+            'q'           => mb_substr(trim((string) $this->input->get('q', true)), 0, 100),
+        ];
+    }
+
+    /** Pagination Bootstrap/AdminLTE générique (sans la librairie CI) */
+    private function _pagination($uri, $page, $pages, array $params)
+    {
+        if ($pages <= 1) {
+            return '';
+        }
+        $li = function ($p, $label, $active = false, $disabled = false) use ($uri, $params) {
+            $params['page'] = $p;
+            $href = $disabled ? '#' : site_url($uri) . '?' . http_build_query($params);
+            $cls  = 'page-item' . ($active ? ' active' : '') . ($disabled ? ' disabled' : '');
+            return '<li class="' . $cls . '"><a class="page-link" href="' . html_escape($href) . '">' . $label . '</a></li>';
+        };
+        $dots  = '<li class="page-item disabled"><span class="page-link">…</span></li>';
+        $start = max(1, $page - 2);
+        $end   = min($pages, $page + 2);
+
+        $html = '<ul class="pagination pagination-sm m-0 float-right">' . $li($page - 1, '&laquo;', false, $page <= 1);
+        if ($start > 1) {
+            $html .= $li(1, '1') . ($start > 2 ? $dots : '');
+        }
+        for ($p = $start; $p <= $end; $p++) {
+            $html .= $li($p, (string) $p, $p === $page);
+        }
+        if ($end < $pages) {
+            $html .= ($end < $pages - 1 ? $dots : '') . $li($pages, (string) $pages);
+        }
+        return $html . $li($page + 1, '&raquo;', false, $page >= $pages) . '</ul>';
     }
 
     public function personnelChantierPrint()
@@ -2858,5 +3228,467 @@ class TechController extends CI_Controller
         $this->load->view('v1/components/layout/header-print', $data);
         $this->load->view('v1/components/modules/technique/personnelChantierPrint', $data);
         $this->load->view('v1/components/layout/footer-print', $data);
+    }
+
+
+
+    /* =========================================================
+     *  POINTAGE
+     * ========================================================= */
+
+    private function _ptDate($v)
+    {
+        $d = DateTime::createFromFormat('Y-m-d', (string) $v);
+        return ($d && $d->format('Y-m-d') === $v) ? $v : null;
+    }
+
+    public function pointage()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $companyId  = (int) $this->session->userdata('company_id');
+        $chantierId = (int) $this->input->get('chantier');
+        $today      = date('Y-m-d');
+        $date       = $this->_ptDate($this->input->get('date')) ?: $today;
+        if ($date > $today) {
+            $date = $today;
+        }
+        $bornes = $this->tech->getPointageSemaineBornes($date);
+
+        $data['title']        = 'Pointage';
+        $data['chantierId']   = $chantierId;
+        $data['date']         = $date;
+        $data['today']        = $today;
+        $data['bornes']       = $bornes;
+        $data['statuts']      = TechModel::POINTAGE_STATUTS;
+        $data['onglet']       = $this->input->get('onglet') === 'semaine' ? 'semaine' : 'jour';
+        $data['allChantiers'] = $this->tech->getChantiersPourFiltreCoutReel($companyId);
+        $data['stats']        = $this->tech->getPointageStats($companyId, $today, $this->tech->getPointageSemaineBornes($today));
+        $data['feuille']      = $chantierId ? $this->tech->getPointageFeuille($chantierId, $date) : [];
+        $data['semaine']      = $chantierId ? $this->tech->getPointageSemaine($chantierId, $bornes) : null;
+
+        $data['chantierNom'] = '';
+        foreach ($data['allChantiers'] as $c) {
+            if ((int) $c['id'] === $chantierId) {
+                $data['chantierNom'] = $c['name'];
+            }
+        }
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/pointage', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function pointageStore()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+        if ($this->input->method() !== 'post') {
+            redirect('pointage');
+            return;
+        }
+
+        $chantierId = (int) $this->input->post('chantier_id');
+        $date       = $this->_ptDate($this->input->post('date'));
+
+        if (!$chantierId || !$date) {
+            $this->session->set_flashdata('error', 'Chantier ou date invalide.');
+            redirect('pointage');
+            return;
+        }
+
+        $back = 'pointage?' . http_build_query(['chantier' => $chantierId, 'date' => $date]);
+
+        if ($date > date('Y-m-d')) {
+            $this->session->set_flashdata('error', 'Impossible de pointer une date future.');
+            redirect($back);
+            return;
+        }
+
+        $statuts = (array) $this->input->post('statut');
+        $heures  = (array) $this->input->post('heures');
+        $obs     = (array) $this->input->post('observation', true);
+
+        $lignes = [];
+        foreach ($statuts as $cid => $st) {
+            $st = (string) $st;
+            if ($st !== '' && !array_key_exists($st, TechModel::POINTAGE_STATUTS)) {
+                continue;
+            }
+            $h = str_replace(',', '.', trim((string) ($heures[$cid] ?? '')));
+            $h = ($h !== '' && is_numeric($h) && $h >= 0 && $h <= 24) ? round((float) $h, 2) : null;
+            if (in_array($st, ['absent', 'justifie'], true)) {
+                $h = null;
+            }
+            $o = trim((string) ($obs[$cid] ?? ''));
+
+            $lignes[(int) $cid] = [
+                'statut'      => $st,
+                'heures'      => $h,
+                'observation' => $o === '' ? null : mb_substr($o, 0, 255),
+            ];
+        }
+
+        $n = $this->tech->savePointage(
+            $chantierId,
+            $date,
+            $lignes,
+            (int) $this->session->userdata('user_id'),
+            (int) $this->session->userdata('company_id')
+        );
+
+        if ($n === false) {
+            $this->session->set_flashdata('error', "Le pointage n'a pas pu être enregistré.");
+        } else {
+            $this->session->set_flashdata('success', 'Pointage du ' . date('d/m/Y', strtotime($date)) . ' enregistré (' . $n . ' travailleur(s)).');
+        }
+        redirect($back);
+    }
+
+    public function pointageExport()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+
+        $chantierId = (int) $this->input->get('chantier');
+        $date       = $this->_ptDate($this->input->get('date')) ?: date('Y-m-d');
+        if (!$chantierId) {
+            redirect('pointage');
+            return;
+        }
+
+        $b       = $this->tech->getPointageSemaineBornes($date);
+        $semaine = $this->tech->getPointageSemaine($chantierId, $b);
+        $chantier = $this->tech->getChantierById($chantierId);
+
+        $jourFr = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+        $abrev  = ['present' => 'P', 'demi' => '1/2', 'absent' => 'A', 'justifie' => 'J'];
+        $num    = function ($v, $d = 1) {
+            return $v === null ? '' : number_format((float) $v, $d, ',', '');
+        };
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="pointage_' . $chantierId . '_' . $b['debut'] . '.csv"');
+        $out = fopen('php://output', 'w');
+        fwrite($out, "\xEF\xBB\xBF");
+
+        fputcsv($out, [
+            'Chantier : ' . ($chantier ? $chantier->name : $chantierId),
+            'Semaine du ' . date('d/m/Y', strtotime($b['debut'])) . ' au ' . date('d/m/Y', strtotime($b['fin']))
+        ], ';');
+
+        $head = ['Travailleur', 'Fonction', 'Type'];
+        foreach ($b['jours'] as $d) {
+            $head[] = $jourFr[(int) date('w', strtotime($d))] . ' ' . date('d/m', strtotime($d));
+        }
+        fputcsv($out, array_merge($head, ['Jours travaillés', 'Absences', 'Heures', 'Taux de présence (%)']), ';');
+
+        foreach ($semaine['lignes'] as $l) {
+            $line = [$l['worker_name'], $l['function_name'], $l['worker_type']];
+            foreach ($b['jours'] as $d) {
+                $j = $l['jours'][$d];
+                $line[] = !$j['actif'] ? '-' : ($j['statut'] ? $abrev[$j['statut']] : '');
+            }
+            fputcsv($out, array_merge($line, [
+                $num($l['travailles']),
+                $l['absences'],
+                $num($l['heures'], 2),
+                $num($l['taux']),
+            ]), ';');
+        }
+
+        fputcsv($out, [], ';');
+        fputcsv($out, ['Légende : P = Présent, 1/2 = Demi-journée, A = Absent, J = Absence justifiée, - = hors contrat'], ';');
+
+        fclose($out);
+        exit;
+    }
+
+    /* =========================================================
+     *  ORDRES DE SERVICE
+     * ========================================================= */
+
+    const OS_UPLOAD = 'uploads/ordres_service/';
+
+    private function _osFiltres()
+    {
+        $get = function ($k) {
+            return trim((string) $this->input->get($k, true));
+        };
+        return [
+            'company_id'  => (int) $this->session->userdata('company_id'),
+            'chantier_id' => (int) $get('chantier'),
+            'type'        => $this->eqOneOf($get('type'), array_keys(TechModel::OS_TYPES), ''),
+            'sens'        => $this->eqOneOf($get('sens'), array_keys(TechModel::OS_SENS), ''),
+            'statut'      => $this->eqOneOf($get('statut'), array_merge(array_keys(TechModel::OS_STATUTS), ['retard']), ''),
+            'date_debut'  => $this->eqValidDate($get('date_debut')) ?: '',
+            'date_fin'    => $this->eqValidDate($get('date_fin')) ?: '',
+            'q'           => mb_substr($get('q'), 0, 100),
+        ];
+    }
+
+    public function ordreService()
+    {
+        $this->eqGuardPage();
+
+        $f       = $this->_osFiltres();
+        $perPage = 15;
+        $total   = $this->tech->countOrdresService($f);
+        $pages   = max(1, (int) ceil($total / $perPage));
+        $page    = min(max(1, (int) $this->input->get('page')), $pages);
+        $offset  = ($page - 1) * $perPage;
+
+        $params = array_filter([
+            'chantier'   => $f['chantier_id'] ?: null,
+            'type'       => $f['type'] ?: null,
+            'sens'       => $f['sens'] ?: null,
+            'statut'     => $f['statut'] ?: null,
+            'date_debut' => $f['date_debut'] ?: null,
+            'date_fin'   => $f['date_fin'] ?: null,
+            'q'          => $f['q'] !== '' ? $f['q'] : null,
+        ]);
+
+        $data = [
+            'title'          => 'Ordre service',
+            'filters'        => $f,
+            'rows'           => $this->tech->getOrdresService($f, $perPage, $offset),
+            'offset'         => $offset,
+            'total'          => $total,
+            'stats'          => $this->tech->getOsStats($f['company_id']),
+            'types'          => TechModel::OS_TYPES,
+            'statuts'        => TechModel::OS_STATUTS,
+            'sensList'       => TechModel::OS_SENS,
+            'transitions'    => TechModel::OS_TRANSITIONS,
+            'allChantiers'   => $this->tech->getChantiersPourFiltreCoutReel($f['company_id']),
+            'subcontractors' => $this->tech->getSubcontractorsPourOs($f['company_id']),
+            'codePreview'    => $this->tech->previewCode('OS'),
+            'pagination'     => $this->_pagination('ordre-service', $page, $pages, $params),
+            'queryString'    => http_build_query($params),
+            'csrfName'       => $this->security->get_csrf_token_name(),
+            'csrfHash'       => $this->security->get_csrf_hash(),
+        ];
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/technique/ordreService', $data);
+        $this->load->view('v1/components/layout/footer', $data);
+    }
+
+    public function ordreServiceStore()
+    {
+        $this->_osSave(null);
+    }
+
+    public function ordreServiceUpdate()
+    {
+        $this->_osSave((int) $this->input->post('id'));
+    }
+
+    private function _osSave($id)
+    {
+        $this->eqGuardPage();
+        $to = 'ordre-service';
+        if ($this->input->method() !== 'post') {
+            redirect($to);
+            return;
+        }
+
+        $old = null;
+        if ($id) {
+            $old = $this->tech->getOrdreService($id);
+            if (!$old) {
+                return $this->eqBack('Ordre de service introuvable.', 'error', $to);
+            }
+            if (in_array($old['statut'], ['execute', 'annule'], true)) {
+                return $this->eqBack('Un ordre de service exécuté ou annulé ne peut plus être modifié.', 'error', $to);
+            }
+        }
+
+        $delai = trim((string) $this->input->post('delai_jours'));
+        $data  = [
+            'sens'             => $this->eqOneOf($this->input->post('sens'), array_keys(TechModel::OS_SENS), 'emis'),
+            'type_os'          => $this->eqOneOf($this->input->post('type_os'), array_keys(TechModel::OS_TYPES)),
+            'chantier_id'      => $this->eqInt('chantier_id'),
+            'subcontractor_id' => $this->eqInt('subcontractor_id'),
+            'emetteur'         => $this->eqStr('emetteur', 191),
+            'destinataire'     => $this->eqStr('destinataire', 191),
+            'objet'            => $this->eqStr('objet', 255),
+            'description'      => $this->eqStr('description', 10000),
+            'date_emission'    => $this->eqPostDate('date_emission'),
+            'date_effet'       => $this->eqPostDate('date_effet'),
+            'delai_jours'      => ($delai !== '' && ctype_digit($delai)) ? (int) $delai : null,
+            'montant'          => $this->eqDec('montant'),
+            'observation'      => $this->eqStr('observation', 5000),
+        ];
+
+        if (!$data['type_os'] || !$data['chantier_id'] || !$data['objet'] || !$data['date_emission']) {
+            return $this->eqBack("Le type, le chantier, l'objet et la date d'émission sont obligatoires.", 'error', $to);
+        }
+        if ($data['montant'] !== null && $data['montant'] < 0) {
+            return $this->eqBack('Le montant ne peut pas être négatif.', 'error', $to);
+        }
+        if ($data['sens'] === 'recu') {
+            $data['subcontractor_id'] = null;
+        }
+        if (!$data['emetteur'] && $data['sens'] === 'emis') {
+            $data['emetteur'] = 'SATRACO Construction';
+        }
+
+        // Pièce jointe (scan de l'OS signé)
+        if (!empty($_FILES['fichier']['name'])) {
+            $path = FCPATH . self::OS_UPLOAD;
+            if (!is_dir($path)) {
+                @mkdir($path, 0755, true);
+            }
+            $this->upload->initialize([
+                'upload_path'   => $path,
+                'allowed_types' => 'pdf|jpg|jpeg|png',
+                'max_size'      => 10240,
+                'encrypt_name'  => true,
+            ]);
+            if (!$this->upload->do_upload('fichier')) {
+                return $this->eqBack('Pièce jointe : ' . strip_tags($this->upload->display_errors('', '')), 'error', $to);
+            }
+            $up = $this->upload->data();
+            $data['fichier']     = $up['file_name'];
+            $data['fichier_nom'] = mb_substr($up['client_name'], 0, 255);
+            if ($old && $old['fichier']) {
+                $this->eqRemoveFile(self::OS_UPLOAD, $old['fichier']);
+            }
+        }
+
+        $uid = $this->eqUserId();
+
+        if ($id) {
+            $data['updated_by'] = $uid;
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            $ok  = $this->tech->updateOrdreService($id, $data);
+            $msg = 'Ordre de service ' . $old['numero'] . ' modifié.';
+        } else {
+            $data['company_id'] = (int) $this->session->userdata('company_id') ?: null;
+            $data['statut']     = $data['sens'] === 'recu' ? 'emis' : 'brouillon';
+            if ($data['sens'] === 'recu') {
+                $data['date_notification'] = $data['date_emission'];
+            }
+            $data['created_by'] = $uid;
+            $res = $this->tech->insertOrdreService($data);
+            $ok  = (bool) $res;
+            $msg = $res ? 'Ordre de service ' . $res['numero'] . ' enregistré.' : '';
+        }
+
+        $ok
+            ? $this->eqBack($msg, 'success', $to)
+            : $this->eqBack("L'ordre de service n'a pas pu être enregistré.", 'error', $to);
+    }
+
+    /** AJAX : un OS (détail + modification) */
+    public function ordreServiceGet($id)
+    {
+        $this->eqGuardAjax();
+        $os = $this->tech->getOrdreService((int) $id);
+        if (!$os) {
+            return $this->eqJson(['success' => false, 'message' => 'Ordre de service introuvable.'], 404);
+        }
+        $os['fichier_url']  = $os['fichier'] ? base_url(self::OS_UPLOAD . $os['fichier']) : null;
+        $os['transitions']  = TechModel::OS_TRANSITIONS[$os['statut']] ?? [];
+        $os['modifiable']   = !in_array($os['statut'], ['execute', 'annule'], true);
+        $os['print_url']    = site_url('ordre-service/print/' . $os['id']);
+        $this->eqJson(['success' => true, 'os' => $os]);
+    }
+
+    /** AJAX : changement de statut */
+    public function ordreServiceStatut()
+    {
+        $this->eqGuardAjax();
+        $statut = (string) $this->input->post('statut');
+        $res = $this->tech->setOsStatut($this->eqInt('id'), $statut, $this->eqUserId());
+
+        $res === true
+            ? $this->eqJson(['success' => true, 'message' => 'Statut : ' . (TechModel::OS_STATUTS[$statut] ?? $statut) . '.'])
+            : $this->eqJson(['success' => false, 'message' => $res], 422);
+    }
+
+    /** AJAX : suppression (brouillon uniquement) */
+    public function ordreServiceDelete()
+    {
+        $this->eqGuardAjax();
+        $os = $this->tech->getOrdreService($this->eqInt('id'));
+        if (!$os) {
+            return $this->eqJson(['success' => false, 'message' => 'Ordre de service introuvable.'], 404);
+        }
+        if ($os['statut'] !== 'brouillon') {
+            return $this->eqJson(['success' => false, 'message' => "Seul un brouillon peut être supprimé. Annulez plutôt l'ordre de service."], 409);
+        }
+        $this->tech->softDeleteOrdreService($os['id'], $this->eqUserId());
+        $this->eqJson(['success' => true, 'message' => 'Ordre de service ' . $os['numero'] . ' supprimé.']);
+    }
+
+    /** Document imprimable */
+    public function ordreServicePrint($id)
+    {
+        $this->eqGuardPage();
+        $os = $this->tech->getOrdreService((int) $id);
+        if (!$os) {
+            show_404();
+        }
+        $this->load->view(self::EQ_VIEW_DIR . 'ordreServicePrint', [
+            'os'      => $os,
+            'types'   => TechModel::OS_TYPES,
+            'statuts' => TechModel::OS_STATUTS,
+            'sens'    => TechModel::OS_SENS,
+        ]);
+    }
+
+    /** Export CSV (filtres appliqués) */
+    public function ordreServiceExport()
+    {
+        $this->eqGuardPage();
+        $lines = [];
+        foreach ($this->tech->getOrdresService($this->_osFiltres()) as $o) {
+            $lines[] = [
+                $o['numero'],
+                $o['date_emission'],
+                TechModel::OS_SENS[$o['sens']] ?? $o['sens'],
+                TechModel::OS_TYPES[$o['type_os']] ?? $o['type_os'],
+                $o['chantier_name'],
+                $o['projet_name'],
+                $o['emetteur'],
+                $o['destinataire'],
+                $o['subcontractor_name'],
+                $o['objet'],
+                $o['date_effet'],
+                $o['delai_jours'],
+                $o['echeance'],
+                $this->eqCsvNum($o['montant'], 0),
+                TechModel::OS_STATUTS[$o['statut']] ?? $o['statut'],
+                $o['en_retard'] ? 'Oui' : 'Non',
+            ];
+        }
+        $this->eqCsv('ordres-service-' . date('Ymd') . '.csv', [
+            'N°',
+            "Date d'émission",
+            'Sens',
+            'Type',
+            'Chantier',
+            'Projet',
+            'Émetteur',
+            'Destinataire',
+            'Sous-traitant',
+            'Objet',
+            "Date d'effet",
+            'Délai (jours)',
+            'Échéance',
+            'Montant (BIF)',
+            'Statut',
+            'En retard',
+        ], $lines);
     }
 }

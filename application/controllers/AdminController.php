@@ -644,7 +644,7 @@ class AdminController extends CI_Controller
                 ['code' => 'personnel-chantier',      'label' => 'Personnel Chantier',       'icon' => 'fa-users'],
                 ['code' => 'suivie-paie-chantier',    'label' => 'Suivie Paie Chantier',     'icon' => 'fa-money-bill-wave'],
                 ['code' => 'pointage',                'label' => 'Pointage',                 'icon' => 'fa-user-clock'],
-                ['code' => 'ordre-service',           'label' => 'Ordres de service',        'icon' => 'fa-file-signature'],
+                ['code' => 'ordre-service',           'label' => 'Ordre service',        'icon' => 'fa-file-signature'],
             ]],
 
             /* ---------- DAF / FINANCE ---------- */

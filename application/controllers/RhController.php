@@ -48,10 +48,8 @@ class RhController extends CI_Controller
         }
 
         $title = 'Employés';
-        $data['employes'] = $this->Employe_model->get_all('DESC');
-
-        $next_matricule = $this->Employe_model->generer_matricule();
-        $data['next_matricule'] = $next_matricule;
+        $data['employes']       = $this->Employe_model->get_all('DESC');
+        $data['next_matricule'] = $this->Employe_model->generer_matricule();
 
         $this->load->view('v1/components/layout/header', ['title' => $title]);
         $this->load->view('v1/components/layout/sidebar');
@@ -70,71 +68,245 @@ class RhController extends CI_Controller
     }
 
 
+    /** Règles de validation communes création / modification */
+    private function _regles_employe($avec_statut = FALSE)
+    {
+        $fv = $this->form_validation;
+        $fv->set_rules('nom',                 'Nom',                 'required|trim|max_length[100]');
+        $fv->set_rules('prenoms',             'Prénom(s)',           'required|trim|max_length[100]');
+        $fv->set_rules('sexe',                'Sexe',                'required|in_list[Masculin,Féminin]');
+        $fv->set_rules('nationalite',         'Nationalité',         'required|trim|max_length[50]');
+        $fv->set_rules('cnid',                'N° CNI',              'trim|max_length[30]');
+        $fv->set_rules('etat_civil',          'État civil',          'in_list[Célibataire,Marié(e),Divorcé(e),Veuf(ve)]');
+        $fv->set_rules('fonction',            'Qualification professionnelle', 'required|trim|max_length[100]');
+        $fv->set_rules('date_embauche',       "Date d'entrée",       'required');
+        $fv->set_rules('categorie',           'Catégorie',           'required|in_list[Bureau,Chantier]');
+        $fv->set_rules('matricule_inss',      'N° INSS',             'trim|max_length[30]');
+        $fv->set_rules('assurance_maladie',   'Assurance maladie',   'trim|max_length[100]');
+        $fv->set_rules('numero_contribuable', 'N° contribuable',     'trim|max_length[30]');
+        $fv->set_rules('telephone',           'Téléphone',           'trim|max_length[30]');
+        $fv->set_rules('email',               'E-mail',              'trim|valid_email|max_length[120]');
+        $fv->set_rules('type_contrat',        'Type de contrat',     'required|in_list[CDI,CDD,Stage]');
+        $fv->set_rules('salaire_base',        'Salaire brut',        'required|numeric|greater_than_equal_to[0]');
+        $fv->set_rules(
+            'cause_cessation',
+            'Cause de cessation',
+            'in_list[Fin de contrat,Démission,Licenciement,Retraite,Décès,Abandon de poste,Autre]'
+        );
+        if ($avec_statut) {
+            $fv->set_rules('statut', 'Statut', 'in_list[Actif,En congé,Suspendu,Fin de contrat]');
+        }
+    }
+
+    /** Colonnes communes (sans matricule, statut ni documents) */
+    private function _donnees_employe()
+    {
+        $type_contrat = $this->input->post('type_contrat');
+        $date_sortie  = $this->_val('date_sortie');
+        $email        = $this->_val('email');
+
+        return [
+            'nom'                 => mb_strtoupper($this->_val('nom')),
+            'prenoms'             => $this->_val('prenoms'),
+            'sexe'                => $this->input->post('sexe'),
+            'nationalite'         => $this->_val('nationalite') ?: 'Burundaise',
+            'date_naissance'      => $this->_val('date_naissance'),
+            'cnid'                => $this->_val('cnid'),
+            'etat_civil'          => $this->_val('etat_civil'),
+            'fonction'            => $this->_val('fonction'),
+            'date_embauche'       => $this->input->post('date_embauche'),
+            'categorie'           => $this->input->post('categorie'),
+            'site_affectation'    => $this->_val('site_affectation'),
+            'departement'         => $this->_val('departement'),
+            'matricule_inss'      => $this->_val('matricule_inss'),
+            'assurance_maladie'   => $this->_val('assurance_maladie'),
+            'numero_contribuable' => $this->_val('numero_contribuable'),
+            'telephone'           => $this->_val('telephone'),
+            'email'               => $email ? mb_strtolower($email) : NULL,
+            'adresse'             => $this->_val('adresse'),
+            'type_contrat'        => $type_contrat,
+            'date_fin_contrat'    => ($type_contrat !== 'CDI') ? $this->_val('date_fin_contrat') : NULL,
+            'periode_essai'       => $this->_val('periode_essai'),
+            'salaire_base'        => (float) $this->input->post('salaire_base'),
+            'mode_paiement'       => $this->_val('mode_paiement'),
+            'date_sortie'         => $date_sortie,
+            'cause_cessation'     => $date_sortie ? $this->_val('cause_cessation') : NULL,
+        ];
+    }
+
+    /** Upload des 4 documents ; rollback complet en cas d'erreur. Retourne [docs] ou ['__error' => msg] */
+    private function _uploader_documents()
+    {
+        $docs = [];
+        foreach (['doc_cnid', 'doc_photo', 'doc_contrat', 'doc_cv'] as $champ) {
+            $res = $this->_upload_doc($champ);
+            if (is_array($res)) {
+                $this->_supprimer_fichiers($docs);
+                return ['__error' => $res['error']];
+            }
+            if ($res !== NULL) $docs[$champ] = $res;
+        }
+        return $docs;
+    }
+
+    /** Flash d'erreur + retour à la liste */
+    private function _echec($msg)
+    {
+        $this->session->set_flashdata('error', $msg);
+        redirect('rh-employes');
+    }
+
+    /* =========================================================
+   CRÉATION
+   ========================================================= */
     public function employes_store()
     {
-        if (!$this->session->userdata('logged_in')) {
-            redirect('sign-in');
-        }
-
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('nom', 'Nom', 'required|trim');
-        $this->form_validation->set_rules('prenoms', 'Prénoms', 'required|trim');
-        $this->form_validation->set_rules('fonction', 'Fonction', 'required|trim');
-        $this->form_validation->set_rules('date_embauche', "Date d'embauche", 'required');
-        $this->form_validation->set_rules('salaire_base', 'Salaire de base', 'required|numeric');
-        $this->form_validation->set_rules('email', 'Email', 'valid_email');
-
-        if ($this->form_validation->run() === FALSE) {
-            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+        if (!$this->session->userdata('logged_in')) redirect('sign-in');
+        if ($this->input->method() !== 'post') {
             redirect('rh-employes');
             return;
         }
 
-        // 1. Upload des 4 documents (optionnels)
-        $docs = [];
-        foreach (['doc_cnid', 'doc_photo', 'doc_contrat', 'doc_cv'] as $champ) {
-            $res = $this->_upload_doc($champ);
-            if (is_array($res)) { // erreur d'upload
-                $this->session->set_flashdata('error', $res['error']);
-                redirect('rh-employes');
-                return;
-            }
-            if ($res !== NULL) {
-                $docs[$champ] = $res;
+        $this->_regles_employe();
+        if ($this->form_validation->run() === FALSE) {
+            return $this->_echec('Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+        }
+        if ($erreur = $this->_controle_dates_employe()) return $this->_echec($erreur);
+
+        $docs = $this->_uploader_documents();
+        if (isset($docs['__error'])) return $this->_echec($docs['__error']);
+
+        $data = $this->_donnees_employe();
+        $data['matricule'] = $this->Employe_model->generer_matricule();
+        $data['statut']    = $data['date_sortie'] ? 'Fin de contrat' : 'Actif';
+        $data              = array_merge($data, $docs);
+
+        if ($this->Employe_model->insert($data) === FALSE) {
+            $this->_supprimer_fichiers($docs);
+            return $this->_echec("Échec de l'enregistrement en base. Aucune donnée n'a été conservée.");
+        }
+
+        $this->session->set_flashdata('success', $data['date_sortie']
+            ? 'Employé ' . $data['matricule'] . ' inscrit au registre (sorti le ' . date('d/m/Y', strtotime($data['date_sortie'])) . ').'
+            : 'Employé ' . $data['matricule'] . ' enregistré avec succès.');
+        redirect('rh-employes');
+    }
+
+    /* =========================================================
+   MODIFICATION
+   ========================================================= */
+    public function employes_update()
+    {
+        if (!$this->session->userdata('logged_in')) redirect('sign-in');
+        if ($this->input->method() !== 'post') {
+            redirect('rh-employes');
+            return;
+        }
+
+        $id     = (int) $this->input->post('employe_id');
+        $ancien = $this->Employe_model->get_by_id($id);
+        if (!$ancien) return $this->_echec('Employé introuvable.');
+
+        $this->_regles_employe(TRUE);
+        if ($this->form_validation->run() === FALSE) {
+            return $this->_echec('Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+        }
+        if ($erreur = $this->_controle_dates_employe()) return $this->_echec($erreur);
+
+        // Nouveaux documents (les anciens ne sont supprimés qu'après une mise à jour réussie)
+        $nouveaux = $this->_uploader_documents();
+        if (isset($nouveaux['__error'])) return $this->_echec($nouveaux['__error']);
+
+        $data = $this->_donnees_employe();
+        // Sortie déclarée → Fin de contrat ; sinon statut choisi (réintégration possible)
+        $statut = $this->_val('statut');
+        $data['statut'] = $data['date_sortie']
+            ? 'Fin de contrat'
+            : (($statut && $statut !== 'Fin de contrat') ? $statut : 'Actif');
+        $data = array_merge($data, $nouveaux);
+
+        if ($this->Employe_model->update($id, $data) === FALSE) {
+            $this->_supprimer_fichiers($nouveaux);
+            return $this->_echec("Échec de la mise à jour. La fiche n'a pas été modifiée.");
+        }
+
+        // Mise à jour OK → suppression des fichiers remplacés
+        foreach ($nouveaux as $champ => $chemin) {
+            if (!empty($ancien->$champ)) $this->_supprimer_fichiers([$ancien->$champ]);
+        }
+
+        $this->session->set_flashdata('success', 'Fiche ' . $ancien->matricule . ' mise à jour avec succès.');
+        redirect('rh-employes');
+    }
+
+    /** Valeur POST nettoyée : chaîne trimée ou NULL si vide */
+    private function _val($champ)
+    {
+        $v = trim((string) $this->input->post($champ));
+        return $v === '' ? NULL : $v;
+    }
+
+    /** Vérifie qu'une date est au format Y-m-d et réelle */
+    private function _date_valide($d)
+    {
+        $dt = DateTime::createFromFormat('Y-m-d', $d);
+        return $dt && $dt->format('Y-m-d') === $d;
+    }
+
+    /**
+     * Règles métier sur les dates d'un employé.
+     * Retourne un message d'erreur, ou NULL si tout est cohérent.
+     */
+    private function _controle_dates_employe()
+    {
+        $naissance = $this->_val('date_naissance');
+        $entree    = $this->_val('date_embauche');
+        $fin       = $this->_val('date_fin_contrat');
+        $sortie    = $this->_val('date_sortie');
+        $cause     = $this->_val('cause_cessation');
+        $type      = $this->input->post('type_contrat');
+
+        $libelles = [
+            "Date de naissance" => $naissance,
+            "Date d'entrée"     => $entree,
+            "Fin de contrat"    => $fin,
+            "Date de sortie"    => $sortie,
+        ];
+        foreach ($libelles as $lib => $d) {
+            if ($d !== NULL && !$this->_date_valide($d)) {
+                return $lib . ' : date invalide.';
             }
         }
 
-        // 2. Insertion
-        $data = array_merge([
-            'matricule'           => $this->Employe_model->generer_matricule(),
-            'nom'                 => $this->input->post('nom'),
-            'prenoms'             => $this->input->post('prenoms'),
-            'sexe'                => $this->input->post('sexe'),
-            'date_naissance'      => $this->input->post('date_naissance') ?: NULL,
-            'etat_civil'          => $this->input->post('etat_civil'),
-            'cnid'                => $this->input->post('cnid'),
-            'telephone'           => $this->input->post('telephone'),
-            'email'               => $this->input->post('email'),
-            'adresse'             => $this->input->post('adresse'),
-            'categorie'           => $this->input->post('categorie'),
-            'fonction'            => $this->input->post('fonction'),
-            'departement'         => $this->input->post('departement'),
-            'site_affectation'    => $this->input->post('site_affectation'),
-            'date_embauche'       => $this->input->post('date_embauche'),
-            'type_contrat'        => $this->input->post('type_contrat'),
-            'date_fin_contrat'    => $this->input->post('date_fin_contrat') ?: NULL,
-            'periode_essai'       => $this->input->post('periode_essai'),
-            'salaire_base'        => $this->input->post('salaire_base'),
-            'mode_paiement'       => $this->input->post('mode_paiement'),
-            'matricule_inss'      => $this->input->post('matricule_inss'),
-            'numero_contribuable' => $this->input->post('numero_contribuable'),
-        ], $docs);
+        if ($naissance && $naissance >= $entree) {
+            return "La date de naissance doit être antérieure à la date d'entrée.";
+        }
+        if ($type === 'CDD' && !$fin) {
+            return 'La date de fin de contrat est obligatoire pour un CDD.';
+        }
+        if ($fin && $type !== 'CDI' && $fin <= $entree) {
+            return "La fin de contrat doit être postérieure à la date d'entrée.";
+        }
+        if ($sortie && $sortie < $entree) {
+            return "La date de sortie ne peut pas précéder la date d'entrée.";
+        }
+        if ($sortie && !$cause) {
+            return 'Indiquez la cause de cessation pour un employé sorti.';
+        }
+        if ($cause && !$sortie) {
+            return 'Indiquez la date de sortie correspondant à la cause de cessation.';
+        }
+        return NULL;
+    }
 
-        $this->Employe_model->insert($data);
-
-        // 3. ✅ Plus de JSON : toast Swal via flashdata + retour à la liste
-        $this->session->set_flashdata('success', 'Employé ' . $data['matricule'] . ' enregistré avec succès.');
-        redirect('rh-employes');
+    /** Supprime des fichiers uploadés (rollback en cas d'échec) */
+    private function _supprimer_fichiers(array $chemins)
+    {
+        foreach ($chemins as $chemin) {
+            if ($chemin && file_exists(FCPATH . $chemin)) {
+                @unlink(FCPATH . $chemin);
+            }
+        }
     }
 
     /** Helper upload d'un document */
@@ -178,85 +350,85 @@ class RhController extends CI_Controller
 
 
 
-    public function employes_update()
-    {
-        if (!$this->session->userdata('logged_in')) {
-            redirect('sign-in');
-        }
+    // public function employes_update()
+    // {
+    //     if (!$this->session->userdata('logged_in')) {
+    //         redirect('sign-in');
+    //     }
 
-        $id     = (int) $this->input->post('employe_id');
-        $ancien = $this->Employe_model->get_by_id($id);
+    //     $id     = (int) $this->input->post('employe_id');
+    //     $ancien = $this->Employe_model->get_by_id($id);
 
-        if (!$ancien) {
-            $this->session->set_flashdata('error', 'Employé introuvable.');
-            redirect('rh-employes');
-            return;
-        }
+    //     if (!$ancien) {
+    //         $this->session->set_flashdata('error', 'Employé introuvable.');
+    //         redirect('rh-employes');
+    //         return;
+    //     }
 
-        // -------- Validation --------
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('nom', 'Nom', 'required|trim');
-        $this->form_validation->set_rules('prenoms', 'Prénoms', 'required|trim');
-        $this->form_validation->set_rules('fonction', 'Fonction', 'required|trim');
-        $this->form_validation->set_rules('date_embauche', "Date d'embauche", 'required');
-        $this->form_validation->set_rules('salaire_base', 'Salaire de base', 'required|numeric');
-        $this->form_validation->set_rules('email', 'Email', 'valid_email');
+    //     // -------- Validation --------
+    //     $this->load->library('form_validation');
+    //     $this->form_validation->set_rules('nom', 'Nom', 'required|trim');
+    //     $this->form_validation->set_rules('prenoms', 'Prénoms', 'required|trim');
+    //     $this->form_validation->set_rules('fonction', 'Fonction', 'required|trim');
+    //     $this->form_validation->set_rules('date_embauche', "Date d'embauche", 'required');
+    //     $this->form_validation->set_rules('salaire_base', 'Salaire de base', 'required|numeric');
+    //     $this->form_validation->set_rules('email', 'Email', 'valid_email');
 
-        if ($this->form_validation->run() === FALSE) {
-            $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
-            redirect('rh-employes');
-            return;
-        }
+    //     if ($this->form_validation->run() === FALSE) {
+    //         $this->session->set_flashdata('error', 'Formulaire incomplet : ' . strip_tags(validation_errors('• ', ' ')));
+    //         redirect('rh-employes');
+    //         return;
+    //     }
 
-        // -------- Documents de remplacement (optionnels) --------
-        $docs = [];
-        foreach (['doc_cnid', 'doc_photo', 'doc_contrat', 'doc_cv'] as $champ) {
-            if (!empty($_FILES[$champ]['name'])) {
-                $res = $this->_upload_doc($champ);
-                if (is_array($res)) {
-                    $this->session->set_flashdata('error', $res['error']);
-                    redirect('rh-employes');
-                    return;
-                }
-                // Supprime l'ancien fichier du serveur
-                if (!empty($ancien->$champ) && file_exists(FCPATH . $ancien->$champ)) {
-                    unlink(FCPATH . $ancien->$champ);
-                }
-                $docs[$champ] = $res;
-            }
-        }
+    //     // -------- Documents de remplacement (optionnels) --------
+    //     $docs = [];
+    //     foreach (['doc_cnid', 'doc_photo', 'doc_contrat', 'doc_cv'] as $champ) {
+    //         if (!empty($_FILES[$champ]['name'])) {
+    //             $res = $this->_upload_doc($champ);
+    //             if (is_array($res)) {
+    //                 $this->session->set_flashdata('error', $res['error']);
+    //                 redirect('rh-employes');
+    //                 return;
+    //             }
+    //             // Supprime l'ancien fichier du serveur
+    //             if (!empty($ancien->$champ) && file_exists(FCPATH . $ancien->$champ)) {
+    //                 unlink(FCPATH . $ancien->$champ);
+    //             }
+    //             $docs[$champ] = $res;
+    //         }
+    //     }
 
-        // -------- Données à mettre à jour --------
-        $data = array_merge([
-            'nom'                 => $this->input->post('nom'),
-            'prenoms'             => $this->input->post('prenoms'),
-            'sexe'                => $this->input->post('sexe'),
-            'date_naissance'      => $this->input->post('date_naissance') ?: NULL,
-            'etat_civil'          => $this->input->post('etat_civil'),
-            'cnid'                => $this->input->post('cnid'),
-            'telephone'           => $this->input->post('telephone'),
-            'email'               => $this->input->post('email'),
-            'adresse'             => $this->input->post('adresse'),
-            'categorie'           => $this->input->post('categorie'),
-            'fonction'            => $this->input->post('fonction'),
-            'departement'         => $this->input->post('departement'),
-            'site_affectation'    => $this->input->post('site_affectation'),
-            'date_embauche'       => $this->input->post('date_embauche'),
-            'type_contrat'        => $this->input->post('type_contrat'),
-            'date_fin_contrat'    => $this->input->post('date_fin_contrat') ?: NULL,
-            'periode_essai'       => $this->input->post('periode_essai'),
-            'salaire_base'        => $this->input->post('salaire_base'),
-            'mode_paiement'       => $this->input->post('mode_paiement'),
-            'matricule_inss'      => $this->input->post('matricule_inss'),
-            'numero_contribuable' => $this->input->post('numero_contribuable'),
-            'statut'              => $this->input->post('statut'),
-        ], $docs);
+    //     // -------- Données à mettre à jour --------
+    //     $data = array_merge([
+    //         'nom'                 => $this->input->post('nom'),
+    //         'prenoms'             => $this->input->post('prenoms'),
+    //         'sexe'                => $this->input->post('sexe'),
+    //         'date_naissance'      => $this->input->post('date_naissance') ?: NULL,
+    //         'etat_civil'          => $this->input->post('etat_civil'),
+    //         'cnid'                => $this->input->post('cnid'),
+    //         'telephone'           => $this->input->post('telephone'),
+    //         'email'               => $this->input->post('email'),
+    //         'adresse'             => $this->input->post('adresse'),
+    //         'categorie'           => $this->input->post('categorie'),
+    //         'fonction'            => $this->input->post('fonction'),
+    //         'departement'         => $this->input->post('departement'),
+    //         'site_affectation'    => $this->input->post('site_affectation'),
+    //         'date_embauche'       => $this->input->post('date_embauche'),
+    //         'type_contrat'        => $this->input->post('type_contrat'),
+    //         'date_fin_contrat'    => $this->input->post('date_fin_contrat') ?: NULL,
+    //         'periode_essai'       => $this->input->post('periode_essai'),
+    //         'salaire_base'        => $this->input->post('salaire_base'),
+    //         'mode_paiement'       => $this->input->post('mode_paiement'),
+    //         'matricule_inss'      => $this->input->post('matricule_inss'),
+    //         'numero_contribuable' => $this->input->post('numero_contribuable'),
+    //         'statut'              => $this->input->post('statut'),
+    //     ], $docs);
 
-        $this->Employe_model->update($id, $data);
+    //     $this->Employe_model->update($id, $data);
 
-        $this->session->set_flashdata('success', 'Fiche ' . $ancien->matricule . ' mise à jour avec succès.');
-        redirect('rh-employes');
-    }
+    //     $this->session->set_flashdata('success', 'Fiche ' . $ancien->matricule . ' mise à jour avec succès.');
+    //     redirect('rh-employes');
+    // }
 
     public function rhContrats()
     {
@@ -402,8 +574,11 @@ class RhController extends CI_Controller
 
         // 2. Effets automatiques sur la fiche employé
         if (in_array($type, ['Démission', 'Licenciement', 'Fin de contrat', 'Retraite'])) {
-            // Sortie → l'employé passe en "Fin de contrat"
-            $this->Employe_model->update($id_emp, ['statut' => 'Fin de contrat']);
+            $this->Employe_model->update($id_emp, [
+                'statut'          => 'Fin de contrat',
+                'date_sortie'     => $this->input->post('date_effet'),
+                'cause_cessation' => $type,
+            ]);
         } elseif (in_array($type, ['Transfert', 'Promotion']) && $affectation !== '') {
             // Transfert / promotion → mise à jour de l'affectation
             $this->Employe_model->update($id_emp, ['site_affectation' => $affectation]);
