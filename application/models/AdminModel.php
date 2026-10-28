@@ -220,4 +220,33 @@ class AdminModel extends CI_Model
                 'status' => $status
             ]);
     }
+
+    /* ---------- Sauvegarde BD ---------- */
+
+    public function getDatabaseTables()
+    {
+        return $this->db->query(
+            "SELECT TABLE_NAME AS name,
+                    TABLE_ROWS AS rows_count,
+                    (DATA_LENGTH + INDEX_LENGTH) AS size_bytes,
+                    ENGINE AS engine
+             FROM information_schema.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_TYPE = 'BASE TABLE'
+             ORDER BY TABLE_NAME"
+        )->result();
+    }
+
+    public function getDatabaseStats()
+    {
+        return $this->db->query(
+            "SELECT DATABASE() AS db_name,
+                    COUNT(*) AS tables_count,
+                    COALESCE(SUM(DATA_LENGTH + INDEX_LENGTH), 0) AS size_bytes,
+                    COALESCE(SUM(TABLE_ROWS), 0) AS rows_count
+             FROM information_schema.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_TYPE = 'BASE TABLE'"
+        )->row();
+    }
 }

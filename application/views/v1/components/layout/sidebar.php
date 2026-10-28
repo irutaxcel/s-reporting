@@ -257,7 +257,7 @@ $tresoTitles  = ['Caisse', 'Journal de caisse', 'Livre de Caisse', 'Rapport Fina
 $factuTitles  = ['Factures clients', 'Factures fournisseurs', 'Paiements', 'Échéances'];
 $rhTitles     = ['Tableau de bord RH', 'Employés', 'Contrats & mouvements', "Registre d'employeur", 'Temps & présences', 'Congés', 'Paie', 'Discipline', 'Évaluations', 'Rapports & éditions'];
 $crmTitles    = ['Tableau de Bord CRM', 'Clients CRM', 'Devis', 'Projets CRM', 'Chantiers & Avancement', 'Reporting & Statistiques'];
-$adminTitles  = ['Utilisateurs', 'Matrice des access', 'Rôles & Permissions', 'Paramètres'];
+$adminTitles  = ['Utilisateurs', 'Matrice des access', 'Rôles & Permissions', 'Sauvegarde BD', 'Paramètres'];
 $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
 ?>
 
@@ -1076,6 +1076,15 @@ $reportTitles = ['Reporting général', 'Analytique', 'Statistiques'];
                                         class="nav-link <?= $title == 'Rôles & Permissions' ? 'active' : '' ?>">
                                         <i class="fas fa-user-shield nav-icon"></i>
                                         <p>Rôles & Permissions</p>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <?php if (has_access('admin', 'backup')): ?>
+                                <li class="nav-item">
+                                    <a href="<?= base_url('backup') ?>"
+                                        class="nav-link <?= $title == 'Sauvegarde BD' ? 'active' : '' ?>">
+                                        <i class="fas fa-database nav-icon"></i>
+                                        <p>Sauvegarde BD</p>
                                     </a>
                                 </li>
                             <?php endif; ?>

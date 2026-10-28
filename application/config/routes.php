@@ -412,4 +412,11 @@ $route['roles/delete']               = 'AdminController/roleDelete';
 $route['roles/permissions/load']     = 'AdminController/rolePermissionsLoad';
 $route['roles/permissions/save']     = 'AdminController/rolePermissionsSave';
 
+// Sauvegarde base de données
+$route['backup']                  = 'AdminController/backup';
+$route['backup/create']           = 'AdminController/backupCreate';
+// $route['backup/download/(:any)']  = 'AdminController/backupDownload/$1';
+$route['backup/download']         = 'AdminController/backupDownload';
+$route['backup/delete']           = 'AdminController/backupDelete';
+
 $route['settings'] = 'AdminController/settings';

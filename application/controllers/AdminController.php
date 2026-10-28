@@ -715,6 +715,7 @@ class AdminController extends CI_Controller
                 ['code' => 'users',             'label' => 'Utilisateurs',        'icon' => 'fa-users-cog'],
                 ['code' => 'matrice-access',    'label' => 'Matrice des accès',   'icon' => 'fa-th-large'],
                 ['code' => 'roles-permissions', 'label' => 'Rôles & Permissions', 'icon' => 'fa-user-tag'],
+                ['code' => 'backup',            'label' => 'Sauvegarde BD',       'icon' => 'fa-database'],
                 ['code' => 'settings',          'label' => 'Paramètres',          'icon' => 'fa-sliders-h'],
             ]],
         ];
@@ -888,6 +889,210 @@ class AdminController extends CI_Controller
             'message'   => $ok ? 'Permissions enregistrées (' . count($rows) . ' accordées).' : "Échec de l'enregistrement.",
             'csrf_hash' => $this->security->get_csrf_hash(),
         ]);
+    }
+
+    /* =========================================================
+       SAUVEGARDE DE LA BASE DE DONNÉES
+       ========================================================= */
+
+    public function backup()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+        if (!has_access('admin', 'backup')) {
+            show_error('Accès refusé.', 403);
+            return;
+        }
+
+        $data['title']   = 'Sauvegarde BD';
+        $data['backups'] = $this->backupFiles();
+        $data['dbStats'] = $this->admin->getDatabaseStats();
+        $data['tables']  = $this->admin->getDatabaseTables();
+        $data['gzipOk']  = function_exists('gzencode');
+
+        $this->load->view('v1/components/layout/header', $data);
+        $this->load->view('v1/components/layout/sidebar', $data);
+        $this->load->view('v1/components/modules/admin/backup', $data);
+        $this->load->view('v1/components/layout/footer');
+    }
+
+    public function backupCreate()
+    {
+        $this->output->set_content_type('application/json');
+
+        if ($this->input->method() !== 'post' || !$this->session->userdata('user_id')) {
+            return $this->backupJson(['success' => false, 'message' => 'Requête non autorisée.']);
+        }
+        if (!has_access('admin', 'backup')) {
+            return $this->backupJson(['success' => false, 'message' => 'Accès refusé.']);
+        }
+
+        @set_time_limit(0);
+        @ini_set('memory_limit', '1024M');
+
+        // Uniquement les vraies tables (les vues casseraient la restauration)
+        $allTables = array_map(function ($t) {
+            return $t->name;
+        }, $this->admin->getDatabaseTables());
+
+        $mode     = $this->input->post('mode') === 'selection' ? 'selection' : 'all';
+        $selected = (array) ($this->input->post('tables') ?: []);
+        $tables   = $mode === 'selection' ? array_values(array_intersect($selected, $allTables)) : $allTables;
+
+        if (empty($tables)) {
+            return $this->backupJson(['success' => false, 'message' => 'Aucune table sélectionnée.']);
+        }
+
+        $compress = $this->input->post('compress') === '1' && function_exists('gzencode');
+
+        try {
+            $this->load->dbutil();
+            $sql = $this->dbutil->backup([
+                'tables'             => $tables,
+                'format'             => 'txt',
+                'add_drop'           => true,
+                'add_insert'         => true,
+                'newline'            => "\n",
+                'foreign_key_checks' => false,
+            ]);
+        } catch (Throwable $e) {
+            log_message('error', 'Backup BD : ' . $e->getMessage());
+            return $this->backupJson(['success' => false, 'message' => 'Échec de la génération de la sauvegarde.']);
+        }
+
+        $dbName = preg_replace('/[^A-Za-z0-9_\-]/', '', $this->db->database);
+        $user   = trim($this->session->userdata('first_name') . ' ' . $this->session->userdata('last_name'));
+
+        $header  = "-- ==========================================================\n";
+        $header .= "-- SATRACO Construction ERP - Sauvegarde base de données\n";
+        $header .= "-- Base     : {$dbName}\n";
+        $header .= "-- Date     : " . date('Y-m-d H:i:s') . "\n";
+        $header .= "-- Par      : " . ($user !== '' ? $user : 'ID ' . $this->session->userdata('user_id')) . "\n";
+        $header .= "-- Tables   : " . count($tables) . ($mode === 'selection' ? ' (sélection)' : ' (complète)') . "\n";
+        $header .= "-- ==========================================================\n\n";
+        $header .= "SET NAMES utf8mb4;\n\n";
+
+        $content  = $header . $sql;
+        $fileName = 'backup_' . $dbName . '_' . date('Y-m-d_His') . ($mode === 'selection' ? '_partiel' : '') . '.sql';
+
+        if ($compress) {
+            $content   = gzencode($content, 9);
+            $fileName .= '.gz';
+        }
+
+        $path = $this->backupDir() . $fileName;
+        if (@file_put_contents($path, $content) === false) {
+            return $this->backupJson(['success' => false, 'message' => "Impossible d'écrire le fichier (droits sur application/backups/)."]);
+        }
+
+        log_message('info', 'Backup BD créé : ' . $fileName . ' par user ' . $this->session->userdata('user_id'));
+
+        return $this->backupJson([
+            'success' => true,
+            'message' => 'Sauvegarde créée : ' . $fileName . ' (' . count($tables) . ' tables).',
+            'file'    => $fileName,
+        ]);
+    }
+
+    public function backupDownload()
+    {
+        if (!$this->session->userdata('user_id')) {
+            redirect('sign-in');
+            return;
+        }
+        if (!has_access('admin', 'backup')) {
+            show_error('Accès refusé.', 403);
+            return;
+        }
+
+        $file = basename((string) $this->input->get('file', true));
+        $path = $this->backupDir() . $file;
+
+        if (!$this->isValidBackupName($file) || !is_file($path)) {
+            show_404();
+            return;
+        }
+
+        $this->load->helper('download');
+        force_download($path, null);
+    }
+
+    public function backupDelete()
+    {
+        $this->output->set_content_type('application/json');
+
+        if ($this->input->method() !== 'post' || !$this->session->userdata('user_id')) {
+            return $this->backupJson(['success' => false, 'message' => 'Requête non autorisée.']);
+        }
+        if (!has_access('admin', 'backup')) {
+            return $this->backupJson(['success' => false, 'message' => 'Accès refusé.']);
+        }
+
+        $file = basename((string) $this->input->post('file'));
+        $path = $this->backupDir() . $file;
+
+        if (!$this->isValidBackupName($file) || !is_file($path)) {
+            return $this->backupJson(['success' => false, 'message' => 'Fichier introuvable.']);
+        }
+
+        $ok = @unlink($path);
+        if ($ok) {
+            log_message('info', 'Backup BD supprimé : ' . $file . ' par user ' . $this->session->userdata('user_id'));
+        }
+
+        return $this->backupJson([
+            'success' => $ok,
+            'message' => $ok ? 'Sauvegarde supprimée.' : 'Échec de la suppression.',
+        ]);
+    }
+
+    /* ---------- Helpers backup ---------- */
+
+    private function backupDir()
+    {
+        $dir = APPPATH . 'backups/';
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755, true);
+            @file_put_contents(
+                $dir . '.htaccess',
+                "<IfModule authz_core_module>\n    Require all denied\n</IfModule>\n<IfModule !authz_core_module>\n    Deny from all\n</IfModule>\n"
+            );
+            @file_put_contents($dir . 'index.html', '');
+        }
+        return $dir;
+    }
+
+    private function isValidBackupName($name)
+    {
+        return (bool) preg_match('/^backup_[A-Za-z0-9_\-]+\.sql(\.gz)?$/', $name);
+    }
+
+    private function backupFiles()
+    {
+        $dir   = $this->backupDir();
+        $files = [];
+        foreach (scandir($dir) ?: [] as $f) {
+            if (!$this->isValidBackupName($f)) continue;
+            $files[] = [
+                'name'       => $f,
+                'size'       => filesize($dir . $f),
+                'date'       => filemtime($dir . $f),
+                'compressed' => substr($f, -3) === '.gz',
+                'partial'    => strpos($f, '_partiel') !== false,
+            ];
+        }
+        usort($files, function ($a, $b) {
+            return $b['date'] - $a['date'];
+        });
+        return $files;
+    }
+
+    private function backupJson(array $payload)
+    {
+        $payload['csrf_hash'] = $this->security->get_csrf_hash();
+        echo json_encode($payload);
     }
 
     public function settings()

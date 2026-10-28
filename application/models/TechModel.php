@@ -390,7 +390,22 @@ class TechModel extends CI_Model
         $this->db->join('purchase_request_items pri', 'pri.request_id = prf.id', 'left');
 
         // Filtre utilisateur
-        $rolesSeeAll = [1, 2, 3, 4, 7, 24, 30];
+        /*
+        //     * ============================================================
+        //     * FILTRE PAR UTILISATEUR (via created_by)
+        //     * Rôles qui voient TOUTES les demandes :
+        //     *   1  = SUPER_ADMIN
+        //     *   2  = ADMINISTRATEUR_SYSTEM
+        //     *   3  = DIRECTEUR_GENERAL
+        //     *   4  = DIRECTEUR_TECHNIQUE
+        //     *   7  = RESPONSABLE_ADMIN_FINANCIER (DAF)
+        //     *   24 = TRESORIER
+        //     *   30 = ASSISTANT_TRESORERIE
+        //     *   14 = ASSISTANT_ADMIN
+        //     * Tous les autres rôles ne voient que leurs propres demandes.
+        //     * ============================================================
+        //     */
+        $rolesSeeAll = [1, 2, 3, 4, 7, 14, 24, 30];
         if (!empty($filters['user_id']) && !empty($filters['role_id'])) {
             if (!in_array((int) $filters['role_id'], $rolesSeeAll)) {
                 $this->db->where('prf.created_by', (int) $filters['user_id']);
